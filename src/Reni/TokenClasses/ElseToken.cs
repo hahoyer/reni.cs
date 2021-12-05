@@ -5,11 +5,15 @@ using Reni.SyntaxFactory;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ElseToken : TokenClass, IValueToken
+    sealed class ElseToken : TokenClass, IValueToken, IBelongingsMatcher
     {
         public const string TokenId = "else";
-        public override string Id => TokenId;
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => otherMatcher is ThenToken;
 
         IValueProvider IValueToken.Provider => Factory.Else;
+
+        public override string Id => TokenId;
     }
 }

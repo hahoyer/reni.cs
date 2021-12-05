@@ -1,20 +1,20 @@
 ﻿using System.ComponentModel.Composition;
 using hw.DebugFormatter;
-using hw.Helper;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
 namespace ReniVSIX
 {
     [Export(typeof(IClassifierProvider))]
-    [Export(typeof(ITaggerProvider))]
+    [Export(typeof(IViewTaggerProvider))]
     [TagType(typeof(IErrorTag))]
     [TagType(typeof(ITextMarkerTag))]
     [ContentType("reni")]
-    class ClassifierProvider : DumpableObject, IClassifierProvider, ITaggerProvider
+    class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
     {
         [UsedImplicitly]
         [Import]
@@ -24,7 +24,7 @@ namespace ReniVSIX
             => buffer.Properties.GetOrCreateSingletonProperty(()
                 => new Classifier(buffer, ClassificationRegistry));
 
-        ITagger<T> ITaggerProvider.CreateTagger<T>(ITextBuffer buffer) 
-            => new Classifier(buffer, ClassificationRegistry) as ITagger<T>;
+        ITagger<T> IViewTaggerProvider.CreateTagger<T>(ITextView view, ITextBuffer buffer)
+            => new Tagger(view, buffer) as ITagger<T>;
     }
 }

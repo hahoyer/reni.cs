@@ -65,10 +65,16 @@ namespace ReniUI.Classification
         public virtual bool IsBrace => false;
 
         [DisableDump]
+        public virtual bool IsPunctuation => false;
+
+        [DisableDump]
         public virtual string State => "";
 
         [DisableDump]
         public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
+
+        [DisableDump]
+        public virtual Issue Issue => null;
 
         public override bool Equals(object obj)
         {
@@ -108,13 +114,14 @@ namespace ReniUI.Classification
                     return 'k';
                 if(IsIdentifier)
                     return 'i';
+                if(IsBrace)
+                    return 'b';
                 NotImplementedMethod();
                 return '?';
             }
         }
 
-        [DisableDump]
-        public virtual Issue Issue => null;
+        public string Types => GetTypes().Stringify(",");
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
@@ -124,6 +131,42 @@ namespace ReniUI.Classification
 
         [DisableDump]
         public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
+
+        public IEnumerable<Item> Belonging
+        {
+            get
+            {
+                if(IsBraceLike)
+                    return Anchor.ParserLevelGroup.Select(item => new Syntax(item));
+                return new Item[0];
+            }
+        }
+
+        IEnumerable<string> GetTypes()
+        {
+            if(IsError)
+                yield return "error";
+            if(IsComment)
+                yield return "comment";
+            if(IsLineComment)
+                yield return "line-comment";
+            if(IsWhiteSpace)
+                yield return "whitespace";
+            if(IsLineEnd)
+                yield return "line-end";
+            if(IsNumber)
+                yield return "number";
+            if(IsText)
+                yield return "text";
+            if(IsKeyword)
+                yield return "keyword";
+            if(IsIdentifier)
+                yield return "identifier";
+            if(IsBrace)
+                yield return "brace";
+            if(IsBraceLike)
+                yield return "brace-like";
+        }
 
         public Trimmed TrimLine(SourcePart span) => new(this, span);
 
@@ -146,13 +189,20 @@ namespace ReniUI.Classification
             var end = LocateByPosition(target, span.End);
             var result = start.Anchor.CommonRoot(end.Anchor);
             result.AssertIsNotNull();
-            return (result);
+            return result;
         }
 
         public static Item GetRightNeighbor(Helper.Syntax target, int current)
         {
             NotImplementedFunction(target, current);
             return default;
+        }
+
+        public string ShortDump()
+        {
+            var start = SourcePart.Start.TextPosition;
+            return
+                $"{start.LineNumber}/{start.ColumnNumber}: {Types}: {SourcePart.Id.Quote()}";
         }
     }
 }

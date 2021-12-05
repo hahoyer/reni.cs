@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -49,6 +47,8 @@ namespace Reni.TokenClasses
         readonly FunctionCache<bool, string> FlatFormatCache;
         readonly FunctionCache<int, BinaryTree> LocationCache;
 
+        readonly ValueCache<ITokenClass> TokenClassCache;
+
         [DisableDump]
         BinaryTree LeftNeighbor;
 
@@ -75,7 +75,7 @@ namespace Reni.TokenClasses
             Right = right;
             FlatFormatCache = new(GetFlatStringValue);
             LocationCache = new(GetItemByOffset);
-            TokenClassCache = new (GetTokenClass);
+            TokenClassCache = new(GetTokenClass);
 
             SetLinks();
             StopByObjectIds();
@@ -94,8 +94,6 @@ namespace Reni.TokenClasses
             };
 
         int ITree<BinaryTree>.LeftDirectChildCount => 1;
-
-        readonly ValueCache<ITokenClass> TokenClassCache;
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id}{InnerTokenClassPart})";
 
@@ -122,23 +120,6 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal Issue Issue => this.CachedValue(GetIssue);
 
-        Issue GetIssue()
-        {
-            if(TokenClass is not IIssueTokenClass errorToken)
-                return null;
-
-            if(errorToken.IssueId == MissingRightBracket)
-                return errorToken.IssueId.Issue(Right?.SourcePart ?? Token.Characters.End.Span(0));
-            if(errorToken.IssueId == MissingLeftBracket)
-                return errorToken.IssueId.Issue(Left.SourcePart);
-            if(errorToken.IssueId == MissingMatchingRightBracket)
-                return errorToken.IssueId.Issue(Left.Right.SourcePart);
-            if(errorToken.IssueId == EOFInComment || errorToken.IssueId == EOLInString)
-                return errorToken.IssueId.Issue(Token.Characters);
-
-            throw new InvalidEnumArgumentException($"Unexpected issue: {errorToken.IssueId}");
-        }
-
         [DisableDump]
         internal BracketNodes BracketKernel
         {
@@ -152,9 +133,9 @@ namespace Reni.TokenClasses
                 if(errorToken.IssueId == MissingRightBracket)
                     return new() { Left = this, Center = Right, Right = RightMost };
                 if(errorToken.IssueId == MissingLeftBracket)
-                    return new() { Left = Left.LeftMost, Center = Left, Right = this};
+                    return new() { Left = Left.LeftMost, Center = Left, Right = this };
                 if(errorToken.IssueId == MissingMatchingRightBracket)
-                    return new() { Left = Left, Center = Left.Right, Right = this};
+                    return new() { Left = Left, Center = Left.Right, Right = this };
 
                 throw new InvalidEnumArgumentException($"Unexpected Bracket issue: {errorToken.IssueId}");
             }
@@ -166,7 +147,8 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         public bool IsSeparatorRequired
-            => !Token.PrecededWith.HasComment() && SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
+            => !Token.PrecededWith.HasComment() &&
+                SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
 
         [DisableDump]
         IssueId BracketIssueId
@@ -207,6 +189,23 @@ namespace Reni.TokenClasses
         }
 
         bool IsBracketLevel => InnerTokenClass is IRightBracket;
+
+        Issue GetIssue()
+        {
+            if(TokenClass is not IIssueTokenClass errorToken)
+                return null;
+
+            if(errorToken.IssueId == MissingRightBracket)
+                return errorToken.IssueId.Issue(Right?.SourcePart ?? Token.Characters.End.Span(0));
+            if(errorToken.IssueId == MissingLeftBracket)
+                return errorToken.IssueId.Issue(Left.SourcePart);
+            if(errorToken.IssueId == MissingMatchingRightBracket)
+                return errorToken.IssueId.Issue(Left.Right.SourcePart);
+            if(errorToken.IssueId == EOFInComment || errorToken.IssueId == EOLInString)
+                return errorToken.IssueId.Issue(Token.Characters);
+
+            throw new InvalidEnumArgumentException($"Unexpected issue: {errorToken.IssueId}");
+        }
 
         ITokenClass GetTokenClass()
         {
@@ -262,19 +261,24 @@ namespace Reni.TokenClasses
                     .Chain(node => tokenClass.IsBelongingTo(node.Right?.InnerTokenClass)? node.Right : null);
 
             if(tokenClass is IRightBracket)
-            {
-                if(BracketKernel == null)
-                    NotImplementedMethod(tokenClass);
-                return T(BracketKernel.Left, BracketKernel.Right);
-            }
+                return BracketKernel == null? null : T(BracketKernel.Left, BracketKernel.Right);
 
             if(tokenClass is ILeftBracket)
+                return Parent?.BracketKernel == null? null : T(Parent.BracketKernel.Left, Parent.BracketKernel.Right);
+
+            if(tokenClass is ThenToken)
             {
-                NotImplementedMethod(tokenClass);
-                return default;
+                var elseItem = Parent is { TokenClass: ElseToken }? Parent: null;
+                return elseItem == null? default : T(this, elseItem);
             }
 
-            NotImplementedMethod(tokenClass);
+            if(tokenClass is ElseToken)
+            {
+                var thenItem = Right.TokenClass is ThenToken? Right : null;
+                return thenItem == null? default : T(thenItem, this);
+            }
+
+            NotImplementedMethod();
             return default;
         }
 

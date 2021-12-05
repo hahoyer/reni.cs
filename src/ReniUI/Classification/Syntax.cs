@@ -34,7 +34,11 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsBrace
-            => TokenClass is LeftParenthesis || TokenClass is RightParenthesis;
+            => TokenClass is IBracket;
+
+        [EnableDumpExcept(false)]
+        public override bool IsPunctuation
+            => TokenClass is List;
 
         [DisableDump]
         public override string State => Token.Characters.Id ?? "";
