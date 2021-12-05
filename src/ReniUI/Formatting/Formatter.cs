@@ -276,7 +276,7 @@ namespace ReniUI.Formatting
                     thenClause.Anchors.Begin.EnsureLineBreaks(1);
                 if(target.Children.Length == 2)
                     return;
-                NotImplementedMethod(target);
+
                 SetupLineBreaksForChildren(
                     target
                     , putLineBreaksBeforePrefix: true
