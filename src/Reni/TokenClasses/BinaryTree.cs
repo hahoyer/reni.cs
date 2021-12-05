@@ -143,7 +143,7 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         public BinaryTree[] ParserLevelGroup
-            => this.CachedValue(() => GetParserLevelGroup().ToArray());
+            => this.CachedValue(() => GetParserLevelGroup()?.ToArray()??new BinaryTree[0]);
 
         [DisableDump]
         public bool IsSeparatorRequired
