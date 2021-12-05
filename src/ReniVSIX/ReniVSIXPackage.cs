@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.Shell;
+using ReniUI.Formatting;
 
 namespace ReniVSIX
 {
@@ -23,6 +26,10 @@ namespace ReniVSIX
     ///         &gt; in .vsixmanifest file.
     ///     </para>
     /// </remarks>
+    [ProvideService(typeof(ReniService), ServiceName = "Reni Language Service")]
+    [ProvideLanguageService(typeof(ReniService), "Reni", 106)]
+    [ProvideLanguageExtension(typeof(ReniService), ".reni")]
+    [UsedImplicitly]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuidString)]
     public sealed class ReniVSIXPackage : AsyncPackage
@@ -47,8 +54,29 @@ namespace ReniVSIX
         /// </returns>
         protected override async System.Threading.Tasks.Task InitializeAsync
             (CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
-            // Do any initialization that requires the UI thread after switching to the UI thread.
             // When initialized asynchronously, the current thread may be a background thread at this point.
-            => await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            // Do any initialization that requires the UI thread after switching to the UI thread.
+        {
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            Initialize();
+        }
+
+        new void Initialize()
+        {
+            var serviceContainer = this as IServiceContainer;
+            var langService = new ReniService();
+            langService.SetSite(this);
+            serviceContainer.AddService(typeof(ReniService), langService, true);
+        }
+
+        internal IFormatter CreateFormattingProvider()
+        {
+            var pd = (Properties)GetDialogPage(typeof(Properties));
+            return new Configuration
+            {
+                MaxLineLength = pd.MaxLineLength //
+                , EmptyLineLimit = pd.EmptyLineLimit
+            }.Create();
+        }
     }
 }

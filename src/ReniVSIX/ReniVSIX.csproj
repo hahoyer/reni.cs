@@ -46,13 +46,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BufferContainer.cs" />
+    <Compile Include="DummyScanner.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="LanguageClient.cs" />
+    <Compile Include="Properties.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classifier.cs" />
     <Compile Include="ClassifierProvider.cs" />
     <Compile Include="ReniContent.cs" />
+    <Compile Include="ReniService.cs" />
     <Compile Include="ReniVSIXPackage.cs" />
+    <Compile Include="Source.cs" />
+    <Compile Include="SourceWrapper.cs" />
     <Compile Include="Tagger.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +81,9 @@
       <HintPath>..\..\bin\Packages\JetBrains.Annotations.2021.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\bin\Packages\NUnit.3.13.2\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -98,6 +108,9 @@
       <Version>16.11.35</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="NUnit">
+      <Version>3.13.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
