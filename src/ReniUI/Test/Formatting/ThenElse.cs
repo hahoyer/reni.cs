@@ -1,10 +1,10 @@
 using hw.UnitTest;
-using ReniUI.Test;
-using ReniUI.Test.Formatting;
+using NUnit.Framework;
 
 namespace ReniUI.Test.Formatting
 {
     [UnitTest]
+    [TestFixture]
     public sealed class ThenElse : DependenceProvider
     {
         [UnitTest]
@@ -22,6 +22,7 @@ namespace ReniUI.Test.Formatting
         }
 
         [UnitTest]
+        [Test]
         public void SimpleThenElse1()
         {
             const string text = @"ccccccc then aaaaaa else bbbbbbb";
