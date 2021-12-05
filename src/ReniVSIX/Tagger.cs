@@ -12,18 +12,16 @@ namespace ReniVSIX
 {
     class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag>
     {
-        readonly ITextView View;
         SnapshotPoint? Caret;
 
         internal Tagger(ITextView view, ITextBuffer buffer)
             : base(buffer)
         {
-            View = view;
-            View.Caret.PositionChanged += (sender, args) => UpdateAtCaretPosition(args.NewPosition);
-            View.LayoutChanged += (sender, args) =>
+            view.Caret.PositionChanged += (sender, args) => UpdateAtCaretPosition(args.NewPosition);
+            view.LayoutChanged += (sender, args) =>
             {
                 if(args.NewSnapshot != args.OldSnapshot)
-                    UpdateAtCaretPosition(View.Caret.Position);
+                    UpdateAtCaretPosition(view.Caret.Position);
             };
         }
 
@@ -52,7 +50,6 @@ namespace ReniVSIX
                     , new SnapshotSpanEventArgs(new SnapshotSpan(Buffer.CurrentSnapshot, 0
                         , Buffer.CurrentSnapshot.Length)));
         }
-
 
         IEnumerable<ITagSpan<IErrorTag>> GetErrorTag(Item item)
         {
