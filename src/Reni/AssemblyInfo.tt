@@ -21,3 +21,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyProduct("<#=product #>")]
 [assembly: AssemblyCopyright("Copyright © Harald Hoyer <#=DateTime.Today.ToString("yyyy") #>")]
 [assembly: InternalsVisibleTo("ReniUI")]
+[assembly: InternalsVisibleTo("ReniVSIX")]
