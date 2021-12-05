@@ -20,6 +20,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Test\Formatting\Comments.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
     <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
