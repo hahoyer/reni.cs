@@ -13,10 +13,16 @@ namespace ReniUI.Classification
     {
         public sealed class Trimmed : DumpableObject
         {
-            readonly SourcePart SourcePart;
+            [DisableDump]
+            internal readonly Item Item;
+            [DisableDump]
+            internal readonly SourcePart SourcePart;
 
             internal Trimmed(Item item, SourcePart sourcePart)
-                => SourcePart = sourcePart.Intersect(item.SourcePart) ?? item.SourcePart.Start.Span(0);
+            {
+                Item = item;
+                SourcePart = sourcePart.Intersect(item.SourcePart) ?? item.SourcePart.Start.Span(0);
+            }
 
             public IEnumerable<char> GetCharArray()
                 => SourcePart
