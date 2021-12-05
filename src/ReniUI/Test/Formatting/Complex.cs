@@ -2,10 +2,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI;
 using ReniUI.Formatting;
-using ReniUI.Test;
-using ReniUI.Test.Formatting;
 
 namespace ReniUI.Test.Formatting
 {
@@ -98,14 +95,13 @@ namespace ReniUI.Test.Formatting
 
             text.SimpleFormattingTest(expectedText, 120, 1);
         }
-        
+
         [UnitTest]
         public void Reformat1_120EmptyBrackets()
         {
             const string text =
                 @"(
 )";
-
 
 
             text.SimpleFormattingTest(maxLineLength: 120, emptyLineLimit: 1);
@@ -130,7 +126,7 @@ namespace ReniUI.Test.Formatting
     Memory: ((0 type *(125)) mutable) instance();
     !mutable FreePointer: Memory array_reference mutable;
 };";
-            
+
             text.SimpleFormattingTest(expectedText, 60, 0);
         }
 
@@ -169,13 +165,13 @@ llll: bbbbb;
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
-                    new ReniUI.Formatting.Configuration {MaxLineLength = 10, EmptyLineLimit = 0}.Create()
+                    new ReniUI.Formatting.Configuration { MaxLineLength = 10, EmptyLineLimit = 0 }.Create()
                 )
                 .Replace("\r\n", "\n");
 
             var lineCount = newSource.Count(item => item == '\n');
 
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            (newSource == expectedText).Assert("\n\"" + newSource + "\"");
         }
 
         [Test]
@@ -189,6 +185,5 @@ llll: bbbbb;
 
             text.SimpleFormattingTest(expectedText, 12, 1);
         }
-
     }
 }
