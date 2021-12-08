@@ -7,14 +7,14 @@ namespace Reni.Type
         where TProvider : TypeBase
     {
         [EnableDump]
-        readonly TProvider _innerProvider;
+        readonly TProvider InnerProvider;
         [EnableDump]
-        readonly TypeBase _mainProvider;
+        readonly TypeBase MainProvider;
 
         public FeaturePathBridge(TProvider innerProvider, TypeBase mainProvider)
         {
-            _innerProvider = innerProvider;
-            _mainProvider = mainProvider;
+            InnerProvider = innerProvider;
+            MainProvider = mainProvider;
         }
 
     }

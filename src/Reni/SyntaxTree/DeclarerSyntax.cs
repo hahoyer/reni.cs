@@ -2,6 +2,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using JetBrains.Annotations;
 using Reni.Helper;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
@@ -49,6 +50,7 @@ namespace Reni.SyntaxTree
         internal readonly IssueSyntax Issue;
         readonly bool? MeansPublic;
 
+        [UsedImplicitly]
         readonly ValueCache<Syntax[]> DirectChildren;
 
         DeclarerSyntax

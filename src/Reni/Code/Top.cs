@@ -10,26 +10,26 @@ namespace Reni.Code
         [DisableDump]
         internal readonly Size Offset;
 
-        readonly Size _size;
-        readonly Size _dataSize;
+        readonly Size SizeValue;
+        readonly Size DataSizeValue;
 
         protected Top(Size offset, Size size, Size dataSize)
         {
             Offset = offset;
-            _size = size;
-            _dataSize = dataSize;
+            SizeValue = size;
+            DataSizeValue = dataSize;
             StopByObjectIds(-945);
         }
 
-        protected override Size GetSize() => _size;
+        protected override Size GetSize() => SizeValue;
 
         [DisableDump]
         internal override bool IsRelativeReference => true;
 
         [Node]
         [DisableDump]
-        protected internal Size DataSize => _dataSize;
+        protected internal Size DataSize => DataSizeValue;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " Offset=" + Offset + " DataSize=" + _dataSize;
+        protected override string GetNodeDump() => base.GetNodeDump() + " Offset=" + Offset + " DataSize=" + DataSizeValue;
     }
 }

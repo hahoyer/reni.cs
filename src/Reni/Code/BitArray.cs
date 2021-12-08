@@ -1,36 +1,35 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
-
 using Reni.Basics;
 
 namespace Reni.Code
 {
     sealed class BitArray : FiberHead
     {
-        readonly Size _size;
-
         [Node]
         [DisableDump]
         internal readonly BitsConst Data;
 
+        readonly Size SizeValue;
+
         public BitArray(Size size, BitsConst data)
         {
             //Tracer.Assert(size.IsPositive);
-            _size = size;
+            SizeValue = size;
             Data = data;
             StopByObjectIds();
         }
 
         public BitArray()
-            : this(Size.Zero, Basics.BitsConst.None()) {}
+            : this(Size.Zero, Basics.BitsConst.None()) { }
 
-        protected override Size GetSize() => _size;
+        protected override Size GetSize() => SizeValue;
 
         protected override IEnumerable<CodeBase> AsList()
         {
             if(IsHollow)
                 return new CodeBase[0];
-            return new[] {this};
+            return new[] { this };
         }
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
@@ -46,6 +45,6 @@ namespace Reni.Code
 
         protected override string GetNodeDump() => base.GetNodeDump() + " Data=" + Data;
 
-        internal new static BitArray Void => new BitArray(Size.Create(0), Basics.BitsConst.None());
+        internal new static BitArray Void => new(Size.Create(0), Basics.BitsConst.None());
     }
 }

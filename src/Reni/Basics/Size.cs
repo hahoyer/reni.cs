@@ -39,25 +39,25 @@ namespace Reni.Basics
             static void TestNextPacketSize(int x, int b)
             {
                 var xs = Create(x);
-                Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
+                (xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b)).Assert();
             }
         }
 
         static readonly Hashtable Values = new Hashtable();
-        static int _nextObjectId;
-        readonly int _value;
+        static int NextObjectId;
+        readonly int Value;
 
         Size(int value)
-            : base(_nextObjectId++)
-            => _value = value;
+            : base(NextObjectId++)
+            => Value = value;
 
-        public bool IsZero => _value == 0;
+        public bool IsZero => Value == 0;
 
         public int SaveByteCount => SaveSizeToPacketCount(BitsConst.SegmentAlignBits);
         public static Size Zero => Create(0);
         public static Size Bit => Create(1);
         public static Size Byte => Bit.ByteAlignedSize;
-        public bool IsPositive => _value > 0;
+        public bool IsPositive => Value > 0;
         public int ByteCount => SizeToPacketCount(BitsConst.SegmentAlignBits);
         public Size ByteAlignedSize => NextPacketSize(BitsConst.SegmentAlignBits);
 
@@ -100,17 +100,17 @@ namespace Reni.Basics
         public Size Align(int alignBits)
         {
             var result = SizeToPacketCount(alignBits) << alignBits;
-            if(result == _value)
+            if(result == Value)
                 return this;
             return Create(result);
         }
 
-        public int SizeToPacketCount(int alignBits) => ((_value - 1) >> alignBits) + 1;
+        public int SizeToPacketCount(int alignBits) => ((Value - 1) >> alignBits) + 1;
 
         public Size NextPacketSize(int alignBits)
             => Create(SizeToPacketCount(alignBits) << alignBits);
 
-        public int ToInt() => _value;
+        public int ToInt() => Value;
 
         public static bool operator <(Size x, Size y) => x.LessThan(y);
 
@@ -152,14 +152,14 @@ namespace Reni.Basics
 
         public Size Max(Size x)
         {
-            if(_value > x._value)
+            if(Value > x.Value)
                 return this;
             return x;
         }
 
         public Size Min(Size x)
         {
-            if(_value < x._value)
+            if(Value < x.Value)
                 return this;
             return x;
         }
@@ -173,7 +173,7 @@ namespace Reni.Basics
 
         protected override string Dump(bool isRecursion) => GetNodeDump();
 
-        protected override string GetNodeDump() => _value.ToString();
+        protected override string GetNodeDump() => Value.ToString();
 
         internal static Size AutoSize(long value)
         {
@@ -187,7 +187,7 @@ namespace Reni.Basics
         internal void AssertAlignedSize(int alignBits)
         {
             var result = SizeToPacketCount(alignBits);
-            if(result << alignBits == _value)
+            if(result << alignBits == Value)
                 return;
             NotImplementedMethod(alignBits);
 
@@ -202,23 +202,23 @@ namespace Reni.Basics
             return SizeToPacketCount(alignBits);
         }
 
-        bool LessThan(Size x) => _value < x._value;
+        bool LessThan(Size x) => Value < x.Value;
 
-        Size Modulo(Size x) => Create(_value % x._value);
+        Size Modulo(Size x) => Create(Value % x.Value);
 
-        Size Plus(int y) => Create(_value + y);
+        Size Plus(int y) => Create(Value + y);
 
-        Size Times(int y) => Create(_value * y);
+        Size Times(int y) => Create(Value * y);
 
-        Size Minus(int y) => Create(_value - y);
+        Size Minus(int y) => Create(Value - y);
 
-        Size Divide(int y) => Create(_value / y);
+        Size Divide(int y) => Create(Value / y);
 
-        Size Plus(Size y) => Create(_value + y._value);
+        Size Plus(Size y) => Create(Value + y.Value);
 
-        int Divide(Size y) => _value / y._value;
+        int Divide(Size y) => Value / y.Value;
 
-        Size Minus(Size y) => Create(_value - y._value);
+        Size Minus(Size y) => Create(Value - y.Value);
     }
 
     interface IIconKeyProvider

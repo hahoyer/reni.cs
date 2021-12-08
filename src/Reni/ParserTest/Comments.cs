@@ -1,4 +1,3 @@
-using System;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
@@ -14,6 +13,7 @@ namespace Reni.ParserTest
         [Test]
         [UnitTest]
         public void MultiLineMinimal() => PerformTest("#()# outside", 4);
+
         [Test]
         [UnitTest]
         public void MultiLineOneSpace() => PerformTest("#( )# outside", 5);

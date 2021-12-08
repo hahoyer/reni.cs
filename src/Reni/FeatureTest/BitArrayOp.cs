@@ -2,6 +2,7 @@ using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
 
+// ReSharper disable once CheckNamespace
 namespace Reni.FeatureTest.BitArrayOp
 {
     /// <summary>

@@ -3,6 +3,7 @@ using hw.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Helper;
 
+// ReSharper disable once CheckNamespace
 namespace Reni.FeatureTest.DefaultOperations
 {
     [UnitTest]

@@ -16,10 +16,10 @@ namespace Reni.FeatureTest.ConversionService
             var number = new Root(null).BitType.Number(1);
             var types = number.SymmetricFeatureClosure().Types().ToArray();
 
-            Tracer.Assert(types.Contains(number));
-            Tracer.Assert(types.Contains(number.Align));
-            Tracer.Assert(types.Contains(number.Pointer));
-            Tracer.Assert(types.Length == 3, ()=>"\n"+types.Stringify("\n"));
+            types.Contains(number).Assert();
+            types.Contains(number.Align).Assert();
+            types.Contains(number.Pointer).Assert();
+            (types.Length == 3).Assert(()=>"\n"+types.Stringify("\n"));
         }
 
         [UnitTest]
@@ -30,10 +30,10 @@ namespace Reni.FeatureTest.ConversionService
 
             var destinations = paths.Select(p => p.Source).ToArray();
 
-            Tracer.Assert(destinations.Contains(source.Pointer));
-            Tracer.Assert(destinations.Contains(source.Align));
-            Tracer.Assert(destinations.Contains(source));
-            Tracer.Assert(destinations.Length == 2);
+            destinations.Contains(source.Pointer).Assert();
+            destinations.Contains(source.Align).Assert();
+            destinations.Contains(source).Assert();
+            (destinations.Length == 2).Assert();
         }
 
         [UnitTest]
@@ -44,10 +44,10 @@ namespace Reni.FeatureTest.ConversionService
 
             var destinations = paths.Select(p => p.Source).ToArray();
 
-            Tracer.Assert(destinations.Contains(source.Pointer));
-            Tracer.Assert(destinations.Contains(source.Align));
-            Tracer.Assert(destinations.Contains(source));
-            Tracer.Assert(destinations.Length == 2);
+            destinations.Contains(source.Pointer).Assert();
+            destinations.Contains(source.Align).Assert();
+            destinations.Contains(source).Assert();
+            (destinations.Length == 2).Assert();
         }
 
         [UnitTest]
@@ -57,10 +57,10 @@ namespace Reni.FeatureTest.ConversionService
             var paths = Type.ConversionService.ClosureService.Result(source);
             var destinations = paths.Select(p => p.Destination).ToArray();
 
-            Tracer.Assert(destinations.Contains(source.Pointer));
-            Tracer.Assert(destinations.Contains(source.Align));
-            Tracer.Assert(destinations.Contains(source));
-            Tracer.Assert(destinations.Length == 3);
+            destinations.Contains(source.Pointer).Assert();
+            destinations.Contains(source.Align).Assert();
+            destinations.Contains(source).Assert();
+            (destinations.Length == 3).Assert();
         }
 
         [UnitTest]
@@ -70,14 +70,14 @@ namespace Reni.FeatureTest.ConversionService
             var pointer = number.Pointer;
             var paths = pointer.SymmetricPathsClosure().ToArray();
 
-            Tracer.Assert(paths.Select(p => p.Source).Distinct().Single() == pointer);
+            (paths.Select(p => p.Source).Distinct().Single() == pointer).Assert();
 
             var destinations = paths.Select(p => p.Destination).ToArray();
 
-            Tracer.Assert(destinations.Contains(number.Pointer));
-            Tracer.Assert(destinations.Contains(number.Align));
-            Tracer.Assert(destinations.Contains(number));
-            Tracer.Assert(destinations.Length == 3);
+            destinations.Contains(number.Pointer).Assert();
+            destinations.Contains(number.Align).Assert();
+            destinations.Contains(number).Assert();
+            (destinations.Length == 3).Assert();
         }
 
     }

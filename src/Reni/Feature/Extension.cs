@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -19,22 +18,17 @@ namespace Reni.Feature
     {
         static readonly
             FunctionCache<Func<Category, ResultCache, ContextBase, ValueSyntax, Result>, MetaFunction>
-            _metaFunctionCache
-                =
-                new FunctionCache<Func<Category, ResultCache, ContextBase, ValueSyntax, Result>, MetaFunction>
-                    (function => new MetaFunction(function));
+            MetaFunctionCache = new(function => new(function));
 
         static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> ValueCache
-            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
-            (
+            = new(
                 function =>
-                    new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
+                    new(type => new(function, type)));
 
         static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>> ConversionCache
-            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
-            (
+            = new(
                 function =>
-                    new FunctionCache<TypeBase, Conversion>(type => new Conversion(function, type)));
+                    new(type => new(function, type)));
 
         internal static Value Value(Func<Category, Result> function, TypeBase target = null)
             => ValueCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
@@ -50,11 +44,10 @@ namespace Reni.Feature
         )
         {
             var context = (target ?? function.Target as IContextReferenceProvider).AssertNotNull();
-            return new ObjectFunction(function, context);
+            return new(function, context);
         }
 
-        internal static Function FunctionFeature(Func<Category, TypeBase, Result> function)
-            => new Function(function);
+        internal static Function FunctionFeature(Func<Category, TypeBase, Result> function) => new(function);
 
         internal static IImplementation FunctionFeature<T>
             (Func<Category, TypeBase, T, Result> function, T arg)
@@ -63,7 +56,7 @@ namespace Reni.Feature
 
         internal static IValue ExtendedValue(this IImplementation feature)
         {
-            var function = ((IEvalImplementation) feature).Function;
+            var function = ((IEvalImplementation)feature).Function;
             if(function != null && function.IsImplicit)
                 return null;
 
@@ -72,7 +65,7 @@ namespace Reni.Feature
 
         internal static MetaFunction MetaFeature
             (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
-            => _metaFunctionCache[function];
+            => MetaFunctionCache[function];
 
         internal static TypeBase ResultType(this IConversion conversion)
             => conversion.Result(Category.Type).Type;
@@ -80,11 +73,11 @@ namespace Reni.Feature
         internal static Result Result(this IConversion conversion, Category category)
         {
             var result = conversion.Execute(category);
-            Tracer.Assert(result!= null);
+            (result != null).Assert();
 
-            if (!result.HasIssue && category.HasCode && result.Code.ArgType != null)
-                Tracer.Assert
-                    (result.Code.ArgType == conversion.Source, () => result.DebuggerDump());
+            if(!result.HasIssue && category.HasCode && result.Code.ArgType != null)
+                (result.Code.ArgType == conversion.Source).Assert
+                    (() => result.DebuggerDump());
 
             return result;
         }
@@ -117,12 +110,11 @@ namespace Reni.Feature
             Category category,
             IToken currentTarget,
             ContextBase context,
-            ValueSyntax right)
+            ValueSyntax right
+        )
         {
-            Tracer.Assert
-            (
-                feature.Function == null || !feature.Function.IsImplicit || feature.Value == null
-            );
+            (feature.Function == null || !feature.Function.IsImplicit || feature.Value == null).Assert
+                ();
 
             var valueCategory = category;
             if(right != null)
@@ -145,7 +137,7 @@ namespace Reni.Feature
                 if(feature.Function == null)
                     Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
 
-                Tracer.Assert(feature.Function != null);
+                (feature.Function != null).Assert();
 
                 var argsResult = context.ResultAsReferenceCache(right);
                 var argsType = argsResult.Type;
@@ -158,7 +150,7 @@ namespace Reni.Feature
 
             return valueResult
                 .Type
-                .Execute(category, valueResult, currentTarget, definable: null, context: context, right: right);
+                .Execute(category, valueResult, currentTarget, null, context, right);
         }
 
         static Result ValueResult
@@ -166,7 +158,8 @@ namespace Reni.Feature
             this IEvalImplementation feature,
             ContextBase context,
             ValueSyntax right,
-            Category valueCategory)
+            Category valueCategory
+        )
         {
             if(feature.Function != null && feature.Function.IsImplicit)
             {
@@ -191,9 +184,10 @@ namespace Reni.Feature
             ResultCache left,
             IToken token,
             ContextBase context,
-            ValueSyntax right)
+            ValueSyntax right
+        )
         {
-            var metaFeature = ((IMetaImplementation) feature).Function;
+            var metaFeature = ((IMetaImplementation)feature).Function;
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
@@ -204,14 +198,11 @@ namespace Reni.Feature
 
         internal static T DistinctNotNull<T>(this IEnumerable<T> enumerable)
             where T : class
-        {
-            return enumerable
+            => enumerable
                 .Where(x => x != null)
                 .Distinct()
                 .SingleOrDefault();
-        }
 
-        internal static Result Result(this Issue[] issues, Category category) => new Result(category, issues);
-
+        internal static Result Result(this Issue[] issues, Category category) => new(category, issues);
     }
 }

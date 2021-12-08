@@ -11,101 +11,97 @@ namespace Reni.Code
     {
         sealed class Counter : Base
         {
-            readonly Dictionary<LocalReference, int> _references =
-                new Dictionary<LocalReference, int>();
+            readonly Dictionary<LocalReference, int> ReferencesCounts = new();
 
-            public Counter(CodeBase body) { body.Visit(this); }
+            public Counter(CodeBase body) => body.Visit(this);
+
+            internal override CodeBase LocalReference(LocalReference visitedObject)
+            {
+                if(ReferencesCounts.ContainsKey(visitedObject))
+                    ReferencesCounts[visitedObject]++;
+                else
+                    ReferencesCounts.Add(visitedObject, 1);
+                visitedObject.ValueCode.Visit(this);
+                return null;
+            }
 
             internal LocalReference[] SingleReferences
-                => _references
+                => ReferencesCounts
                     .Where(r => r.Value == 1)
                     .Select(r => r.Key)
                     .ToArray();
 
-            internal LocalReference[] References => _references.Keys.ToArray();
-
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-            {
-                if(_references.ContainsKey(visitedObject))
-                    _references[visitedObject]++;
-                else
-                    _references.Add(visitedObject, value: 1);
-                visitedObject.ValueCode.Visit(this);
-                return null;
-            }
+            internal LocalReference[] References => ReferencesCounts.Keys.ToArray();
         }
 
         sealed class Reducer : Base
         {
-            readonly FunctionCache<LocalReference, LocalReference> _map;
-            readonly LocalReference[] _references;
+            public CodeBase NewBody { get; }
+            readonly FunctionCache<LocalReference, LocalReference> Map;
+            readonly LocalReference[] References;
 
             public Reducer(LocalReference[] references, CodeBase body)
             {
-                _references = references;
-                _map = new FunctionCache<LocalReference, LocalReference>(GetReplacementsForCache);
+                References = references;
+                Map = new(GetReplacementsForCache);
                 NewBody = GetNewBody(body);
             }
 
-            public CodeBase NewBody { get; }
+            internal override CodeBase LocalReference(LocalReference visitedObject)
+                => References.Contains(visitedObject)? Map[visitedObject] : null;
 
             CodeBase GetNewBody(CodeBase body)
-                => _references.Any() ? (body.Visit(this) ?? body) : body;
-
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-                => _references.Contains(visitedObject) ? _map[visitedObject] : null;
+                => References.Any()? body.Visit(this) ?? body : body;
 
             LocalReference GetReplacementsForCache(LocalReference reference)
             {
                 var valueCode = reference.ValueCode;
                 return (valueCode.Visit(this) ?? valueCode)
-                    .LocalReference(reference.ValueType, isUsedOnce: true);
+                    .LocalReference(reference.ValueType, true);
             }
         }
 
         sealed class FinalReplacer : Base
         {
-            readonly Size _offset;
-            readonly LocalReference _target;
+            readonly Size Offset;
+            readonly LocalReference Target;
+
+            public FinalReplacer(LocalReference target)
+                : this(Size.Zero, target) { }
 
             FinalReplacer(Size offset, LocalReference target)
             {
-                _offset = offset;
-                _target = target;
-            }
-
-            public FinalReplacer(LocalReference target)
-                : this(Size.Zero, target)
-            {
+                Offset = offset;
+                Target = target;
             }
 
             internal override CodeBase LocalReference(LocalReference visitedObject)
-                => visitedObject != _target
+                => visitedObject != Target
                     ? null
                     : CodeBase
                         .TopRef()
-                        .ReferencePlus(_offset);
+                        .ReferencePlus(Offset);
 
 
             protected override Visitor<CodeBase, FiberItem> After(Size size)
-                => new FinalReplacer(_offset + size, _target);
+                => new FinalReplacer(Offset + size, Target);
         }
 
-        static int _nextObjectId;
-        readonly ValueCache<CodeBase> _reducedBodyCache;
-        readonly ValueCache<LocalReference[]> _referencesCache;
-
-        public RemoveLocalReferences(CodeBase body, CodeBase copier)
-            : base(_nextObjectId++)
-        {
-            Body = body;
-            Copier = copier;
-            _referencesCache = new ValueCache<LocalReference[]>(GetReferencesForCache);
-            _reducedBodyCache = new ValueCache<CodeBase>(GetReducedBodyForCache);
-        }
+        static int NextObjectId;
+        readonly ValueCache<CodeBase> ReducedBodyCache;
+        readonly ValueCache<LocalReference[]> ReferencesCache;
 
         CodeBase Body { get; }
         CodeBase Copier { get; }
+
+        public RemoveLocalReferences(CodeBase body, CodeBase copier)
+            : base(NextObjectId++)
+        {
+            Body = body;
+            Copier = copier;
+            ReferencesCache = new(GetReferencesForCache);
+            ReducedBodyCache = new(GetReducedBodyForCache);
+        }
 
         [DisableDump]
         internal CodeBase NewBody
@@ -121,7 +117,7 @@ namespace Reni.Code
                 {
                     BreakExecution();
 
-                    Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
+                    (!ReducedBody.HasArg).Assert(ReducedBody.Dump);
 
                     Dump(nameof(ReducedBody), ReducedBody);
                     Dump(nameof(References), References);
@@ -129,7 +125,7 @@ namespace Reni.Code
                     var body = ReducedBody;
                     var initialSize = Size.Zero;
 
-                    var cleanup = new Result(Category.Code | Category.Closures, getIsHollow: () => true);
+                    var cleanup = new Result(Category.Code | Category.Closures, () => true);
 
                     foreach(var reference in References)
                     {
@@ -163,8 +159,8 @@ namespace Reni.Code
             }
         }
 
-        LocalReference[] References => _referencesCache.Value;
-        CodeBase ReducedBody => _reducedBodyCache.Value;
+        LocalReference[] References => ReferencesCache.Value;
+        CodeBase ReducedBody => ReducedBodyCache.Value;
 
         CodeBase GetReducedBodyForCache()
             => new Reducer(new Counter(Body).SingleReferences, Body).NewBody;

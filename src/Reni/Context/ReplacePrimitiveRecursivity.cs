@@ -29,13 +29,13 @@ namespace Reni.Context
 {
     sealed class ReplacePrimitiveRecursivity : Base
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [EnableDump]
-        readonly FunctionId _functionId;
+        readonly FunctionId FunctionId;
 
         public ReplacePrimitiveRecursivity(FunctionId functionId)
-            : base(_nextObjectId++) { _functionId = functionId; }
+            : base(NextObjectId++) { FunctionId = functionId; }
 
         internal override CodeBase List(List visitedObject)
         {
@@ -57,6 +57,6 @@ namespace Reni.Context
             return Fiber(visitedObject, null, newItems);
         }
 
-        internal override FiberItem Call(Call visitedObject) => visitedObject.TryConvertToRecursiveCall(_functionId);
+        internal override FiberItem Call(Call visitedObject) => visitedObject.TryConvertToRecursiveCall(FunctionId);
     }
 }

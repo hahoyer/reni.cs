@@ -20,14 +20,14 @@ namespace Reni.Type
             , IChild<TypeBase>
             , ISymbolProvider<StableReference>
     {
-        readonly int _order;
+        readonly int Order;
 
         internal PointerType(TypeBase valueType)
         {
-            _order = Closures.NextOrder++;
+            Order = Closures.NextOrder++;
             ValueType = valueType;
-            Tracer.Assert(!valueType.IsHollow, valueType.Dump);
-            Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
+            (!valueType.IsHollow).Assert(valueType.Dump);
+            valueType.IsPointerPossible.Assert(valueType.Dump);
             StopByObjectIds(-10);
         }
 
@@ -50,7 +50,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsPointerPossible => false;
 
-        int IContextReference.Order => _order;
+        int IContextReference.Order => Order;
         IConversion IReference.Converter => this;
         bool IReference.IsWeak => true;
         IConversion IProxyType.Converter => this;

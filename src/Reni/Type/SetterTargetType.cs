@@ -11,9 +11,9 @@ namespace Reni.Type
     abstract class SetterTargetType
         : TypeBase, IProxyType, IConversion, IValue, IReference, ISymbolProvider<ReassignToken>
     {
-        readonly int _order;
+        readonly int Order;
 
-        protected SetterTargetType() => _order = Closures.NextOrder++;
+        protected SetterTargetType() => Order = Closures.NextOrder++;
 
         TypeBase IConversion.Source => this;
 
@@ -22,7 +22,7 @@ namespace Reni.Type
 
         IConversion IProxyType.Converter => this;
 
-        int IContextReference.Order => _order;
+        int IContextReference.Order => Order;
         bool IReference.IsWeak => true;
         IConversion IReference.Converter => this;
 

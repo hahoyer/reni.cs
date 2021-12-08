@@ -8,7 +8,7 @@ namespace Reni.Code
 {
     sealed class Container : DumpableObject
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [Node]
         internal readonly FunctionId FunctionId;
@@ -19,14 +19,14 @@ namespace Reni.Code
         Container(string errorText) => Description = errorText;
 
         internal Container(CodeBase data, Issue[] issues, string description, FunctionId functionId = null)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Description = description;
             Data = data;
             Issues = issues;
             FunctionId = functionId;
 
-            Tracer.Assert(HasCode != HasIssues);
+            (HasCode != HasIssues).Assert();
         }
 
         bool HasIssues => Issues?.Any() ?? false;

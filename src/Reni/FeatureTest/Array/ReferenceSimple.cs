@@ -1,6 +1,7 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
+// ReSharper disable once CheckNamespace
 namespace Reni.FeatureTest.Reference
 {
     [UnitTest]

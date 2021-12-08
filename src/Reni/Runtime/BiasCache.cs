@@ -8,9 +8,9 @@ namespace Reni.Runtime
 {
     sealed class BiasCache
     {
-        readonly List<byte[]> _data = new List<byte[]>();
-        readonly BigInteger _maxDistance;
-        public BiasCache(BigInteger maxDistance) { _maxDistance = maxDistance; }
+        readonly List<byte[]> Data = new List<byte[]>();
+        readonly BigInteger MaxDistance;
+        public BiasCache(BigInteger maxDistance) { MaxDistance = maxDistance; }
 
         string Dump(Data data, bool isAddress)
         {
@@ -32,9 +32,9 @@ namespace Reni.Runtime
 
         (int, BigInteger) AddBase(byte[] data)
         {
-            Tracer.Assert(data.Length == DataHandler.RefBytes);
-            _data.Add(data);
-            return (_data.Count - 1, 0);
+            (data.Length == DataHandler.RefBytes).Assert();
+            Data.Add(data);
+            return (Data.Count - 1, 0);
         }
 
         static BigInteger Distance(byte[] aa, BigInteger b)
@@ -57,15 +57,15 @@ namespace Reni.Runtime
 
         (int, BigInteger)? Split(byte[] data, bool isAddress)
         {
-            Tracer.Assert(data.Length == DataHandler.RefBytes);
+            (data.Length == DataHandler.RefBytes).Assert();
             var value = new BigInteger(data);
 
-            if(_data.Count > 0)
+            if(Data.Count > 0)
             {
-                var minDistanceIndex = _data.Select(d => Distance(d, value)).MinIndexList().First();
-                if(Distance(_data[minDistanceIndex], value) <= _maxDistance)
+                var minDistanceIndex = Data.Select(d => Distance(d, value)).MinIndexList().First();
+                if(Distance(Data[minDistanceIndex], value) <= MaxDistance)
                     return 
-                        (minDistanceIndex, value - new BigInteger(_data[minDistanceIndex]));
+                        (minDistanceIndex, value - new BigInteger(Data[minDistanceIndex]));
             }
 
             if(isAddress)

@@ -2,6 +2,7 @@ using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Helper;
 
+// ReSharper disable once CheckNamespace
 namespace Reni.FeatureTest.Text
 {
     [UnitTest]

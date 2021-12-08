@@ -94,7 +94,7 @@ namespace Reni.Context
         ValueSyntax CreateMetaDictionary(string source)
         {
             var result = Parent.ParsePredefinedItem(source);
-            Tracer.Assert(!result.Issues.Any());
+            (!result.Issues.Any()).Assert();
             return result.Target;
         }
 

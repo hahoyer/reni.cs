@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -188,6 +189,7 @@ namespace Reni
 
         internal bool? FindIsHollow => HasIsHollow? Data.IsHollow : FindSize?.IsZero;
 
+        [PublicAPI]
         bool? QuickFindIsHollow => HasIsHollow? Data.IsHollow : QuickFindSize?.IsZero;
 
         internal bool SmartIsHollow
@@ -594,7 +596,7 @@ namespace Reni
             (
                 CompleteCategory & category,
                 Issues,
-                () => IsHollow.Value,
+                () => IsHollow.AssertValue(),
                 () => Size,
                 () => Type,
                 () => Code,

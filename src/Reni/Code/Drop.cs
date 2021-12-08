@@ -5,26 +5,26 @@ namespace Reni.Code
 {
     sealed class Drop : FiberItem
     {
-        readonly Size _beforeSize;
-        readonly Size _afterSize;
+        readonly Size BeforeSize;
+        readonly Size AfterSize;
 
         public Drop(Size beforeSize, Size afterSize)
         {
-            _beforeSize = beforeSize;
-            _afterSize = afterSize;
+            BeforeSize = beforeSize;
+            AfterSize = afterSize;
             StopByObjectIds();
         }
 
-        internal override void Visit(IVisitor visitor) => visitor.Drop(_beforeSize, _afterSize);
+        internal override void Visit(IVisitor visitor) => visitor.Drop(BeforeSize, AfterSize);
 
         [DisableDump]
-        internal override Size InputSize => _beforeSize;
+        internal override Size InputSize => BeforeSize;
 
         [DisableDump]
-        internal override Size OutputSize => _afterSize;
+        internal override Size OutputSize => AfterSize;
 
         protected override string GetNodeDump()
-            => base.GetNodeDump() + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize;
+            => base.GetNodeDump() + " BeforeSize=" + BeforeSize + " AfterSize=" + AfterSize;
 
         protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.Drop(this);

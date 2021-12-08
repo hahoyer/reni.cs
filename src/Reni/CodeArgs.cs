@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -59,6 +60,7 @@ namespace Reni
         internal bool HasArg => Contains(Closure.Instance);
         public int Count => Data.Count;
 
+        [UsedImplicitly]
         IContextReference this[int i] => Data[i];
         public Size Size => Sizes.Size;
         public bool IsNone => Count == 0;

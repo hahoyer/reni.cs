@@ -100,7 +100,8 @@ namespace Reni.Runtime
             var result = new byte[bytes];
             fixed(byte* dataPointer = data)
             {
-                (sizeof(long) == sizeof(byte*)).Assert(()=>$"sizeof(long) = {sizeof(long)}, sizeof(byte*) = {sizeof(byte*)}");
+                (sizeof(long) == sizeof(byte*)).Assert(()
+                    => $"sizeof(long) = {sizeof(long)}, sizeof(byte*) = {sizeof(byte*)}");
                 var intPointer = (long)(dataPointer + dataStart);
                 var bytePointer = (byte*)&intPointer;
                 for(var i = 0; i < bytes; i++)
@@ -303,7 +304,7 @@ namespace Reni.Runtime
                 result[i] = data[i];
             if(i < bytes)
             {
-                var sign = (byte)(data[i - 1] < 0? 127 : 0);
+                var sign = (byte)(data[i - 1] >= 128? 127 : 0);
                 for(; i < bytes; i++)
                     result[i] = sign;
             }

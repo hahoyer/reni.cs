@@ -7,25 +7,26 @@ namespace Reni.Code
     sealed class LocalStackReference : DumpableObject, IStackDataAddressBase
     {
         [EnableDump]
-        readonly FunctionCache<string, StackData> _locals;
+        readonly FunctionCache<string, StackData> Locals;
+
         [EnableDump]
-        readonly string _holder;
+        readonly string Holder;
 
         public LocalStackReference(FunctionCache<string, StackData> locals, string holder)
         {
-            _locals = locals;
-            _holder = holder;
+            Locals = locals;
+            Holder = holder;
         }
 
+        string IStackDataAddressBase.Dump() => Holder;
+
         StackData IStackDataAddressBase.GetTop(Size offset, Size size)
-            => _locals[_holder].DoPull(offset).DoGetTop(size);
+            => Locals[Holder].DoPull(offset).DoGetTop(size);
 
         void IStackDataAddressBase.SetTop(Size offset, StackData right)
         {
-            var dataForTrace = ((IStackDataAddressBase) this).GetTop(offset, right.Size);
-            NotImplementedMethod(offset, right);
+            var dataForTrace = ((IStackDataAddressBase)this).GetTop(offset, right.Size);
+            NotImplementedMethod(offset, right, nameof(dataForTrace), dataForTrace);
         }
-
-        string IStackDataAddressBase.Dump() => _holder;
     }
 }

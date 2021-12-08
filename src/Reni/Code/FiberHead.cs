@@ -4,7 +4,7 @@ namespace Reni.Code
 {
     abstract class FiberHead : CodeBase
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         protected FiberHead(int objectId)
             : base(objectId)
@@ -12,7 +12,7 @@ namespace Reni.Code
         }
 
         protected FiberHead()
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
         }
 

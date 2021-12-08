@@ -16,9 +16,9 @@ namespace Reni.Struct
         : DumpableObject, IContextReference, IChild<ContextBase>, ValueCache.IContainer, IRootProvider
 
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
-        readonly int _order;
+        readonly int Order;
 
         [Node]
         internal readonly ContextBase Parent;
@@ -30,9 +30,9 @@ namespace Reni.Struct
         internal readonly FunctionCache<int, CompoundView> View;
 
         internal Compound(CompoundSyntax syntax, ContextBase parent)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
-            _order = Closures.NextOrder++;
+            Order = Closures.NextOrder++;
             Syntax = syntax;
             Parent = parent;
             View = new FunctionCache<int, CompoundView>
@@ -44,7 +44,7 @@ namespace Reni.Struct
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
-        int IContextReference.Order => _order;
+        int IContextReference.Order => Order;
 
         Root IRootProvider.Value => Root;
 
@@ -177,7 +177,7 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int position)
         {
-            Tracer.Assert(!Syntax.PureStatements[position].IsLambda);
+            (!Syntax.PureStatements[position].IsLambda).Assert();
             return AccessResult(category, position, position);
         }
 
@@ -268,7 +268,7 @@ namespace Reni.Struct
         Result GetCleanup(Category category, int index)
         {
             var result = AccessType(EndPosition, index).Cleanup(category);
-            Tracer.Assert(result.CompleteCategory == category);
+            (result.CompleteCategory == category).Assert();
             return result;
         }
 

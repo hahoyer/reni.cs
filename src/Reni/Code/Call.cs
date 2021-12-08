@@ -35,7 +35,7 @@ namespace Reni.Code
 
         [Node]
         [DisableDump]
-        readonly Size _resultSize;
+        readonly Size ResultSize;
 
         [Node]
         [DisableDump]
@@ -44,7 +44,7 @@ namespace Reni.Code
         internal Call(FunctionId functionId, Size resultSize, Size argsAndRefsSize)
         {
             FunctionId = functionId;
-            _resultSize = resultSize;
+            ResultSize = resultSize;
             ArgsAndRefsSize = argsAndRefsSize;
             StopByObjectIds(-1);
         }
@@ -53,7 +53,7 @@ namespace Reni.Code
         internal override Size InputSize => ArgsAndRefsSize;
 
         [DisableDump]
-        internal override Size OutputSize => _resultSize;
+        internal override Size OutputSize => ResultSize;
 
         protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual) => actual.Call(this);
 
@@ -65,7 +65,7 @@ namespace Reni.Code
         {
             if(FunctionId != functionId)
                 return this;
-            Tracer.Assert(_resultSize.IsZero);
+            ResultSize.IsZero.Assert();
             return CodeBase.RecursiveCall(ArgsAndRefsSize);
         }
     }

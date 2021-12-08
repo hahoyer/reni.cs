@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         {
             var leftType = left.Type(context);
-            Tracer.Assert(leftType != null);
+            (leftType != null).Assert();
             return leftType
                 .InstanceResult(category, c => context.ResultAsReference(c, right));
         }

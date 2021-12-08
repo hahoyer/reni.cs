@@ -10,7 +10,7 @@ namespace Reni.Feature
             , IImplementation
             , IValue
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [EnableDump]
         internal Func<Category, Result> Function { get; }
@@ -18,11 +18,11 @@ namespace Reni.Feature
         TypeBase Source { get; }
 
         internal Value(Func<Category, Result> function, TypeBase source)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Function = function;
             Source = source;
-            Tracer.Assert(Source != null);
+            (Source != null).Assert();
         }
 
         IFunction IEvalImplementation.Function => null;

@@ -12,7 +12,7 @@ namespace Reni.FeatureTest.Helper
 
         internal abstract void AssertLike(ValueSyntax syntax);
         public static LikeSyntax Null => new Empty();
-        public LikeSyntax dump_print => Expression("dump_print");
+        public LikeSyntax DumpPrint => Expression("dump_print");
         public static LikeSyntax Number(int i) => new Number(i);
 
         public static LikeSyntax Expression(LikeSyntax s1, string s2, LikeSyntax s3)
@@ -90,35 +90,35 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Declaration
     {
-        readonly string _name;
-        readonly int _position;
+        readonly string Name;
+        readonly int Position;
 
         public Declaration(string name, int position)
         {
-            _name = name;
-            _position = position;
+            Name = name;
+            Position = position;
         }
 
         public void AssertContains(CompoundSyntax container)
         {
-            var s = container.Find(_name, false);
+            var s = container.Find(Name, false);
 
             (s != null).Assert();
-            (_position == s.Value).Assert();
+            (Position == s.Value).Assert();
         }
     }
 
     sealed class Struct : LikeSyntax
     {
-        readonly int[] _converters;
-        readonly Declaration[] _declarations;
-        readonly LikeSyntax[] _list;
+        readonly int[] Converters;
+        readonly Declaration[] Declarations;
+        readonly LikeSyntax[] List;
 
         public Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters)
         {
-            _list = list;
-            _declarations = declarations;
-            _converters = converters;
+            List = list;
+            Declarations = declarations;
+            Converters = converters;
         }
 
         internal override void AssertLike(BinaryTree target)
@@ -127,51 +127,51 @@ namespace Reni.FeatureTest.Helper
         internal override void AssertLike(ValueSyntax syntax)
         {
             var co = (CompoundSyntax)syntax;
-            (_list.Length == co.PureStatements.Length).Assert();
-            for(var i = 0; i < _list.Length; i++)
-                _list[i].AssertLike(co.PureStatements[i]);
+            (List.Length == co.PureStatements.Length).Assert();
+            for(var i = 0; i < List.Length; i++)
+                List[i].AssertLike(co.PureStatements[i]);
 
-            (_declarations.Length == co.AllNames.Length).Assert();
-            foreach(var declaration in _declarations)
+            (Declarations.Length == co.AllNames.Length).Assert();
+            foreach(var declaration in Declarations)
                 declaration.AssertContains(co);
 
-            (_converters.Length == co.ConverterStatementPositions.Length).Assert();
-            for(var i = 0; i < _converters.Length; i++)
-                (_converters[i] == co.ConverterStatementPositions[i]).Assert();
+            (Converters.Length == co.ConverterStatementPositions.Length).Assert();
+            for(var i = 0; i < Converters.Length; i++)
+                (Converters[i] == co.ConverterStatementPositions[i]).Assert();
         }
     }
 
     sealed class Expression : LikeSyntax
     {
         [EnableDump]
-        readonly LikeSyntax _s1;
+        readonly LikeSyntax S1;
 
         [EnableDump]
-        readonly string _s2;
+        readonly string S2;
 
         [EnableDump]
-        readonly LikeSyntax _s3;
+        readonly LikeSyntax S3;
 
         public Expression(LikeSyntax s1, string s2, LikeSyntax s3)
         {
-            _s1 = s1;
-            _s2 = s2;
-            _s3 = s3;
+            S1 = s1;
+            S2 = s2;
+            S3 = s3;
         }
 
         internal override void AssertLike(BinaryTree target)
         {
-            (target.TokenClass.Id == _s2).Assert(() => $"\nTarget: {target.Dump()}\nPattern: {Dump()}");
-            AssertLike(_s1, target.Left);
-            AssertLike(_s3, target.Right);
+            (target.TokenClass.Id == S2).Assert(() => $"\nTarget: {target.Dump()}\nPattern: {Dump()}");
+            AssertLike(S1, target.Left);
+            AssertLike(S3, target.Right);
         }
 
         internal override void AssertLike(ValueSyntax syntax)
         {
             var ex = (ExpressionSyntax)syntax;
-            AssertLike(_s1, ex.Left);
-            (ex.Definable?.Id == _s2).Assert();
-            AssertLike(_s3, ex.Right);
+            AssertLike(S1, ex.Left);
+            (ex.Definable?.Id == S2).Assert();
+            AssertLike(S3, ex.Right);
         }
 
         static void AssertLike(LikeSyntax syntax, ValueSyntax right)
@@ -193,23 +193,23 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Number : LikeSyntax
     {
-        readonly long _i;
+        readonly long I;
 
-        internal Number(long i) => _i = i;
+        internal Number(long i) => I = i;
 
         internal override void AssertLike(BinaryTree target)
         {
             (target.Left == null).Assert();
             (target.Right == null).Assert();
             (target.TokenClass is TokenClasses.Number).Assert();
-            (BitsConst.Convert(target.Token.Characters.Id).ToInt64() == _i).Assert();
+            (BitsConst.Convert(target.Token.Characters.Id).ToInt64() == I).Assert();
         }
 
         internal override void AssertLike(ValueSyntax syntax)
         {
             var terminalSyntax = (TerminalSyntax)syntax;
             (terminalSyntax.Terminal is TokenClasses.Number).Assert();
-            (terminalSyntax.ToNumber == _i).Assert();
+            (terminalSyntax.ToNumber == I).Assert();
         }
     }
 }

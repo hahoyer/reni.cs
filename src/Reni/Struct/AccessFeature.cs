@@ -3,7 +3,6 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.SyntaxTree;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -15,26 +14,29 @@ namespace Reni.Struct
             , IConversion
             , ResultCache.IResultProvider
     {
-        static int _nextObjectId;
-
-        internal AccessFeature(CompoundView compoundView, int position)
-            : base(_nextObjectId++)
-        {
-            View = compoundView;
-            Position = position;
-            FunctionFeature = new ValueCache<IFunction>(ObtainFunctionFeature);
-            StopByObjectIds();
-        }
+        static int NextObjectId;
 
         [EnableDump]
         public CompoundView View { get; }
+
         [EnableDump]
         public int Position { get; }
 
         ValueCache<IFunction> FunctionFeature { get; }
 
-        IMeta IMetaImplementation.Function
-            => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
+        internal AccessFeature(CompoundView compoundView, int position)
+            : base(NextObjectId++)
+        {
+            View = compoundView;
+            Position = position;
+            FunctionFeature = new(ObtainFunctionFeature);
+            StopByObjectIds();
+        }
+
+        Result IConversion.Execute(Category category)
+            => Result(category).ConvertToConverter(View.Type.Pointer);
+
+        TypeBase IConversion.Source => View.Type.Pointer;
 
         IFunction IEvalImplementation.Function => FunctionFeature.Value;
 
@@ -49,12 +51,8 @@ namespace Reni.Struct
             }
         }
 
-        Result IConversion.Execute(Category category)
-            => Result(category).ConvertToConverter(View.Type.Pointer);
-
-        TypeBase IConversion.Source => View.Type.Pointer;
-
-        Result IValue.Execute(Category category) => Result(category);
+        IMeta IMetaImplementation.Function
+            => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
@@ -64,12 +62,14 @@ namespace Reni.Struct
             return null;
         }
 
-        Result Result(Category category) => View.AccessViaObject(category, Position);
+        Result IValue.Execute(Category category) => Result(category);
 
         ValueSyntax Statement => View
             .Compound
             .Syntax
             .PureStatements[Position];
+
+        Result Result(Category category) => View.AccessViaObject(category, Position);
 
         IFunction ObtainFunctionFeature()
         {
@@ -79,7 +79,7 @@ namespace Reni.Struct
 
             var valueType = View.ValueType(Position);
             StopByObjectIds();
-            return ((IEvalImplementation) valueType.CheckedFeature)?.Function;
+            return ((IEvalImplementation)valueType.CheckedFeature)?.Function;
         }
     }
 }

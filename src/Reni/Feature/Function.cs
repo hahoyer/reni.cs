@@ -9,26 +9,26 @@ namespace Reni.Feature
 {
     abstract class ObjectFunctionBase : DumpableObject, IFunction
     {
-        readonly Func<Category, IContextReference, TypeBase, Result> _function;
-        readonly IContextReferenceProvider _target;
-        static int _nextObjectId;
+        readonly Func<Category, IContextReference, TypeBase, Result> Function;
+        readonly IContextReferenceProvider Target;
+        static int NextObjectId;
         [UsedImplicitly]
-        readonly int _order;
+        readonly int Order;
 
         protected ObjectFunctionBase
             (Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
-            _order = Closures.NextOrder++;
-            _function = function;
-            _target = target;
+            Order = Closures.NextOrder++;
+            Function = function;
+            Target = target;
         }
 
         Result IFunction.Result(Category category, TypeBase argsType)
-            => _function(category, ObjectReference, argsType);
+            => Function(category, ObjectReference, argsType);
 
         bool IFunction.IsImplicit => false;
-        IContextReference ObjectReference => _target.ContextReference;
+        IContextReference ObjectReference => Target.ContextReference;
     }
 
     sealed class ObjectFunction : ObjectFunctionBase, IImplementation
@@ -43,33 +43,33 @@ namespace Reni.Feature
 
     sealed class Function : FunctionFeatureImplementation
     {
-        readonly Func<Category, TypeBase, Result> _function;
+        readonly Func<Category, TypeBase, Result> Data;
 
-        internal Function(Func<Category, TypeBase, Result> function) { _function = function; }
+        internal Function(Func<Category, TypeBase, Result> function) { Data = function; }
 
-        protected override Result Result(Category category, TypeBase argsType) => _function(category, argsType);
+        protected override Result Result(Category category, TypeBase argsType) => Data(category, argsType);
         protected override bool IsImplicit => false;
     }
 
     sealed class ExtendedFunction<T> : FunctionFeatureImplementation
     {
-        static int _nextObjectId;
+        static int NextObjectId;
         [UsedImplicitly]
-        readonly int _order;
+        readonly int Order;
 
-        readonly Func<Category, TypeBase, T, Result> _function;
-        readonly T _arg;
+        readonly Func<Category, TypeBase, T, Result> Function;
+        readonly T Argument;
 
-        public ExtendedFunction(Func<Category, TypeBase, T, Result> function, T arg)
-            : base(_nextObjectId++)
+        public ExtendedFunction(Func<Category, TypeBase, T, Result> function, T argument)
+            : base(NextObjectId++)
         {
-            _order = Closures.NextOrder++;
-            _function = function;
-            _arg = arg;
-            Tracer.Assert(_function.Target is IContextReferenceProvider);
+            Order = Closures.NextOrder++;
+            Function = function;
+            Argument = argument;
+            (Function.Target is IContextReferenceProvider).Assert();
         }
 
-        protected override Result Result(Category category, TypeBase argsType) => _function(category, argsType, _arg);
+        protected override Result Result(Category category, TypeBase argsType) => Function(category, argsType, Argument);
         protected override bool IsImplicit => false;
     }
 }

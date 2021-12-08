@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 
 namespace Reni.Basics
 {
@@ -179,6 +180,7 @@ namespace Reni.Basics
             HasType == x.HasType &&
             HasIsHollow == x.HasIsHollow;
 
+        [PublicAPI]
         bool IsLessThan(Category x) =>
             !HasCode && x.HasCode ||
             !HasClosures && x.HasClosures ||

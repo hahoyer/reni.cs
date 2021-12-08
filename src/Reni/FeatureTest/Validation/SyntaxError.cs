@@ -4,6 +4,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using hw.UnitTest;
+using JetBrains.Annotations;
 using Reni.FeatureTest.Helper;
 using Reni.Parser;
 using Reni.Validation;
@@ -56,6 +57,7 @@ world'
     {
         const string Pattern = ".reni({0},{1},{2},{3}): error {4}: ";
 
+        [UsedImplicitly]
         const string RegExPattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
 
         internal static bool IsLogDumpLike

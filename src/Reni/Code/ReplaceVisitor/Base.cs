@@ -9,17 +9,17 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     abstract class Base : Visitor<CodeBase, FiberItem>
     {
-        readonly FunctionCache<LocalReference, LocalReference> _internalRefs;
+        readonly FunctionCache<LocalReference, LocalReference> InternalRefs;
 
         protected Base(int objectId)
             : base(objectId)
         {
-            _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
+            InternalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
         }
 
         protected Base()
         {
-            _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
+            InternalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
         }
 
         internal override CodeBase Arg(Arg visitedObject) => null;
@@ -28,7 +28,7 @@ namespace Reni.Code.ReplaceVisitor
         internal override CodeBase Default(CodeBase codeBase) => null;
 
         internal override CodeBase LocalReference(LocalReference visitedObject)
-            => _internalRefs[visitedObject];
+            => InternalRefs[visitedObject];
 
         protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
         {

@@ -120,8 +120,7 @@ namespace Reni.Type
             => ((ArrayType) Value).Mutable.TypeType.Result(category);
         Result ArrayReferenceResult(Category category)
             => ((ArrayType) Value).Reference(true).TypeType.Result(category);
-        Result ArrayAccessResult(Category category)
-            => ((ArrayType) Value).ElementType.TypeType.Result(category);
+
         Result MutableReferenceResult(Category category)
             => ((ArrayReferenceType) Value).Mutable.TypeType.Result(category);
     }

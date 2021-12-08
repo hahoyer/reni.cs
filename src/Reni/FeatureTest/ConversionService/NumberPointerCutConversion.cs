@@ -15,12 +15,13 @@ namespace Reni.FeatureTest.ConversionService
             var destination = new Root(null).BitType.Number(6);
             var path = Type.ConversionService.FindPath(source, destination);
 
-            Tracer.Assert(path != null);
+            (path != null).Assert();
 
-            var calulatedDestination = path.Execute(Category.Type).Type;
-            Tracer.Assert(calulatedDestination == destination);
+            var calculatedDestination = path.Execute(Category.Type).Type;
+            (calculatedDestination == destination).Assert();
 
             var code = path.Execute(Category.Code.WithType).Code.ReplaceArg(source.ArgResult(Category.Code.WithType));
+            code.AssertIsNotNull();
         }
     }
 }

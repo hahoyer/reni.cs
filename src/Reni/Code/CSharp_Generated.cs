@@ -38,13 +38,13 @@ namespace Reni.Code
             
             #line 11 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 
-        GenerateCSharpCode(_main);
-        for (var i = 0; i < _functions.Count; i++)
+        GenerateCSharpCode(Main);
+        for (var i = 0; i < Functions.Count; i++)
         {
-	        if(_functions[i].Getter != null)
-	            GenerateCSharpFunctionCode(_functions[i].Getter);
-            if (_functions[i].Setter != null)
-	            GenerateCSharpFunctionCode(_functions[i].Setter);
+	        if(Functions[i].Getter != null)
+	            GenerateCSharpFunctionCode(Functions[i].Getter);
+            if (Functions[i].Setter != null)
+	            GenerateCSharpFunctionCode(Functions[i].Setter);
         }	     
 	
             

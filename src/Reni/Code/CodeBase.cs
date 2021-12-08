@@ -78,7 +78,6 @@ namespace Reni.Code
 
         internal CodeBase Assignment(Size size)
         {
-            var refAlignParam = Root.DefaultRefAlignParam;
             var alignedSize = size.ByteAlignedSize;
             return Add(new Assign(alignedSize));
         }
@@ -119,7 +118,7 @@ namespace Reni.Code
             return Add(new BitCast(size, Size, Size));
         }
 
-        CodeBase Sequence(params CodeBase[] data) => List(this.plus(data));
+        CodeBase Sequence(params CodeBase[] data) => List(this.Plus(data));
 
         protected virtual IEnumerable<CodeBase> AsList() => new[] {this};
 
@@ -231,7 +230,7 @@ namespace Reni.Code
             if(initialSize.IsZero)
                 return this;
 
-            Tracer.Assert(copier.IsEmpty);
+            copier.IsEmpty.Assert();
             return Add(new Drop(Size, Size - initialSize));
         }
 

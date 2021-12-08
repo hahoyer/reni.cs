@@ -10,22 +10,22 @@ namespace Reni.Type
     sealed class Pair : TypeBase
     {
         [EnableDump]
-        readonly TypeBase _first;
+        readonly TypeBase First;
         [EnableDump]
-        readonly TypeBase _second;
+        readonly TypeBase Second;
 
         internal Pair(TypeBase first, TypeBase second)
         {
-            Tracer.Assert(first.Root == second.Root);
-            _first = first;
-            _second = second;
+            (first.Root == second.Root).Assert();
+            First = first;
+            Second = second;
         }
 
         [DisableDump]
-        internal override bool IsHollow => _first.IsHollow && _second.IsHollow;
+        internal override bool IsHollow => First.IsHollow && Second.IsHollow;
         [DisableDump]
-        internal override Root Root => _first.Root;
-        protected override Size GetSize() => _first.Size + _second.Size;
+        internal override Root Root => First.Root;
+        protected override Size GetSize() => First.Size + Second.Size;
 
         [DisableDump]
         internal override string DumpPrintText
@@ -62,7 +62,7 @@ namespace Reni.Type
         {
             get
             {
-                var result = new List<TypeBase>(_first.ToList) {_second};
+                var result = new List<TypeBase>(First.ToList) {Second};
                 return result.ToArray();
             }
         }

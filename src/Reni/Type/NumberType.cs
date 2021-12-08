@@ -175,7 +175,7 @@ namespace Reni.Type
 
         CodeBase OperationCode(Size resultSize, string token, TypeBase right)
         {
-            Tracer.Assert(!(right is PointerType));
+            (!(right is PointerType)).Assert();
             return Align
                 .Pair(right.Align)
                 .ArgCode

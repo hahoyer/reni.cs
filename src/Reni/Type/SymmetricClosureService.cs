@@ -21,8 +21,8 @@ namespace Reni.Type
 
         TypeBase Source { get; }
         IEnumerable<IConversion> AllFeatures { get; }
-        List<TypeBase> _foundTypes;
-        List<IConversion> _newFeatures;
+        List<TypeBase> FoundTypes;
+        List<IConversion> NewFeatures;
 
         internal SymmetricClosureService(TypeBase source)
         {
@@ -41,29 +41,29 @@ namespace Reni.Type
             foreach(var feature in AllFeatures.Where(feature => navigator.Start(feature) == startType))
             {
                 var destination = navigator.End(feature);
-                if(_foundTypes.Contains(destination))
+                if(FoundTypes.Contains(destination))
                     continue;
-                _foundTypes.Add(destination);
+                FoundTypes.Add(destination);
                 var newFeature = navigator.Combine(startFeature, feature);
                 if(newFeature == null)
                     continue;
                 yield return newFeature;
-                _newFeatures.Add(newFeature);
+                NewFeatures.Add(newFeature);
             }
         }
 
         internal IEnumerable<IConversion> Execute(INavigator navigator)
         {
-            _foundTypes = new List<TypeBase>();
-            _newFeatures = new List<IConversion>();
+            FoundTypes = new List<TypeBase>();
+            NewFeatures = new List<IConversion>();
 
             foreach(var feature in Combination(navigator))
                 yield return feature;
 
-            while(_newFeatures.Any())
+            while(NewFeatures.Any())
             {
-                var features = _newFeatures;
-                _newFeatures = new List<IConversion>();
+                var features = NewFeatures;
+                NewFeatures = new List<IConversion>();
                 foreach(var feature in features.SelectMany(f => Combination(navigator, f)))
                     yield return feature;
             }

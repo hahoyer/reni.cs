@@ -6,18 +6,18 @@ namespace Reni.Code
     internal sealed class BitsStackData : NonListStackData
     {
         [EnableDump]
-        private readonly BitsConst _data;
+        private readonly BitsConst Data;
 
         public BitsStackData(BitsConst data, IOutStream outStream)
             : base(outStream)
         {
-            _data = data;
-            Tracer.Assert(!_data.Size.IsZero);
+            Data = data;
+            (!Data.Size.IsZero).Assert();
         }
 
-        protected override string Dump(bool isRecursion) => _data.DumpValue();
+        protected override string Dump(bool isRecursion) => Data.DumpValue();
 
-        internal override BitsConst GetBitsConst() => _data;
+        internal override BitsConst GetBitsConst() => Data;
         protected override StackData GetTop(Size size)
         {
             if (size < Size)
@@ -28,7 +28,7 @@ namespace Reni.Code
         protected override StackData Pull(Size size)
         {
             if(size <= Size)
-                return new BitsStackData(_data.ShiftDown(size),OutStream);
+                return new BitsStackData(Data.ShiftDown(size),OutStream);
             return base.Pull(size);
         }
         internal override Size Size => GetBitsConst().Size;

@@ -9,16 +9,16 @@ namespace Reni.Code
     /// </summary>
     sealed class BitCast : FiberItem
     {
-        static int _nextId;
+        static int NextId;
 
         [Node]
         [DisableDump]
         internal readonly Size InputDataSize;
 
         internal BitCast(Size outputSize, Size inputSize, Size inputDataSize)
-            : base(_nextId++)
+            : base(NextId++)
         {
-            Tracer.Assert(outputSize != inputSize || inputSize != inputDataSize);
+            (outputSize != inputSize || inputSize != inputDataSize).Assert();
             OutputSize = outputSize;
             InputSize = inputSize;
             InputDataSize = inputDataSize;
@@ -41,7 +41,7 @@ namespace Reni.Code
                 return new FiberItem[0];
             if(OutputSize == preceding.InputSize && OutputSize == inputDataSize)
                 return new FiberItem[0];
-            return new[] {new BitCast(OutputSize, preceding.InputSize, inputDataSize)};
+            return new FiberItem[] {new BitCast(OutputSize, preceding.InputSize, inputDataSize)};
         }
 
         internal override CodeBase TryToCombineBack(BitArray precedingElement)

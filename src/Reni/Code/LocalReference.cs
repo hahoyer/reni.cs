@@ -8,14 +8,14 @@ namespace Reni.Code
 {
     sealed class LocalReference : FiberHead
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         public LocalReference(TypeBase valueType, CodeBase valueCode, bool isUsedOnce)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             ValueType = valueType;
             ValueCode = valueCode;
-            Tracer.Assert(valueCode.Size == ValueType.Size);
+            (valueCode.Size == ValueType.Size).Assert();
             IsUsedOnce = isUsedOnce;
             StopByObjectIds();
         }

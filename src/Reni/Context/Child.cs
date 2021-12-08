@@ -8,20 +8,15 @@ namespace Reni.Context
 {
     abstract class Child : ContextBase
     {
-        public sealed override string GetContextIdentificationDump()
-            => Parent.GetContextIdentificationDump()
-                + GetContextChildIdentificationDump();
+        [DisableDump]
+        readonly ContextBase Parent;
+
+        internal Child(ContextBase parent) => Parent = parent;
 
         protected abstract string GetContextChildIdentificationDump();
 
-        [DisableDump]
-        readonly ContextBase _parent;
-
-        internal Child(ContextBase parent) { _parent = parent; }
-
-        [Node]
-        [DisableDump]
-        internal ContextBase Parent => _parent;
+        public sealed override string GetContextIdentificationDump()
+            => Parent.GetContextIdentificationDump() + GetContextChildIdentificationDump();
 
         [DisableDump]
         internal override bool IsRecursionMode => Parent.IsRecursionMode;
@@ -39,11 +34,11 @@ namespace Reni.Context
             (TDefinable tokenClass)
         {
             var result = base.Declarations(tokenClass).ToArray();
-            return result.Any() ? result : Parent.Declarations(tokenClass);
+            return result.Any()? result : Parent.Declarations(tokenClass);
         }
 
         [DisableDump]
         internal override IEnumerable<ContextBase> ParentChain
-            => _parent.ParentChain.Concat(base.ParentChain);
+            => Parent.ParentChain.Concat(base.ParentChain);
     }
 }

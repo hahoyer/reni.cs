@@ -13,7 +13,7 @@ namespace Reni.Code
     public sealed class CodeContainer : DumpableObject, ValueCache.IContainer
     {
         [Node]
-        readonly FunctionCache<int, FunctionContainer> _functions;
+        readonly FunctionCache<int, FunctionContainer> FunctionsCache;
 
         readonly ValueCache<string> CSharpStringCache;
 
@@ -29,13 +29,13 @@ namespace Reni.Code
             Root = root;
             MainCache = new ValueCache<Container>(() => root.MainContainer(syntax, description));
             CSharpStringCache = new ValueCache<string>(GetCSharpStringForCache);
-            _functions = new FunctionCache<int, FunctionContainer>(Root.FunctionContainer);
+            FunctionsCache= new FunctionCache<int, FunctionContainer>(Root.FunctionContainer);
         }
 
         internal IEnumerable<Issue> Issues
             => Main
                 .Issues
-                .plus(Functions.SelectMany(f => f.Value.Issues));
+                .Plus(Functions.SelectMany(f => f.Value.Issues));
 
         internal Container Main => MainCache.Value;
 
@@ -47,8 +47,8 @@ namespace Reni.Code
             get
             {
                 for(var i = 0; i < Root.FunctionCount; i++)
-                    _functions.IsValid(i, true);
-                return _functions;
+                    FunctionsCache.IsValid(i, true);
+                return FunctionsCache;
             }
         }
 
@@ -58,7 +58,7 @@ namespace Reni.Code
         {
             var result = "main\n" + Main.Dump() + "\n";
             for(var i = 0; i < Root.FunctionCount; i++)
-                result += "function index=" + i + "\n" + _functions[i].Dump() + "\n";
+                result += "function index=" + i + "\n" + FunctionsCache[i].Dump() + "\n";
             return result;
         }
 
@@ -67,7 +67,7 @@ namespace Reni.Code
 
         internal CodeBase Function(FunctionId functionId)
         {
-            var item = _functions[functionId.Index];
+            var item = FunctionsCache[functionId.Index];
             var container = functionId.IsGetter? item.Getter : item.Setter;
             return container.Data;
         }

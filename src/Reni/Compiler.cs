@@ -116,6 +116,7 @@ namespace Reni
         [Node]
         internal string CSharpString => this.CachedValue(() => CodeContainer?.CSharpString);
 
+        [UsedImplicitly]
         bool IsTraceEnabled
             => IsInExecutionPhase && Parameters.TraceOptions.Functions;
 

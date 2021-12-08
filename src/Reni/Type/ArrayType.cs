@@ -26,10 +26,10 @@ namespace Reni.Type
     {
         [Node]
         [SmartNode]
-        readonly ValueCache<RepeaterAccessType> _repeaterAccessTypeCache;
+        readonly ValueCache<RepeaterAccessType> RepeaterAccessTypeCache;
         [Node]
         [SmartNode]
-        readonly ValueCache<NumberType> _numberCache;
+        readonly ValueCache<NumberType> NumberCache;
 
         internal sealed class Options : DumpableObject
         {
@@ -41,7 +41,7 @@ namespace Reni.Type
                 IsMutable = Data.Register("mutable");
                 IsTextItem = Data.Register("text_item");
                 Data.Align();
-                Tracer.Assert(Data.IsValid);
+                Data.IsValid.Assert();
             }
 
             public Flag IsMutable { get; }
@@ -59,12 +59,12 @@ namespace Reni.Type
             ElementType = elementType;
             Count = count;
             OptionsValue = Options.Create(optionsId);
-            Tracer.Assert(count > 0);
-            Tracer.Assert(elementType.CheckedReference == null);
-            Tracer.Assert(!elementType.IsHollow);
-            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
+            (count > 0).Assert();
+            (elementType.CheckedReference == null).Assert();
+            (!elementType.IsHollow).Assert();
+            RepeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
                 (() => new RepeaterAccessType(this));
-            _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
+            NumberCache = new ValueCache<NumberType>(() => new NumberType(this));
         }
 
         [DisableDump]
@@ -76,13 +76,13 @@ namespace Reni.Type
         TypeBase IRepeaterType.IndexType => Root.BitType.Number(IndexSize.ToInt());
         bool IRepeaterType.IsMutable => IsMutable;
         [DisableDump]
-        RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
+        RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
         [DisableDump]
         internal bool IsMutable => OptionsValue.IsMutable.Value;
         [DisableDump]
         internal bool IsTextItem => OptionsValue.IsTextItem.Value;
         [DisableDump]
-        internal NumberType Number => _numberCache.Value;
+        internal NumberType Number => NumberCache.Value;
         [DisableDump]
         ArrayType NoTextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(false));
         [DisableDump]
@@ -313,7 +313,7 @@ namespace Reni.Type
                 .Evaluate(context.RootContext.ExecutionContext)
                 .ToString(ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
-            Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
+            (conversionBase >= 2).Assert(conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
             return Root.BitType.Result(category, result).Align;
         }
@@ -321,7 +321,7 @@ namespace Reni.Type
         Result CountResult
             (Category category, ResultCache left, ContextBase context, ValueSyntax right)
         {
-            Tracer.Assert(right == null);
+            (right == null).Assert();
             return IndexType.Result
                 (category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
         }

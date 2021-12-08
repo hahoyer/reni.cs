@@ -11,18 +11,18 @@ namespace Reni.Code
 {
     sealed class CSharpGenerator : DumpableObject, IVisitor
     {
-        readonly int _temporaryByteCount;
-        readonly List<string> _data = new List<string>();
-        int _indent;
+        readonly int TemporaryByteCount;
+        readonly List<string> DataCache = new();
+        int IndentLevel;
 
-        public CSharpGenerator(int temporaryByteCount) { _temporaryByteCount = temporaryByteCount; }
+        public CSharpGenerator(int temporaryByteCount) => TemporaryByteCount = temporaryByteCount;
 
         public string Data
         {
             get
             {
-                var start = $"\nvar data = Data.Create({_temporaryByteCount})";
-                return _data
+                var start = $"\nvar data = Data.Create({TemporaryByteCount})";
+                return DataCache
                     .Aggregate(start, (x, y) => x + ";\n" + y)
                     + ";\n";
             }
@@ -32,7 +32,7 @@ namespace Reni.Code
         void AddCode(string pattern, params object[] data)
         {
             var c = string.Format(pattern, data);
-            _data.Add("    ".Repeat(_indent) + c);
+            DataCache.Add("    ".Repeat(IndentLevel) + c);
         }
 
         static string BitCast(Size size, Size dataSize)
@@ -183,11 +183,11 @@ namespace Reni.Code
             AddCode("if({0})\n{{", PullBool(condSize.ByteCount));
             Indent();
             thenCode.Visit(this);
-            Unindent();
+            BackIndent();
             AddCode("}}\nelse\n{{");
             Indent();
             elseCode.Visit(this);
-            Unindent();
+            BackIndent();
             AddCode("}}");
         }
 
@@ -198,8 +198,8 @@ namespace Reni.Code
             return "data.Pull(" + byteCount + ").IsNotNull()";
         }
 
-        void Unindent() { _indent--; }
-        void Indent() { _indent++; }
+        void BackIndent() => IndentLevel--;
+        void Indent() => IndentLevel++;
 
         void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
         {

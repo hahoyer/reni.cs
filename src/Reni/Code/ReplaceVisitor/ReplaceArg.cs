@@ -10,12 +10,12 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     abstract class ReplaceArg : Base
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         internal ReplaceArg(ResultCache actualArg)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
-            Tracer.Assert(actualArg != null, () => "actualArg != null");
+            (actualArg != null).Assert(() => "actualArg != null");
             ActualArg = actualArg;
         }
 
@@ -34,22 +34,22 @@ namespace Reni.Code.ReplaceVisitor
         [Dump("Dump")]
         internal sealed class TypeException : Exception
         {
-            readonly CodeBase _actual;
-            readonly Arg _visitedObject;
+            readonly CodeBase Actual;
+            readonly Arg VisitedObject;
 
             public TypeException(CodeBase actual, Arg visitedObject)
             {
-                _actual = actual;
-                _visitedObject = visitedObject;
+                Actual = actual;
+                VisitedObject = visitedObject;
             }
 
             [UsedImplicitly]
             public string Dump()
             {
                 var data = "\nVisitedObject="
-                    + Tracer.Dump(_visitedObject)
+                    + Tracer.Dump(VisitedObject)
                     + "\nActual="
-                    + Tracer.Dump(_actual);
+                    + Tracer.Dump(Actual);
 
                 return "TypeException\n{"
                     + data.Indent()

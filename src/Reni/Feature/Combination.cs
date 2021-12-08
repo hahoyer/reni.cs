@@ -16,7 +16,7 @@ namespace Reni.Feature
                 return right;
             if(right == null)
                 return left;
-            Tracer.Assert(left.ResultType() == right.Source);
+            (left.ResultType() == right.Source).Assert();
             if(right.ResultType() == left.Source)
                 return null;
 

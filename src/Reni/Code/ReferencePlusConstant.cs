@@ -23,7 +23,7 @@ namespace Reni.Code
         void AssertValid()
         {
             Right.AssertAlignedSize(Root.DefaultRefAlignParam.AlignBits);
-            Tracer.Assert(!Right.IsZero);
+            (!Right.IsZero).Assert();
         }
 
         protected override string GetNodeDump() => base.GetNodeDump() + " Right=" + Right;

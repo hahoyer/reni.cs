@@ -9,10 +9,76 @@ namespace Reni.Type
 {
     static class ConversionService
     {
+        internal sealed class ClosureService
+        {
+            TypeBase Source { get; }
+            readonly List<TypeBase> FoundTypes = new();
+            readonly ValueCache<List<ConversionPath>> NewPathsCache;
+
+            ClosureService(TypeBase source)
+            {
+                Source = source;
+                NewPathsCache = new(() => new());
+            }
+
+            internal static IEnumerable<ConversionPath> Result(TypeBase source)
+                => new ClosureService(source).Result();
+
+            IEnumerable<ConversionPath> ExtendPathByOneConversionAndCollect(ConversionPath startFeature = null)
+            {
+                var startType = startFeature?.Destination ?? Source;
+
+                var newFeatures = startType
+                    .NextConversionStepOptions
+                    .Where(IsRelevantForConversionPathExtension)
+                    .Select(feature => startFeature + feature)
+                    .ToArray();
+
+                newFeatures.All(item => item.Source == Source).Assert();
+
+                NewPathsCache.Value.AddRange(newFeatures);
+                FoundTypes.AddRange(newFeatures.Select(item => item.Destination));
+
+                return newFeatures;
+            }
+
+            bool IsRelevantForConversionPathExtension(IConversion feature)
+            {
+                var resultType = feature.ResultType();
+                return !(resultType == null || FoundTypes.Contains(resultType));
+            }
+
+            IEnumerable<ConversionPath> Result()
+            {
+                NewPathsCache.IsValid = false;
+                var singularPath = new ConversionPath(Source);
+                NewPathsCache.Value.Add(singularPath);
+                FoundTypes.Add(singularPath.Destination);
+                (singularPath.Source == Source).Assert();
+                var results = new List<ConversionPath>
+                {
+                    singularPath
+                };
+
+                while(NewPathsCache.IsValid && NewPathsCache.Value.Any())
+                {
+                    var features = NewPathsCache.Value;
+                    NewPathsCache.IsValid = false;
+                    var newResults = features.SelectMany(ExtendPathByOneConversionAndCollect);
+                    results.AddRange(newResults);
+                }
+
+                return results.ToArray();
+            }
+        }
+
         abstract class ConversionProcess : DumpableObject
         {
             TypeBase Source { get; }
-            protected ConversionProcess(TypeBase source) { Source = source; }
+            protected ConversionProcess(TypeBase source) => Source = source;
+
+            protected abstract IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left);
+            protected abstract bool IsDestination(TypeBase source);
 
             internal ConversionPath Result
             {
@@ -23,7 +89,7 @@ namespace Reni.Type
 
                     var paths = ClosureService.Result(Source);
                     if(paths == null)
-                        return new ConversionPath();
+                        return new();
 
                     var others = new List<ConversionPath>();
 
@@ -38,31 +104,26 @@ namespace Reni.Type
                         .SelectMany(GetForcedConversions)
                         .ToArray();
 
-                    var length = results.Min(path => (int?) path.Elements.Length);
+                    var length = results.Min(path => (int?)path.Elements.Length);
                     return results.SingleOrDefault(path => path.Elements.Length == length);
                 }
             }
 
-            protected abstract IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left);
-            protected abstract bool IsDestination(TypeBase source);
-
-            ConversionPath SimplePath => new ConversionPath(Source);
+            ConversionPath SimplePath => new(Source);
         }
 
         sealed class GenericConversionProcess : ConversionProcess
         {
-            readonly Func<TypeBase, bool> _isDestination;
+            readonly Func<TypeBase, bool> IsDestinationCache;
 
             public GenericConversionProcess(TypeBase source, Func<TypeBase, bool> isDestination)
                 : base(source)
-            {
-                _isDestination = isDestination;
-            }
+                => IsDestinationCache = isDestination;
 
             protected override IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left)
-                => left + left.Destination.GetForcedConversions(_isDestination);
+                => left + left.Destination.GetForcedConversions(IsDestinationCache);
 
-            protected override bool IsDestination(TypeBase source) => _isDestination(source);
+            protected override bool IsDestination(TypeBase source) => IsDestinationCache(source);
         }
 
         sealed class ExplicitConversionProcess : ConversionProcess
@@ -71,15 +132,13 @@ namespace Reni.Type
 
             public ExplicitConversionProcess(TypeBase source, TypeBase destination)
                 : base(source)
-            {
-                Destination = destination;
-            }
+                => Destination = destination;
 
             protected override IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left)
                 => Destination
                     .SymmetricPathsClosureBackwards()
                     .SelectMany
-                    (right => left + left.Destination.GetForcedConversions(right.Source) + right);
+                        (right => left + left.Destination.GetForcedConversions(right.Source) + right);
 
             protected override bool IsDestination(TypeBase source) => source == Destination;
         }
@@ -96,7 +155,7 @@ namespace Reni.Type
             var path = FindPath(source, t => t is TDestination);
             if(path == null)
                 return Enumerable.Empty<TDestination>();
-            return path.IsValid ? new[] {(TDestination) path.Destination} : null;
+            return path.IsValid? new[] { (TDestination)path.Destination } : null;
         }
 
         internal static IEnumerable<IConversion> ForcedConversions
@@ -113,19 +172,16 @@ namespace Reni.Type
         internal static IEnumerable<IConversion> SymmetricFeatureClosure(this TypeBase source)
         {
             var result = RawSymmetricFeatureClosure(source).ToArray();
-            Tracer.Assert
+            result.IsSymmetric().Assert
+            (() => result.Select
                 (
-                    result.IsSymmetric(),
-                    () => result.Select
-                        (
-                            path => new
-                            {
-                                source = path.Source.DumpPrintText,
-                                destination = path.ResultType().DumpPrintText
-                            }
-                        )
-                        .Stringify("\n")
-                );
+                    path => new
+                    {
+                        source = path.Source.DumpPrintText, destination = path.ResultType().DumpPrintText
+                    }
+                )
+                .Stringify("\n")
+            );
             return result;
         }
 
@@ -136,18 +192,15 @@ namespace Reni.Type
             var x = list
                 .Types()
                 .Select
-                (t => t.RawSymmetricFeatureClosure().Types().OrderBy(f => f.ObjectId).Count())
+                    (t => t.RawSymmetricFeatureClosure().Types().OrderBy(f => f.ObjectId).Count())
                 .ToArray();
             var y = x.Distinct().ToArray();
             return y.Length == 1 && x.Length == y.Single();
         }
 
-        internal static IEnumerable<TypeBase> Types(this IEnumerable<IConversion> list)
-        {
-            return list
-                .SelectMany(i => new[] {i.Source, i.ResultType()})
-                .Distinct();
-        }
+        internal static IEnumerable<TypeBase> Types(this IEnumerable<IConversion> list) => list
+            .SelectMany(i => new[] { i.Source, i.ResultType() })
+            .Distinct();
 
         static void AssertPath(this IReadOnlyList<IConversion> elements)
         {
@@ -157,13 +210,11 @@ namespace Reni.Type
                 (
                     (element, i) => new
                     {
-                        i,
-                        result = elements[i].ResultType(),
-                        next = element.Source
+                        i, result = elements[i].ResultType(), next = element.Source
                     })
                 .Where(item => item.result != item.next)
                 .ToArray();
-            //Tracer.Assert(!features.Any(), features.Stringify("\n"));
+            (!features.Any()).Assert(features.Stringify("\n"));
         }
 
         internal static IEnumerable<IConversion> RemoveCircles
@@ -185,10 +236,10 @@ namespace Reni.Type
                         .Reverse()
                         .SkipWhile(element => element.Source != s)
                         .ToArray();
-                var tailLength = simpleFeatures.Count();
+                var tailLength = simpleFeatures.Length;
                 if(tailLength != 0)
                     result.RemoveRange(i, result.Count - i - tailLength);
-                Tracer.Assert(source == result.First().Source);
+                (source == result.First().Source).Assert();
             }
 
             return result;
@@ -197,7 +248,7 @@ namespace Reni.Type
         static IEnumerable<IConversion> RawSymmetricFeatureClosure(this TypeBase source)
         {
             var types = new TypeBase[0];
-            var newTypes = new[] {source};
+            var newTypes = new[] { source };
             do
             {
                 types = types.Union(newTypes).ToArray();
@@ -211,18 +262,19 @@ namespace Reni.Type
                     .Select(element => element.ResultType())
                     .Except(types)
                     .ToArray();
-            } while(newTypes.Any());
+            }
+            while(newTypes.Any());
         }
 
         internal static IEnumerable<ConversionPath> SymmetricPathsClosure(this TypeBase source)
             =>
-                new[] {new ConversionPath(source)}.Concat
+                new[] { new ConversionPath(source) }.Concat
                     (source.SymmetricClosureConversions.Select(f => new ConversionPath(f)));
 
         internal static IEnumerable<ConversionPath> SymmetricPathsClosureBackwards
             (this TypeBase destination)
             =>
-                new[] {new ConversionPath(destination)}.Concat
+                new[] { new ConversionPath(destination) }.Concat
                     (SymmetricClosureService.To(destination).Select(f => new ConversionPath(f)));
 
         internal static IEnumerable<SearchResult> RemoveLowPriorityResults
@@ -234,69 +286,6 @@ namespace Reni.Type
         {
             var l = list.ToArray();
             return l.Where(item => l.All(other => other.Equals(item) || !isInRelation(other, item)));
-        }
-
-        internal sealed class ClosureService
-        {
-            internal static IEnumerable<ConversionPath> Result(TypeBase source)
-                => new ClosureService(source).Result();
-
-            TypeBase Source { get; }
-            readonly List<TypeBase> _foundTypes = new List<TypeBase>();
-            readonly ValueCache<List<ConversionPath>> _newPathsCache;
-
-            ClosureService(TypeBase source)
-            {
-                Source = source;
-                _newPathsCache = new ValueCache<List<ConversionPath>>
-                    (() => new List<ConversionPath>());
-            }
-
-            IEnumerable<ConversionPath> ExtendPathByOneConversionAndCollect(ConversionPath startFeature = null)
-            {
-                var startType = startFeature?.Destination ?? Source;
-
-                var newFeatures = startType
-                    .NextConversionStepOptions
-                    .Where(IsRelevantForConversionPathExtension)
-                    .Select(feature => startFeature + feature)
-                    .ToArray();
-
-                Tracer.Assert(newFeatures.All(item => item.Source == Source));
-
-                _newPathsCache.Value.AddRange(newFeatures);
-                _foundTypes.AddRange(newFeatures.Select(item => item.Destination));
-
-                return newFeatures;
-            }
-
-            bool IsRelevantForConversionPathExtension(IConversion feature)
-            {
-                var resultType = feature.ResultType();
-                return !(resultType == null || _foundTypes.Contains(resultType));
-            }
-
-            IEnumerable<ConversionPath> Result()
-            {
-                _newPathsCache.IsValid = false;
-                var singularPath = new ConversionPath(Source);
-                _newPathsCache.Value.Add(singularPath);
-                _foundTypes.Add(singularPath.Destination);
-                Tracer.Assert(singularPath.Source == Source);
-                var results = new List<ConversionPath>
-                {
-                    singularPath
-                };
-
-                while(_newPathsCache.IsValid && _newPathsCache.Value.Any())
-                {
-                    var features = _newPathsCache.Value;
-                    _newPathsCache.IsValid = false;
-                    var newResults = features.SelectMany(ExtendPathByOneConversionAndCollect);
-                    results.AddRange(newResults);
-                }
-                return results.ToArray();
-            }
         }
     }
 }

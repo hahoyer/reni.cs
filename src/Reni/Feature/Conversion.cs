@@ -7,14 +7,14 @@ namespace Reni.Feature
 {
     sealed class Conversion : DumpableObject, IConversion
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         internal Conversion(Func<Category, Result> function, TypeBase source)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Function = function;
             Source = source;
-            Tracer.Assert(Source != null);
+            (Source != null).Assert();
             StopByObjectIds();
         }
 

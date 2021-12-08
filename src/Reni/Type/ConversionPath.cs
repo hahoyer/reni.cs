@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.TokenClasses;
@@ -14,20 +15,20 @@ namespace Reni.Type
             , IEquatable<ConversionPath>
             , ResultCache.IResultProvider
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         internal readonly TypeBase Source;
         internal readonly IConversion[] Elements;
 
         internal ConversionPath()
-            : base(_nextObjectId++) { }
+            : base(NextObjectId++) { }
 
         internal ConversionPath(TypeBase source)
             : this()
         {
             Source = source;
             Elements = new IConversion[0];
-            Tracer.Assert(IsValid);
+            IsValid.Assert();
         }
 
         [DisableDump]
@@ -36,9 +37,9 @@ namespace Reni.Type
         internal ConversionPath(params IConversion[] rawElements)
             : this()
         {
-            Tracer.Assert(rawElements.Any());
+            rawElements.Any().Assert();
             Source = rawElements.First().Source;
-            Tracer.Assert(IsValid);
+            IsValid.Assert();
             Elements = rawElements.RemoveCircles().ToArray();
 
             AssertValid();
@@ -48,19 +49,15 @@ namespace Reni.Type
         void AssertValid()
         {
             if(Elements.Any())
-                Tracer.Assert
-                    (
-                        Source == Elements.First().Source,
-                        () =>
+                (Source == Elements.First().Source).Assert
+                    (() =>
                             "Wrong source type: "
                                 + Source
                                 + " should be: "
                                 + Elements.First().Source);
 
-            Tracer.Assert
-                (
-                    Types.Count() == Types.Distinct().Count(),
-                    () => "Cyclic conversion:\n"
+            (Types.Count() == Types.Distinct().Count()).Assert
+                (() => "Cyclic conversion:\n"
                         + Types.Select(t => t.DumpPrintText).Stringify("\n")
                         + "\n****\n"
                         + Dump()
@@ -80,10 +77,8 @@ namespace Reni.Type
                 .Where(item => item.type != item.typeDestination)
                 .ToArray();
 
-            Tracer.Assert
-                (
-                    !merge.Any(),
-                    () =>
+            (!merge.Any()).Assert
+                (() =>
                         "Inconsistent path:\n"
                             + Source.Dump()
                             + "\n"
@@ -113,6 +108,7 @@ namespace Reni.Type
                 .Concat(Elements.Select(element => element.ResultType()))
                 .ToArray();
 
+        [UsedImplicitly]
         IEnumerable<string> DumpConversions
             => Elements
                 .Select(element => element.Result(Category.Code).Code.DebuggerDump())
@@ -169,9 +165,9 @@ namespace Reni.Type
         {
             if(this == other)
                 return true;
-            if(Source != other.Source)
+            if(Source != other.AssertNotNull().Source)
                 return false;
-            if(Elements.Length != other.Elements.Length)
+            if(Elements.Length != other.AssertNotNull().Elements.Length)
                 return false;
             return !Elements.Where((element, index) => element != Elements[index]).Any();
         }
@@ -201,7 +197,7 @@ namespace Reni.Type
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
-            Tracer.Assert(pendingCategory.IsNone);
+            pendingCategory.IsNone.Assert();
             return Source.ArgResult(category);
         }
     }

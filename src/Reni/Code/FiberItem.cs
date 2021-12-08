@@ -5,38 +5,23 @@ namespace Reni.Code
 {
     abstract class FiberItem : DumpableObject, IFormalCodeItem
     {
-        static int _nextObjectId;
-        static string _newCombinedReason;
-        readonly string _reason;
-
-        [DisableDump]
-        string ReasonForCombine => _reason == "" ? NodeDumpForDebug() : _reason;
-
-        [DisableDump]
-        static string NewCombinedReason
-        {
-            get
-            {
-                if(_newCombinedReason == null)
-                    return "";
-                return _newCombinedReason;
-            }
-            set
-            {
-                Tracer.Assert((_newCombinedReason == null) != (value == null));
-                _newCombinedReason = value;
-            }
-        }
+        static int NextObjectId;
+        static string NewCombinedReasonValue;
 
         [EnableDumpExcept("")]
         [EnableDump]
-        internal string Reason => _reason;
+        readonly string Reason;
 
         protected FiberItem(int objectId, string reason = null)
-            : base(objectId) { _reason = reason ?? NewCombinedReason; }
+            : base(objectId)
+            => Reason = reason ?? NewCombinedReason;
 
         protected FiberItem(string reason = null)
-            : this(_nextObjectId++, reason) { }
+            : this(NextObjectId++, reason) { }
+
+        Size IFormalCodeItem.Size => DeltaSize;
+
+        void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
 
         [DisableDump]
         internal abstract Size InputSize { get; }
@@ -44,32 +29,12 @@ namespace Reni.Code
         [DisableDump]
         internal abstract Size OutputSize { get; }
 
-        [DisableDump]
-        internal Size DeltaSize => OutputSize - InputSize;
-
-        protected override string GetNodeDump() => base.GetNodeDump() + DumpSignature;
-
-        [DisableDump]
-        string DumpSignature => "(" + InputSize + "==>" + OutputSize + ")";
-
-        [DisableDump]
-        internal Closures Closures => GetRefsImplementation();
+        internal abstract void Visit(IVisitor visitor);
 
         [DisableDump]
         internal virtual bool HasArg => false;
 
-        [DisableDump]
-        internal Size TemporarySize => OutputSize + GetAdditionalTemporarySize();
-
         protected virtual Size GetAdditionalTemporarySize() => Size.Zero;
-
-        internal FiberItem[] TryToCombine(FiberItem subsequentElement)
-        {
-            NewCombinedReason = ReasonForCombine + " " + subsequentElement.ReasonForCombine;
-            var result = TryToCombineImplementation(subsequentElement);
-            NewCombinedReason = null;
-            return result;
-        }
 
         protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
             => null;
@@ -89,20 +54,54 @@ namespace Reni.Code
         internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement)
             => null;
 
-        internal TFiber Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
-            => VisitImplementation(actual);
-
         protected virtual TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
-            => default(TFiber);
-
-        internal abstract void Visit(IVisitor visitor);
-
-        Size IFormalCodeItem.Size => DeltaSize;
-
-        void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
+            => default;
 
         protected virtual Closures GetRefsImplementation() => Closures.Void();
 
+        protected override string GetNodeDump() => base.GetNodeDump() + DumpSignature;
+
+        [DisableDump]
+        string ReasonForCombine => Reason == ""? NodeDumpForDebug() : Reason;
+
+        [DisableDump]
+        static string NewCombinedReason
+        {
+            get
+            {
+                if(NewCombinedReasonValue == null)
+                    return "";
+                return NewCombinedReasonValue;
+            }
+            set
+            {
+                (NewCombinedReasonValue == null != (value == null)).Assert();
+                NewCombinedReasonValue = value;
+            }
+        }
+
+        [DisableDump]
+        internal Size DeltaSize => OutputSize - InputSize;
+
+        [DisableDump]
+        string DumpSignature => "(" + InputSize + "==>" + OutputSize + ")";
+
+        [DisableDump]
+        internal Closures Closures => GetRefsImplementation();
+
+        [DisableDump]
+        internal Size TemporarySize => OutputSize + GetAdditionalTemporarySize();
+
+        internal FiberItem[] TryToCombine(FiberItem subsequentElement)
+        {
+            NewCombinedReason = ReasonForCombine + " " + subsequentElement.ReasonForCombine;
+            var result = TryToCombineImplementation(subsequentElement);
+            NewCombinedReason = null;
+            return result;
+        }
+
+        internal TFiber Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => VisitImplementation(actual);
     }
 
     interface IFormalCodeItem

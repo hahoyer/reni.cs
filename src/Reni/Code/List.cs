@@ -10,7 +10,7 @@ namespace Reni.Code
 {
     sealed class List : FiberHead
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [Node]
         internal CodeBase[] Data { get; }
@@ -47,14 +47,14 @@ namespace Reni.Code
         {
             foreach(var codeBase in Data)
             {
-                Tracer.Assert(!(codeBase is List), () => codeBase.Dump());
-                Tracer.Assert(!(codeBase.IsEmpty));
+                (!(codeBase is List)).Assert(() => codeBase.Dump());
+                (!(codeBase.IsEmpty)).Assert();
             }
-            Tracer.Assert(Data.Length > 1);
+            (Data.Length > 1).Assert();
         }
 
         List(IEnumerable<CodeBase> data)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Data = data.ToArray();
             AssertValid();
@@ -120,11 +120,11 @@ namespace Reni.Code
                 return false;
 
             var size = Size;
-            foreach(var d in topFrameDatas)
+            foreach(var topFrameData in topFrameDatas)
             {
-                if(d.Size + d.Offset != size)
+                if(topFrameData.Size + topFrameData.Offset != size)
                     return false;
-                size -= d.Size;
+                size -= topFrameData.Size;
             }
 
             return size.IsZero;

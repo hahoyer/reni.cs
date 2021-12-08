@@ -24,13 +24,13 @@ namespace Reni.Parser
             => new Result<TTarget>(x.Target, x.Issues);
 
         internal Result<TTarget> With(params Issue[] issues)
-            => new Result<TTarget>(Target, Issues.plus(issues));
+            => new Result<TTarget>(Target, Issues.Plus(issues));
 
         internal Result<TOutTarget> Convert<TOutTarget>(Func<TTarget, Result<TOutTarget>> converter)
             where TOutTarget : class
         {
             var inner = converter(Target);
-            return new Result<TOutTarget>(inner.Target, Issues.plus(inner.Issues));
+            return new Result<TOutTarget>(inner.Target, Issues.Plus(inner.Issues));
         }
 
         internal Result<TOutTarget> Convert<TOutTarget>(Func<TTarget, TOutTarget> converter)

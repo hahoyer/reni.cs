@@ -46,6 +46,12 @@ namespace hw.Parser
 
         BracketContext Add(string token) => AddCache[token];
 
+        internal bool? IsLeftBracket(string token)
+        {
+            var delta = Depth - Add(token).Depth;
+            return delta == 0? null : delta < 0;
+        }
+
         BracketContext GetAddCache(string token)
         {
             var index = GetContextIndex(token);
@@ -59,6 +65,7 @@ namespace hw.Parser
             if(index < 0)
                 return new(new[] { index }.Concat(tail).ToArray(), Brackets);
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             (index > 0).Assert();
 
             if(tail.FirstOrDefault() + index == 0)

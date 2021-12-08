@@ -23,9 +23,6 @@ namespace Reni.Helper
         internal TResult[] DirectChildren
             => this.CachedValue(() => FlatItem.DirectChildCount.Select(CreateDirectChild).ToArray());
 
-        [DisableDump]
-        TResult Center => this as TResult;
-
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         TResult CreateDirectChild(int index)

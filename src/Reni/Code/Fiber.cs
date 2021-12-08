@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
@@ -11,66 +10,55 @@ namespace Reni.Code
 {
     sealed class Fiber : CodeBase
     {
-        readonly FiberHead _fiberHead;
-        readonly FiberItem[] _fiberItems;
-        static int _nextObjectId;
+        static int NextObjectId;
+
+        [Node]
+        internal readonly FiberHead FiberHead;
+
+        [Node]
+        internal readonly FiberItem[] FiberItems;
+
+        internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
+            : this(fiberHead, null, fiberItem) { }
 
         Fiber(FiberHead fiberHead, IEnumerable<FiberItem> fiberItems, FiberItem fiberItem)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
-            _fiberHead = fiberHead;
+            FiberHead = fiberHead;
             var l = new List<FiberItem>();
             if(fiberItems != null)
                 l.AddRange(fiberItems);
             if(fiberItem != null)
                 l.Add(fiberItem);
-            _fiberItems = l.ToArray();
+            FiberItems = l.ToArray();
             AssertValid();
 
             StopByObjectIds();
         }
 
-        void AssertValid()
-        {
-            Tracer.Assert(!_fiberHead.IsNonFiberHeadList, Dump);
-            Tracer.Assert(_fiberItems.Any(), Dump);
-            var lastSize = _fiberHead.Size;
-            foreach(var t in _fiberItems)
-            {
-                Tracer.Assert(lastSize == t.InputSize, Dump);
-                lastSize = t.OutputSize;
-            }
-        }
-
-        internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
-            : this(fiberHead, null, fiberItem) {}
-
-        [Node]
-        internal FiberHead FiberHead => _fiberHead;
-        [Node]
-        internal FiberItem[] FiberItems => _fiberItems;
-        internal override bool IsRelativeReference => _fiberHead.IsRelativeReference;
+        internal override bool IsRelativeReference => FiberHead.IsRelativeReference;
 
         protected override Size GetTemporarySize()
         {
-            var result = _fiberHead.TemporarySize;
-            var sizeSoFar = _fiberHead.Size;
-            foreach(var codeBase in _fiberItems)
+            var result = FiberHead.TemporarySize;
+            var sizeSoFar = FiberHead.Size;
+            foreach(var codeBase in FiberItems)
             {
                 sizeSoFar -= codeBase.InputSize;
                 var newResult = sizeSoFar + codeBase.TemporarySize;
                 sizeSoFar += codeBase.OutputSize;
                 result = result.Max(newResult).Max(sizeSoFar);
             }
+
             return result;
         }
 
-        protected override Size GetSize() => _fiberItems.Last().OutputSize;
+        protected override Size GetSize() => FiberItems.Last().OutputSize;
 
         protected override Closures GetRefsImplementation()
-            => _fiberItems
+            => FiberItems
                 .Aggregate
-                (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));
+                    (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));
 
         internal override CodeBase Add(FiberItem subsequentElement)
         {
@@ -78,7 +66,7 @@ namespace Reni.Code
             {
                 subsequentElement
             };
-            var fiberItems = new List<FiberItem>(_fiberItems);
+            var fiberItems = new List<FiberItem>(FiberItems);
             while(lastFiberItems.Count > 0)
                 if(fiberItems.Count > 0)
                 {
@@ -100,26 +88,39 @@ namespace Reni.Code
                     fiberItems.AddRange(lastFiberItems);
                     lastFiberItems.RemoveAll(x => true);
                 }
+
             if(fiberItems.Count <= 0)
-                return _fiberHead;
-            return new Fiber(_fiberHead, fiberItems, null);
+                return FiberHead;
+            return new Fiber(FiberHead, fiberItems, null);
         }
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.Fiber(this);
 
-        [DisableDump]
-        internal new bool HasArg => FiberHead.HasArg || FiberItems.Any(x => x.HasArg);
-
         internal override void Visit(IVisitor visitor)
-            => visitor.Fiber(_fiberHead, _fiberItems);
+            => visitor.Fiber(FiberHead, FiberItems);
 
         public override string DumpData()
         {
             var result = "";
-            result += "[*] " + _fiberHead.Dump() + "\n";
-            result += _fiberItems.DumpLines();
+            result += "[*] " + FiberHead.Dump() + "\n";
+            result += FiberItems.DumpLines();
             return result.Substring(0, result.Length - 1);
+        }
+
+        [DisableDump]
+        internal new bool HasArg => FiberHead.HasArg || FiberItems.Any(x => x.HasArg);
+
+        void AssertValid()
+        {
+            (!FiberHead.IsNonFiberHeadList).Assert(Dump);
+            FiberItems.Any().Assert(Dump);
+            var lastSize = FiberHead.Size;
+            foreach(var t in FiberItems)
+            {
+                (lastSize == t.InputSize).Assert(Dump);
+                lastSize = t.OutputSize;
+            }
         }
 
         internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
@@ -127,7 +128,7 @@ namespace Reni.Code
                 .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
 
         internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
-            => new[] {FiberHead.Visit(argTypeVisitor)}
+            => new[] { FiberHead.Visit(argTypeVisitor) }
                 .Concat(FiberItems.Select(x => x.Visit(argTypeVisitor)))
                 .DistinctNotNull();
     }

@@ -14,7 +14,7 @@ namespace Reni.ParserTest
             var text = "@( ertzu )@";
             var source = new Source(text) + 0;
             var length = Lexer.Instance.MatchText(source);
-            Tracer.Assert(length != null && length.Value == text.Length);
+            (length != null && length.Value == text.Length).Assert();
         }
 
         [UnitTest]
@@ -23,7 +23,7 @@ namespace Reni.ParserTest
             var textContainerText = "   @( ertzu )@     ";
             var source = (new Source(textContainerText) + 3).Span(11);
             var text = Lexer.Instance.ExtractText(source);
-            Tracer.Assert(text == "ertzu");
+            (text == "ertzu").Assert();
         }
     }
 }

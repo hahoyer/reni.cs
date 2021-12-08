@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
@@ -110,6 +111,7 @@ namespace Reni
         }
 
         [DisableDump]
+        [PublicAPI]
         static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
 
         [DisableDump]

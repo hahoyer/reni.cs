@@ -1,6 +1,5 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
-using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -10,11 +9,7 @@ namespace Reni.Parser
     {
         BinaryTree Value { get; }
 
-        internal ExclamationBoxToken(BinaryTree value)
-        {
-            var t = value.TokenClass;
-            Value = value;
-        }
+        internal ExclamationBoxToken(BinaryTree value) => Value = value;
 
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
         {

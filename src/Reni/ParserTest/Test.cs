@@ -22,7 +22,7 @@ namespace Reni.ParserTest
         public void Add2Numbers()
         {
             var syntaxPrototype =
-                (LikeSyntax.Number(2) + LikeSyntax.Number(4)).Brackets().dump_print;
+                (LikeSyntax.Number(2) + LikeSyntax.Number(4)).Brackets().DumpPrint;
             Parameters.ParseOnly = true;
 
             CreateFileAndRunCompiler
@@ -36,7 +36,7 @@ namespace Reni.ParserTest
         public void LineComment()
         {
             var syntaxPrototype =
-                (LikeSyntax.Number(2) + LikeSyntax.Number(4)).Brackets().dump_print;
+                (LikeSyntax.Number(2) + LikeSyntax.Number(4)).Brackets().DumpPrint;
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler
             (
@@ -52,7 +52,7 @@ dump_print
         public void BlockComment()
         {
             var syntaxPrototype =
-                (LikeSyntax.Number(2) + LikeSyntax.Number(4)).Brackets().dump_print;
+                (LikeSyntax.Number(2) + LikeSyntax.Number(4)).Brackets().DumpPrint;
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler
             (
@@ -73,7 +73,7 @@ aa)#dump_print
                     .Brackets()
                     .Expression("()", LikeSyntax.Number(3).Brackets())
                     .Brackets()
-                    .dump_print;
+                    .DumpPrint;
             Parameters.ParseOnly = true;
             Parameters.TraceOptions.Parser = false;
             CreateFileAndRunCompiler
@@ -90,7 +90,7 @@ aa)#dump_print
                 LikeSyntax
                     .Expression(null, "this", LikeSyntax.Null)
                     .Expression("()", LikeSyntax.Number(3).Brackets())
-                    .dump_print;
+                    .DumpPrint;
             Parameters.ParseOnly = true;
             Parameters.TraceOptions.Parser = false;
             CreateFileAndRunCompiler

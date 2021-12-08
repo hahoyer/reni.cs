@@ -17,7 +17,7 @@ namespace Reni.Struct
     {
         [Node]
         [EnableDump]
-        readonly CompoundView _compoundView;
+        readonly CompoundView CompoundView;
 
         [Node]
         internal readonly TypeBase ArgsType;
@@ -44,7 +44,7 @@ namespace Reni.Struct
             Setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
             Index = index;
             Body = body;
-            _compoundView = compoundView;
+            CompoundView = compoundView;
             ArgsType = argsType;
             StopByObjectIds();
         }
@@ -58,7 +58,7 @@ namespace Reni.Struct
         internal override bool IsHollow => Closures.IsNone && ArgsType.IsHollow;
 
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView => _compoundView;
+        internal override CompoundView FindRecentCompoundView => CompoundView;
 
         [DisableDump]
         internal override bool HasQuickSize => false;
@@ -131,7 +131,7 @@ namespace Reni.Struct
         protected override Size GetSize() => ArgsType.Size + Closures.Size;
 
         internal ContextBase CreateSubContext(bool useValue)
-            => new Context.Function(_compoundView.Context, ArgsType, useValue ? ValueType : null);
+            => new Context.Function(CompoundView.Context, ArgsType, useValue ? ValueType : null);
 
         public string DumpFunction()
         {
@@ -140,7 +140,7 @@ namespace Reni.Struct
             result += "\n";
             result += "argsType=" + ArgsType.Dump();
             result += "\n";
-            result += "context=" + _compoundView.Dump();
+            result += "context=" + CompoundView.Dump();
             result += "\n";
             result += "Getter=" + Getter.DumpFunction();
             result += "\n";
@@ -169,7 +169,7 @@ namespace Reni.Struct
                     () => Closures.ToCode() + ArgsType.ArgCode,
                     () => Closures + Closures.Arg()
                 );
-                Tracer.Assert(category == result.CompleteCategory);
+                (category == result.CompleteCategory).Assert();
                 return ReturnMethodDump(result);
             }
             finally
@@ -181,12 +181,12 @@ namespace Reni.Struct
         Closures GetClosures()
         {
             var result = Getter.Closures;
-            Tracer.Assert(result != null);
+            (result != null).Assert();
             if(Setter != null)
                 result += Setter.Closures;
             var argsExt = ArgsType as IContextReference;
             if(argsExt != null)
-                Tracer.Assert(!result.Contains(argsExt));
+                (!result.Contains(argsExt)).Assert();
             return result;
         }
     }

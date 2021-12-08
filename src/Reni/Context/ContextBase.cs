@@ -5,11 +5,9 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -22,21 +20,17 @@ namespace Reni.Context
     ///     Base class for compiler environments
     /// </summary>
     abstract class ContextBase
-        : DumpableObject,
-            ResultCache.IResultProvider,
-            IIconKeyProvider,
-            ValueCache.IContainer,
-            IRootProvider
+        : DumpableObject, ResultCache.IResultProvider, IIconKeyProvider, ValueCache.IContainer, IRootProvider
     {
         internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
         {
             static int NextObjectId;
 
-            [EnableDumpExcept(false)]
-            readonly bool AsReference;
-
             internal readonly ContextBase Context;
             internal readonly ValueSyntax Syntax;
+
+            [EnableDumpExcept(false)]
+            readonly bool AsReference;
 
             internal ResultProvider
                 (ContextBase context, ValueSyntax syntax, bool asReference = false)
@@ -99,17 +93,13 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                ResultCache = new FunctionCache<ValueSyntax, ResultCache>
-                    (target.ResultCacheForCache);
-                ResultAsReferenceCache = new FunctionCache<ValueSyntax, ResultCache>
-                    (target.GetResultAsReferenceCacheForCache);
-                RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
-                RecentFunctionContextObject = new ValueCache<IFunctionContext>
-                    (target.ObtainRecentFunctionContext);
-                Compounds = new FunctionCache<CompoundSyntax, Compound>
-                    (container => new Compound(container, target));
+                ResultCache = new(target.ResultCacheForCache);
+                ResultAsReferenceCache = new(target.GetResultAsReferenceCacheForCache);
+                RecentStructure = new(target.ObtainRecentCompoundView);
+                RecentFunctionContextObject = new(target.ObtainRecentFunctionContext);
+                Compounds = new(container => new(container, target));
 
-                AsObject = new ResultCache(target);
+                AsObject = new(target);
             }
 
             [DisableDump]
@@ -123,9 +113,9 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(NextId++) => CacheObject = new Cache(this);
+            : base(NextId++) => CacheObject = new(this);
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
 
         string IIconKeyProvider.IconKey => "Context";
 
@@ -146,14 +136,12 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DisableDump]
-        internal CompoundView FindRecentCompoundView => CacheObject.RecentStructure.Value;
-
-        [DisableDump]
-        internal IFunctionContext FindRecentFunctionContextObject
-            => CacheObject.RecentFunctionContextObject.Value;
-
-        [DisableDump]
         internal abstract bool IsRecursionMode { get; }
+
+        [DisableDump]
+        protected abstract string LevelFormat { get; }
+
+        public abstract string GetContextIdentificationDump();
 
         [DisableDump]
         internal virtual IEnumerable<string> DeclarationOptions
@@ -165,18 +153,45 @@ namespace Reni.Context
             }
         }
 
-        internal virtual IEnumerable<ContextBase> ParentChain { get { yield return this; } }
+        internal virtual IEnumerable<ContextBase> ParentChain
+        {
+            get { yield return this; }
+        }
 
-        [DisableDump]
-        public string Format => ParentChain.Select(item => item.LevelFormat).Stringify(separator: " in ");
+        internal virtual CompoundView ObtainRecentCompoundView()
+        {
+            NotImplementedMethod();
+            return null;
+        }
 
-        [DisableDump]
-        protected abstract string LevelFormat { get; }
+        internal virtual IFunctionContext ObtainRecentFunctionContext()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        internal virtual IEnumerable<IImplementation> Declarations<TDefinable>
+            (TDefinable tokenClass)
+            where TDefinable : Definable
+        {
+            var provider = this as ISymbolProviderForPointer<TDefinable>;
+            var feature = provider?.Feature(tokenClass);
+            if(feature != null)
+                yield return feature;
+        }
 
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
-        public abstract string GetContextIdentificationDump();
+        [DisableDump]
+        internal CompoundView FindRecentCompoundView => CacheObject.RecentStructure.Value;
+
+        [DisableDump]
+        internal IFunctionContext FindRecentFunctionContextObject
+            => CacheObject.RecentFunctionContextObject.Value;
+
+        [DisableDump]
+        public string Format => ParentChain.Select(item => item.LevelFormat).Stringify(" in ");
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size)
@@ -229,20 +244,8 @@ namespace Reni.Context
             return result;
         }
 
-        ResultCache GetResultAsReferenceCacheForCache(ValueSyntax syntax)
-            => new ResultCache(new ResultProvider(this, syntax, asReference: true));
-
-        internal virtual CompoundView ObtainRecentCompoundView()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
-        internal virtual IFunctionContext ObtainRecentFunctionContext()
-        {
-            NotImplementedMethod();
-            return null;
-        }
+        ResultCache GetResultAsReferenceCacheForCache
+            (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true));
 
         internal Result ResultAsReference(Category category, ValueSyntax syntax)
             => Result(category.WithType, syntax)
@@ -267,11 +270,11 @@ namespace Reni.Context
                 .Execute
                 (
                     category,
-                    new ResultCache(FunctionalArgObjectResult),
+                    new(FunctionalArgObjectResult),
                     token,
-                    definable: null,
-                    context: this,
-                    right: right
+                    null,
+                    this,
+                    right
                 );
         }
 
@@ -284,7 +287,7 @@ namespace Reni.Context
         IImplementation Declaration(Definable tokenClass)
         {
             var genericTokenClass = tokenClass.MakeGeneric.ToArray();
-            var results 
+            var results
                 = genericTokenClass
                     .SelectMany(g => g.Declarations(this));
             var result = results.SingleOrDefault();
@@ -306,33 +309,21 @@ namespace Reni.Context
 
             var result = searchResult.Result(category, CacheObject.AsObject, token, this, right);
 
-            Tracer.Assert(result.HasIssue || category <= result.CompleteCategory);
+            (result.HasIssue || category <= result.CompleteCategory).Assert();
             return result;
-        }
-
-        internal virtual IEnumerable<IImplementation> Declarations<TDefinable>
-            (TDefinable tokenClass)
-            where TDefinable : Definable
-        {
-            var provider = this as ISymbolProviderForPointer<TDefinable>;
-            var feature = provider?.Feature(tokenClass);
-            if(feature != null)
-                yield return feature;
         }
 
         public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
         {
             var target = Result(category.WithType, argsType).SmartUn<PointerType>().Align;
             return target
-                       .Type
-                       .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
-                       .Result(category.WithType, target)
-                       .LocalReferenceResult
-                   & category;
+                    .Type
+                    .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
+                    .Result(category.WithType, target)
+                    .LocalReferenceResult &
+                category;
         }
     }
 
-    sealed class SmartNodeAttribute : Attribute
-    {
-    }
+    sealed class SmartNodeAttribute : Attribute { }
 }

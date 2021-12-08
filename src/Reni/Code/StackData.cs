@@ -52,7 +52,7 @@ namespace Reni.Code
             if(size.IsZero)
                 return new EmptyStackData(OutStream);
             var result = GetTop(size);
-            Tracer.Assert(result.Size == size);
+            (result.Size == size).Assert();
             return result;
         }
 
@@ -63,7 +63,7 @@ namespace Reni.Code
             if(size == Size)
                 return new EmptyStackData(OutStream);
             var result = Pull(size);
-            Tracer.Assert(result.Size + size == Size);
+            (result.Size + size == Size).Assert();
             return result;
         }
 

@@ -1,5 +1,6 @@
 using hw.DebugFormatter;
 using hw.Parser;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -77,6 +78,7 @@ namespace Reni.SyntaxTree
         [Node]
         readonly IInfix Infix;
 
+        [PublicAPI]
         readonly IToken Token;
 
         public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, IToken token, Anchor brackets)
@@ -110,7 +112,7 @@ namespace Reni.SyntaxTree
         )
         {
             ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, token, brackets);
-            return syntax.AddIssues(left.Issues.plus(right.Issues));
+            return syntax.AddIssues(left.Issues.Plus(right.Issues));
         }
     }
 
@@ -127,6 +129,7 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ISuffix Suffix;
 
+        [PublicAPI]
         readonly IToken Token;
 
         internal SuffixSyntax(ValueSyntax left, ISuffix suffix, IToken token, Anchor brackets)

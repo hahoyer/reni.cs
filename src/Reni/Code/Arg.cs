@@ -5,13 +5,13 @@ namespace Reni.Code
 {
     sealed class Arg : FiberHead
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [Node]
         internal TypeBase Type { get; }
 
         internal Arg(TypeBase type)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Type = type;
             StopByObjectIds();

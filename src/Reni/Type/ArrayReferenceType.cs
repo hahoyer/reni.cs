@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -33,7 +34,7 @@ namespace Reni.Type
                 IsMutable = Data.Register("mutable");
                 IsEnableReinterpretation = Data.Register("enable_reinterpretation");
                 Data.Align();
-                Tracer.Assert(Data.IsValid);
+                Data.IsValid.Assert();
             }
 
             internal Flag IsMutable { get; }
@@ -49,18 +50,19 @@ namespace Reni.Type
             public string DumpPrintText => Data.DumpPrintText;
         }
 
-        readonly int _order;
-        readonly ValueCache<RepeaterAccessType> _repeaterAccessTypeCache;
+        [UsedImplicitly]
+        readonly int Order;
+        readonly ValueCache<RepeaterAccessType> RepeaterAccessTypeCache;
 
         internal ArrayReferenceType(TypeBase valueType, string optionsId)
         {
-            _order = Closures.NextOrder++;
+            Order = Closures.NextOrder++;
             OptionsValue = Options.Create(optionsId);
-            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
+            RepeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
                 (() => new RepeaterAccessType(this));
             ValueType = valueType;
-            Tracer.Assert(!valueType.IsHollow, valueType.Dump);
-            Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
+            (!valueType.IsHollow).Assert(valueType.Dump);
+            (!(valueType.CoreType is PointerType)).Assert(valueType.Dump);
 
             StopByObjectIds(-10);
         }
@@ -77,7 +79,7 @@ namespace Reni.Type
         internal string DumpOptions => OptionsValue.DumpPrintText;
 
         [DisableDump]
-        RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
+        RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
         [DisableDump]
         internal override bool IsHollow => false;
         [DisableDump]
@@ -158,7 +160,7 @@ namespace Reni.Type
 
         Result MutableResult(Category category)
         {
-            Tracer.Assert(OptionsValue.IsForceMutable.Value);
+            OptionsValue.IsForceMutable.Value.Assert();
             return ResultFromPointer(category, Mutable);
         }
 
@@ -224,16 +226,6 @@ namespace Reni.Type
             NotImplementedMethod(category, right);
             return null;
         }
-
-        Result DereferenceResult(Category category)
-            => ValueType
-                .Align
-                .Result
-                (
-                    category,
-                    () => ArgCode.DePointer(ValueType.Size).Align(),
-                    Closures.Arg
-                );
 
         TypeBase IChild<TypeBase>.Parent => ValueType;
 

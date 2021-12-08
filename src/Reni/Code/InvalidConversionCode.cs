@@ -4,10 +4,10 @@ namespace Reni.Code
 {
     sealed class InvalidConversionCode : FiberItem
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         internal InvalidConversionCode(Size sourceSize, Size destinationsize)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             InputSize = sourceSize;
             OutputSize = destinationsize;

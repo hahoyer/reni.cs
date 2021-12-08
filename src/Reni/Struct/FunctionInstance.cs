@@ -19,7 +19,7 @@ namespace Reni.Struct
 
         internal readonly ResultCache ResultCache;
 
-        bool _isObtainBodyCodeActive;
+        bool IsObtainBodyCodeActive;
 
         [Node]
         [EnableDump]
@@ -186,12 +186,12 @@ namespace Reni.Struct
 
         CodeBase GetBodyCode()
         {
-            if(_isObtainBodyCodeActive || IsStopByObjectIdActive)
+            if(IsObtainBodyCodeActive || IsStopByObjectIdActive)
                 return null;
 
             try
             {
-                _isObtainBodyCodeActive = true;
+                IsObtainBodyCodeActive = true;
                 var foreignRefsRef = CreateContextRefCode();
                 var visitResult = ResultCache & (Category.Code | Category.Closures);
                 var result = visitResult
@@ -203,7 +203,7 @@ namespace Reni.Struct
             }
             finally
             {
-                _isObtainBodyCodeActive = false;
+                IsObtainBodyCodeActive = false;
             }
         }
 

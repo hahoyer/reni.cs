@@ -4,6 +4,7 @@ using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.TypeType;
 
+// ReSharper disable once CheckNamespace
 namespace Reni.FeatureTest.Integer
 {
     /// <summary>

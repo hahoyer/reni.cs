@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -22,40 +21,27 @@ namespace Reni.SyntaxTree
         internal new abstract class NoChildren : ValueSyntax
         {
             protected NoChildren(Anchor anchor, Issue issue = null)
-                : base(anchor, issue) 
+                : base(anchor, issue)
                 => anchor.AssertIsNotNull();
 
             [DisableDump]
             protected sealed override int DirectChildCount => 0;
 
             protected sealed override Syntax GetDirectChild(int index)
-                => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
+                => throw new($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
         // Used for debug only
         [DisableDump]
         [Node]
-        internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
-            new FunctionCache<ContextBase, ResultCache>();
+        internal readonly FunctionCache<ContextBase, ResultCache> ResultCache = new();
 
         protected ValueSyntax(Anchor anchor, Issue issue = null)
             : base(anchor, issue)
             => anchor.AssertIsNotNull();
 
         protected ValueSyntax(int objectId, Anchor anchor, Issue issue = null)
-            : base(anchor, issue,objectId) { }
-
-        [DisableDump]
-        internal virtual bool IsLambda => false;
-
-        [DisableDump]
-        internal virtual bool? IsHollow => IsLambda? (bool?)true : null;
-
-        [DisableDump]
-        internal virtual IRecursionHandler RecursionHandler => null;
-
-        [DisableDump]
-        internal Issue[] AllIssues => this.CachedValue(GetAllIssues);
+            : base(anchor, issue, objectId) { }
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
@@ -73,10 +59,14 @@ namespace Reni.SyntaxTree
             return default;
         }
 
-        Issue[] GetAllIssues() => this
-            .GetNodesFromLeftToRight()
-            .SelectMany(node => node?.Issues)
-            .ToArray();
+        [DisableDump]
+        internal virtual bool IsLambda => false;
+
+        [DisableDump]
+        internal virtual bool? IsHollow => IsLambda? true : null;
+
+        [DisableDump]
+        internal virtual IRecursionHandler RecursionHandler => null;
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -84,6 +74,20 @@ namespace Reni.SyntaxTree
             NotImplementedMethod(context, category);
             return null;
         }
+
+        internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
+        {
+            NotImplementedMethod(visitor);
+            return null;
+        }
+
+        [DisableDump]
+        internal Issue[] AllIssues => this.CachedValue(GetAllIssues);
+
+        Issue[] GetAllIssues() => this
+            .GetNodesFromLeftToRight()
+            .SelectMany(node => node?.Issues)
+            .ToArray();
 
         internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
             => ResultCache.Add(context, cacheItem);
@@ -108,12 +112,6 @@ namespace Reni.SyntaxTree
 
         internal ValueSyntax ReplaceArg(ValueSyntax syntax)
             => Visit(new ReplaceArgVisitor(syntax)) ?? this;
-
-        internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
-        {
-            NotImplementedMethod(visitor);
-            return null;
-        }
 
         internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;

@@ -7,15 +7,15 @@ namespace Reni.Code
     sealed class StackDataAddress : NonListStackData
     {
         [EnableDump]
-        readonly IStackDataAddressBase _data;
+        readonly IStackDataAddressBase Data;
         [EnableDump]
-        readonly Size _offset;
+        readonly Size Offset;
 
         public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream outStream)
             : base(outStream)
         {
-            _data = data;
-            _offset = offset;
+            Data = data;
+            Offset = offset;
         }
 
         protected override StackData GetTop(Size size) { throw new GetTopException(size); }
@@ -37,10 +37,10 @@ namespace Reni.Code
         internal override Size Size => DataStack.RefSize;
 
         internal new StackData Dereference(Size size, Size dataSize)
-            => _data.GetTop(_offset, size).BitCast(dataSize).BitCast(size);
+            => Data.GetTop(Offset, size).BitCast(dataSize).BitCast(size);
 
         internal new void Assign(Size size, StackData right)
-            => _data.SetTop(_offset, right.Dereference(size, size));
+            => Data.SetTop(Offset, right.Dereference(size, size));
 
         internal override StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
         {
@@ -56,7 +56,7 @@ namespace Reni.Code
         {
             if(offset.IsZero)
                 return this;
-            return new StackDataAddress(_data, offset + _offset, OutStream);
+            return new StackDataAddress(Data, offset + Offset, OutStream);
         }
 
         protected override StackDataAddress GetAddress() => this;
@@ -65,7 +65,7 @@ namespace Reni.Code
         {
             if(isRecursion)
                 throw new NotImplementedException();
-            return _data.Dump() + "[" + _offset.ToInt() + "]";
+            return Data.Dump() + "[" + Offset.ToInt() + "]";
         }
     }
 

@@ -20,58 +20,52 @@ namespace Reni.Basics
             public void All()
             {
                 "Position of method tested".FlaggedLine(FilePositionTag.Test);
-                Tracer.Assert(Convert(0).ToInt64() == 0);
-                Tracer.Assert(Convert(11).ToInt64() == 11);
-                Tracer.Assert(Convert(-111).ToInt64() == -111);
+                (Convert(0).ToInt64() == 0).Assert();
+                (Convert(11).ToInt64() == 11).Assert();
+                (Convert(-111).ToInt64() == -111).Assert();
 
-                Tracer.Assert((Convert(10) + Convert(1)).ToInt64() == 11);
-                Tracer.Assert((Convert(10) + Convert(-1)).ToInt64() == 9);
-                Tracer.Assert((Convert(1) + Convert(-10)).ToInt64() == -9);
+                ((Convert(10) + Convert(1)).ToInt64() == 11).Assert();
+                ((Convert(10) + Convert(-1)).ToInt64() == 9).Assert();
+                ((Convert(1) + Convert(-10)).ToInt64() == -9).Assert();
 
-                Tracer.Assert((Convert(1111) + Convert(-10)).ToInt64() == 1101);
-                Tracer.Assert((Convert(1111) + Convert(-1110)).ToInt64() == 1);
-                Tracer.Assert((Convert(1111) + Convert(-1112)).ToInt64() == -1);
+                ((Convert(1111) + Convert(-10)).ToInt64() == 1101).Assert();
+                ((Convert(1111) + Convert(-1110)).ToInt64() == 1).Assert();
+                ((Convert(1111) + Convert(-1112)).ToInt64() == -1).Assert();
 
-                Tracer.Assert(Convert("0").ToString(10) == "0", () => Convert("0").ToString(10));
-                Tracer.Assert(Convert("1").ToString(10) == "1", () => Convert("1").ToString(10));
-                Tracer.Assert(Convert("21").ToString(10) == "21", () => Convert("21").ToString(10));
-                Tracer.Assert(Convert("321").ToString(10) == "321");
-                Tracer.Assert(Convert("4321").ToString(10) == "4321");
-                Tracer.Assert(Convert("54321").ToString(10) == "54321");
-                Tracer.Assert(Convert("654321").ToString(10) == "654321");
-                Tracer.Assert(Convert("-1").ToString(10) == "-1");
-                Tracer.Assert(Convert("-21").ToString(10) == "-21");
-                Tracer.Assert(Convert("-321").ToString(10) == "-321");
-                Tracer.Assert(Convert("-4321").ToString(10) == "-4321");
-                Tracer.Assert(Convert("-54321").ToString(10) == "-54321");
-                Tracer.Assert(Convert("-654321").ToString(10) == "-654321");
+                (Convert("0").ToString(10) == "0").Assert(() => Convert("0").ToString(10));
+                (Convert("1").ToString(10) == "1").Assert(() => Convert("1").ToString(10));
+                (Convert("21").ToString(10) == "21").Assert(() => Convert("21").ToString(10));
+                (Convert("321").ToString(10) == "321").Assert();
+                (Convert("4321").ToString(10) == "4321").Assert();
+                (Convert("54321").ToString(10) == "54321").Assert();
+                (Convert("654321").ToString(10) == "654321").Assert();
+                (Convert("-1").ToString(10) == "-1").Assert();
+                (Convert("-21").ToString(10) == "-21").Assert();
+                (Convert("-321").ToString(10) == "-321").Assert();
+                (Convert("-4321").ToString(10) == "-4321").Assert();
+                (Convert("-54321").ToString(10) == "-54321").Assert();
+                (Convert("-654321").ToString(10) == "-654321").Assert();
             }
 
             [UnitTest]
             public void Resize()
             {
                 "Position of method tested".FlaggedLine(FilePositionTag.Test);
-                Tracer.Assert(Convert("100").Resize(Size.Create(6)).ToString(10) == "-28");
+                (Convert("100").Resize(Size.Create(6)).ToString(10) == "-28").Assert();
 
-                Tracer.Assert(Convert("1").Resize(Size.Create(1)).ToString(10) == "-1");
-                Tracer.Assert(Convert("1").Resize(Size.Create(2)).ToString(10) == "1");
-                Tracer.Assert(Convert("1").Resize(Size.Create(3)).ToString(10) == "1");
+                (Convert("1").Resize(Size.Create(1)).ToString(10) == "-1").Assert();
+                (Convert("1").Resize(Size.Create(2)).ToString(10) == "1").Assert();
+                (Convert("1").Resize(Size.Create(3)).ToString(10) == "1").Assert();
 
-                Tracer.Assert(Convert("2").Resize(Size.Create(1)).ToString(10) == "0");
-                Tracer.Assert
-                (
-                    Convert("2").Resize(Size.Create(2)).ToString(10) == "-2",
-                    () => Convert("2").Resize(Size.Create(2)).ToString(10));
-                Tracer.Assert(Convert("2").Resize(Size.Create(3)).ToString(10) == "2");
+                (Convert("2").Resize(Size.Create(1)).ToString(10) == "0").Assert();
+                (Convert("2").Resize(Size.Create(2)).ToString(10) == "-2").Assert
+                (() => Convert("2").Resize(Size.Create(2)).ToString(10));
+                (Convert("2").Resize(Size.Create(3)).ToString(10) == "2").Assert();
 
-                Tracer.Assert
-                (
-                    Convert("-4").Resize(Size.Create(32)).ToString(10) == "-4",
-                    () => Convert("-4").Resize(Size.Create(32)).ToString(10));
-                Tracer.Assert
-                (
-                    Convert("-4095").Resize(Size.Create(8)).ToString(10) == "1",
-                    () => Convert("-4095").Resize(Size.Create(32)).ToString(10));
+                (Convert("-4").Resize(Size.Create(32)).ToString(10) == "-4").Assert
+                (() => Convert("-4").Resize(Size.Create(32)).ToString(10));
+                (Convert("-4095").Resize(Size.Create(8)).ToString(10) == "1").Assert
+                (() => Convert("-4095").Resize(Size.Create(32)).ToString(10));
             }
         }
 
@@ -89,14 +83,14 @@ namespace Reni.Basics
 
         internal const int SegmentAlignBits = 3;
         const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        static int _nextObjectId;
+        static int NextObjectId;
         public Size Size { get; }
 
         readonly byte[] Data;
         readonly ValueCache<BigInteger> DataCache;
 
         BitsConst(Size size)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Size = size;
             Data = CreateDataArray();
@@ -126,6 +120,7 @@ namespace Reni.Basics
 
         static Size SegmentBits => Size.Create(1 << SegmentAlignBits);
         static int SegmentValues => 1 << SegmentBits.ToInt();
+        [PublicAPI]
         static int MaxSegmentValue => SegmentValues - 1;
 
         bool IsNegative
@@ -166,7 +161,7 @@ namespace Reni.Basics
 
         public static BitsConst ConvertAsText(string value)
         {
-            Tracer.Assert(Marshal.SizeOf(value[0].GetType()) == 1);
+            (Marshal.SizeOf(value[0].GetType()) == 1).Assert();
             return new BitsConst(value.Length, value.Select(c => (byte)c).ToArray(), 0);
         }
 
@@ -177,7 +172,7 @@ namespace Reni.Basics
             {
                 var digit = Digits.IndexOf
                     (target.Substring(i, 1), StringComparison.InvariantCultureIgnoreCase);
-                Tracer.Assert(digit >= 0 && digit < @base);
+                (digit >= 0 && digit < @base).Assert();
                 result = result * @base + digit;
             }
 
@@ -194,10 +189,10 @@ namespace Reni.Basics
 
         public BitsConst ShiftDown(Size size)
         {
-            Tracer.Assert
-                (SlagBits(Size).IsZero, () => "Size of object is not byte aligned: " + Dump());
-            Tracer.Assert
-                (SlagBits(size).IsZero, () => "Binary size is not byte aligned: " + size.Dump());
+            SlagBits(Size).IsZero.Assert
+                (() => "Size of object is not byte aligned: " + Dump());
+            SlagBits(size).IsZero.Assert
+                (() => "Binary size is not byte aligned: " + size.Dump());
 
             var bytes = size.ByteCount;
             return Convert(Data.Length - bytes, Data, bytes);
@@ -298,7 +293,7 @@ namespace Reni.Basics
 
         public string ToString(Size itemSize)
         {
-            Tracer.Assert(itemSize == SegmentBits);
+            (itemSize == SegmentBits).Assert();
             return new string(Data.Select(c => (char)c).ToArray());
         }
 

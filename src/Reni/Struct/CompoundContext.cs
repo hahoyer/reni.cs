@@ -13,12 +13,12 @@ namespace Reni.Struct
         ISymbolProviderForPointer<Definable>,
         IContextReference
     {
-        readonly int _order;
+        readonly int Order;
 
         internal CompoundContext(CompoundView view)
             : base(view.Compound.Parent)
         {
-            _order = Closures.NextOrder++;
+            Order = Closures.NextOrder++;
             View = view;
             StopByObjectIds();
         }
@@ -39,7 +39,7 @@ namespace Reni.Struct
         [DisableDump]
         protected override string LevelFormat => "compount";
 
-        int IContextReference.Order => _order;
+        int IContextReference.Order => Order;
 
         [DisableDump]
         internal override IEnumerable<string> DeclarationOptions => View.DeclarationOptions;

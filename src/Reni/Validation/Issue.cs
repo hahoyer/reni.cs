@@ -69,7 +69,7 @@ namespace Reni.Validation
             }
         }
 
-        void AssertValid() => Tracer.Assert(Position != null);
+        void AssertValid() => (Position != null).Assert();
 
         protected override string GetNodeDump()
             => base.GetNodeDump() +

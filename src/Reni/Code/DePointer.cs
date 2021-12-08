@@ -6,10 +6,10 @@ namespace Reni.Code
 {
     sealed class DePointer : FiberItem
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         public DePointer(Size outputSize, Size dataSize)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             OutputSize = outputSize;
             DataSize = dataSize;

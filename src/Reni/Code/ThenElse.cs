@@ -11,7 +11,7 @@ namespace Reni.Code
     /// </summary>
     sealed class ThenElse : FiberItem
     {
-        static int _nextId;
+        static int NextId;
 
         [Node]
         readonly Size CondSize;
@@ -26,7 +26,7 @@ namespace Reni.Code
             : this(Size.Bit, thenCode, elseCode) {}
 
         ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
-            : base(_nextId++)
+            : base(NextId++)
         {
             CondSize = condSize.AssertNotNull();
             ThenCode = thenCode.AssertNotNull();

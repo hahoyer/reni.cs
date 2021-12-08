@@ -1,5 +1,4 @@
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -23,6 +22,5 @@ namespace Reni.TokenClasses
             NotImplementedMethod(context, category, token, right);
             return null;
         }
-
     }
 }

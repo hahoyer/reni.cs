@@ -132,34 +132,34 @@ namespace Reni.Feature
 
     sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
     {
-        readonly T _target;
-        public GenericProviderForType(T target) { _target = target; }
+        readonly T Target;
+        public GenericProviderForType(T target) { Target = target; }
 
         IEnumerable<IConversion> IGenericProviderForType.GetForcedConversions(TypeBase source)
-            => source.GetForcedConversions(_target);
+            => source.GetForcedConversions(Target);
     }
 
     sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvider
         where T : Definable
     {
-        readonly T _target;
-        public GenericProviderForDefinable(T target) { _target = target; }
+        readonly T Target;
+        public GenericProviderForDefinable(T target) { Target = target; }
 
         IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
-            => source.Declarations(_target);
+            => source.Declarations(Target);
 
         IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
-            => source.Declarations(_target);
+            => source.Declarations(Target);
     }
 
     sealed class MetaFunction : DumpableObject, IImplementation, IMeta
     {
-        readonly Func<Category, ResultCache, ContextBase, ValueSyntax, Result> _function;
+        readonly Func<Category, ResultCache, ContextBase, ValueSyntax, Result> Function;
 
         public MetaFunction
             (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
         {
-            _function = function;
+            Function = function;
         }
 
         IMeta IMetaImplementation.Function => this;
@@ -168,29 +168,29 @@ namespace Reni.Feature
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
-            => _function(category, left, contextBase, right);
+            => Function(category, left, contextBase, right);
     }
 
     sealed class ContextMetaFunction : ContextMetaFeatureImplementation
     {
-        readonly Func<ContextBase, Category, ValueSyntax, Result> _function;
+        readonly Func<ContextBase, Category, ValueSyntax, Result> Function;
 
         public ContextMetaFunction(Func<ContextBase, Category, ValueSyntax, Result> function)
         {
-            _function = function;
+            Function = function;
         }
 
         protected override Result Result
             (ContextBase contextBase, Category category, ValueSyntax right)
-            => _function(contextBase, category, right);
+            => Function(contextBase, category, right);
     }
 
     sealed class ContextMetaFunctionFromSyntax
         : DumpableObject, IImplementation, IMeta
     {
         [EnableDump]
-        readonly ValueSyntax _definition;
-        public ContextMetaFunctionFromSyntax(ValueSyntax definition) { _definition = definition; }
+        readonly ValueSyntax Definition;
+        public ContextMetaFunctionFromSyntax(ValueSyntax definition) { Definition = definition; }
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
@@ -198,7 +198,7 @@ namespace Reni.Feature
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
-            => callContext.Result(category, _definition.ReplaceArg(right));
+            => callContext.Result(category, Definition.ReplaceArg(right));
     }
 
     interface IForcedConversionProvider<in TDestination>

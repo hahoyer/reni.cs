@@ -308,7 +308,6 @@
     <Compile Include="Feature\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
-    <Compile Include="Parser\DefinableToken.cs" />
     <Compile Include="SyntaxTree\ExpressionSyntax.cs" />
     <Compile Include="Parser\MainTokenFactory.cs" />
     <Compile Include="Runtime\BiasCache.cs" />
@@ -419,7 +418,6 @@
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionInstanceType.cs" />
     <Compile Include="CodeArgs.cs" />
-    <Compile Include="ReniException.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Runtime\Data.cs" />
     <Compile Include="SyntaxTree\CompoundSyntax.cs" />
@@ -439,7 +437,6 @@
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
-    <Compile Include="Validation\SourceIssue.cs" />
     <None Include="Code\CSharp_Generated.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>

@@ -4,6 +4,7 @@ using Reni.FeatureTest.ConversionService;
 using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
 
+// ReSharper disable once CheckNamespace
 namespace Reni.FeatureTest.ThenElse
 {
     [UnitTest]

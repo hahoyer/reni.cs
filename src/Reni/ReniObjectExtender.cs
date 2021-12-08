@@ -6,7 +6,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using JetBrains.Annotations;
-using Reni.Numeric;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -32,7 +31,7 @@ namespace Reni
         internal static string NodeDump(this object o)
             => o is DumpableObject r? r.NodeDump : o.ToString();
 
-        internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other) 
+        internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other)
             => other is IBelongingsMatcher otherMatcher && current.IsBelongingTo(otherMatcher);
 
         internal static bool IsBelongingTo(this ITokenClass current, ITokenClass other)
@@ -53,7 +52,7 @@ namespace Reni
             => TypeNameExtender.Types.Where(item => item.Is<T>());
 
         internal static IEnumerable<string> GetTokenIds<T>()
-            => DerivedClasses<Operation>()
+            => DerivedClasses<T>()
                 .Where(item => item.IsSealed)
                 .SelectMany(GetTokenIds);
 
@@ -71,7 +70,7 @@ namespace Reni
                         .Select
                             (item => (string)((MethodInfo)member).Invoke(null, item.CreationParameter));
                 case MemberTypes.Field:
-                    return new[] {(string)((FieldInfo)member).GetValue(null)};
+                    return new[] { (string)((FieldInfo)member).GetValue(null) };
             }
 
             Dumpable.NotImplementedFunction(member.Name);

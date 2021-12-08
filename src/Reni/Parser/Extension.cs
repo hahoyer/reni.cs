@@ -13,18 +13,18 @@ namespace Reni.Parser
 {
     static class Extension
     {
-        internal static T[] plus<T>(this IEnumerable<T> x, IEnumerable<T> y)
+        internal static T[] Plus<T>(this IEnumerable<T> x, IEnumerable<T> y)
             => (x ?? new T[0])
                 .Concat(y ?? new T[0])
                 .ToDistinctNotNullArray();
 
-        internal static T[] plus<T>(this IEnumerable<T> x, T y)
+        internal static T[] Plus<T>(this IEnumerable<T> x, T y)
             where T : class
             => (x ?? new T[0])
                 .Concat(y.NullableToArray())
                 .ToDistinctNotNullArray();
 
-        internal static T[] plus<T>(this T x, IEnumerable<T> y)
+        internal static T[] Plus<T>(this T x, IEnumerable<T> y)
             => new[] {x}.Concat(y).ToDistinctNotNullArray();
 
         internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
@@ -92,31 +92,6 @@ namespace Reni.Parser
 
         internal static bool IsSpace(this IItem item)
             => Lexer.IsSpace(item);
-
-        public static int Length(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)
-            => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);
-
-        public static string Id(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)
-            => whiteSpaceTokens.Select(item => item.Characters.Id).Stringify("");
-
-        internal static IEnumerable<Lexer.WhiteSpaceToken> OnlyLeftPart
-            (this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaces)
-            => whiteSpaces.Take(ThisLineIndex(whiteSpaces));
-
-        internal static IEnumerable<Lexer.WhiteSpaceToken> OnlyRightPart
-            (this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaces)
-            => whiteSpaces.Skip(ThisLineIndex(whiteSpaces));
-
-        static int ThisLineIndex(IEnumerable<Lexer.WhiteSpaceToken> whiteSpaces)
-        {
-            var data = whiteSpaces.ToArray();
-            var result = 0;
-            for(var i = 0; i < data.Length; i++)
-                if(data[i].Characters.Id.Contains("\n"))
-                    result = i + 1;
-
-            return result;
-        }
 
         [UsedImplicitly]
         internal static string Symbolize
@@ -240,6 +215,7 @@ namespace Reni.Parser
                 .ToArray();
         }
 
+        [PublicAPI]
         static string GetDumpAfterCurrent(this SourcePart target, int dumpWidth)
             => target.Source.GetDumpAfterCurrent(target.EndPosition, dumpWidth);
 

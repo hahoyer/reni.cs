@@ -1,4 +1,5 @@
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 
 namespace Reni.Runtime
 {
@@ -7,23 +8,22 @@ namespace Reni.Runtime
     /// </summary>
     public sealed class OutStream : DumpableObject, IOutStream
     {
-        private string _data = "";
-        private string _log = "";
-
-        internal string Data => _data;
-        internal string Log => _log;
+        [PublicAPI]
+        internal string Data = "";
+        [PublicAPI]
+        internal string Log = "";
 
         void IOutStream.AddData(string x)
         {
-            _data += x;
-            ("-data----------------\n" + _data + "|<--\n---------------------").Log();
-            Tracer.Assert(_data.Length < 1000);
+            Data += x;
+            ("-data----------------\n" + Data + "|<--\n---------------------").Log();
+            (Data.Length < 1000).Assert();
         }
 
         void IOutStream.AddLog(string x)
         {
-            _log += x;
-            ("-log----------------\n" + _log + "\n---------------------").Log();
+            Log += x;
+            ("-log----------------\n" + Log + "\n---------------------").Log();
         }
     }
 }

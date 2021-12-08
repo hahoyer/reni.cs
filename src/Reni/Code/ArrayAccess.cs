@@ -1,4 +1,5 @@
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 
@@ -8,30 +9,36 @@ namespace Reni.Code
     {
         [EnableDump]
         internal readonly Size ElementSize;
+
         [EnableDump]
         internal readonly Size IndexSize;
-        readonly string _callingMethodName;
+
+        [PublicAPI]
+        new readonly string CallingMethodName;
 
         protected ArrayAccess(Size elementSize, Size indexSize, string callingMethodName)
         {
             ElementSize = elementSize;
             IndexSize = indexSize;
-            _callingMethodName = callingMethodName;
+            CallingMethodName = callingMethodName;
         }
     }
 
     sealed class ArrayGetter : ArrayAccess
     {
         public ArrayGetter(Size elementSize, Size indexSize, string callingMethodName)
-            : base(elementSize, indexSize, callingMethodName) { StopByObjectIds();}
+            : base(elementSize, indexSize, callingMethodName)
+            => StopByObjectIds();
 
         [DisableDump]
         internal override Size InputSize => Root.DefaultRefAlignParam.RefSize + IndexSize;
+
         [DisableDump]
         internal override Size OutputSize => Root.DefaultRefAlignParam.RefSize;
 
         internal override void Visit(IVisitor visitor)
             => visitor.ArrayGetter(ElementSize, IndexSize);
+
         protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ArrayGetter(this);
     }
@@ -43,11 +50,13 @@ namespace Reni.Code
 
         [DisableDump]
         internal override Size InputSize => Root.DefaultRefAlignParam.RefSize * 2 + IndexSize;
+
         [DisableDump]
         internal override Size OutputSize => Size.Zero;
 
         internal override void Visit(IVisitor visitor)
             => visitor.ArraySetter(ElementSize, IndexSize);
+
         protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ArraySetter(this);
     }

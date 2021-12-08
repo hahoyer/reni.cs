@@ -6,11 +6,6 @@ namespace Reni.Parser
 {
     public sealed class Lexer : Match2TwoLayerScannerGuard
     {
-        public class WhiteSpaceToken
-        {
-            public SourcePart Characters;
-        }
-
         const string Symbols = "^!%&/=?\\*@+~><|:-";
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
@@ -45,10 +40,9 @@ namespace Reni.Parser
         readonly IssueId InvalidTextEnd = IssueId.EOLInString;
         readonly IMatch LineComment;
         readonly Match LineEnd;
-        readonly Match LineEndOrEnd;
         readonly IMatch Number;
         readonly Match Text;
-        readonly Match VarbatimTextHead;
+        readonly Match VerbatimTextHead;
         readonly Match Space;
         internal readonly LexerItem LineCommentItem;
         internal readonly LexerItem LineEndItem;
@@ -69,10 +63,10 @@ namespace Reni.Parser
             Any = symbol1.Else(identifier);
 
             LineEnd = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
-            LineEndOrEnd = LineEnd.Else(Match.End);
+            var lineEndOrEnd = LineEnd.Else(Match.End);
 
             LineComment = "#" +
-                           LineEndOrEnd
+                           lineEndOrEnd
                                .Else
                                (
                                    "(".AnyChar().Not +
@@ -98,12 +92,12 @@ namespace Reni.Parser
                                .Else(Match.End.Find + InvalidTextEnd)
                 ;
 
-            VarbatimTextHead = "@(" + Match.WhiteSpace.Else(identifier);
+            VerbatimTextHead = "@(" + Match.WhiteSpace.Else(identifier);
             Text = textFrame.Value
                 (
                     head =>
                     {
-                        var textEnd = head.Else(LineEndOrEnd + InvalidTextEnd);
+                        var textEnd = head.Else(lineEndOrEnd + InvalidTextEnd);
                         return textEnd.Find + (head + textEnd.Find).Repeat();
                     })
                 .Else(verbatimText);
@@ -139,7 +133,7 @@ namespace Reni.Parser
 
         internal string ExtractText(SourcePart token)
         {
-            var headLength = token.Start.Match(VarbatimTextHead);
+            var headLength = token.Start.Match(VerbatimTextHead);
             if(headLength != null)
                 return (token.Start + headLength.Value).Span(token.End + -headLength.Value).Id;
 

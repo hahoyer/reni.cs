@@ -8,12 +8,12 @@ namespace Reni.Context
 {
     sealed class Function : Child, IFunctionContext
     {
-        readonly int _order;
+        readonly int Order;
 
         internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
             : base(parent)
         {
-            _order = Closures.NextOrder++;
+            Order = Closures.NextOrder++;
             ArgsType = argsType;
             ValueType = valueType;
             StopByObjectIds();
@@ -24,7 +24,7 @@ namespace Reni.Context
         [Node]
         TypeBase ValueType { get; }
 
-        int IContextReference.Order => _order;
+        int IContextReference.Order => Order;
 
         protected override string GetContextChildIdentificationDump()
             => "@(." + ArgsType.ObjectId + "i)";

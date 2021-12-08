@@ -18,10 +18,10 @@ namespace ReniUI.Test.Formatting
         )
         {
             var canonicalText = text.Replace("\r\n", "\n");
-            expected ??= canonicalText;
+            expected ??= text;
             expected = expected.Replace("\r\n", "\n");
 
-            var compiler = CompilerBrowser.FromText(canonicalText, parameters);
+            var compiler = CompilerBrowser.FromText(text, parameters);
             var newSource = compiler.Reformat
                 (
                     new ReniUI.Formatting.Configuration {MaxLineLength = maxLineLength, EmptyLineLimit = emptyLineLimit}

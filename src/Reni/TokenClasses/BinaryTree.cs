@@ -47,8 +47,6 @@ namespace Reni.TokenClasses
         readonly FunctionCache<bool, string> FlatFormatCache;
         readonly FunctionCache<int, BinaryTree> LocationCache;
 
-        readonly ValueCache<ITokenClass> TokenClassCache;
-
         [DisableDump]
         BinaryTree LeftNeighbor;
 
@@ -75,7 +73,6 @@ namespace Reni.TokenClasses
             Right = right;
             FlatFormatCache = new(GetFlatStringValue);
             LocationCache = new(GetItemByOffset);
-            TokenClassCache = new(GetTokenClass);
 
             SetLinks();
             StopByObjectIds();

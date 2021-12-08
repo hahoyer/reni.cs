@@ -5,7 +5,7 @@ namespace Reni.Code
 {
     sealed class CodeWithCleanup : CodeBase
     {
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [EnableDump]
         readonly CodeBase CleanupCode;
@@ -14,7 +14,7 @@ namespace Reni.Code
         readonly CodeBase Initialisation;
 
         internal CodeWithCleanup(CodeBase initialisation, CodeBase cleanupCode)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Initialisation = initialisation;
             CleanupCode = cleanupCode;

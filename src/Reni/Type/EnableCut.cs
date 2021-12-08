@@ -11,7 +11,7 @@ namespace Reni.Type
         internal EnableCut(TypeBase parent)
             : base(parent)
         {
-            Tracer.Assert(Parent.IsCuttingPossible, Parent.Dump);
+            Parent.IsCuttingPossible.Assert(Parent.Dump);
         }
 
         [DisableDump]
