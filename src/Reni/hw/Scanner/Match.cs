@@ -112,12 +112,13 @@ namespace hw.Scanner
         {
             [EnableDump]
             readonly IMatch Data;
-
+            readonly bool IncludeMatch;
             readonly SourcePart Bound;
 
-            public FindMatch(IMatch data, SourcePosition bound = null)
+            public FindMatch(IMatch data, SourcePosition bound = null, bool includeMatch = true)
             {
                 Data = data;
+                IncludeMatch = includeMatch;
                 Bound = bound == null? null : bound.Span(0);
             }
 
@@ -130,8 +131,12 @@ namespace hw.Scanner
                 while(true)
                 {
                     var result = Data.Match(current, isForward);
-                    if(result != null && (Bound == null || IsBoundReached(isForward, current + result.Value)))
-                        return current - sourcePosition + result;
+                    if(result != null)
+                    {
+                        var position = current + (IncludeMatch? result.Value : 0);
+                        if(Bound == null || IsBoundReached(isForward, position))
+                            return position - sourcePosition;
+                    }
 
                     if(IsBoundReached(isForward, current))
                         return null;
@@ -216,6 +221,9 @@ namespace hw.Scanner
         public Match Find => new(new FindMatch(Data));
 
         [DisableDump]
+        public Match Until => new(new FindMatch(Data, includeMatch:false));
+
+        [DisableDump]
         public Match Not => new(new NotMatch(this));
 
         public static Match Box(Func<char, bool> func) => new(new FunctionalMatch(func, true));
@@ -239,6 +247,7 @@ namespace hw.Scanner
         public Match Else(IMatch other) => Data.Else(other);
         public Match Value(Func<string, IMatch> func) => new(new ValueMatch(Data, func));
 
-        public Match FindUntil(SourcePosition end) => new(new FindMatch(Data, end));
+        public Match FindWithBoundary(SourcePosition end) => new(new FindMatch(Data, end));
+        public Match UntilWithBoundary(SourcePosition end) => new(new FindMatch(Data, bound: end, includeMatch:false));
     }
 }

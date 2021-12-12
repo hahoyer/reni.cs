@@ -68,7 +68,7 @@ namespace hw.Scanner
         public string FilePosition => "\n" + Source.FilePosition(Position, EndPosition, Id);
 
         [UsedImplicitly]
-        public string NodeDump => GetDumpAroundCurrent(Source.NodeDumpWidth);
+        public string NodeDump => GetDumpAroundCurrent(Source.NodeDumpWidth).LogDump();
 
         [DisableDump]
         public SourcePosition Start => Source + Position;

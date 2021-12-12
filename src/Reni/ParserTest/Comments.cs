@@ -21,7 +21,7 @@ namespace Reni.ParserTest
         static void PerformTest(string text, int expectedLength)
         {
             var source = new Source(text) + 0;
-            var length = Lexer.Instance.InineCommentItem.Match(source);
+            var length = Lexer.Instance.InlineCommentItem.Match(source);
             (length == expectedLength).Assert();
         }
     }

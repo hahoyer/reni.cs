@@ -12,12 +12,12 @@ namespace ReniUI.Test.Formatting
         public void SingleLine()
         {
             var text =
-                @"#asdf_
-texxxxxxxxxxxt
+                @"#asdf1_
+text1
 ";
             var expectedText =
-                @"#asdf
-texxxxxxxxxxxt
+                @"#asdf1
+text1
 ";
 
             text.SimpleFormattingTest(expectedText,spaceReplacement:'_');

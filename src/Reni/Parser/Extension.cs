@@ -84,7 +84,7 @@ namespace Reni.Parser
 
         internal static bool? GetSeparatorRequest(this SourcePart prefix)
         {
-            if(prefix.Position == 0)
+            if(prefix.Position == 0 || prefix.End.IsEnd)
                 return false;
             Dumpable.NotImplementedFunction(prefix);
             return default;

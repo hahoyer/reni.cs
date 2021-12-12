@@ -10,14 +10,16 @@ namespace Reni.Parser
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new();
         internal readonly Match LineEnd;
-        internal readonly LexerItem InineCommentItem;
+        internal readonly LexerItem InlineCommentItem;
         internal readonly LexerItem WhiteSpacesItem;
         internal readonly IMatch LineComment;
         internal readonly IMatch Space;
         internal readonly IMatch InlineComment;
+        internal readonly Match LineCommentHead;
+        internal readonly Match InlineCommentHead;
+        internal readonly Match InlineCommentTail;
 
         readonly IMatch Any;
-        readonly IMatch CommentHead;
         readonly IssueId InvalidComment = IssueId.EOFInComment;
         readonly IssueId InvalidTextEnd = IssueId.EOLInString;
         readonly IMatch Number;
@@ -43,7 +45,8 @@ namespace Reni.Parser
             LineEnd = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
             var lineEndOrEnd = LineEnd.Else(Match.End);
 
-            LineComment = "#" +
+            LineCommentHead = "#".Box();
+            LineComment = LineCommentHead +
                 lineEndOrEnd
                     .Else
                     (
@@ -53,14 +56,15 @@ namespace Reni.Parser
                     );
 
             Space = " \t".AnyChar();
-            InlineComment = "#(" +
-                ")#"
-                    .Else(Match.WhiteSpace + ")#".Else((Match.WhiteSpace + ")#").Find))
-                    .Else(identifier.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
+            InlineCommentHead = "#(".Box();
+            InlineCommentTail = ")#".Box();
+
+            InlineComment = InlineCommentHead +
+                InlineCommentTail
+                    .Else(Match.WhiteSpace + InlineCommentTail.Else((Match.WhiteSpace + InlineCommentTail).Find))
+                    .Else(identifier.Value(id => (Match.WhiteSpace + id + InlineCommentTail).Box().Find))
                     .Else(Match.End.Find + InvalidComment)
                 ;
-
-            CommentHead = "#(" + Match.WhiteSpace.Else(identifier);
 
             Number = Match.Digit.Repeat(1);
 
@@ -79,10 +83,10 @@ namespace Reni.Parser
                         return textEnd.Find + (head + textEnd.Find).Repeat();
                     })
                 .Else(verbatimText);
-            WhiteSpaces = LineComment.Else(LineEnd).Else(Space).Repeat(minCount:1);
+            WhiteSpaces = LineComment.Else(LineEnd).Else(Space).Repeat(1);
 
             LineCommentItem = new(new WhiteSpaceTokenType("LineComment"), MatchLineComment);
-            InineCommentItem = new(new WhiteSpaceTokenType("InlineComment"), MatchInlineComment);
+            InlineCommentItem = new(new WhiteSpaceTokenType("InlineComment"), MatchInlineComment);
             LineEndItem = new(new WhiteSpaceTokenType("LineEnd"), MatchLineEnd);
             SpaceItem = new(new WhiteSpaceTokenType("Space"), MatchSpace);
             WhiteSpacesItem = new(new WhiteSpaceTokenType("WhiteSpaces"), MatchWhiteSpaces);
@@ -92,7 +96,7 @@ namespace Reni.Parser
             => item.ScannerTokenType == Instance.SpaceItem.ScannerTokenType;
 
         public static bool IsMultiLineComment(IItem item)
-            => item.ScannerTokenType == Instance.InineCommentItem.ScannerTokenType;
+            => item.ScannerTokenType == Instance.InlineCommentItem.ScannerTokenType;
 
         public static bool IsLineComment(IItem item)
             => item.ScannerTokenType == Instance.LineCommentItem.ScannerTokenType;
@@ -140,7 +144,7 @@ namespace Reni.Parser
         public bool HasComment(SourcePart sourcePart)
             => sourcePart
                 .Start
-                .Match(LineComment.Else(InlineComment).FindUntil(sourcePart.End)).HasValue;
+                .Match(LineComment.Else(InlineComment).FindWithBoundary(sourcePart.End)).HasValue;
 
         public static bool IsMultiLineCommentEnd(IItem item)
         {

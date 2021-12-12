@@ -212,8 +212,12 @@ namespace Reni.Helper
 
         internal static string FlatFormat(this string target, WhitespaceGroup prefix, bool areEmptyLinesPossible)
         {
-            Dumpable.NotImplementedFunction(target, prefix, areEmptyLinesPossible);
-            return default;
+            if(prefix == null)
+                return target;   
+
+            var result = prefix.FlatFormat(areEmptyLinesPossible);
+            return result == null? null : result + target;
         }
+
     }
 }

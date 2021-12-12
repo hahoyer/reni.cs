@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Parser;
+using hw.Helper;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -18,9 +18,7 @@ namespace ReniUI.Formatting
     /// </summary>
     sealed class WhiteSpaceView : DumpableObject, ISourcePartEdit, IEditPieces
     {
-        sealed class CacheContainer
-        {
-        }
+        sealed class CacheContainer { }
 
         readonly CacheContainer Cache = new();
         readonly Configuration Configuration;
@@ -51,24 +49,24 @@ namespace ReniUI.Formatting
         ///     The goal is, to change only things necessary to allow editors to work smoothly
         /// </summary>
         /// <returns></returns>
-        [Obsolete("",true)]
+        [Obsolete("", true)]
         IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
         {
-            NotImplementedMethod(parameter.IndentCharacterCount);
+            NotImplementedMethod(parameter);
             return default;
         }
 
-        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
-
         bool ISourcePartEdit.HasLines => Target.TargetLineBreakCount > 0;
+
+        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
         SourcePart ISourcePartEdit.SourcePart => Target.SourcePart;
 
         protected override string GetNodeDump()
-            => Target.SourcePart.GetDumpAroundCurrent(10) + " " + base.GetNodeDump();
+            => Target.SourcePart.GetDumpAroundCurrent(10).CSharpQuote() + " " + base.GetNodeDump();
 
 
-        [Obsolete("",true)]
+        [Obsolete("", true)]
         static SourcePart GetLineBreakPart(IEnumerable<IItem> group)
         {
             var last = group.Last();

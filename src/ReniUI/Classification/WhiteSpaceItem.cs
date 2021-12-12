@@ -18,7 +18,7 @@ namespace ReniUI.Classification
 
         public override bool IsComment => Item.Type is WhitespaceGroup.IComment;
         public override bool IsSpace => Item.Type is WhitespaceGroup.ISpace;
-        public override bool IsLineEnd => Item.Type is WhitespaceGroup.ILineEnd;
+        public override bool IsLineEnd => Item.Type is WhitespaceGroup.ILineBreak;
         //public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
 
         [DisableDump]
