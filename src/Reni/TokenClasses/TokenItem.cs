@@ -1,6 +1,5 @@
 using System;
 using hw.DebugFormatter;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
@@ -18,8 +17,8 @@ namespace Reni.TokenClasses
         }
 
         [EnableDump]
-        [Obsolete("",true)]
-        SourcePart IFormatItem.Content => BinaryTree.Token.Characters;
+        [Obsolete("", true)]
+        SourcePart IFormatItem.Content => BinaryTree.Token;
 
         [EnableDump]
         bool IFormatItem.IsEssential => true;
@@ -27,15 +26,6 @@ namespace Reni.TokenClasses
         [EnableDump]
         ITokenClass IFormatItem.TokenClass => BinaryTree.TokenClass;
 
-        bool IFormatItem.HasEssentialWhiteSpaces
-        {
-            get
-            {
-                var tokenPrecededWith = BinaryTree.Token.PrecededWith;
-                return !IgnoreWhitespaces && tokenPrecededWith.HasComment();
-            }
-        }
-
-        string IFormatItem.WhiteSpaces => IgnoreWhitespaces ? "" : BinaryTree.Token.PrecededWith.SourcePart()?.Id ?? "";
+        string IFormatItem.WhiteSpaces => IgnoreWhitespaces? "" : BinaryTree.WhiteSpaces.SourcePart.Id;
     }
 }

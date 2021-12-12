@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using JetBrains.Annotations;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
@@ -36,7 +37,10 @@ namespace Reni.TokenClasses
         internal BinaryTree Right { get; }
 
         [DisableDump]
-        internal readonly IToken Token;
+        internal readonly SourcePart Token;
+
+        [DisableDump]
+        internal readonly WhitespaceGroup WhiteSpaces;
 
         [DisableDump]
         internal Syntax Syntax;
@@ -45,7 +49,7 @@ namespace Reni.TokenClasses
         readonly ITokenClass InnerTokenClass;
 
         readonly FunctionCache<bool, string> FlatFormatCache;
-        readonly FunctionCache<int, BinaryTree> LocationCache;
+        readonly FunctionCache<int, BinaryTree> FindItemCache;
 
         [DisableDump]
         BinaryTree LeftNeighbor;
@@ -54,6 +58,7 @@ namespace Reni.TokenClasses
         BinaryTree Parent;
 
         [DisableDump]
+        [UsedImplicitly]
         BinaryTree RightNeighbor;
 
         int Depth;
@@ -67,21 +72,24 @@ namespace Reni.TokenClasses
         )
             : base(NextObjectId++)
         {
-            Token = token;
+            Token = token.Characters;
+            WhiteSpaces = new(token.GetPrefixSourcePart());
             Left = left;
             InnerTokenClass = tokenClass;
             Right = right;
             FlatFormatCache = new(GetFlatStringValue);
-            LocationCache = new(GetItemByOffset);
+            FindItemCache = new(position => FindItemForCache(Token.Source + position));
 
             SetLinks();
             StopByObjectIds();
         }
 
+        internal SourcePart FullToken => WhiteSpaces.SourcePart.Start.Span(Token.End);
+
         ValueCache ValueCache.IContainer.Cache { get; } = new();
 
         SourcePart ISyntax.All => SourcePart;
-        SourcePart ISyntax.Main => Token.Characters;
+        SourcePart ISyntax.Main => Token;
         int ITree<BinaryTree>.DirectChildCount => 2;
 
         BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
@@ -100,7 +108,12 @@ namespace Reni.TokenClasses
         internal ITokenClass TokenClass => this.CachedValue(GetTokenClass);
 
         [DisableDump]
-        internal SourcePart SourcePart => LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
+        internal SourcePart SourcePart 
+            => LeftMost
+                .WhiteSpaces
+                .SourcePart
+                .Start
+                .Span(RightMost.Token.End);
 
         [DisableDump]
         internal BinaryTree LeftMost => Left?.LeftMost ?? this;
@@ -140,12 +153,13 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         public BinaryTree[] ParserLevelGroup
-            => this.CachedValue(() => GetParserLevelGroup()?.ToArray()??new BinaryTree[0]);
+            => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? new BinaryTree[0]);
 
         [DisableDump]
         public bool IsSeparatorRequired
-            => !Token.PrecededWith.HasComment() &&
+            => WhiteSpaces.SourcePart.GetSeparatorRequest() ??
                 SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
+
 
         [DisableDump]
         IssueId BracketIssueId
@@ -193,13 +207,13 @@ namespace Reni.TokenClasses
                 return null;
 
             if(errorToken.IssueId == MissingRightBracket)
-                return errorToken.IssueId.Issue(Right?.SourcePart ?? Token.Characters.End.Span(0));
+                return errorToken.IssueId.Issue(Right?.SourcePart ?? Token.End.Span(0));
             if(errorToken.IssueId == MissingLeftBracket)
                 return errorToken.IssueId.Issue(Left.SourcePart);
             if(errorToken.IssueId == MissingMatchingRightBracket)
                 return errorToken.IssueId.Issue(Left.Right.SourcePart);
             if(errorToken.IssueId == EOFInComment || errorToken.IssueId == EOLInString)
-                return errorToken.IssueId.Issue(Token.Characters);
+                return errorToken.IssueId.Issue(Token);
 
             throw new InvalidEnumArgumentException($"Unexpected issue: {errorToken.IssueId}");
         }
@@ -210,19 +224,15 @@ namespace Reni.TokenClasses
             return issueId == null? InnerTokenClass : IssueTokenClass.From[issueId];
         }
 
-        BinaryTree GetItemByOffset(int position)
+        BinaryTree FindItemForCache(SourcePosition position)
         {
-            if(TokenClass is not EndOfText && Token.Characters.EndPosition <= position)
-                return Right?.LocationCache[position];
+            if(position < WhiteSpaces.SourcePart.Start)
+                return Left?.FindItemCache[position.Position];
 
-            if(Token.Characters.Position <= position)
+            if(position < Token.End || position == Token.End && TokenClass is EndOfText)
                 return this;
-
-            var whiteSpaceStart = Token.PrecededWith.FirstOrDefault();
-            if(whiteSpaceStart != null && whiteSpaceStart.SourcePart.Position <= position)
-                return this;
-
-            return Left?.LocationCache[position];
+            
+            return Right?.FindItemCache[position.Position];
         }
 
         void SetLinks()
@@ -265,7 +275,7 @@ namespace Reni.TokenClasses
 
             if(tokenClass is ThenToken)
             {
-                var elseItem = Parent is { TokenClass: ElseToken }? Parent: null;
+                var elseItem = Parent is { TokenClass: ElseToken }? Parent : null;
                 return elseItem == null? default : T(this, elseItem);
             }
 
@@ -303,8 +313,8 @@ namespace Reni.TokenClasses
 
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
-            var tokenString = Token.Characters.Id
-                .FlatFormat(Left == null? null : Token.PrecededWith, areEmptyLinesPossible);
+            var tokenString = Token.Id
+                .FlatFormat(Left == null? null : WhiteSpaces, areEmptyLinesPossible);
 
             if(tokenString == null)
                 return null;
@@ -324,7 +334,7 @@ namespace Reni.TokenClasses
                 return null;
 
             var gapString =
-                Right == null? "" : "".FlatFormat(Right.LeftMost.Token.PrecededWith, areEmptyLinesPossible);
+                Right == null? "" : "".FlatFormat(Right.LeftMost.WhiteSpaces, areEmptyLinesPossible);
             if(gapString == null)
                 return null;
 
@@ -353,7 +363,7 @@ namespace Reni.TokenClasses
 
         internal void SetSyntax(Syntax syntax)
         {
-            if(Token.Characters.Source.Identifier == Compiler.PredefinedSource)
+            if(Token.Source.Identifier == Compiler.PredefinedSource)
                 return;
             (Syntax == null || Syntax == syntax).Assert(() => @$"
 this: {Dump()}
@@ -362,10 +372,10 @@ New: {syntax.Dump()}");
             Syntax = syntax;
         }
 
-        internal BinaryTree LocateByPosition(SourcePosition offset)
+        internal BinaryTree FindItem(SourcePosition offset)
         {
-            (Token.Characters.Source == offset.Source).Assert();
-            return LocationCache[offset.Position];
+            (Token.Source == offset.Source).Assert();
+            return FindItemCache[offset.Position];
         }
 
         internal BinaryTree CommonRoot(BinaryTree end)

@@ -1,9 +1,6 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI;
-using ReniUI.Test;
-using ReniUI.Test.Formatting;
 
 namespace ReniUI.Test.Formatting
 {
@@ -16,8 +13,8 @@ namespace ReniUI.Test.Formatting
         [UnitTest]
         public void SimpleLine()
         {
-            const string Text = @"(1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
+            const string text = @"(1,3,4,6)";
+            var compiler = CompilerBrowser.FromText(text);
             var span = compiler.Source.All;
             var trimmed = compiler.Reformat(targetPart: span);
 

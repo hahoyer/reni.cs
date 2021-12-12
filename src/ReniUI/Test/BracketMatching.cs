@@ -44,6 +44,7 @@ namespace ReniUI.Test
             var matchClose = close.ParserLevelGroup.ToArray();
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
+            pairs.AssertNotNull();
 
             (matchOpen.Length == 1).Assert();
             (matchClose.Length == 1).Assert();

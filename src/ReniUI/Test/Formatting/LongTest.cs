@@ -1,5 +1,4 @@
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
 using Reni.TokenClasses;
@@ -64,7 +63,7 @@ new ({span.NodeDump}):
             if(target.TokenClass.Id != other.TokenClass.Id)
                 return false;
 
-            if(target.Token.Characters.Id != other.Token.Characters.Id)
+            if(target.Token.Id != other.Token.Id)
                 return false;
 
             if(!Compare(target.Left, other.Left))

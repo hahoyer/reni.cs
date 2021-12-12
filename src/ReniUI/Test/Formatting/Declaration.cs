@@ -126,6 +126,7 @@ ddddd";
 
         [Test]
         [UnitTest]
+        // ReSharper disable once InconsistentNaming
         public void ListWithDeclarationLineBreakTestAA4()
         {
             const string text = @"aaaaa;aaaaa;llll:bbbbb;mmmmm:22222;ccccc;ddddd";

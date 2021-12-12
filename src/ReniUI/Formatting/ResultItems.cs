@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
@@ -10,11 +9,26 @@ namespace ReniUI.Formatting
 {
     sealed class ResultItems : DumpableObject, IAggregateable<ResultItems>
     {
-        public static ResultItems Default() => new ResultItems();
+        readonly List<IResultItem> Data;
+
+        ResultItems() => Data = new();
+
+        ResultItems(IEnumerable<IResultItem> data) => Data = new(data);
+
+        ResultItems IAggregateable<ResultItems>.Aggregate(ResultItems other) => Combine(other);
+
+        protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
+
+        public override string ToString() => Text;
+
+        public bool IsEmpty => Data.All(item => item.VisibleText == "");
+
+        internal string Text => Data.Aggregate("", (c, n) => c + n.VisibleText);
+        public static ResultItems Default() => new();
 
         static bool CheckForStart(IResultItem item, ref SourcePosition lastPosition, SourcePart targetPart)
         {
-            Tracer.Assert(item != null);
+            (item != null).Assert();
 
             var sourcePart = item.SourcePart;
 
@@ -26,18 +40,6 @@ namespace ReniUI.Formatting
 
             return sourcePart.Intersect(targetPart) != null;
         }
-
-        readonly List<IResultItem> Data;
-
-        ResultItems() => Data = new List<IResultItem>();
-
-        ResultItems(IEnumerable<IResultItem> data) => Data = new List<IResultItem>(data);
-
-        ResultItems IAggregateable<ResultItems>.Aggregate(ResultItems other) => Combine(other);
-
-        public bool IsEmpty => Data.All(item => item.VisibleText == "");
-
-        internal string Text {get {return Data.Aggregate("", (c, n) => c + n.VisibleText);}}
 
         ResultItems Combine(ResultItems other)
         {
@@ -60,17 +62,9 @@ namespace ReniUI.Formatting
                 Add(new NewWhiteSpace(count, false));
         }
 
-        internal void Add(IItem token)
-            => Add
-            (
-                token.IsComment()
-                    ? (IResultItem) new Skeleton(token.SourcePart)
-                    : WhiteSpace.Create(token, true)
-            );
-
         internal void AddHidden(IItem token)
         {
-            Tracer.Assert(token.IsNonComment());
+            token.IsNonComment().Assert();
             Add(WhiteSpace.Create(token, false));
         }
 
@@ -95,6 +89,7 @@ namespace ReniUI.Formatting
         IEnumerable<IResultItem> GetNewItems(IResultItem left, IResultItem right)
         {
             var trace = false;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             StartMethodDump(trace, left, right);
             try
             {
@@ -109,16 +104,15 @@ namespace ReniUI.Formatting
 
         internal IEnumerable<Edit> GetEditPieces(SourcePart targetPart)
         {
-            Tracer.Assert(targetPart != null);
+            (targetPart != null).Assert();
 
             var endPosition = targetPart.EndPosition;
             SourcePosition lastPosition = null;
             using(var enumerator = Data.GetEnumerator())
             {
-                while(enumerator.MoveNext() && !CheckForStart(enumerator.Current, ref lastPosition, targetPart)) 
-                {}
+                while(enumerator.MoveNext() && !CheckForStart(enumerator.Current, ref lastPosition, targetPart)) { }
 
-                Tracer.Assert(lastPosition != null);
+                (lastPosition != null).Assert();
 
                 var result = new List<Edit>();
                 var newText = "";
@@ -128,7 +122,7 @@ namespace ReniUI.Formatting
                 {
                     var item = enumerator.Current;
 
-                    Tracer.Assert(item != null);
+                    (item != null).Assert();
 
                     newText += item.NewText;
                     removeCount += item.RemoveCount;
@@ -148,17 +142,14 @@ namespace ReniUI.Formatting
 
                     lastPosition = item.SourcePart.End;
                 }
+
                 return result;
             }
         }
-
-        protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
 
         internal bool HasInnerLineBreaks()
             => Data
                 .Skip(1)
                 .Any(item => item.VisibleText.Contains("\n"));
-
-        public override string ToString() => Text;
     }
 }

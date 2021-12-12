@@ -75,7 +75,7 @@ namespace Reni.SyntaxFactory
             public PrefixErrorTokenClass(ITokenClass tokenClass)
                 : base(IssueId.InvalidPrefixExpression, tokenClass) { }
 
-            Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, IToken token)
+            Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
                 => new(category, GetIssue(right.Anchor.SourcePart));
         }
 
@@ -84,8 +84,8 @@ namespace Reni.SyntaxFactory
             public TerminalErrorTokenClass(ITokenClass tokenClass)
                 : base(IssueId.InvalidTerminalExpression, tokenClass) { }
 
-            Result ITerminal.Result(ContextBase context, Category category, IToken token)
-                => new(category, GetIssue(token.Characters));
+            Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
+                => new(category, GetIssue(token));
 
             ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor)
             {

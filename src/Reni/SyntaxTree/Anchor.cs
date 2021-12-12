@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Helper;
@@ -21,7 +20,7 @@ namespace Reni.SyntaxTree
             Items = items
                 .Where(item => item != null)
                 .Distinct()
-                .OrderBy(item => item.Token.Characters.Position)
+                .OrderBy(item => item.Token.Position)
                 .ToArray();
 
             Items.Any().Assert();
@@ -47,16 +46,16 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal BinaryTree Main => this.CachedValue(GetMain);
 
-        internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.SourcePart().Start);
-        internal Anchor GetRightOf(BinaryTree target) => GetRightOf(target.Token.SourcePart().End);
+        internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.Start);
+        internal Anchor GetRightOf(BinaryTree target) => GetRightOf(target.Token.End);
 
         [PublicAPI]
         internal Anchor GetLeftOf(SourcePosition position)
-            => new(Items.Where(item => item.Token.SourcePart() < position).ToArray());
+            => new(Items.Where(item => item.Token < position).ToArray());
 
         [PublicAPI]
         internal Anchor GetRightOf(SourcePosition position)
-            => new(Items.Where(item => position < item.Token.SourcePart()).ToArray());
+            => new(Items.Where(item => position < item.Token).ToArray());
 
         internal static Anchor Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
             => new(leftAnchor, rightAnchor);

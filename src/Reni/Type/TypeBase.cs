@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -705,7 +706,7 @@ namespace Reni.Type
         internal Result ObjectResult(Category category)
             => IsHollow? Result(category) : Pointer.Result(category.WithType, ForcedReference);
 
-        Result IssueResult(Category category, IssueId issueId, IToken token)
+        Result IssueResult(Category category, IssueId issueId, SourcePart token)
             => issueId
                 .IssueResult(category, token, "Type: " + DumpPrintText);
 
@@ -713,7 +714,7 @@ namespace Reni.Type
         (
             Category category,
             ResultCache left,
-            IToken currentTarget,
+            SourcePart currentTarget,
             Definable definable,
             ContextBase context,
             ValueSyntax right

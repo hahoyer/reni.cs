@@ -25,16 +25,16 @@ namespace ReniUI.Formatting
             Anchor(BinaryTree target) => Target = target;
 
             [UsedImplicitly]
-            internal string TargetPosition => Target.Token.SourcePart().GetDumpAroundCurrent(5);
+            internal string TargetPosition => Target.FullToken.GetDumpAroundCurrent(5);
 
-            internal static Anchor Create(BinaryTree anchor) => anchor == null ? null : new Anchor(anchor);
+            internal static Anchor Create(BinaryTree anchor) => anchor == null? null : new Anchor(anchor);
 
             internal ISourcePartEdit[] GetWhiteSpaceEdits(Configuration configuration)
-                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount);
+                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount).ToArray();
 
             internal void EnsureLineBreaks(int count)
             {
-                if (LineBreakCount < count)
+                if(LineBreakCount < count)
                     LineBreakCount = count;
             }
         }
@@ -65,9 +65,9 @@ namespace ReniUI.Formatting
 
         [EnableDump]
         internal readonly AnchorsClass Anchors = new();
-
-
+        
         [DisableDump]
+        [PublicAPI]
         readonly Syntax Parent;
 
         readonly IItem Main;
@@ -77,6 +77,7 @@ namespace ReniUI.Formatting
 
         readonly bool HasAdditionalIndent;
 
+        [PublicAPI]
         Syntax LeftNeighbor;
 
         [UsedImplicitly]
@@ -90,7 +91,7 @@ namespace ReniUI.Formatting
             HasAdditionalIndent = child.HasAdditionalIndent;
             Parent = parent;
             Formatter = child.Formatter;
-            if (Main != null)
+            if(Main != null)
             {
                 var frameAnchors = Formatter.GetFrameAnchors(Main);
                 Anchors.Begin = Anchor.Create(frameAnchors.begin);
@@ -113,7 +114,7 @@ namespace ReniUI.Formatting
         [EnableDump(Order = -3)]
         string MainPosition => (Main as Reni.SyntaxTree.Syntax)?.Position;
 
-        int IndentDirection => IsIndentRequired ? 1 : 0;
+        int IndentDirection => IsIndentRequired? 1 : 0;
 
         [EnableDump(Order = 3)]
         [EnableDumpExcept(false)]
@@ -123,7 +124,7 @@ namespace ReniUI.Formatting
         {
             get
             {
-                if (Main == null)
+                if(Main == null)
                     return false;
                 var lineLength = Main.Anchor.Main.GetFlatLength(Configuration.EmptyLineLimit != 0);
                 return lineLength == null || lineLength > Configuration.MaxLineLength;
@@ -149,12 +150,12 @@ namespace ReniUI.Formatting
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
             => new(new(null, target, false), configuration, null);
 
-        Syntax Create(Formatter.Child child) => child == null ? null : new(child, Configuration, this);
+        Syntax Create(Formatter.Child child) => child == null? null : new(child, Configuration, this);
 
         Syntax[] GetChildren()
         {
             var result = Formatter.GetChildren(Main).Select(Create).ToArray();
-            for (var index = 0; index < result.Length - 1; index++)
+            for(var index = 0; index < result.Length - 1; index++)
                 result[index + 1].LeftNeighbor = result[index];
             ChildrenForDebug = result;
             return result;
@@ -167,10 +168,10 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetChildEdits(Syntax child)
         {
-            if (child == null)
+            if(child == null)
                 return new ISourcePartEdit[0];
             var result = child.Edits;
-            if (IsLineSplit && child.HasAdditionalIndent && !(child.IsLineSplit && child.Formatter.IsIndentRequired))
+            if(IsLineSplit && child.HasAdditionalIndent && !(child.IsLineSplit && child.Formatter.IsIndentRequired))
                 result = result.Indent(1).ToArray();
             return result;
         }
@@ -179,19 +180,19 @@ namespace ReniUI.Formatting
         {
             Formatter.SetupUnconditionalLineBreaks(this);
 
-            if (!IsLineSplit)
+            if(!IsLineSplit)
                 return;
 
             Formatter.SetupLineBreaks(this);
-            foreach (var child in Children)
+            foreach(var child in Children)
                 child?.SetupLineBreaks();
         }
 
         internal void EnsureLineBreaks(int count, bool beforePrefix)
         {
-            if (beforePrefix && Anchors.Prefix != null)
+            if(beforePrefix && Anchors.Prefix != null)
                 Anchors.Prefix.EnsureLineBreaks(count);
-            else if (Anchors.Begin != null)
+            else if(Anchors.Begin != null)
                 Anchors.Begin.EnsureLineBreaks(count);
             else
             {

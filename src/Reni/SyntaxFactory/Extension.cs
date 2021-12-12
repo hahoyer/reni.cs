@@ -2,6 +2,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Parser;
 using Reni.SyntaxTree;
 
@@ -12,7 +13,7 @@ namespace Reni.SyntaxFactory
         internal static ValueSyntax GetInfixSyntax
         (
             this ValueSyntax left,
-            ITokenClass tokenClass, IToken token,
+            ITokenClass tokenClass, SourcePart token,
             ValueSyntax right,
             Anchor anchor
         )

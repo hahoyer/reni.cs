@@ -1,6 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Helper;
 
 namespace ReniUI.Helper
@@ -9,6 +10,7 @@ namespace ReniUI.Helper
     {
         internal readonly Reni.SyntaxTree.Syntax FlatItem;
         [DisableDump]
+        [UsedImplicitly]
         readonly Syntax Parent;
         [DisableDump]
         readonly PositionDictionary<Syntax> Context;

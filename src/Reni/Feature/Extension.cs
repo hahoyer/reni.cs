@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -108,7 +109,7 @@ namespace Reni.Feature
         (
             this IEvalImplementation feature,
             Category category,
-            IToken currentTarget,
+            SourcePart currentTarget,
             ContextBase context,
             ValueSyntax right
         )
@@ -182,7 +183,7 @@ namespace Reni.Feature
             this IImplementation feature,
             Category category,
             ResultCache left,
-            IToken token,
+            SourcePart token,
             ContextBase context,
             ValueSyntax right
         )

@@ -1,4 +1,5 @@
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -17,7 +18,7 @@ namespace Reni.TokenClasses
                 .FindRecentFunctionContextObject
                 .CreateValueReferenceResult(category);
 
-        protected override Result Result(ContextBase context, Category category, ValueSyntax right, IToken token)
+        protected override Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
         {
             NotImplementedMethod(context, category, token, right);
             return null;

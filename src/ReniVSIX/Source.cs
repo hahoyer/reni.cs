@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Reni;
 using ReniUI;
-using ReniUI.Classification;
 using ReniUI.Formatting;
 
 namespace ReniVSIX
@@ -38,6 +36,7 @@ namespace ReniVSIX
         public TokenInfo GetTokenInfo(int line, int column)
         {
             var trace = false;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             StartMethodDump(trace, line, column);
             try
             {
@@ -50,32 +49,6 @@ namespace ReniVSIX
             finally
             {
                 EndMethodDump();
-            }
-        }
-
-        IEnumerable<Item.Trimmed> TokensForLine(int lineIndex, bool trace)
-        {
-            var line = Data.Line(lineIndex);
-
-            var index = line.Position;
-            var i = 0;
-            while(index < line.EndPosition)
-            {
-                var token = Compiler.Locate(index).AssertNotNull().TrimLine(line);
-                if(trace)
-                    Tracer.IndentStart();
-                if(trace)
-                    ("\n" + i + ": " + token.Item.ConvertToTokenColor()).Log();
-                if(trace)
-                    token.SourcePart.NodeDump.Quote().Log();
-                if(trace)
-                    "-----------------".Log();
-                if(trace)
-                    Tracer.IndentEnd();
-
-                yield return token;
-                index += token.SourcePart.Length;
-                i++;
             }
         }
 
@@ -104,7 +77,7 @@ namespace ReniVSIX
                 .OrderByDescending(p => p.Location.EndPosition)
                 .ToArray();
 
-            var ns = reformat.Select(r => r.Location.Position).ToArray();
+            var unused = reformat.Select(r => r.Location.Position).ToArray();
 
             foreach(var edit in reformat)
             {

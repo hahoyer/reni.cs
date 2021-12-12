@@ -49,7 +49,7 @@ oldValue = {oldValue.LogDump()}"
             values[key] = value;
         }
 
-        static SourcePart KeyMap(BinaryTree key) => key.Token.SourcePart();
+        static SourcePart KeyMap(BinaryTree key) => key.FullToken;
 
         public void AssertValid(BinaryTree binary)
         {
@@ -74,7 +74,7 @@ oldValue = {oldValue.LogDump()}"
  -----
 /{Position++:D5}\    BinaryTree.ObjectId={keyItem.ObjectId}
 Key: -----------------------------------------vv
-{keyItem.Token.Characters.GetDumpAroundCurrent(20)}
+{keyItem.Token.GetDumpAroundCurrent(20)}
 ----------------------------------------------^^".Log();
 
             return false;

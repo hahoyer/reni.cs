@@ -1,4 +1,5 @@
 ﻿using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.SyntaxFactory;
@@ -18,14 +19,14 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
     {
-        Result ITerminal.Result(ContextBase context, Category category, IToken token)
+        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
             => Result(context, category, token);
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
         IValueProvider IValueToken.Provider => Factory.Infix;
 
-        protected abstract Result Result(ContextBase context, Category category, IToken token);
+        protected abstract Result Result(ContextBase context, Category category, SourcePart token);
 
         protected ValueSyntax Visit(ISyntaxVisitor visitor)
         {
@@ -39,7 +40,7 @@ namespace Reni.TokenClasses
         Result IInfix.Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
             => Result(context, category, left, right);
 
-        Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, IToken token)
+        Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
             => Result(context, category, right);
 
         IValueProvider IValueToken.Provider => Factory.Infix;
@@ -51,10 +52,10 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueToken
     {
-        Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, IToken token)
+        Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
             => Result(context, category, right, token);
 
-        Result ITerminal.Result(ContextBase context, Category category, IToken token)
+        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
             => Result(context, category);
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
@@ -63,7 +64,8 @@ namespace Reni.TokenClasses
 
         protected abstract Result Result(ContextBase context, Category category);
 
-        protected abstract Result Result(ContextBase callContext, Category category, ValueSyntax right, IToken token);
+        protected abstract Result Result
+            (ContextBase callContext, Category category, ValueSyntax right, SourcePart token);
 
         internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
         {

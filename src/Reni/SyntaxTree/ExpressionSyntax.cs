@@ -50,9 +50,9 @@ namespace Reni.SyntaxTree
         internal ValueSyntax Right { get; }
 
         int CurrentResultDepth;
-        readonly IToken Token;
+        readonly SourcePart Token;
 
-        internal ExpressionSyntax(ValueSyntax left, Definable definable, IToken token, ValueSyntax right, Anchor anchor)
+        internal ExpressionSyntax(ValueSyntax left, Definable definable, SourcePart token, ValueSyntax right, Anchor anchor)
             : base(anchor)
         {
             Token = token;
@@ -75,7 +75,7 @@ namespace Reni.SyntaxTree
         (
             ValueSyntax left,
             Definable definable,
-            IToken token,
+            SourcePart token,
             ValueSyntax right,
             Anchor frameItems
         )

@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
-using Reni.Parser;
+using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
@@ -209,36 +210,10 @@ namespace Reni.Helper
             }
         }
 
-        [PublicAPI]
-        internal static TTarget ApplyPath<TTarget, TAspect>
-            (this TTarget container, int[] path, Func<TTarget, TAspect> getAspect)
-            where TAspect : class, ITree<TTarget>
-            => path.Aggregate(container, (node, index) => getAspect(node).GetDirectChild(index));
-
-        [PublicAPI]
-        internal static string FlatFormat
-            (this string target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
+        internal static string FlatFormat(this string target, WhitespaceGroup prefix, bool areEmptyLinesPossible)
         {
-            if(precede == null)
-                return target;   
-
-            var results = precede
-                .Select(item => item.FlatFormat(areEmptyLinesPossible));
-
-            if(results.Any(result => result == null))
-                return null;
-
-            return results
-                .Aggregate(target, (result, item) => result + item);
-        }
-
-        static string FlatFormat(this IItem item, bool areEmptyLinesPossible)
-        {
-            var isComment = item.IsComment();
-
-            if (item.HasLines() && (isComment || areEmptyLinesPossible))
-                return null;
-            return isComment ? item.SourcePart.Id : "";
+            Dumpable.NotImplementedFunction(target, prefix, areEmptyLinesPossible);
+            return default;
         }
     }
 }

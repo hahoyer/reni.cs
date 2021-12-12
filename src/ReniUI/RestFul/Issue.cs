@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.Scanner;
-
-namespace ReniUI.RestFul
+﻿namespace ReniUI.RestFul
 {
     public sealed class Issue
     {

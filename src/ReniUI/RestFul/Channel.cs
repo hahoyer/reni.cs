@@ -1,45 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni;
 
 namespace ReniUI.RestFul
 {
     public sealed class Channel
     {
+        sealed class ExecutionProhibitedException : Exception { }
+
         readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly ValueCache<StringStream> ResultCache;
-        string _text;
+        string TextValue;
 
         public Channel()
         {
-            ResultCache = new ValueCache<StringStream>(GetResult);
-            CompilerCache = new ValueCache<CompilerBrowser>(CreateCompiler);
+            ResultCache = new(GetResult);
+            CompilerCache = new(CreateCompiler);
         }
-
-        CompilerBrowser CreateCompiler()
-            => CompilerBrowser.FromText(_text);
 
         public string Text
         {
-            get { return _text; }
+            get => TextValue;
             set
             {
-                if(value == _text)
+                if(value == TextValue)
                     return;
 
-                _text = value;
+                TextValue = value;
                 CompilerCache.IsValid = false;
                 ResultCache.IsValid = false;
             }
         }
 
+        CompilerBrowser CreateCompiler()
+            => CompilerBrowser.FromText(TextValue);
+
         StringStream GetResult() => CompilerCache.Value.Result;
 
+        [PublicAPI]
         public Issue[] GetIssues() => CompilerCache.Value.Issues.Select(Issue.Create).ToArray();
 
-        public void ResetResult() { ResultCache.IsValid = false; }
+        public void ResetResult() => ResultCache.IsValid = false;
 
         public string GetOutput()
         {
@@ -47,8 +50,6 @@ namespace ReniUI.RestFul
                 throw new ExecutionProhibitedException();
             return ResultCache.Value.Data;
         }
-
-        sealed class ExecutionProhibitedException : Exception {}
 
         public string GetUnexpectedErrors()
         {

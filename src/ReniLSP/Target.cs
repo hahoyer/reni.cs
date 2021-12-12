@@ -15,6 +15,7 @@ namespace ReniLSP
     [UsedImplicitly]
     sealed class Target : DumpableObject, IDidOpenTextDocumentHandler
     {
+        // ReSharper disable once CollectionNeverQueried.Local
         readonly ConcurrentDictionary<string, TextDocumentItem> Buffers = new();
 
         TextDocumentOpenRegistrationOptions

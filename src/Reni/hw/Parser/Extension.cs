@@ -36,9 +36,6 @@ namespace hw.Parser
             return result;
         }
 
-        public static SourcePart SourcePart(this IEnumerable<IItem> items)
-            => items.Select(item => item.SourcePart).Aggregate();
-
         public static int BracketBalance(this IToken token)
         {
             switch(token.IsBracketAndLeftBracket)

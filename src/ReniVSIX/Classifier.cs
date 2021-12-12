@@ -41,7 +41,7 @@ namespace ReniVSIX
                 return Types["keyword"];
             if(item.IsIdentifier)
                 return Types["identifier"];
-            if(item.IsWhiteSpace)
+            if(item.IsSpace)
                 return Types["text"];
             if(item.IsLineEnd)
                 return Types["text"];
@@ -51,7 +51,7 @@ namespace ReniVSIX
                 return Types["keyword"];
             if(item.IsComment)
                 return Types["comment"];
-            return item.IsLineComment? Types["comment"] : Types["text"];
+            return Types["text"];
         }
 
         ClassificationSpan GetClassificationSpan(Item item)

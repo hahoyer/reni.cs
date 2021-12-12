@@ -30,10 +30,8 @@ namespace Reni.Parser
 
         LexerItem[] Classes => new[]
         {
-            Lexer.Instance.SpaceItem,
-            Lexer.Instance.LineEndItem,
-            Lexer.Instance.MultiLineCommentItem,
-            Lexer.Instance.LineCommentItem,
+            Lexer.Instance.WhiteSpacesItem,
+            Lexer.Instance.InineCommentItem,
             new LexerItem(new Number(), Lexer.Instance.MatchNumber),
             new LexerItem(Current.Get<ScannerTokenType<BinaryTree>>(), Lexer.Instance.MatchAny),
             new LexerItem(new Text(), Lexer.Instance.MatchText)

@@ -42,7 +42,7 @@ namespace Reni.Validation
             return new(this, anchors.Select(anchor => anchor.SourcePart).Aggregate(), message);
         }
 
-        internal Result IssueResult(Category category, IToken token, string message = null)
+        internal Result IssueResult(Category category, SourcePart token, string message = null)
             => new(category, Issue(token, message));
 
         internal Result<BinaryTree> Syntax(BinaryTree binaryTree) => new(binaryTree, Issue(binaryTree.SourcePart));

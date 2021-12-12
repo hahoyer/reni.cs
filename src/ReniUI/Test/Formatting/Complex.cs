@@ -44,6 +44,7 @@ namespace ReniUI.Test.Formatting
 
         [Test]
         [UnitTest]
+        // ReSharper disable once InconsistentNaming
         public void Reformat1_120()
         {
             const string text =
@@ -78,6 +79,7 @@ namespace ReniUI.Test.Formatting
 
         [Test]
         [UnitTest]
+        // ReSharper disable once InconsistentNaming
         public void Reformat1_120TopLineBreak()
         {
             const string text =
@@ -97,6 +99,7 @@ namespace ReniUI.Test.Formatting
         }
 
         [UnitTest]
+        // ReSharper disable once InconsistentNaming
         public void Reformat1_120EmptyBrackets()
         {
             const string text =
@@ -150,7 +153,7 @@ llll: bbbbb;
         [UnitTest]
         public void UseLineBreakBeforeParenthesis()
         {
-            const string Text =
+            const string text =
                 @"a:{ 1234512345, 12345}";
 
             var expectedText =
@@ -162,7 +165,7 @@ llll: bbbbb;
                     .Replace("\r\n", "\n");
 
 
-            var compiler = CompilerBrowser.FromText(Text);
+            var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
                 (
                     new ReniUI.Formatting.Configuration { MaxLineLength = 10, EmptyLineLimit = 0 }.Create()
@@ -170,7 +173,7 @@ llll: bbbbb;
                 .Replace("\r\n", "\n");
 
             var lineCount = newSource.Count(item => item == '\n');
-
+            (lineCount > 0).Assert();
             (newSource == expectedText).Assert("\n\"" + newSource + "\"");
         }
 

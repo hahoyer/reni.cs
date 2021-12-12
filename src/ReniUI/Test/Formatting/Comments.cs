@@ -5,8 +5,58 @@ namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    public class Comments : DependenceProvider
+    public sealed class Comments : DependenceProvider
     {
+        [UnitTest]
+        [Test]
+        public void SingleLine()
+        {
+            var text =
+                @"#asdf_
+texxxxxxxxxxxt
+";
+            var expectedText =
+                @"#asdf
+texxxxxxxxxxxt
+";
+
+            text.SimpleFormattingTest(expectedText,spaceReplacement:'_');
+        }
+
+        [UnitTest]
+        [Test]
+        public void SingleLineWithLineBreak()
+        {
+            var text =
+                @"#asdf
+
+texxxxxxxxxxxt
+";
+            var expectedText =
+                @"#asdf
+
+texxxxxxxxxxxt
+";
+
+            text.SimpleFormattingTest(expectedText);
+        }
+
+        [UnitTest]
+        [Test]
+        public void SingleLineWithVolatileLineBreak()
+        {
+            var text =
+                @"#asdf
+
+texxxxxxxxxxxt
+";
+            var expectedText =
+                @"#asdf
+texxxxxxxxxxxt";
+
+            text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
+        }
+
         [UnitTest]
         [Test]
         public void MultiLineCommentSingleLine()
@@ -14,14 +64,26 @@ namespace ReniUI.Test.Formatting
             const string text =
                 @"#( asdf )#  texxxxxxxxxxxt
 ";
-
             const string expectedText =
                 @"#( asdf )# texxxxxxxxxxxt
 ";
-
             text.SimpleFormattingTest(expectedText);
         }
 
+        [UnitTest]
+        [Test]
+        public void ComplexText1()
+        {
+            const string text =
+                @"#( asdf )# head
+#( asdf)# comment )# waggon
+";
+            const string expectedText =
+                @"#( asdf )# head
+    #( asdf)# comment )# waggon
+";
+            text.SimpleFormattingTest(expectedText);
+        }
         [UnitTest]
         [Test]
         public void ComplexText()
@@ -50,12 +112,12 @@ texxxxxxx
             const string expectedText =
                 @"#( asdf )# texxxxxxxxxxxt
 
-texxxxxxx
+    texxxxxxx
 
 #(
     comment
 )#
-texxxxxxx
+    texxxxxxx
 
 #( asdf)# comment )#  texxxxxxxxxxxt
 
@@ -70,5 +132,6 @@ texxxxxxx
 
             text.SimpleFormattingTest(expectedText);
         }
+
     }
 }

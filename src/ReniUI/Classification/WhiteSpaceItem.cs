@@ -8,18 +8,18 @@ namespace ReniUI.Classification
 {
     sealed class WhiteSpaceItem : Item
     {
-        readonly IItem Item;
+        readonly WhitespaceGroup Item;
 
-        internal WhiteSpaceItem(IItem item, BinaryTree anchor)
+        internal WhiteSpaceItem(WhitespaceGroup item, BinaryTree anchor)
             : base(anchor)
             => Item = item;
 
         public override SourcePart SourcePart => Item.SourcePart;
-        public override bool IsComment => Lexer.IsMultiLineComment(Item);
-        public override bool IsLineComment => Lexer.IsLineComment(Item);
-        public override bool IsWhiteSpace => Lexer.IsSpace(Item);
-        public override bool IsLineEnd => Lexer.IsLineEnd(Item);
-        public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
+
+        public override bool IsComment => Item.Type is WhitespaceGroup.IComment;
+        public override bool IsSpace => Item.Type is WhitespaceGroup.ISpace;
+        public override bool IsLineEnd => Item.Type is WhitespaceGroup.ILineEnd;
+        //public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
 
         [DisableDump]
         public override IEnumerable<SourcePart> ParserLevelGroup

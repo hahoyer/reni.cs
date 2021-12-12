@@ -54,16 +54,14 @@ namespace ReniUI.Formatting
             var start = compiler.Locate(targetPart.Start);
             var end = compiler.Locate(targetPart.End+- 1);
             if(start != null && end != null)
-                return start.Anchor == end.Anchor && IsTooSmall(start.Token, targetPart);
+                return start.Anchor == end.Anchor && IsTooSmall(start.SourcePart, targetPart);
 
             Dumpable.NotImplementedFunction(compiler, targetPart);
             return default;
         }
 
-        static bool IsTooSmall(IToken token, SourcePart targetPart)
-            => token.Characters.Contains
-                   (targetPart) ||
-               token.PrecededWith.Any(part => part.SourcePart.Contains(targetPart));
+        static bool IsTooSmall(SourcePart fullToken, SourcePart targetPart)
+            => fullToken.Contains(targetPart);
 
         public static TValue[] T<TValue>(params TValue[] value) => value;
     }

@@ -17,11 +17,11 @@ namespace Reni.Parser
             OnMismatch = onMismatch;
         }
 
-        int? IMatch.Match(SourcePosition sourcePosn)
+        int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
         {
-            var length = sourcePosn.Match(Target);
+            var length = sourcePosition.Match(Target, isForward);
             if (length != null)
-                OnMatch(sourcePosn.SubString(0, length.Value));
+                OnMatch(sourcePosition.SubString(0, length.Value));
             else
                 OnMismatch?.Invoke();
             return length;

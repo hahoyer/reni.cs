@@ -25,7 +25,7 @@ namespace Reni.Parser
                 .ToDistinctNotNullArray();
 
         internal static T[] Plus<T>(this T x, IEnumerable<T> y)
-            => new[] {x}.Concat(y).ToDistinctNotNullArray();
+            => new[] { x }.Concat(y).ToDistinctNotNullArray();
 
         internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
             => (y ?? new T[0]).Where(item => item != null).Distinct().ToArray();
@@ -33,22 +33,20 @@ namespace Reni.Parser
         internal static bool IsRelevantWhitespace(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(item => !Lexer.IsSpace(item)) ?? false;
 
+        internal static bool HasComment(this IToken token)
+            => Lexer.Instance.HasComment(token.GetPrefixSourcePart());
+
         internal static bool HasComment(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(IsComment) ?? false;
 
         internal static bool HasLineComment(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(Lexer.IsLineComment) ?? false;
 
-        internal static SourcePart PrefixCharacters(this IToken token)
-            => token.PrecededWith.SourcePart() ?? token.Characters.Start.Span(0);
+        internal static bool HasMultiLineComment(this IEnumerable<IItem> whiteSpaces)
+            => whiteSpaces?.Any(Lexer.IsMultiLineComment) ?? false;
 
         internal static bool HasWhiteSpaces(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(Lexer.IsSpace) ?? false;
-
-        internal static bool HasLines(this IEnumerable<IItem> whiteSpaces)
-            => whiteSpaces?.Any(HasLines) ?? false;
-
-        internal static bool HasLines(this IItem item) => item.SourcePart.Id.Contains("\n");
 
         internal static bool HasLineAtEnd(this IItem item) => item.IsLineEnd()||item.IsLineComment();
 
@@ -81,14 +79,22 @@ namespace Reni.Parser
         internal static bool IsMultiLineComment(this IItem item)
             => Lexer.IsMultiLineComment(item);
 
+        internal static bool IsMultiLineCommentEnd(this IItem item)
+            => Lexer.IsMultiLineCommentEnd(item);
+
+        internal static bool? GetSeparatorRequest(this SourcePart prefix)
+        {
+            if(prefix.Position == 0)
+                return false;
+            Dumpable.NotImplementedFunction(prefix);
+            return default;
+        }
+
         internal static bool IsLineComment(this IItem item)
             => Lexer.IsLineComment(item);
 
         internal static bool IsLineEnd(this IItem item)
             => Lexer.IsLineEnd(item);
-
-        internal static string State(this IItem item)
-            => Lexer.Instance.WhiteSpaceId(item);
 
         internal static bool IsSpace(this IItem item)
             => Lexer.IsSpace(item);
@@ -223,7 +229,7 @@ namespace Reni.Parser
             => target.Source.GetDumpBeforeCurrent(target.Position, dumpWidth);
 
         public static SourcePart[] SourceParts(this BinaryTree[] targets)
-            => targets.Select(item => item.Token.SourcePart()).ToArray();
+            => targets.Select(item => item.FullToken).ToArray();
 
         public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
         {

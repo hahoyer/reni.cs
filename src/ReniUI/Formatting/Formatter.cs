@@ -138,12 +138,6 @@ namespace ReniUI.Formatting
                         return new(prefixAnchor, null, false);
                 }
             }
-
-            static Child CreateChild(IItem node, IItem left, IItem right)
-            {
-                var prefixAnchor = node.Anchor.Items.First();
-                return new(prefixAnchor, right, left != null);
-            }
         }
 
         abstract class FlatCompound : Formatter

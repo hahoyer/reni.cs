@@ -5,8 +5,8 @@ namespace ReniUI.RestFul
 {
     public sealed class ChannelRepo : DumpableObject, IChannelRepo
     {
-        int _nextKey = 1;
-        string CreateNewKey() => _nextKey++.ToString();
+        int NextKey = 1;
+        string CreateNewKey() => NextKey++.ToString();
 
         readonly IDictionary<string, Channel> Data = new Dictionary<string, Channel>();
 

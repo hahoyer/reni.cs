@@ -1,6 +1,7 @@
 using System;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
+
 // ReSharper disable CheckNamespace
 
 namespace hw.Scanner
@@ -8,13 +9,11 @@ namespace hw.Scanner
     [PublicAPI]
     public interface IMatch
     {
-        int? Match(SourcePosition sourcePosition);
+        int? Match(SourcePosition sourcePosition, bool isForward = true);
     }
 
     [PublicAPI]
-    public sealed class Match
-        : Dumpable
-            , IMatch
+    public sealed class Match : DumpableObject, IMatch
     {
         public interface IError { }
 
@@ -30,23 +29,23 @@ namespace hw.Scanner
             }
         }
 
-        sealed class NotMatch
-            : Dumpable
-                , IMatch
+        sealed class NotMatch : DumpableObject, IMatch
         {
             readonly IMatch Data;
             public NotMatch(IMatch data) => Data = data;
 
-            int? IMatch.Match(SourcePosition sourcePosition)
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
             {
-                var result = Data.Match(sourcePosition);
-                return result == null? 1 : null;
+                var result = Data.Match(sourcePosition, isForward);
+                return result != null
+                    ? null
+                    : isForward
+                        ? 1
+                        : -1;
             }
         }
 
-        sealed class Sequence
-            : Dumpable
-                , IMatch
+        sealed class Sequence : DumpableObject, IMatch
         {
             [EnableDump]
             readonly IMatch Data;
@@ -60,23 +59,34 @@ namespace hw.Scanner
                 Other = other;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition)
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
             {
-                var result = Data.Match(sourcePosition);
-                if(result == null)
-                    return null;
+                int? result = 0;
+                int? otherResult = 0;
 
-                var otherResult = Other.Match(sourcePosition + result.Value);
+                if(isForward)
+                {
+                    result = Data.Match(sourcePosition);
+                    if(result == null)
+                        return null;
+                }
+
+                otherResult = Other.Match(sourcePosition + result.Value, isForward);
                 if(otherResult == null)
                     return null;
+
+                if(!isForward)
+                {
+                    result = Data.Match(sourcePosition + otherResult.Value, false);
+                    if(result == null)
+                        return null;
+                }
 
                 return result.Value + otherResult.Value;
             }
         }
 
-        sealed class FunctionalMatch
-            : Dumpable
-                , IMatch
+        sealed class FunctionalMatch : DumpableObject, IMatch
         {
             [EnableDump]
             readonly Func<char, bool> Func;
@@ -90,39 +100,54 @@ namespace hw.Scanner
                 IsTrue = isTrue;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition)
-                => Func(sourcePosition.Current) != IsTrue? null : 1;
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+                => Func((sourcePosition - (isForward? 0 : 1)).Current) != IsTrue
+                    ? null
+                    : isForward
+                        ? 1
+                        : -1;
         }
 
-        sealed class FindMatch
-            : Dumpable
-                , IMatch
+        sealed class FindMatch : DumpableObject, IMatch
         {
             [EnableDump]
             readonly IMatch Data;
 
-            public FindMatch(IMatch data) => Data = data;
+            readonly SourcePart Bound;
 
-            int? IMatch.Match(SourcePosition sourcePosition)
+            public FindMatch(IMatch data, SourcePosition bound = null)
             {
+                Data = data;
+                Bound = bound == null? null : bound.Span(0);
+            }
+
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+            {
+                if(Bound != null && sourcePosition.Source != Bound.Source)
+                    throw new InvalidOperationException();
+
                 var current = sourcePosition.Clone;
                 while(true)
                 {
-                    var result = Data.Match(current);
-                    if(result != null)
+                    var result = Data.Match(current, isForward);
+                    if(result != null && (Bound == null || IsBoundReached(isForward, current + result.Value)))
                         return current - sourcePosition + result;
 
-                    if(current.IsEnd)
+                    if(IsBoundReached(isForward, current))
                         return null;
 
-                    current.Position += 1;
+                    current.Position += isForward? 1 : -1;
                 }
+            }
+
+            bool IsBoundReached(bool isForward, SourcePosition current)
+            {
+                var bound = Bound ?? current.Source.All;
+                return isForward? current >= bound.End : current <= bound.Start;
             }
         }
 
-        sealed class ValueMatch
-            : Dumpable
-                , IMatch
+        sealed class ValueMatch : DumpableObject, IMatch
         {
             [EnableDump]
             readonly IMatch Data;
@@ -136,28 +161,27 @@ namespace hw.Scanner
                 Func = func;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition)
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
             {
-                var length = Data.Match(sourcePosition);
+                var length = Data.Match(sourcePosition, isForward);
                 if(length == null)
                     return null;
 
                 var value = sourcePosition.SubString(0, length.Value);
-                var funcResult = Func(value).Match(sourcePosition + length.Value);
+                var funcResult = Func(value).Match(sourcePosition + length.Value, isForward);
                 return funcResult == null? null : length.Value + funcResult;
             }
         }
 
-        sealed class EndMatch
-            : Dumpable
-                , IMatch
+        sealed class FrameMatch : DumpableObject, IMatch
         {
-            int? IMatch.Match(SourcePosition sourcePosition) => sourcePosition.IsEnd? 0 : null;
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+                => isForward && sourcePosition.IsEnd || !isForward && sourcePosition.Position <= 0? 0 : null;
         }
 
-        sealed class BreakMatch : IMatch
+        sealed class BreakMatch : DumpableObject, IMatch
         {
-            public int? Match(SourcePosition sourcePosition)
+            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
             {
                 Tracer.TraceBreak();
                 return 0;
@@ -173,11 +197,14 @@ namespace hw.Scanner
             Data = data;
         }
 
-        public static Match Break => new Match(new BreakMatch());
+        int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+            => Data.Match(sourcePosition, isForward);
+
+        public static Match Break => new(new BreakMatch());
 
         public static Match WhiteSpace => Box(char.IsWhiteSpace);
         public static Match LineEnd => "\n".Box().Else("\r\n").Else(End);
-        public static Match End => new Match(new EndMatch());
+        public static Match End => new(new FrameMatch());
         public static Match Digit => Box(char.IsDigit);
         public static Match Letter => Box(char.IsLetter);
         public static Match Any => Box(c => true);
@@ -186,14 +213,12 @@ namespace hw.Scanner
         public IMatch UnBox => Data.UnBox();
 
         [DisableDump]
-        public Match Find => new Match(new FindMatch(Data));
+        public Match Find => new(new FindMatch(Data));
 
         [DisableDump]
-        public Match Not => new Match(new NotMatch(this));
+        public Match Not => new(new NotMatch(this));
 
-        int? IMatch.Match(SourcePosition sourcePosition) => Data.Match(sourcePosition);
-
-        public static Match Box(Func<char, bool> func) => new Match(new FunctionalMatch(func, true));
+        public static Match Box(Func<char, bool> func) => new(new FunctionalMatch(func, true));
 
         public static Match operator +(string target, Match y) => target.Box() + y;
         public static Match operator +(Match target, string y) => target + y.Box();
@@ -202,7 +227,7 @@ namespace hw.Scanner
         public static Match operator +(Match target, IError y) => target + y.Box();
 
         public static Match operator +(Match target, Match y)
-            => new Match(new Sequence(target.UnBox(), y.UnBox()));
+            => new(new Sequence(target.UnBox(), y.UnBox()));
 
         public static Match operator |(Match target, Match y) => target.Else(y);
 
@@ -212,6 +237,8 @@ namespace hw.Scanner
         public Match Option() => Data.Repeat(maxCount: 1);
 
         public Match Else(IMatch other) => Data.Else(other);
-        public Match Value(Func<string, IMatch> func) => new Match(new ValueMatch(Data, func));
+        public Match Value(Func<string, IMatch> func) => new(new ValueMatch(Data, func));
+
+        public Match FindUntil(SourcePosition end) => new(new FindMatch(Data, end));
     }
 }

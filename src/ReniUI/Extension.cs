@@ -2,17 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Scanner;
+using Reni.TokenClasses;
 
 namespace ReniUI
 {
     static class Extension
     {
-        public interface IClickHandler
-        {
-            void Signal(object target);
-        }
-
         sealed class QueryClass<T> : IEnumerable<T>
         {
             readonly Func<IEnumerable<T>> Function;
@@ -21,8 +18,6 @@ namespace ReniUI
             IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
             IEnumerator<T> GetEnumerator() => Function().GetEnumerator();
         }
-
-        const int DefaultTextSize = 10;
 
         internal static string FilePosition(this SourcePart sourcePart)
         {
@@ -45,6 +40,42 @@ namespace ReniUI
             => new QueryClass<T>(function);
 
         internal static SourcePart Combine(this IEnumerable<SourcePart> target)
-            => SourcePart.SaveCombine(target).Single();
+            => hw.Scanner.SourcePart.SaveCombine(target).Single();
+
+        internal static IItem LocateToken(this SourcePart prefix, SourcePosition offset)
+        {
+            if(prefix.Length == 0)
+                return null;
+            Dumpable.NotImplementedFunction(prefix, offset);
+            return default;
+        }
+
+        internal static bool HasStableLineBreak(this SourcePart prefix)
+        {
+            Dumpable.NotImplementedFunction(prefix);
+            return default;
+        }
+
+        [Obsolete("",true)]
+        internal static bool HasLines(this IEnumerable<IItem> whiteSpaces)
+            => whiteSpaces?.Any(HasLines) ?? false;
+
+        [Obsolete("",true)]
+        internal static bool HasLines(this IItem item) 
+            => item.ScannerTokenType is ILineBreak;
+
+        internal static SourcePart SourcePart(this IItem item)
+        {
+            Dumpable.NotImplementedFunction(item);
+            return default;
+        }
+
+        internal static SourcePart SourcePart(this IEnumerable<IItem> items)
+        {
+            Dumpable.NotImplementedFunction(items);
+            return default;
+        }
     }
+
+    interface ILineBreak { }
 }

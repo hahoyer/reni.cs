@@ -14,7 +14,7 @@ namespace ReniUI.Formatting
         {
             Count = count;
             IsLineBreak = isLineBreak;
-            Tracer.Assert(Count > 0);
+            (Count > 0).Assert();
         }
 
         SourcePart IResultItem.SourcePart => null;
@@ -28,7 +28,7 @@ namespace ReniUI.Formatting
             => IsLineBreak == left.IsLineBreak
                 ? left.IsVisible
                     ? new IResultItem[] {this, left}
-                    : left.Preceed(Count - 1)
+                    : left.Precede(Count - 1)
                 : null;
 
         IEnumerable<IResultItem> IResultItem.CombineBack(NewWhiteSpace left)

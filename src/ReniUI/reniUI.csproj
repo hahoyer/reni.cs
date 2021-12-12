@@ -32,7 +32,6 @@
     </Content>
     <Compile Include="Classification\Item.cs" />
     <Compile Include="Classification\WhiteSpaceItem.cs" />
-    <Compile Include="Formatting\EmptyWhiteSpaceView.cs" />
     <Compile Include="Formatting\Edit.cs" />
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\Extension.cs" />
@@ -42,7 +41,6 @@
     <Compile Include="Formatting\SplitItem.cs" />
     <Compile Include="Formatting\WhiteSpaceView.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
-    <Compile Include="Formatting\ResultItems.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\ISourcePartEdit.cs" />

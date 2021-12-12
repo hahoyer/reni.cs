@@ -41,14 +41,14 @@ namespace ReniUI.Classification
             => TokenClass is List;
 
         [DisableDump]
-        public override string State => Token.Characters.Id ?? "";
+        public override string State => Anchor.Token.Id ?? "";
 
         public override IEnumerable<SourcePart> ParserLevelGroup
             => Master
                 .Anchor
                 .Items
                 .Where(node => Anchor.TokenClass.IsBelongingTo(node.TokenClass))
-                .Select(node => node.Token.Characters);
+                .Select(node => node.Token);
 
         [DisableDump]
         public override Issue Issue => Master.MainAnchor.Issue ?? Master.Issue;

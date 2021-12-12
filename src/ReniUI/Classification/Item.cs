@@ -35,7 +35,7 @@ namespace ReniUI.Classification
         protected Item(BinaryTree anchor) => Anchor = anchor;
 
         [DisableDump]
-        public virtual SourcePart SourcePart => Anchor.Token.Characters;
+        public virtual SourcePart SourcePart => Anchor.Token;
 
         [DisableDump]
         public virtual bool IsKeyword => false;
@@ -53,10 +53,7 @@ namespace ReniUI.Classification
         public virtual bool IsComment => false;
 
         [DisableDump]
-        public virtual bool IsLineComment => false;
-
-        [DisableDump]
-        public virtual bool IsWhiteSpace => false;
+        public virtual bool IsSpace => false;
 
         [DisableDump]
         public virtual bool IsBraceLike => false;
@@ -96,7 +93,6 @@ namespace ReniUI.Classification
         public override int GetHashCode() => SourcePart.GetHashCode();
 
         internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
-        internal IToken Token => Anchor.Token;
 
         public char TypeCharacter
         {
@@ -106,9 +102,7 @@ namespace ReniUI.Classification
                     return 'e';
                 if(IsComment)
                     return 'c';
-                if(IsLineComment)
-                    return 'l';
-                if(IsWhiteSpace)
+                if(IsSpace)
                     return 'w';
                 if(IsLineEnd)
                     return '$';
@@ -127,7 +121,7 @@ namespace ReniUI.Classification
             }
         }
 
-        public string Types => GetTypes().Stringify(",");
+        string Types => GetTypes().Stringify(",");
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
@@ -154,10 +148,8 @@ namespace ReniUI.Classification
                 yield return "error";
             if(IsComment)
                 yield return "comment";
-            if(IsLineComment)
-                yield return "line-comment";
-            if(IsWhiteSpace)
-                yield return "whitespace";
+            if(IsSpace)
+                yield return "space";
             if(IsLineEnd)
                 yield return "line-end";
             if(IsNumber)
@@ -180,10 +172,9 @@ namespace ReniUI.Classification
 
         internal static Item LocateByPosition(BinaryTree target, SourcePosition offset)
         {
-            var result = target.LocateByPosition(offset);
+            var result = target.FindItem(offset);
             result.AssertIsNotNull();
-            var resultToken = result.Token;
-            var item = resultToken.PrecededWith.LastOrDefault(item => item.SourcePart.Contains(offset));
+            var item = result.WhiteSpaces.LocateItem(offset);
             if(item == null)
                 return new Syntax(result);
             return new WhiteSpaceItem(item, result);

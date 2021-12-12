@@ -87,7 +87,7 @@ namespace Reni.SyntaxFactory
                     return new EmptyList
                     (
                         Anchor.CreateAll(target).Combine(anchor)
-                        , IssueId.InvalidExpression.Issue(target.Token.Characters)
+                        , IssueId.InvalidExpression.Issue(target.Token)
                     );
             }
         }

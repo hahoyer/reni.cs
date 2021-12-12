@@ -390,7 +390,6 @@
     <Compile Include="TokenClasses\BinaryTree.cs" />
     <Compile Include="SyntaxFactory\BracketHandler.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
-    <Compile Include="TokenClasses\TokenItem.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />
     <Compile Include="TokenClasses\List.cs" />
@@ -401,7 +400,7 @@
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
-    <Compile Include="TokenClasses\WhiteItem.cs" />
+    <Compile Include="TokenClasses\WhitespaceGroup.cs" />
     <Compile Include="Type\ConversionPath.cs" />
     <Compile Include="Type\ConversionService.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />

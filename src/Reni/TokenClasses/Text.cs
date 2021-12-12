@@ -1,4 +1,5 @@
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -10,9 +11,9 @@ namespace Reni.TokenClasses
     {
         public override string Id => "<text>";
 
-        protected override Result Result(ContextBase context, Category category, IToken token)
+        protected override Result Result(ContextBase context, Category category, SourcePart token)
         {
-            var data = Lexer.Instance.ExtractText(token.Characters);
+            var data = Lexer.Instance.ExtractText(token);
             return context
                 .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()))
                 .TextItem

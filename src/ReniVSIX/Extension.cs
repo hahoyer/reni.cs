@@ -13,63 +13,49 @@ namespace ReniVSIX
     {
         internal static int GetCaretPosition(this IVsTextView textView)
         {
-            int piLine;
-            int piColumn;
-            var rc = textView.GetCaretPos(out piLine, out piColumn);
+            var rc = textView.GetCaretPos(out var piLine, out var piColumn);
             (rc == VSConstants.S_OK).Assert();
-            int virt;
-            int position;
-            rc = textView.GetNearestPosition(piLine, piColumn, out position, out virt);
+            rc = textView.GetNearestPosition(piLine, piColumn, out var position, out var _);
             (rc == VSConstants.S_OK).Assert();
             return position;
         }
 
         internal static int GetLineCount(this IVsTextLines vsTextLines)
         {
-            int result;
-            vsTextLines.GetLineCount(out result);
+            vsTextLines.GetLineCount(out var result);
             return result;
         }
 
         internal static int LinePosition(this IVsTextLines vsTextLines, int lineIndex)
         {
-            int result;
-            vsTextLines.GetPositionOfLine(lineIndex, out result);
+            vsTextLines.GetPositionOfLine(lineIndex, out var result);
             return result;
         }
 
         internal static int LineIndex(this IVsTextLines vsTextLines, int position)
         {
-            int result;
-            int column;
-            vsTextLines.GetLineIndexOfPosition(position, out result, out column);
+            vsTextLines.GetLineIndexOfPosition(position, out var result, out var _);
             return result;
         }
 
         internal static int LineLength(this IVsTextLines vsTextLines, int lineIndex)
         {
-            int result;
-            vsTextLines.GetLengthOfLine(lineIndex, out result);
+            vsTextLines.GetLengthOfLine(lineIndex, out var result);
             return result;
         }
 
         internal static string GetAll(this IVsTextLines vsTextLines)
         {
-            int lineCount;
-            vsTextLines.GetLineCount(out lineCount);
-            int lengthOfLastLine;
-            vsTextLines.GetLengthOfLine(lineCount - 1, out lengthOfLastLine);
-            string result;
-            vsTextLines.GetLineText(0, 0, lineCount - 1, lengthOfLastLine, out result);
+            vsTextLines.GetLineCount(out var lineCount);
+            vsTextLines.GetLengthOfLine(lineCount - 1, out var lengthOfLastLine);
+            vsTextLines.GetLineText(0, 0, lineCount - 1, lengthOfLastLine, out var result);
             return result;
         }
 
         internal static string Line(IVsTextLines vsTextLines, int index)
         {
-            int length;
-            vsTextLines.GetLengthOfLine(index, out length);
-            string result;
-            vsTextLines.GetLineText(index, 0, index, length, out result);
+            vsTextLines.GetLengthOfLine(index, out var length);
+            vsTextLines.GetLineText(index, 0, index, length, out var result);
             return result;
         }
 
@@ -88,9 +74,7 @@ namespace ReniVSIX
         {
             if(token.IsComment)
                 return TokenType.Comment;
-            if(token.IsLineComment)
-                return TokenType.LineComment;
-            if(token.IsWhiteSpace || token.IsLineEnd)
+            if(token.IsSpace || token.IsLineEnd)
                 return TokenType.WhiteSpace;
             if(token.IsError)
                 return TokenType.Unknown;
@@ -107,7 +91,7 @@ namespace ReniVSIX
 
         internal static TokenColor ConvertToTokenColor(this Item token)
         {
-            if(token.IsComment || token.IsLineComment)
+            if(token.IsComment )
                 return TokenColor.Comment;
             if(token.IsKeyword)
                 return TokenColor.Keyword;

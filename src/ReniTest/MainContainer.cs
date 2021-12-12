@@ -4,6 +4,7 @@ using System.Reflection;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
+using JetBrains.Annotations;
 using Reni;
 using Reni.FeatureTest.Helper;
 using Reni.Runtime;
@@ -13,7 +14,9 @@ namespace ReniTest
 {
     static class MainContainer
     {
+        [UsedImplicitly]
         const string Target = @"f: @ ^(); x: 1; f(@x) dump_print";
+        [UsedImplicitly]
         const string Output = "1";
 
         public static void Main()
@@ -43,8 +46,10 @@ namespace ReniTest
         }
 
         // Keep this to ensure reference to ReniUI
+        [UsedImplicitly]
         static void BrowseCompiler(CompilerBrowser compiler) { }
 
+        [UsedImplicitly]
         static Compiler CreateCompiler(string text)
         {
             Tracer.IsBreakDisabled = false;
@@ -57,6 +62,7 @@ namespace ReniTest
             return compiler;
         }
 
+        [UsedImplicitly]
         static void Run<TTarget>()
             where TTarget : CompilerTest, new()
             => new TTarget().Run();
@@ -83,7 +89,6 @@ namespace ReniTest
             Data.PrintText(", ");
             Data.PrintText(")");
             data.Drop(1);
-            ;
         }
     }
 }

@@ -1,6 +1,7 @@
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;
@@ -77,7 +78,7 @@ namespace Reni.Feature
         (
             Category category,
             ResultCache left,
-            IToken currentTarget,
+            SourcePart currentTarget,
             ContextBase context,
             ValueSyntax right
         )

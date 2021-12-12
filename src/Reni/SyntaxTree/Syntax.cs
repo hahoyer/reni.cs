@@ -113,9 +113,9 @@ namespace Reni.SyntaxTree
             get
             {
                 var main = Anchor.Items.FirstOrDefault();
-                var mainPosition = main?.Token.Characters;
+                var mainPosition = main?.Token;
                 var child = DirectChildren.FirstOrDefault()?.LeftMostAnchor;
-                var childPosition = child?.Token.Characters;
+                var childPosition = child?.Token;
                 return mainPosition != null && (childPosition == null || mainPosition < childPosition)
                     ? main
                     : child;
@@ -127,9 +127,9 @@ namespace Reni.SyntaxTree
             get
             {
                 var main = Anchor.Items.LastOrDefault();
-                var mainPosition = main?.Token.Characters;
+                var mainPosition = main?.Token;
                 var child = DirectChildren.LastOrDefault()?.RightMostAnchor;
-                var childPosition = child?.Token.Characters;
+                var childPosition = child?.Token;
                 return mainPosition != null && (childPosition == null || mainPosition > childPosition)
                     ? main
                     : child;
@@ -149,7 +149,7 @@ namespace Reni.SyntaxTree
         internal IEnumerable<SourcePart> GetParserLevelGroup(int index)
             => Anchor.Items
                 .Where(item => item.TokenClass.IsBelongingTo(Anchor.Items[index].TokenClass))
-                .Select(item => item.Token.Characters);
+                .Select(item => item.Token);
         internal SourcePart[] Anchors => Anchor.SourceParts;
 
 

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -14,7 +13,6 @@ namespace ReniLSP
 {
     static class MainContainer
     {
-
         public static async Task Main(string[] args)
         {
             if(args.SingleOrDefault() == "none")
@@ -42,16 +40,16 @@ namespace ReniLSP
         static Task Initialized
         (
             ILanguageServer server, InitializeParams request, InitializeResult response
-            , CancellationToken cancellationtoken
+            , CancellationToken cancellationToken
         )
         {
-            Dumpable.NotImplementedFunction(server, request, response, cancellationtoken);
+            Dumpable.NotImplementedFunction(server, request, response, cancellationToken);
             return Task.CompletedTask;
         }
 
-        static Task Initialize(ILanguageServer server, InitializeParams request, CancellationToken cancellationtoken)
+        static Task Initialize(ILanguageServer server, InitializeParams request, CancellationToken cancellationToken)
         {
-            Dumpable.NotImplementedFunction(server, request, cancellationtoken);
+            Dumpable.NotImplementedFunction(server, request, cancellationToken);
             return Task.CompletedTask;
         }
 
@@ -78,9 +76,9 @@ namespace ReniLSP
 
             void ILogger.Log<TState>
             (
-                LogLevel logLevel, EventId eventId, TState state, Exception? exception
-                , Func<TState, Exception?, string> formatter
-            ) => ($"{CategoryName}: [{logLevel}] {formatter(state, exception)}").Log();
+                LogLevel logLevel, EventId eventId, TState state, Exception exception
+                , Func<TState, Exception, string> formatter
+            ) => $"{CategoryName}: [{logLevel}] {formatter(state, exception)}".Log();
         }
 
         void IDisposable.Dispose() { }

@@ -79,6 +79,7 @@ namespace hw.Scanner
         [UsedImplicitly]
         string DumpCurrent => Id;
 
+        [DisableDump]
         public(TextPosition start, TextPosition end) TextPosition
             => (Source.GetTextPosition(Position), Source.GetTextPosition(EndPosition));
 

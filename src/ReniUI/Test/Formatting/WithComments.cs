@@ -1,7 +1,5 @@
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI.Test;
-using ReniUI.Test.Formatting;
 
 namespace ReniUI.Test.Formatting
 {
@@ -26,7 +24,6 @@ namespace ReniUI.Test.Formatting
 
             const string expectedText =
                 @"137;
-
 ################################################################
 # Test
 ################################################################

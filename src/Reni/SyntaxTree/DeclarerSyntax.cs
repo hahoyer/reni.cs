@@ -159,7 +159,7 @@ namespace Reni.SyntaxTree
         }
 
         static NameSyntax GetNameSyntax(BinaryTree name)
-            => name == null? null : new NameSyntax(name.Token.Characters.Id, Anchor.Create(name));
+            => name == null? null : new NameSyntax(name.Token.Id, Anchor.Create(name));
 
         static TagSyntax GetTagSyntax((BinaryTree[] anchors, BinaryTree tag) target)
         {
@@ -171,7 +171,7 @@ namespace Reni.SyntaxTree
             return new
             (
                 tagToken
-                , tagToken == null? IssueId.InvalidDeclarationTag.Issue(tag.Token.Characters) : null
+                , tagToken == null? IssueId.InvalidDeclarationTag.Issue(tag.Token) : null
                 , Anchor.Create(tag).Combine(target.anchors)
             );
         }

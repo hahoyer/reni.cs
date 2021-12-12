@@ -1,5 +1,6 @@
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
@@ -13,9 +14,9 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal readonly ITerminal Terminal;
 
-        readonly IToken Token;
+        readonly SourcePart Token;
 
-        internal TerminalSyntax(ITerminal terminal, IToken token, Anchor anchor)
+        internal TerminalSyntax(ITerminal terminal, SourcePart token, Anchor anchor)
             : base(anchor)
         {
             Terminal = terminal;
@@ -30,7 +31,7 @@ namespace Reni.SyntaxTree
         internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
         [DisableDump]
-        internal string Id => Token.Characters.Id;
+        internal string Id => Token.Id;
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
@@ -44,9 +45,9 @@ namespace Reni.SyntaxTree
         [Node]
         readonly IPrefix Prefix;
 
-        readonly IToken Token;
+        readonly SourcePart Token;
 
-        public PrefixSyntax(IPrefix prefix, ValueSyntax right, IToken token, Anchor brackets)
+        public PrefixSyntax(IPrefix prefix, ValueSyntax right, SourcePart token, Anchor brackets)
             : base(brackets)
         {
             Prefix = prefix;
@@ -63,7 +64,7 @@ namespace Reni.SyntaxTree
             => Prefix.Result(context, category, Right, Token);
 
         public static Result<ValueSyntax> Create
-            (IPrefix prefix, Result<ValueSyntax> right, IToken token, Anchor brackets)
+            (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
             => new PrefixSyntax(prefix, right.Target, token, brackets).AddIssues<ValueSyntax>(right.Issues);
     }
 
@@ -79,9 +80,9 @@ namespace Reni.SyntaxTree
         readonly IInfix Infix;
 
         [PublicAPI]
-        readonly IToken Token;
+        readonly SourcePart Token;
 
-        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, IToken token, Anchor brackets)
+        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, SourcePart token, Anchor brackets)
             : base(brackets)
         {
             Left = left;
@@ -107,7 +108,7 @@ namespace Reni.SyntaxTree
 
         public static Result<ValueSyntax> Create
         (
-            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, IToken token
+            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, SourcePart token
             , Anchor brackets
         )
         {
@@ -130,9 +131,9 @@ namespace Reni.SyntaxTree
         readonly ISuffix Suffix;
 
         [PublicAPI]
-        readonly IToken Token;
+        readonly SourcePart Token;
 
-        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, IToken token, Anchor brackets)
+        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, SourcePart token, Anchor brackets)
             : base(brackets)
         {
             Left = left;
@@ -149,7 +150,7 @@ namespace Reni.SyntaxTree
             => Suffix.Result(context, category, Left);
 
         public static Result<ValueSyntax> Create
-            (Result<ValueSyntax> left, ISuffix suffix, IToken token, Anchor brackets)
+            (Result<ValueSyntax> left, ISuffix suffix, SourcePart token, Anchor brackets)
         {
             ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, token, brackets);
             return syntax.AddIssues(left.Issues);
@@ -158,13 +159,13 @@ namespace Reni.SyntaxTree
 
     interface ITerminal
     {
-        Result Result(ContextBase context, Category category, IToken token);
+        Result Result(ContextBase context, Category category, SourcePart token);
         ValueSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, ValueSyntax right, IToken token);
+        Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token);
     }
 
     interface IInfix

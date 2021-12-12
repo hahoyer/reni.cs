@@ -5,6 +5,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
@@ -263,7 +264,7 @@ namespace Reni.Context
         /// <param name="right"> the expression of the argument of the call. Must not be null </param>
         /// <param name="token"></param>
         /// <returns> </returns>
-        internal Result FunctionalArgResult(Category category, ValueSyntax right, IToken token)
+        internal Result FunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -299,7 +300,7 @@ namespace Reni.Context
         }
 
         internal Result PrefixResult
-            (Category category, Definable definable, IToken token, ValueSyntax right)
+            (Category category, Definable definable, SourcePart token, ValueSyntax right)
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)

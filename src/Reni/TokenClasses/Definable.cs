@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.SyntaxFactory;
@@ -20,7 +21,7 @@ namespace Reni.TokenClasses
 
         IValueProvider IValueToken.Provider => Factory.Definable;
 
-        internal ValueSyntax CreateForVisit(ValueSyntax left, ValueSyntax right, Anchor frameItems, IToken token)
+        internal ValueSyntax CreateForVisit(ValueSyntax left, ValueSyntax right, Anchor frameItems, SourcePart token)
             => ExpressionSyntax.Create(left, this, token, right, frameItems);
     }
 

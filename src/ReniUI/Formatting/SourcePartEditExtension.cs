@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using JetBrains.Annotations;
 
 namespace ReniUI.Formatting
 {
@@ -39,18 +40,7 @@ namespace ReniUI.Formatting
             Indent(this IEnumerable<ISourcePartEdit> target, int direction)
             => direction == 0? target : target.Select(node => node.Indent(direction));
 
-        internal static IEnumerable<ISourcePartEdit>
-            AddLineBreaks(this IEnumerable<ISourcePartEdit> target, int count)
-        {
-            if(count == 0)
-                return target;
-
-            var result = target.Select(i => i).ToArray();
-            (result.Length > 0).Assert();
-            result[0] = result[0].AddLineBreaks(count);
-            return result;
-        }
-
+        [UsedImplicitly]
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
 
         public static ISourcePartEdit CreateIndent(this ISourcePartEdit target, int count)
@@ -78,12 +68,6 @@ namespace ReniUI.Formatting
             var result = Target.GetEditPieces(parameter);
             parameter.Indent = currentIndent;
             return result;
-        }
-
-        ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
-        {
-            NotImplementedMethod(count);
-            return null;
         }
 
         bool ISourcePartEdit.HasLines => Target.HasLines;

@@ -35,7 +35,7 @@ namespace ReniUI.Formatting
 
         IEnumerable<IResultItem> IResultItem.CombineBack(NewWhiteSpace left)
             => IsLineBreak == left.IsLineBreak && !IsVisible
-                ? Preceed(left.Count - 1)
+                ? Precede(left.Count - 1)
                 : null;
 
         string IResultItem.NewText => "";
@@ -47,16 +47,17 @@ namespace ReniUI.Formatting
         public static WhiteSpace Create(IItem token, bool isVisible)
         {
             var isLineBreak = token.IsLineEnd();
-            var sourcePart = token.SourcePart;
+            var sourcePart = token.SourcePart();
 
             if(isLineBreak || sourcePart.Id != "\t")
                 return new WhiteSpace(sourcePart, isLineBreak, isVisible);
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             NotImplementedFunction(token, isLineBreak);
             return null;
         }
 
-        internal IEnumerable<IResultItem> Preceed(int count)
+        internal IEnumerable<IResultItem> Precede(int count)
             => count > 0
                 ? new[] {new NewWhiteSpace(count, IsLineBreak), MakeVisible}
                 : new[] {MakeVisible};

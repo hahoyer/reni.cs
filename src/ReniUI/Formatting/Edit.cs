@@ -21,13 +21,7 @@ namespace ReniUI.Formatting
             Location = location;
             NewText = newText;
             Flag = flag;
-            StopByObjectIds();
-        }
-
-        ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
-        {
-            NotImplementedMethod(count);
-            return null;
+            StopByObjectIds(230);
         }
 
         bool ISourcePartEdit.HasLines => NewText.Contains("\n");

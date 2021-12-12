@@ -202,7 +202,7 @@ namespace Reni.FeatureTest.Helper
             (target.Left == null).Assert();
             (target.Right == null).Assert();
             (target.TokenClass is TokenClasses.Number).Assert();
-            (BitsConst.Convert(target.Token.Characters.Id).ToInt64() == I).Assert();
+            (BitsConst.Convert(target.Token.Id).ToInt64() == I).Assert();
         }
 
         internal override void AssertLike(ValueSyntax syntax)

@@ -1,5 +1,4 @@
 using hw.UnitTest;
-using ReniUI.Test.Formatting;
 
 namespace ReniUI.Test.Formatting
 {

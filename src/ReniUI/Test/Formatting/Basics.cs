@@ -96,7 +96,7 @@ b";
                 .Replace("\r\n", "\n");
 
 
-            Tracer.Assert((newSource == expectedText), "\n\"" + newSource + "\"");
+            (newSource == expectedText).Assert("\n\"" + newSource + "\"");
         }
 
         [UnitTest]
