@@ -11,24 +11,15 @@ namespace Reni.TokenClasses
     {
         internal interface IParent { }
 
-        internal interface IComment { }
-
-        internal interface ISpace { }
-
-        internal interface ILineBreak { }
 
         internal interface IItemType { }
-
-        internal interface IStableLineBreak : ILineBreak { }
-
-        interface IVolatileLineBreak : ILineBreak { }
 
         interface IItemsType
         {
             IEnumerable<WhitespaceGroup> GetItems(SourcePart sourcePart, IParent parent);
         }
 
-        abstract class VariantListType : DumpableObject, IItemsType, IItemType
+        internal abstract class VariantListType : DumpableObject, IItemsType, IItemType
         {
             IEnumerable<WhitespaceGroup> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
             {
@@ -56,7 +47,7 @@ namespace Reni.TokenClasses
             protected abstract ItemPrototype[] VariantPrototypes { get; }
         }
 
-        sealed class ItemPrototype : DumpableObject
+        internal sealed class ItemPrototype : DumpableObject
         {
             internal readonly IItemType Type;
             internal readonly IMatch Match;
@@ -82,30 +73,30 @@ namespace Reni.TokenClasses
             };
         }
 
-        sealed class SpaceType : DumpableObject, ISpace, IItemType
+        sealed class SpaceType : DumpableObject, Whitespace.ISpace, IItemType
         {
             internal static readonly SpaceType Instance = new();
         }
 
-        sealed class LineEndType : DumpableObject, IVolatileLineBreak, IItemType
+        sealed class LineEndType : DumpableObject, Whitespace.IVolatileLineBreak, IItemType
         {
             internal static readonly LineEndType Instance = new();
         }
 
 
-        sealed class LineCommentType : DumpableObject, IItemType, IItemsType, IComment
+        internal sealed class LineCommentType : DumpableObject, IItemType, IItemsType, Whitespace.IComment
         {
-            sealed class HeadType : DumpableObject, IItemType
+            internal sealed class HeadType : DumpableObject, IItemType
             {
                 internal static readonly HeadType Instance = new();
             }
 
-            sealed class TextLineType : DumpableObject, IItemType
+            internal sealed class TextLineType : DumpableObject, IItemType
             {
                 internal static readonly TextLineType Instance = new();
             }
 
-            sealed class TailType : DumpableObject, IItemType, IStableLineBreak
+            internal sealed class TailType : DumpableObject, IItemType, Whitespace.IStableLineBreak
             {
                 internal static readonly TailType Instance = new();
             }
@@ -128,26 +119,26 @@ namespace Reni.TokenClasses
             }
         }
 
-        sealed class InlineCommentType : DumpableObject, IComment, IItemsType, IItemType, IParent
+        internal sealed class InlineCommentType : DumpableObject, Whitespace.IComment, IItemsType, IItemType, IParent
         {
-            sealed class HeadType : DumpableObject, IItemType
+            internal sealed class HeadType : DumpableObject, IItemType
             {
                 internal static readonly HeadType Instance = new();
             }
 
-            sealed class IdType : DumpableObject, IItemType
+            internal sealed class IdType : DumpableObject, IItemType
             {
                 internal static readonly IdType Instance = new();
             }
 
-            sealed class TextType : VariantListType
+            internal sealed class TextType : VariantListType
             {
-                sealed class TextLineType : DumpableObject, IItemType
+                internal     sealed class TextLineType : DumpableObject, IItemType
                 {
                     internal static readonly TextLineType Instance = new();
                 }
 
-                sealed class LineEndType : DumpableObject, IStableLineBreak, IItemType
+                internal sealed class LineEndType : DumpableObject, Whitespace.IStableLineBreak, IItemType
                 {
                     internal static readonly LineEndType Instance = new();
                 }
@@ -256,13 +247,13 @@ namespace Reni.TokenClasses
 
             var item = GetSeparatorRelevantItem(areEmptyLinesPossible);
             if(item != null)
-                return item.Type is IComment;
+                return item.Type is Whitespace.IComment;
             return null;
         }
 
         WhitespaceGroup GetSeparatorRelevantItem(bool areEmptyLinesPossible)
         {
-            if(Type is IComment or IStableLineBreak || areEmptyLinesPossible && Type is IVolatileLineBreak)
+            if(Type is Whitespace.IComment or Whitespace.IStableLineBreak || areEmptyLinesPossible && Type is Whitespace.IVolatileLineBreak)
                 return this;
             return Items
                 .Select(item => item.GetSeparatorRelevantItem(areEmptyLinesPossible))
@@ -298,7 +289,7 @@ namespace Reni.TokenClasses
                 return results.Any(result => result == null)? null : results.Stringify("");
             }
 
-            if(Type is IStableLineBreak || areEmptyLinesPossible && Type is IVolatileLineBreak)
+            if(Type is Whitespace.IStableLineBreak || areEmptyLinesPossible && Type is Whitespace.IVolatileLineBreak)
                 return null;
 
             NotImplementedMethod(areEmptyLinesPossible);

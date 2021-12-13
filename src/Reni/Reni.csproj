@@ -400,6 +400,7 @@
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
+    <Compile Include="TokenClasses\Whitespace.cs" />
     <Compile Include="TokenClasses\WhitespaceGroup.cs" />
     <Compile Include="Type\ConversionPath.cs" />
     <Compile Include="Type\ConversionService.cs" />
