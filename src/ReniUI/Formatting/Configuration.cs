@@ -1,6 +1,8 @@
-﻿namespace ReniUI.Formatting
+﻿using hw.DebugFormatter;
+
+namespace ReniUI.Formatting
 {
-    sealed class Configuration
+    sealed class Configuration: DumpableObject
     {
         public int? EmptyLineLimit;
         public int? MaxLineLength;

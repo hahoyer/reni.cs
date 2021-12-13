@@ -20,7 +20,7 @@ text1
 text1
 ";
 
-            text.SimpleFormattingTest(expectedText,spaceReplacement:'_');
+            text.SimpleFormattingTest(expectedText, spaceReplacement: '_');
         }
 
         [UnitTest]
@@ -54,7 +54,7 @@ texxxxxxxxxxxt
                 @"#asdf
 texxxxxxxxxxxt";
 
-            text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
+            text.SimpleFormattingTest(expectedText, emptyLineLimit: 0);
         }
 
         [UnitTest]
@@ -84,6 +84,51 @@ texxxxxxxxxxxt";
 ";
             text.SimpleFormattingTest(expectedText);
         }
+
+        [UnitTest]
+        [Test]
+        public void SeparatorBeforeComment1()
+        {
+            const string text =
+                @"head#( asdf )#";
+            const string expectedText =
+                @"head #( asdf )#";
+            text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
+        }
+        [UnitTest]
+        [Test]
+        public void SeparatorBeforeComment2()
+        {
+            const string text =
+                @"head #( asdf )#";
+            const string expectedText =
+                @"head #( asdf )#";
+            text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
+        }
+
+        [UnitTest]
+        [Test]
+        public void SeparatorBeforeComment3()
+        {
+            const string text =
+                @"head     #( asdf )#";
+            const string expectedText =
+                @"head #( asdf )#";
+            text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
+        }
+
+        [UnitTest]
+        [Test]
+        public void SeparatorBeforeComment4()
+        {
+            const string text =
+                @"head
+#( asdf )#";
+            const string expectedText =
+                @"head #( asdf )#";
+            text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
+        }
+
         [UnitTest]
         [Test]
         public void ComplexText()
@@ -132,6 +177,5 @@ texxxxxxx
 
             text.SimpleFormattingTest(expectedText);
         }
-
     }
 }

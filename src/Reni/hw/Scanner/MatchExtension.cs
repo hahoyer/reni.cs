@@ -22,12 +22,12 @@ namespace hw.Scanner
             readonly Match.IError Error;
             public ErrorMatch(Match.IError error) => Error = error;
 
-            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+            int? IMatch.Match(SourcePart span, bool isForward)
             {
                 if(Error is IPositionExceptionFactory positionFactory)
-                    throw positionFactory.Create(sourcePosition);
+                    throw positionFactory.Create(span.GetStart(isForward));
 
-                throw new Match.Exception(sourcePosition, Error);
+                throw new Match.Exception(span.GetStart(isForward), Error);
             }
         }
 
@@ -44,11 +44,21 @@ namespace hw.Scanner
                 Type = isCaseSensitive? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+            int? IMatch.Match(SourcePart span, bool isForward)
             {
-                var result = (isForward? 1 : -1) * Data.Length;
-                var startPosition = sourcePosition - (isForward? 0 : Data.Length);
-                return startPosition.IsValid && startPosition.StartsWith(Data, Type)? result : null;
+                if(span.Length < Data.Length)
+                    return null;
+
+                if(isForward)
+                {
+                    var startPosition = span.Start;
+                    return startPosition.StartsWith(Data, Type)? Data.Length : null;
+                }
+                else
+                {
+                    var startPosition = span.End - Data.Length;
+                    return startPosition.StartsWith(Data, Type)? -Data.Length : null;
+                }
             }
         }
 
@@ -79,8 +89,10 @@ namespace hw.Scanner
                 Comparer = isCaseSensitive? Default : UpperInvariant;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
-                => Data.Contains((sourcePosition - (isForward? 0 : 1)).Current, Comparer)? 1 : null;
+            int? IMatch.Match(SourcePart span, bool isForward)
+                => span.Length > 0 && Data.Contains((span.GetStart(isForward) - (isForward? 0 : 1)).Current, Comparer)
+                    ? 1
+                    : null;
 
             static IEqualityComparer<char> Default => new DefaultComparer();
             static IEqualityComparer<char> UpperInvariant => new UpperInvariantComparer();
@@ -100,8 +112,8 @@ namespace hw.Scanner
                 Other = other;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
-                => Data.Match(sourcePosition, isForward) ?? Other.Match(sourcePosition, isForward);
+            int? IMatch.Match(SourcePart span, bool isForward) 
+                => Data.Match(span, isForward) ?? Other.Match(span, isForward);
         }
 
         sealed class Repeater : DumpableObject, IMatch
@@ -125,25 +137,34 @@ namespace hw.Scanner
                 MaxCount = maxCount;
             }
 
-            int? IMatch.Match(SourcePosition sourcePosition, bool isForward)
+            int? IMatch.Match(SourcePart span, bool isForward)
             {
                 var count = 0;
-                var current = sourcePosition;
-                while(true)
+                var start = span.GetStart(isForward);
+                var end = span.GetEnd(isForward);
+                var factor = isForward? 1 : -1;
+                var current = start.Clone;
+
+                while(current != end)
                 {
-                    var result = current - sourcePosition;
+                    if(isForward)
+                        (current < end).Assert();
+                    else
+                        (current > end).Assert();
+
+                    var result = current - start;
                     if(count == MaxCount)
                         return result;
 
-                    var length = Data.Match(current, isForward);
+                    var length = Data.Match(current.Span(end), isForward);
                     if(length == null)
                         return count < MinCount? null : result;
-                    if(isForward && current.IsEnd || !isForward && current.Position <= 0)
-                        return null;
 
                     current += length.Value;
                     count++;
                 }
+
+                return Data.Match(current.Span(end), isForward);
             }
         }
 

@@ -23,7 +23,7 @@ namespace ReniUI.Formatting
                 .ToArray();
         }
 
-        internal static IEnumerable<Edit> GetEditPieces(this ISourcePartEdit target, EditPieceParameter parameter)
+        internal static IEnumerable<Edit> GetEditPieces(this ISourcePartEdit target, IEditPiecesConfiguration parameter)
         {
             switch(target)
             {
@@ -61,7 +61,7 @@ namespace ReniUI.Formatting
             Count = count;
         }
 
-        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
+        IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
             var currentIndent = parameter.Indent;
             parameter.Indent += Count;
@@ -83,7 +83,12 @@ namespace ReniUI.Formatting
 
     interface IEditPieces
     {
-        IEnumerable<Edit> Get(EditPieceParameter parameter);
+        IEnumerable<Edit> Get(IEditPiecesConfiguration parameter);
+    }
+
+    interface IEditPiecesConfiguration
+    {
+        int Indent { get; set; }
     }
 
     [Obsolete("", true)]

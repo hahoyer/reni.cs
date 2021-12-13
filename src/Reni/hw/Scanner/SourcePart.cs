@@ -129,6 +129,7 @@ namespace hw.Scanner
 
         public static SourcePart Span(SourcePosition first, SourcePosition other)
         {
+            (first.Source == other.Source).Assert();
             var length = other - first;
             return new(first.Source, first.Position, length);
         }
@@ -221,5 +222,9 @@ namespace hw.Scanner
 
         bool Equals(SourcePart other)
             => Length == other.Length && Position == other.Position && Equals(Source, other.Source);
+
+        public SourcePosition GetStart(bool isForward) => isForward? Start : End;
+        public SourcePosition GetEnd(bool isForward) => isForward? End: Start;
+        public int? Match(IMatch automaton, bool isForward = true) => automaton.Match(this, isForward);
     }
 }

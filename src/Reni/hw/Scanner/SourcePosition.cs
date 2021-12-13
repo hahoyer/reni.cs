@@ -3,6 +3,7 @@ using System.Diagnostics;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
+using Reni.TokenClasses;
 using SourcePosn = hw.Scanner.SourcePosition;
 
 // ReSharper disable CheckNamespace
@@ -152,7 +153,11 @@ namespace hw.Scanner
             return "<invalid>";
         }
 
-        public int? Match(IMatch automaton, bool isForward = true) => automaton.Match(new(Source, Position),isForward);
+        public int? Match(IMatch automaton, bool isForward = true)
+        {
+            var span = Span(Source + (isForward? Source.Length : 0));
+            return automaton.Match(span, isForward);
+        }
 
         public bool StartsWith(string data, StringComparison type = StringComparison.InvariantCulture)
         {

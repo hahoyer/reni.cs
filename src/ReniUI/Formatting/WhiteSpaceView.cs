@@ -50,7 +50,7 @@ namespace ReniUI.Formatting
         /// </summary>
         /// <returns></returns>
         [Obsolete("", true)]
-        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
+        IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
             NotImplementedMethod(parameter);
             return default;
@@ -77,5 +77,6 @@ namespace ReniUI.Formatting
             return default;
             //return last.GetLineBreakAtEnd();
         }
+
     }
 }

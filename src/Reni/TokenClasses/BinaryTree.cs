@@ -155,10 +155,9 @@ namespace Reni.TokenClasses
         public BinaryTree[] ParserLevelGroup
             => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? new BinaryTree[0]);
 
-        [DisableDump]
-        public bool IsSeparatorRequired
-            => WhiteSpaces.SourcePart.GetSeparatorRequest() ??
-                SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
+        public bool GetIsSeparatorRequired(bool areEmptyLinesPossible) 
+            => WhiteSpaces.GetSeparatorRequest(areEmptyLinesPossible) ??
+            SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
 
 
         [DisableDump]
@@ -319,7 +318,7 @@ namespace Reni.TokenClasses
             if(tokenString == null)
                 return null;
 
-            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
+            tokenString = (GetIsSeparatorRequired(areEmptyLinesPossible)? " " : "") + tokenString;
 
             var leftResult = Left == null
                 ? ""

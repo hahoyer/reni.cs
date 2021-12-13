@@ -19,7 +19,9 @@ namespace Reni.TokenClasses
 
         internal interface IItemType { }
 
-        interface IVolatileLineBreak { }
+        internal interface IStableLineBreak : ILineBreak { }
+
+        interface IVolatileLineBreak : ILineBreak { }
 
         interface IItemsType
         {
@@ -33,14 +35,17 @@ namespace Reni.TokenClasses
                 var sourcePosition = sourcePart.Start.Clone;
                 while(sourcePosition < sourcePart.End)
                 {
-                    var result = VariantPrototypes
-                        .Select(p => (p.Type, Length: sourcePosition.Match(p.Match)))
+                    var valueTuples = VariantPrototypes
+                        .Select(p => (p.Type, Length: sourcePosition.Span(sourcePart.End).Match(p.Match)))
+                        .ToArray();
+                    var result = valueTuples
                         .FirstOrDefault(p => p.Length != null);
 
                     result.AssertIsNotNull();
                     result.Length.AssertIsNotNull();
+                    Tracer.ConditionalBreak(result.Length == 0);
 
-                    var resultingSourcePart = sourcePosition.Span(result.Length.Value);
+                    var resultingSourcePart = sourcePosition.Span(T(result.Length.Value, sourcePart.EndPosition).Min());
                     (resultingSourcePart.End <= sourcePart.End).Assert();
                     yield return new(result.Type, resultingSourcePart, parent);
                     sourcePosition += result.Length.Value;
@@ -100,7 +105,7 @@ namespace Reni.TokenClasses
                 internal static readonly TextLineType Instance = new();
             }
 
-            sealed class TailType : DumpableObject, IItemType, ILineBreak
+            sealed class TailType : DumpableObject, IItemType, IStableLineBreak
             {
                 internal static readonly TailType Instance = new();
             }
@@ -142,17 +147,18 @@ namespace Reni.TokenClasses
                     internal static readonly TextLineType Instance = new();
                 }
 
-                sealed class LineEndType : DumpableObject, ILineBreak, IItemType
+                sealed class LineEndType : DumpableObject, IStableLineBreak, IItemType
                 {
                     internal static readonly LineEndType Instance = new();
                 }
 
                 internal static readonly TextType Instance = new();
 
+                [DisableDump]
                 protected override ItemPrototype[] VariantPrototypes { get; } =
                 {
-                    new(TextLineType.Instance, Lexer.Instance.LineEnd.Until)
-                    , new(LineEndType.Instance, Lexer.Instance.LineEnd)
+                    new(LineEndType.Instance, Lexer.Instance.LineEnd)
+                    , new(TextLineType.Instance, Lexer.Instance.LineEndOrEnd.Until)
                 };
             }
 
@@ -170,7 +176,7 @@ namespace Reni.TokenClasses
                 var head = sourcePart.Start.Span(headLength.Value);
                 yield return new(HeadType.Instance, head, parent);
 
-                var tailLength = sourcePart.End.Match(Lexer.Instance.InlineCommentTail, false);
+                var tailLength = sourcePart.Match(Lexer.Instance.InlineCommentTail, false);
                 tailLength.AssertIsNotNull();
                 var tail = sourcePart.End.Span(tailLength.Value);
 
@@ -189,7 +195,7 @@ namespace Reni.TokenClasses
                     yield break;
                 }
 
-                var beforeWhiteSpace = sourcePart.Start.Match(Match.WhiteSpace.UntilWithBoundary(sourcePart.End));
+                var beforeWhiteSpace = sourcePart.Match(Match.WhiteSpace.Until);
                 if(beforeWhiteSpace == null)
                 {
                     yield return new(TextType.Instance, sourcePart, this);
@@ -198,7 +204,7 @@ namespace Reni.TokenClasses
 
                 var open = sourcePart.Start.Span(beforeWhiteSpace.Value);
 
-                var afterWhiteSpace = sourcePart.End.Match(Match.WhiteSpace.UntilWithBoundary(sourcePart.End), false);
+                var afterWhiteSpace = sourcePart.Match(Match.WhiteSpace.Until, false);
                 afterWhiteSpace.AssertIsNotNull();
                 var close = sourcePart.End.Span(afterWhiteSpace.Value);
 
@@ -240,6 +246,29 @@ namespace Reni.TokenClasses
         [EnableDump]
         WhitespaceGroup[] Items => ItemsCache ??= GetItems();
 
+        public bool? GetSeparatorRequest(bool areEmptyLinesPossible)
+        {
+            if(SourcePart.Position == 0 || SourcePart.End.IsEnd)
+                return false;
+
+            if(SourcePart.Length == 0)
+                return null;
+
+            var item = GetSeparatorRelevantItem(areEmptyLinesPossible);
+            if(item != null)
+                return item.Type is IComment;
+            return null;
+        }
+
+        WhitespaceGroup GetSeparatorRelevantItem(bool areEmptyLinesPossible)
+        {
+            if(Type is IComment or IStableLineBreak || areEmptyLinesPossible && Type is IVolatileLineBreak)
+                return this;
+            return Items
+                .Select(item => item.GetSeparatorRelevantItem(areEmptyLinesPossible))
+                .FirstOrDefault(item => item != null);
+        }
+
         WhitespaceGroup[] GetItems()
             => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhitespaceGroup[0];
 
@@ -269,7 +298,7 @@ namespace Reni.TokenClasses
                 return results.Any(result => result == null)? null : results.Stringify("");
             }
 
-            if(Type is ILineBreak || areEmptyLinesPossible && Type is IVolatileLineBreak)
+            if(Type is IStableLineBreak || areEmptyLinesPossible && Type is IVolatileLineBreak)
                 return null;
 
             NotImplementedMethod(areEmptyLinesPossible);

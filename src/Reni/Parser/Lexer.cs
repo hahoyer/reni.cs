@@ -18,6 +18,7 @@ namespace Reni.Parser
         internal readonly Match LineCommentHead;
         internal readonly Match InlineCommentHead;
         internal readonly Match InlineCommentTail;
+        internal readonly Match LineEndOrEnd;
 
         readonly IMatch Any;
         readonly IssueId InvalidComment = IssueId.EOFInComment;
@@ -43,11 +44,11 @@ namespace Reni.Parser
             Any = symbol1.Else(identifier);
 
             LineEnd = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
-            var lineEndOrEnd = LineEnd.Else(Match.End);
+            LineEndOrEnd = LineEnd.Else(Match.End);
 
             LineCommentHead = "#".Box();
             LineComment = LineCommentHead +
-                lineEndOrEnd
+                LineEndOrEnd
                     .Else
                     (
                         "(".AnyChar().Not +
@@ -79,7 +80,7 @@ namespace Reni.Parser
                 (
                     head =>
                     {
-                        var textEnd = head.Else(lineEndOrEnd + InvalidTextEnd);
+                        var textEnd = head.Else(LineEndOrEnd + InvalidTextEnd);
                         return textEnd.Find + (head + textEnd.Find).Repeat();
                     })
                 .Else(verbatimText);
@@ -143,8 +144,7 @@ namespace Reni.Parser
 
         public bool HasComment(SourcePart sourcePart)
             => sourcePart
-                .Start
-                .Match(LineComment.Else(InlineComment).FindWithBoundary(sourcePart.End)).HasValue;
+                .Match(LineComment.Else(InlineComment).Find).HasValue;
 
         public static bool IsMultiLineCommentEnd(IItem item)
         {
