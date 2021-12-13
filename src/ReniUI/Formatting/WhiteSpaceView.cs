@@ -52,8 +52,8 @@ namespace ReniUI.Formatting
         [Obsolete("", true)]
         IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
+            yield break;
             NotImplementedMethod(parameter);
-            return default;
         }
 
         bool ISourcePartEdit.HasLines => Target.TargetLineBreakCount > 0;

@@ -112,7 +112,7 @@ namespace hw.Scanner
                 Other = other;
             }
 
-            int? IMatch.Match(SourcePart span, bool isForward) 
+            int? IMatch.Match(SourcePart span, bool isForward)
                 => Data.Match(span, isForward) ?? Other.Match(span, isForward);
         }
 
@@ -142,16 +142,10 @@ namespace hw.Scanner
                 var count = 0;
                 var start = span.GetStart(isForward);
                 var end = span.GetEnd(isForward);
-                var factor = isForward? 1 : -1;
                 var current = start.Clone;
 
-                while(current != end)
+                while(true)
                 {
-                    if(isForward)
-                        (current < end).Assert();
-                    else
-                        (current > end).Assert();
-
                     var result = current - start;
                     if(count == MaxCount)
                         return result;
@@ -160,11 +154,18 @@ namespace hw.Scanner
                     if(length == null)
                         return count < MinCount? null : result;
 
-                    current += length.Value;
                     count++;
-                }
 
-                return Data.Match(current.Span(end), isForward);
+                    if(length == 0)
+                        return count < MinCount? null : result;
+
+                    if(isForward)
+                        (current < end).Assert();
+                    else
+                        (current > end).Assert();
+
+                    current += length.Value;
+                }
             }
         }
 

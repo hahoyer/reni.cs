@@ -1,4 +1,5 @@
 using System;
+using System.Resources;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
 
@@ -135,24 +136,24 @@ namespace hw.Scanner
             {
                 var start = span.GetStart(isForward);
                 var end = span.GetEnd(isForward);
-                var factor = isForward? 1 : -1;
 
                 var current = start.Clone;
-                while(current != end)
+                while(true)
                 {
+                    var result = SingleMatch(current, start, end, isForward);
+                    if(result != null)
+                        return result;
+
+                    if(current == end)
+                        return null;
+
                     if(isForward)
                         (current < end).Assert();
                     else
                         (current > end).Assert();
 
-                    var result = SingleMatch(current, start, end, isForward);
-                    if(result != null)
-                        return result;
-
-                    current.Position += factor;
+                    current.Position += isForward? 1 : -1;
                 }
-
-                return SingleMatch(current, start, end, isForward);
             }
 
             int? SingleMatch(SourcePosition current, SourcePosition start, SourcePosition end, bool isForward)
