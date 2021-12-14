@@ -27,6 +27,7 @@
     <Compile Include="Formatting\LineGroup.cs" />
     <Compile Include="Formatting\StableLineGroup.cs" />
     <Compile Include="Test\Formatting\Comments.cs" />
+    <Compile Include="Test\Formatting\CommentsOfLists.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
     <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
