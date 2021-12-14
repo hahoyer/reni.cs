@@ -77,6 +77,7 @@ namespace hw.UnitTest
         string PendingTestsString
             => $@"//{HeaderText}
 
+// ReSharper disable once CheckNamespace
 namespace hw.UnitTest
 {{
     public static class PendingTests

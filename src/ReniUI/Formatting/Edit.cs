@@ -16,7 +16,7 @@ namespace ReniUI.Formatting
 
         readonly string Flag;
 
-        Edit(SourcePart location, string newText, string flag)
+        internal Edit(SourcePart location, string newText, string flag)
         {
             Location = location;
             NewText = newText;

@@ -1,5 +1,4 @@
 using System;
-using System.Resources;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
 

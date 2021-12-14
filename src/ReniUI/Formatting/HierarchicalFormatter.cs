@@ -17,14 +17,15 @@ namespace ReniUI.Formatting
                 return new Edit[0];
 
             var item = Syntax.Create(compilerBrowser.Syntax.FlatItem, Configuration);
-            item.t();
+            //item.t();
             item.SetupLineBreaks();
-            item.LogDump().Log(FilePositionTag.Debug);
+            //item.LogDump().Log(FilePositionTag.Debug);
             var sourcePartEdits = item.Edits.ToArray();
-            var editPieces = sourcePartEdits
-                .GetEditPieces(Configuration)
-                .Where(editPiece=> IsRelevant(editPiece, targetPart))
-                .ToArray();
+            var editPieces
+                = sourcePartEdits
+                    .GetEditPieces()
+                    .Where(editPiece => IsRelevant(editPiece, targetPart))
+                    .ToArray();
             editPieces.LogDump().Log(FilePositionTag.Debug);
             return editPieces;
         }
@@ -34,9 +35,9 @@ namespace ReniUI.Formatting
             if(targetPart == null)
                 return true;
             var sourcePart = editPiece.Location;
-            return targetPart.Source == sourcePart.Source
-                && targetPart.Position <= sourcePart.EndPosition 
-                && sourcePart.Position <= targetPart.EndPosition;
+            return targetPart.Source == sourcePart.Source &&
+                targetPart.Position <= sourcePart.EndPosition &&
+                sourcePart.Position <= targetPart.EndPosition;
         }
     }
 }

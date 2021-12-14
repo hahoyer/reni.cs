@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Whitespace;
 using Reni.Validation;
 
 namespace ReniUI.Classification
@@ -15,6 +15,7 @@ namespace ReniUI.Classification
         {
             [DisableDump]
             internal readonly Item Item;
+
             [DisableDump]
             internal readonly SourcePart SourcePart;
 
@@ -78,6 +79,10 @@ namespace ReniUI.Classification
 
         [DisableDump]
         public virtual Issue Issue => null;
+
+        internal virtual IWhitespaceItem GetItem<TItemType>()
+            where TItemType : IItemType
+            => null;
 
         public override bool Equals(object obj)
         {
@@ -166,7 +171,7 @@ namespace ReniUI.Classification
                 yield return "brace-like";
         }
 
-        public Trimmed TrimLine(SourcePart span) => new(this, span);
+        internal Trimmed TrimLine(SourcePart span) => new(this, span);
 
         bool Equals(Item other) => SourcePart == other.SourcePart;
 
@@ -189,13 +194,13 @@ namespace ReniUI.Classification
             return result;
         }
 
-        public static Item GetRightNeighbor(Helper.Syntax target, int current)
+        internal static Item GetRightNeighbor(Helper.Syntax target, int current)
         {
             NotImplementedFunction(target, current);
             return default;
         }
 
-        public string ShortDump()
+        internal string ShortDump()
         {
             var start = SourcePart.Start.TextPosition;
             return

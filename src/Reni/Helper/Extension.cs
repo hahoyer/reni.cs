@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.TokenClasses;
 
@@ -210,7 +208,7 @@ namespace Reni.Helper
             }
         }
 
-        internal static string FlatFormat(this string target, WhitespaceGroup prefix, bool areEmptyLinesPossible)
+        internal static string FlatFormat(this string target, WhitespaceItem prefix, bool areEmptyLinesPossible)
         {
             if(prefix == null)
                 return target;   

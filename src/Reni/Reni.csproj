@@ -368,6 +368,8 @@
     <Compile Include="SyntaxFactory\IDeclarerToken.cs" />
     <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="TokenClasses\Whitespace\IItemsType.cs" />
+    <Compile Include="TokenClasses\Whitespace\IItemType.cs" />
     <Compile Include="TokenClasses\IssueClass.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
@@ -400,8 +402,16 @@
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
-    <Compile Include="TokenClasses\Whitespace.cs" />
-    <Compile Include="TokenClasses\WhitespaceGroup.cs" />
+    <Compile Include="TokenClasses\Whitespace\InlineCommentType.cs" />
+    <Compile Include="TokenClasses\Whitespace\ItemPrototype.cs" />
+    <Compile Include="TokenClasses\Whitespace\IWhitespaceItem.cs" />
+    <Compile Include="TokenClasses\Whitespace\LineCommentType.cs" />
+    <Compile Include="TokenClasses\Whitespace\LineEndType.cs" />
+    <Compile Include="TokenClasses\Whitespace\RootType.cs" />
+    <Compile Include="TokenClasses\Whitespace\SpaceType.cs" />
+    <Compile Include="TokenClasses\Whitespace\VariantListType.cs" />
+    <Compile Include="TokenClasses\Whitespace\Whitespace.cs" />
+    <Compile Include="TokenClasses\WhitespaceItem.cs" />
     <Compile Include="Type\ConversionPath.cs" />
     <Compile Include="Type\ConversionService.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />
@@ -467,6 +477,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="sys.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

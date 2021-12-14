@@ -79,6 +79,7 @@ namespace ReniVSIX
 
             var unused = reformat.Select(r => r.Location.Position).ToArray();
 
+            // ReSharper disable once LoopCanBePartlyConvertedToQuery
             foreach(var edit in reformat)
             {
                 var editSpan = new EditSpan

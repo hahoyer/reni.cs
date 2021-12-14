@@ -1,5 +1,6 @@
-//14:26:51.967 13.12.2021 ran 176 of 183 
+//23:54:26.117 13.12.2021 ran 176 of 183 
 
+// ReSharper disable once CheckNamespace
 namespace hw.UnitTest
 {
     public static class PendingTests
@@ -9,12 +10,6 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction2().GetTokenForPosition);
-TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SingleLine);
-TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SingleLineWithLineBreak);
-TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SingleLineWithVolatileLineBreak);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().MultiLineCommentSingleLine);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().ComplexText1);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment1);

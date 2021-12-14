@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using hw.Parser;
 using JetBrains.Annotations;
 using Reni.TokenClasses;
 
@@ -13,7 +12,6 @@ namespace ReniUI.Formatting
             if(target == null)
                 yield break;
             var isSeparatorRequired = target.GetIsSeparatorRequired(configuration.EmptyLineLimit!= 0);
-            var token = target.WhiteSpaces;
             yield return new  WhiteSpaceView
             (
                 target.WhiteSpaces

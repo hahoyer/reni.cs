@@ -1,30 +1,33 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Whitespace;
 
 namespace ReniUI.Classification
 {
     sealed class WhiteSpaceItem : Item
     {
-        readonly WhitespaceGroup Item;
+        readonly IWhitespaceItem Item;
 
-        internal WhiteSpaceItem(WhitespaceGroup item, BinaryTree anchor)
+        internal WhiteSpaceItem(WhitespaceItem item, BinaryTree anchor)
             : base(anchor)
             => Item = item;
 
         public override SourcePart SourcePart => Item.SourcePart;
 
-        public override bool IsComment => Item.Type is WhitespaceGroup.IComment;
-        public override bool IsSpace => Item.Type is WhitespaceGroup.ISpace;
-        public override bool IsLineEnd => Item.Type is WhitespaceGroup.ILineBreak;
-        //public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
+        public override bool IsComment => GetItem<IComment>() != null;
+        public override bool IsSpace => GetItem<ISpace>() != null;
+        public override bool IsLineEnd => GetItem<ILineBreak>() != null;
 
         [DisableDump]
         public override IEnumerable<SourcePart> ParserLevelGroup
         {
             get { yield break; }
         }
+
+        internal override IWhitespaceItem GetItem<TItemType>() 
+            => Item.GetItem<TItemType>();
     }
+
 }

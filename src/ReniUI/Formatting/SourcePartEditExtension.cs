@@ -1,18 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using JetBrains.Annotations;
 
 namespace ReniUI.Formatting
 {
     static class SourcePartEditExtension
     {
-        internal static IEnumerable<Edit>
-            GetEditPieces(this IEnumerable<ISourcePartEdit> target, Configuration configuration)
+        internal static IEnumerable<Edit> GetEditPieces(this IEnumerable<ISourcePartEdit> target)
         {
-            var parameter = new EditPieceParameter(configuration);
+            var parameter = new EditPieceParameter();
 
             var sortedTargets = target
                 .OrderBy(node => node.SourcePart.Position)
@@ -45,57 +42,5 @@ namespace ReniUI.Formatting
 
         public static ISourcePartEdit CreateIndent(this ISourcePartEdit target, int count)
             => count != 0 && target.HasLines? new IndentedSourcePartEdit(target, count) : target;
-    }
-
-    sealed class IndentedSourcePartEdit : DumpableObject, ISourcePartEdit, IEditPieces
-    {
-        [EnableDump]
-        internal readonly ISourcePartEdit Target;
-
-        [EnableDump]
-        internal readonly int Count;
-
-        public IndentedSourcePartEdit(ISourcePartEdit target, int count)
-        {
-            Target = target;
-            Count = count;
-        }
-
-        IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
-        {
-            var currentIndent = parameter.Indent;
-            parameter.Indent += Count;
-            var result = Target.GetEditPieces(parameter);
-            parameter.Indent = currentIndent;
-            return result;
-        }
-
-        bool ISourcePartEdit.HasLines => Target.HasLines;
-
-        ISourcePartEdit ISourcePartEdit.Indent(int count)
-        {
-            var newCount = count + Count;
-            return newCount == 0? Target : new IndentedSourcePartEdit(Target, newCount);
-        }
-
-        SourcePart ISourcePartEdit.SourcePart => Target.SourcePart;
-    }
-
-    interface IEditPieces
-    {
-        IEnumerable<Edit> Get(IEditPiecesConfiguration parameter);
-    }
-
-    interface IEditPiecesConfiguration
-    {
-        int Indent { get; set; }
-    }
-
-    [Obsolete("", true)]
-    enum IndentDirection
-    {
-        ToLeft
-        , ToRight
-        , NoIndent
     }
 }

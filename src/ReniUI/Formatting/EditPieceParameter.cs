@@ -4,9 +4,7 @@ namespace ReniUI.Formatting
 {
     sealed class EditPieceParameter : DumpableObject, IEditPiecesConfiguration
     {
-        readonly Configuration Configuration;
         int Indent;
-        public EditPieceParameter(Configuration configuration) => Configuration = configuration;
 
         int IEditPiecesConfiguration.Indent
         {
@@ -22,6 +20,7 @@ namespace ReniUI.Formatting
             return result == ""? base.GetNodeDump() : result;
         }
 
-        public int IndentCharacterCount => Indent > 0? Indent * Configuration.IndentCount : 0;
+        internal int GetIndentCharacterCount(int indentCount)
+            => Indent > 0? Indent * indentCount : 0;
     }
 }

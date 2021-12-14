@@ -20,6 +20,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Formatting\IEditPieces.cs" />
+    <Compile Include="Formatting\IEditPiecesConfiguration.cs" />
+    <Compile Include="Formatting\IndentDirection.cs" />
+    <Compile Include="Formatting\IndentedSourcePartEdit.cs" />
+    <Compile Include="Formatting\LineGroup.cs" />
+    <Compile Include="Formatting\StableLineGroup.cs" />
     <Compile Include="Test\Formatting\Comments.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />

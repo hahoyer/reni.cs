@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.TokenClasses;
+using Reni.TokenClasses.Whitespace;
 
 namespace ReniUI
 {
@@ -77,5 +77,4 @@ namespace ReniUI
         }
     }
 
-    interface ILineBreak { }
 }

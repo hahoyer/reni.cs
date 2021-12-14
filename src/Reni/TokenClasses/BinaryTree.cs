@@ -40,7 +40,7 @@ namespace Reni.TokenClasses
         internal readonly SourcePart Token;
 
         [DisableDump]
-        internal readonly WhitespaceGroup WhiteSpaces;
+        internal readonly WhitespaceItem WhiteSpaces;
 
         [DisableDump]
         internal Syntax Syntax;
