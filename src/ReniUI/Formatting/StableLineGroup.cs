@@ -4,7 +4,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.TokenClasses;
 using Reni.TokenClasses.Whitespace;
-using Reni.TokenClasses.Whitespace.Comment;
 
 namespace ReniUI.Formatting
 {
@@ -61,19 +60,32 @@ namespace ReniUI.Formatting
 
         internal IEnumerable<Edit> Get(IEditPiecesConfiguration parameter, bool isSeparatorRequired)
         {
-            if(!Items.Any() &&
-               (Tail?.Parent?.Type is IInline ||
-                   Tail?.Parent?.Parent?.Type is IInline))
-                return new Edit[0];
-
-            if(Tail == null)
+            if(Items.Any())
             {
-                if(Items.Length == 1)
-                    return Items[0].Get(parameter, isSeparatorRequired);
+                if(Tail == null)
+                {
+                    if(Items.Length == 1)
+                        return Items[0].Get(parameter, isSeparatorRequired);
+
+                    NotImplementedMethod(parameter, isSeparatorRequired);
+                    return default;
+                }
+
+                if(Configuration.EmptyLineLimit == null)
+                    return new Edit[0];
 
                 NotImplementedMethod(parameter, isSeparatorRequired);
                 return default;
             }
+
+            if(Tail == null)
+            {
+                NotImplementedMethod(parameter, isSeparatorRequired);
+                return default;
+            }
+
+            if(Tail.Parent?.Type is IComment || Tail.Parent?.Parent?.Type is IComment)
+                return new Edit[0];
 
             NotImplementedMethod(parameter, isSeparatorRequired);
             return default;

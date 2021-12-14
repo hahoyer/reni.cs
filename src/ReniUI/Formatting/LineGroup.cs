@@ -72,10 +72,10 @@ namespace ReniUI.Formatting
             int? EmptyLineLimit { get; }
         }
 
-        readonly IConfiguration Configuration;
-
         internal readonly SpacesGroup[] Items;
         internal readonly WhitespaceItem Tail;
+
+        readonly IConfiguration Configuration;
 
         LineGroup(IEnumerable<WhitespaceItem> allItems, IConfiguration configuration)
         {
@@ -115,11 +115,15 @@ namespace ReniUI.Formatting
                 return default;
             }
 
-            if(Configuration.EmptyLineLimit == null)
-                return new Edit[0];
+            if(Items.Any())
+            {
+                NotImplementedMethod(parameter, isSeparatorRequired);
+                return default;
+            }
 
-            NotImplementedMethod(parameter, isSeparatorRequired);
-            return default;
+            return Configuration.EmptyLineLimit <= 0
+                ? new[] { new Edit(Tail.SourcePart, "", "-LineBreak") }
+                : new Edit[0];
         }
     }
 }
