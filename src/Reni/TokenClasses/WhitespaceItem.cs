@@ -8,7 +8,7 @@ using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses
 {
-    sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem
+    sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
     {
         internal readonly SourcePart SourcePart;
 
@@ -35,6 +35,8 @@ namespace Reni.TokenClasses
 
         IParent IParent.Parent => Parent;
         IItemType IParent.Type => Type;
+
+        ContactType ISeparatorClass.ContactType => ContactType.Incompatible;
 
         SourcePart IWhitespaceItem.SourcePart => SourcePart;
 

@@ -7,13 +7,13 @@ namespace Reni.TokenClasses.Whitespace
     class LineGroup : DumpableObject
     {
         internal interface IConfiguration
-        {
-            int MinimalLineBreakCount { get; }
-            int? EmptyLineLimit { get; }
-        }
+        { }
 
-        internal readonly SpacesGroup[] Spaces;
-        internal readonly WhiteSpaceItem Main;
+        [EnableDump]
+        readonly SpacesGroup[] Spaces;
+
+        [EnableDump]
+        readonly WhiteSpaceItem Main;
 
         readonly IConfiguration Configuration;
 
@@ -40,5 +40,16 @@ namespace Reni.TokenClasses.Whitespace
         }
 
         static bool TailCondition(WhiteSpaceItem item) => item.Type is IVolatileLineBreak;
+
+        internal IEnumerable<Edit> GetEdits()
+        {
+            if(Spaces.Any())
+            {
+                NotImplementedMethod();
+                return default;
+            }
+
+            return new Edit[0];
+        }
     }
 }

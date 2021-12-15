@@ -1,17 +1,30 @@
+using JetBrains.Annotations;
 using Reni.Parser;
-using Reni.TokenClasses;
 
-namespace Reni.Helper
+namespace Reni.TokenClasses.Whitespace
 {
     static class SeparatorExtension
     {
+        [PublicAPI]
         internal static bool Get(ITokenClass left, ITokenClass right)
+            => Get(left as ISeparatorClass, right as ISeparatorClass);
+
+        [PublicAPI]
+        internal static bool Get(ITokenClass left, ISeparatorClass right)
+            => Get(left as ISeparatorClass, right);
+
+        [PublicAPI]
+        internal static bool Get(ISeparatorClass left, ITokenClass right)
+            => Get(left, right as ISeparatorClass);
+
+        [PublicAPI]
+        internal static bool Get(ISeparatorClass left, ISeparatorClass right)
             => PrettySeparatorType(left, right) ?? BaseSeparatorType(left, right);
 
-        static bool BaseSeparatorType(ITokenClass left, ITokenClass right)
+        static bool BaseSeparatorType(ISeparatorClass left, ISeparatorClass right)
             => !ContactType.Get(left).IsCompatible(ContactType.Get(right));
 
-        static bool? PrettySeparatorType(ITokenClass left, ITokenClass right)
+        static bool? PrettySeparatorType(ISeparatorClass left, ISeparatorClass right)
         {
             if(left == null || right == null)
                 return null;
@@ -24,10 +37,10 @@ namespace Reni.Helper
                right is LeftParenthesis ||
                right is List ||
                left is LeftParenthesis
-            )
+              )
                 return false;
 
-            if(right is Colon || left is ExclamationBoxToken)
+            if(right is Colon)
                 return null;
 
             return true;

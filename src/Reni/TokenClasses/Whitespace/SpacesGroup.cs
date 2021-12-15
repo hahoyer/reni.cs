@@ -7,8 +7,10 @@ namespace Reni.TokenClasses.Whitespace
 {
     class SpacesGroup : DumpableObject
     {
-        internal readonly WhiteSpaceItem[] Items;
-        internal readonly WhiteSpaceItem Tail;
+        [EnableDump]
+        readonly WhiteSpaceItem[] Items;
+        [EnableDump]
+        readonly WhiteSpaceItem Tail;
 
         SpacesGroup(IEnumerable<WhiteSpaceItem> allItems)
         {

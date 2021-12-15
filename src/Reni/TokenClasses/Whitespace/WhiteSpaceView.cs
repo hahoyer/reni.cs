@@ -10,14 +10,19 @@ namespace Reni.TokenClasses.Whitespace
         {
             new int MinimalLineBreakCount { get; }
             new int? EmptyLineLimit { get; }
-            bool IsSeparatorRequired{ get; }
+            bool IsSeparatorRequired { get; }
         }
 
         readonly WhiteSpaceItem Target;
         readonly IConfiguration Configuration;
 
+        [EnableDump]
         readonly LineGroup[] Lines;
+
+        [EnableDump]
         readonly SpacesGroup[] Spaces;
+
+        [EnableDump]
         readonly CommentGroup[] Comments;
 
         internal WhiteSpaceView(WhiteSpaceItem target, IConfiguration configuration)
@@ -33,19 +38,36 @@ namespace Reni.TokenClasses.Whitespace
         {
             (indent == 0).Assert();
 
-            foreach(var edit in Comments.SelectMany((comment,index)=>comment.GetEdits(indent, index != 0 || Configuration.IsSeparatorRequired)))
-                yield return edit;
+            var edits = new List<Edit>();
+            edits.AddRange(Comments.SelectMany(
+                (item, index) => item.GetEdits(indent, index != 0 || Configuration.IsSeparatorRequired)));
 
             if(Lines.Any())
             {
-                NotImplementedMethod(indent);
-                yield break;
+                var delta = Configuration.EmptyLineLimit ?? Lines.Length - Lines.Length;
+
+                if(delta < 0)
+                {
+                    NotImplementedMethod(indent);
+                    return default;
+                }
+
+                if(delta > 0)
+                {
+                    NotImplementedMethod(indent);
+                    return default;
+                }
+
+                edits.AddRange(Lines.SelectMany(item => item.GetEdits()));
             }
+
             if(Spaces.Any())
             {
                 NotImplementedMethod(indent);
-                yield break;
+                return default;
             }
+
+            return edits;
         }
     }
 }

@@ -132,12 +132,12 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Helper\ContactType.cs" />
     <Compile Include="Helper\Extension.cs" />
     <Compile Include="Helper\IFormatResult.cs" />
     <Compile Include="Helper\IntegerResult.cs" />
     <Compile Include="Helper\ITree.cs" />
-    <Compile Include="Helper\SeparatorExtension.cs" />
+    <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
+    <Compile Include="TokenClasses\Whitespace\SeparatorExtension.cs" />
     <Compile Include="Helper\StringResult.cs" />
     <Compile Include="Helper\SyntaxView.cs" />
     <Compile Include="Helper\PositionDictionary.cs" />
@@ -368,6 +368,7 @@
     <Compile Include="SyntaxFactory\IDeclarerToken.cs" />
     <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="TokenClasses\Whitespace\ISeparatorClass.cs" />
     <Compile Include="TokenClasses\Whitespace\SeparatorRequests.cs" />
     <Compile Include="TokenClasses\Whitespace\Edit.cs" />
     <Compile Include="TokenClasses\Whitespace\Extension.cs" />

@@ -45,11 +45,9 @@ namespace ReniUI.Formatting
         }
 
         int? CommentGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
-        int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
         int? WhiteSpaceView.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
         bool WhiteSpaceView.IConfiguration.IsSeparatorRequired => IsSeparatorRequired;
 
-        int LineGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
         int CommentGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
         int WhiteSpaceView.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
 
@@ -79,59 +77,5 @@ namespace ReniUI.Formatting
 
         [DisableDump]
         WhiteSpaceView WhiteSpaceView => WhiteSpaceViewCache.Value;
-
-        IEnumerable<Edit> GetEdits(LineGroup item, IEditPiecesConfiguration parameter, bool isSeparatorRequired)
-        {
-            if(item.Main == null)
-            {
-                if(item.Spaces.Length == 1)
-                {
-                    var item1 = item.Spaces[0];
-                    return GetEdits(item1, parameter, isSeparatorRequired);
-                }
-
-                NotImplementedMethod(item, parameter, isSeparatorRequired);
-                return default;
-            }
-
-            if(item.Spaces.Any())
-            {
-                NotImplementedMethod(item, parameter, isSeparatorRequired);
-                return default;
-            }
-
-            return Configuration.EmptyLineLimit <= 0
-                ? new[] { new Edit(item.Main.SourcePart, "", "-LineBreak") }
-                : new Edit[0];
-        }
-
-        IEnumerable<Edit> GetEdits(SpacesGroup item, IEditPiecesConfiguration parameter, bool isSeparatorRequired)
-        {
-            if(item.Tail == null)
-            {
-                if(isSeparatorRequired)
-                {
-                    if(item.Items.Length == 0)
-                    {
-                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                        NotImplementedMethod(item, parameter, isSeparatorRequired);
-                        return default;
-                    }
-
-                    if(item.Items.Length == 1)
-                        return new Edit[0];
-
-                    var sourcePart = item.Items[1].SourcePart.Start.Span(item.Items.Length - 1);
-                    return new[] { new Edit(sourcePart, "", "-Spaces") };
-                }
-
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                NotImplementedMethod(item, parameter, isSeparatorRequired);
-                return default;
-            }
-
-            NotImplementedMethod(item, parameter, isSeparatorRequired);
-            return default;
-        }
     }
 }

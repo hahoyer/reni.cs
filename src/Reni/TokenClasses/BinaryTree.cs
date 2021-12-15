@@ -109,7 +109,7 @@ namespace Reni.TokenClasses
         internal ITokenClass TokenClass => this.CachedValue(GetTokenClass);
 
         [DisableDump]
-        internal SourcePart SourcePart 
+        internal SourcePart SourcePart
             => LeftMost
                 .WhiteSpaces
                 .SourcePart
@@ -161,9 +161,12 @@ namespace Reni.TokenClasses
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns></returns>
-        public bool IsSeparatorRequired(bool areEmptyLinesPossible) 
-            => WhiteSpaces.IsNotEmpty(areEmptyLinesPossible) ||
-            SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
+        public bool IsSeparatorRequired(bool areEmptyLinesPossible)
+            => SeparatorExtension.Get
+            (
+                LeftNeighbor?.InnerTokenClass,
+                WhiteSpaces.IsNotEmpty(areEmptyLinesPossible)? WhiteSpaces : InnerTokenClass as ISeparatorClass
+            );
 
 
         [DisableDump]
@@ -236,7 +239,7 @@ namespace Reni.TokenClasses
 
             if(position < Token.End || position == Token.End && TokenClass is EndOfText)
                 return this;
-            
+
             return Right?.FindItemCache[position.Position];
         }
 
@@ -320,12 +323,10 @@ namespace Reni.TokenClasses
         {
             var separatorRequests = new SeparatorRequests
             {
-                Head = LeftNeighbor != null && LeftNeighbor.Token.Length > 0,
-                Inner = true,
-                Tail = Token.Length > 0
+                Head = LeftNeighbor != null && LeftNeighbor.Token.Length > 0, Inner = true, Tail = Token.Length > 0
             };
             var tokenString = Token.Id
-                .FlatFormat(Left == null?null:WhiteSpaces, areEmptyLinesPossible, separatorRequests);
+                .FlatFormat(Left == null? null : WhiteSpaces, areEmptyLinesPossible, separatorRequests);
 
             if(tokenString == null)
                 return null;
@@ -345,12 +346,12 @@ namespace Reni.TokenClasses
 
             var gapSeparatorRequests = new SeparatorRequests
             {
-                Head = Token.Length > 0,
-                Inner = true,
-                Tail = Right != null && Right.LeftMost.Token.Length > 0
+                Head = Token.Length > 0, Inner = true, Tail = Right != null && Right.LeftMost.Token.Length > 0
             };
             var gapString =
-                Right == null? "" : "".FlatFormat(Right.LeftMost.WhiteSpaces, areEmptyLinesPossible, gapSeparatorRequests);
+                Right == null
+                    ? ""
+                    : "".FlatFormat(Right.LeftMost.WhiteSpaces, areEmptyLinesPossible, gapSeparatorRequests);
             if(gapString == null)
                 return null;
 
