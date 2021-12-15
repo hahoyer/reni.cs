@@ -209,15 +209,5 @@ namespace Reni.Helper
             }
         }
 
-        internal static string FlatFormat
-            (this string target, WhiteSpaceItem prefix, bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
-        {
-            if(prefix == null)
-                return target;   
-
-            var result = prefix.FlatFormat(areEmptyLinesPossible, separatorRequests);
-            return result == null? null : result + target;
-        }
-
     }
 }

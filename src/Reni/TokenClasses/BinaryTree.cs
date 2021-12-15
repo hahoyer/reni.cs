@@ -197,17 +197,15 @@ namespace Reni.TokenClasses
 
         bool IsBracketLevel => InnerTokenClass is IRightBracket;
 
-        /// <summary>
-        ///     Returns true when a separator is required between token and preceding token or comment
-        /// </summary>
-        /// <param name="areEmptyLinesPossible"></param>
-        /// <returns></returns>
-        public bool IsSeparatorRequired(bool areEmptyLinesPossible)
-            => SeparatorExtension.Get
-            (
-                LeftNeighbor?.InnerTokenClass,
-                WhiteSpaces.IsNotEmpty(areEmptyLinesPossible)? WhiteSpaces : InnerTokenClass as ISeparatorClass
-            );
+        internal SeparatorRequests SeparatorRequests
+            => new()
+            {
+                Head = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, WhiteSpaces) //
+                , Inner = true
+                , Tail = SeparatorExtension.Get(WhiteSpaces, InnerTokenClass as ISeparatorClass) //
+                , Flat = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass as ISeparatorClass) //
+            };
+
 
         Issue GetIssue()
         {
@@ -322,13 +320,11 @@ namespace Reni.TokenClasses
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
             var separatorRequests = SeparatorRequests;
-            var tokenString = Token.Id
-                .FlatFormat(Left == null? null : WhiteSpaces, areEmptyLinesPossible, separatorRequests);
+            var tokenString = Left == null? "" : WhiteSpaces.FlatFormat(areEmptyLinesPossible, separatorRequests);
 
             if(tokenString == null)
                 return null;
 
-            tokenString = (IsSeparatorRequired(areEmptyLinesPossible)? " " : "") + tokenString;
             var leftResult = Left == null
                 ? ""
                 : Left.FlatFormatCache[areEmptyLinesPossible];
@@ -345,11 +341,11 @@ namespace Reni.TokenClasses
             var gapString =
                 Right == null
                     ? ""
-                    : "".FlatFormat(Right.LeftMost.WhiteSpaces, areEmptyLinesPossible, gapSeparatorRequests);
+                    : Right.LeftMost.WhiteSpaces.FlatFormat(areEmptyLinesPossible, gapSeparatorRequests);
             if(gapString == null)
                 return null;
 
-            return leftResult + tokenString + gapString + rightResult;
+            return leftResult + tokenString + Token.Id + gapString + rightResult;
         }
 
         SeparatorRequests GetGapSeparatorRequests() => new()
@@ -357,13 +353,6 @@ namespace Reni.TokenClasses
             Head = Token.Length > 0 //
             , Inner = true
             , Tail = Right != null && Right.LeftMost.Token.Length > 0
-        };
-
-        internal SeparatorRequests SeparatorRequests => new()
-        {
-            Head = LeftNeighbor != null && LeftNeighbor.Token.Length > 0 //
-            , Inner = true
-            , Tail = Token.Length > 0
         };
 
 

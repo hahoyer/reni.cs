@@ -5,5 +5,6 @@ namespace Reni.TokenClasses.Whitespace
         internal bool Head;
         internal bool Inner;
         internal bool Tail;
+        internal bool Flat;
     }
 }

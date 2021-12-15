@@ -82,7 +82,7 @@ namespace Reni.TokenClasses
                 .Select(item => item.SourcePart.Id)
                 .Stringify(separatorRequests.Inner? " " : "");
             if(result == "")
-                return "";
+                return (separatorRequests.Flat? " " : "") ;
             return (separatorRequests.Head? " " : "") + result + (separatorRequests.Tail? " " : "");
         }
     }

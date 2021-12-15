@@ -32,11 +32,8 @@ namespace Reni.TokenClasses.Whitespace
             {
                 case < 0:
                     var start = items[0].SourcePart.Start;
-                    var end = -delta < items.Length
-                        ? items[-delta].SourcePart.Start
-                        : items[-delta - 1].SourcePart.End;
 
-                    yield return new(start.Span(end), "", "-items/+separator");
+                    yield return new(start.Span(-delta), "", "-spaces");
                     break;
                 case > 0:
                     (!items.Any()).Assert();

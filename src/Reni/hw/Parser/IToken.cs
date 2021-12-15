@@ -35,6 +35,6 @@ namespace hw.Parser
             => (token.Characters.Start - token.PrecededWith).Span(token.Characters.End);
 
         internal static SourcePart GetPrefixSourcePart(this IToken token)
-            => (token.Characters.Start - token.PrecededWith).Span(token.Characters.Start);
+            => token.Characters.Start.Span(-token.PrecededWith);
     }
 }

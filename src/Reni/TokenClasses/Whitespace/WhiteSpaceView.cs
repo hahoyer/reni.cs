@@ -33,13 +33,19 @@ namespace Reni.TokenClasses.Whitespace
                 .SelectMany((item, index) => item.GetEdits(indent, IsSeparatorRequired(index)))
                 .ToArray();
 
-            var isSeparatorRequired = Configuration.SeparatorRequests.Tail && (Comments.LastOrDefault()?.IsSeparatorRequired??false);
+            var isSeparatorRequired =
+                Comments.Any()
+                    ? Configuration.SeparatorRequests.Tail && Comments.Last().IsSeparatorRequired
+                    : Configuration.SeparatorRequests.Flat;
+            
             var linesAndSpacesEdits = LinesAndSpaces.GetEdits(indent, isSeparatorRequired, Target.SourcePart.End).ToArray();
 
             return T(commentEdits, linesAndSpacesEdits).ConcatMany();
         }
 
         bool IsSeparatorRequired(int index)
-            => index == 0? Configuration.SeparatorRequests.Head : Configuration.SeparatorRequests.Inner;
+            => index == 0
+            ? Configuration.SeparatorRequests.Head 
+            : Configuration.SeparatorRequests.Inner;
     }
 }
