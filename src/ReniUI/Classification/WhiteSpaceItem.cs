@@ -10,7 +10,7 @@ namespace ReniUI.Classification
     {
         readonly IWhitespaceItem Item;
 
-        internal WhiteSpaceItem(WhitespaceItem item, BinaryTree anchor)
+        internal WhiteSpaceItem(Reni.TokenClasses.WhiteSpaceItem item, BinaryTree anchor)
             : base(anchor)
             => Item = item;
 

@@ -4,10 +4,11 @@ using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.TokenClasses.Whitespace;
+using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses
 {
-    sealed class WhitespaceItem : DumpableObject, IWhitespaceItem
+    sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem
     {
         internal readonly SourcePart SourcePart;
 
@@ -17,12 +18,12 @@ namespace Reni.TokenClasses
         [PublicAPI]
         internal readonly IParent Parent;
 
-        WhitespaceItem[] ItemsCache;
+        WhiteSpaceItem[] ItemsCache;
 
-        internal WhitespaceItem(SourcePart sourcePart)
+        internal WhiteSpaceItem(SourcePart sourcePart)
             : this(RootType.Instance, sourcePart, null) { }
 
-        internal WhitespaceItem(IItemType type, SourcePart sourcePart, IParent parent)
+        internal WhiteSpaceItem(IItemType type, SourcePart sourcePart, IParent parent)
         {
             Type = type;
             SourcePart = sourcePart;
@@ -37,44 +38,24 @@ namespace Reni.TokenClasses
 
         SourcePart IWhitespaceItem.SourcePart => SourcePart;
 
-        IItemType IWhitespaceItem.Type => Type;
-
         protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
         [DisableDump]
         internal int TargetLineBreakCount => Items.Sum(item => item.TargetLineBreakCount);
 
         [EnableDump]
-        internal WhitespaceItem[] Items => ItemsCache ??= GetItems();
+        internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
 
-        public bool? GetSeparatorRequest(bool areEmptyLinesPossible)
-        {
-            if(SourcePart.Position == 0 || SourcePart.End.IsEnd)
-                return false;
+        bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
+        bool HasVolatileLineBreak => Type is IVolatileLineBreak || Items.Any(item => item.HasVolatileLineBreak);
 
-            if(SourcePart.Length == 0)
-                return null;
+        public bool IsNotEmpty(bool areEmptyLinesPossible)
+            => Items.Any(item => item.Type is IComment || areEmptyLinesPossible && item.Type is IVolatileLineBreak);
 
-            var item = GetSeparatorRelevantItem(areEmptyLinesPossible);
-            if(item != null)
-                return item.Type is IComment;
-            return null;
-        }
+        WhiteSpaceItem[] GetItems()
+            => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhiteSpaceItem[0];
 
-        WhitespaceItem GetSeparatorRelevantItem(bool areEmptyLinesPossible)
-        {
-            if(Type is IComment or IStableLineBreak ||
-               areEmptyLinesPossible && Type is IVolatileLineBreak)
-                return this;
-            return Items
-                .Select(item => item.GetSeparatorRelevantItem(areEmptyLinesPossible))
-                .FirstOrDefault(item => item != null);
-        }
-
-        WhitespaceItem[] GetItems()
-            => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhitespaceItem[0];
-
-        internal WhitespaceItem LocateItem(SourcePosition offset)
+        internal WhiteSpaceItem LocateItem(SourcePosition offset)
         {
             (SourcePart.Start <= offset).Assert();
 
@@ -89,21 +70,18 @@ namespace Reni.TokenClasses
                 .FirstOrDefault(item => item != null);
         }
 
-        internal string FlatFormat(bool areEmptyLinesPossible)
+        internal string FlatFormat(bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
         {
-            if(SourcePart.Length == 0)
-                return "";
-
-            if(Items.Any())
-            {
-                var results = Items.Select(item => item.FlatFormat(areEmptyLinesPossible));
-                return results.Any(result => result == null)? null : results.Stringify("");
-            }
-
-            if(Type is IStableLineBreak || areEmptyLinesPossible && Type is IVolatileLineBreak)
+            if(HasStableLineBreak || areEmptyLinesPossible && HasVolatileLineBreak)
                 return null;
 
-            return Type is ILineBreak? "" : SourcePart.Id;
+            var result = Items
+                .Where(item => item.Type is IInline)
+                .Select(item => item.SourcePart.Id)
+                .Stringify(separatorRequests.Inner? " " : "");
+            if(result == "")
+                return "";
+            return (separatorRequests.Head? " " : "") + result + (separatorRequests.Tail? " " : "");
         }
     }
 }

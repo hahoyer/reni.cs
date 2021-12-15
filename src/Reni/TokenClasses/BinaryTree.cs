@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
+using Reni.TokenClasses.Whitespace;
 using Reni.Validation;
 using static Reni.Validation.IssueId;
 
@@ -40,7 +41,7 @@ namespace Reni.TokenClasses
         internal readonly SourcePart Token;
 
         [DisableDump]
-        internal readonly WhitespaceItem WhiteSpaces;
+        internal readonly WhiteSpaceItem WhiteSpaces;
 
         [DisableDump]
         internal Syntax Syntax;
@@ -155,8 +156,13 @@ namespace Reni.TokenClasses
         public BinaryTree[] ParserLevelGroup
             => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? new BinaryTree[0]);
 
-        public bool GetIsSeparatorRequired(bool areEmptyLinesPossible) 
-            => WhiteSpaces.GetSeparatorRequest(areEmptyLinesPossible) ??
+        /// <summary>
+        /// Returns true when a separator is required between token and preceding token or comment
+        /// </summary>
+        /// <param name="areEmptyLinesPossible"></param>
+        /// <returns></returns>
+        public bool IsSeparatorRequired(bool areEmptyLinesPossible) 
+            => WhiteSpaces.IsNotEmpty(areEmptyLinesPossible) ||
             SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
 
 
@@ -312,14 +318,19 @@ namespace Reni.TokenClasses
 
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
+            var separatorRequests = new SeparatorRequests
+            {
+                Head = LeftNeighbor != null && LeftNeighbor.Token.Length > 0,
+                Inner = true,
+                Tail = Token.Length > 0
+            };
             var tokenString = Token.Id
-                .FlatFormat(Left == null? null : WhiteSpaces, areEmptyLinesPossible);
+                .FlatFormat(Left == null?null:WhiteSpaces, areEmptyLinesPossible, separatorRequests);
 
             if(tokenString == null)
                 return null;
 
-            tokenString = (GetIsSeparatorRequired(areEmptyLinesPossible)? " " : "") + tokenString;
-
+            tokenString = (IsSeparatorRequired(areEmptyLinesPossible)? " " : "") + tokenString;
             var leftResult = Left == null
                 ? ""
                 : Left.FlatFormatCache[areEmptyLinesPossible];
@@ -332,8 +343,14 @@ namespace Reni.TokenClasses
             if(rightResult == null)
                 return null;
 
+            var gapSeparatorRequests = new SeparatorRequests
+            {
+                Head = Token.Length > 0,
+                Inner = true,
+                Tail = Right != null && Right.LeftMost.Token.Length > 0
+            };
             var gapString =
-                Right == null? "" : "".FlatFormat(Right.LeftMost.WhiteSpaces, areEmptyLinesPossible);
+                Right == null? "" : "".FlatFormat(Right.LeftMost.WhiteSpaces, areEmptyLinesPossible, gapSeparatorRequests);
             if(gapString == null)
                 return null;
 
@@ -341,7 +358,7 @@ namespace Reni.TokenClasses
         }
 
 
-        public bool HasAsParent(BinaryTree parent)
+        internal bool HasAsParent(BinaryTree parent)
             => Parent
                 .Chain(node => node.Depth >= parent.Depth? node.Parent : null)
                 .Any(node => node == parent);
@@ -351,7 +368,7 @@ namespace Reni.TokenClasses
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The formatted line or null if target contains line breaks.</returns>
-        public string GetFlatString(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible];
+        internal string GetFlatString(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible];
 
         /// <summary>
         ///     Get the line length of target when formatted as one line.

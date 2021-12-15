@@ -11,8 +11,8 @@ namespace ReniUI.Formatting
         {
             if(target == null)
                 yield break;
-            var isSeparatorRequired = target.GetIsSeparatorRequired(configuration.EmptyLineLimit!= 0);
-            yield return new  WhiteSpaceView
+            var isSeparatorRequired = target.IsSeparatorRequired(configuration.EmptyLineLimit!= 0);
+            yield return new  WhiteSpaces
             (
                 target.WhiteSpaces
                 , configuration

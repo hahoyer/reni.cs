@@ -53,7 +53,7 @@ namespace Reni.TokenClasses.Whitespace
 
         internal static readonly InlineCommentType Instance = new();
 
-        IEnumerable<WhitespaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
+        IEnumerable<WhiteSpaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
         {
             var headLength = sourcePart.Start.Match(Lexer.Instance.InlineCommentHead);
             headLength.AssertIsNotNull();
@@ -71,7 +71,7 @@ namespace Reni.TokenClasses.Whitespace
             yield return new(TailType.Instance, tail, parent);
         }
 
-        static IEnumerable<WhitespaceItem> GetContentWithNames(SourcePart sourcePart, IParent parent)
+        static IEnumerable<WhiteSpaceItem> GetContentWithNames(SourcePart sourcePart, IParent parent)
         {
             if(sourcePart.Length == 0)
             {

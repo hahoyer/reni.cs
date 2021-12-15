@@ -1,4 +1,4 @@
-//14:36:42.821 14.12.2021 run 69 of 183 ReniUI.Test.UserInteraction.UserInterAction.TypingAProgram
+//13:20:14.422 15.12.2021 run 69 of 183 ReniUI.Test.UserInteraction.UserInterAction.TypingAProgram
 
 // ReSharper disable once CheckNamespace
 namespace hw.UnitTest
@@ -19,7 +19,6 @@ TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SingleLine);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SingleLineWithLineBreak);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SingleLineWithVolatileLineBreak);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().MultiLineCommentSingleLine);
-TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().ComplexText1);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment1);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment2);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment3);

@@ -24,8 +24,6 @@
     <Compile Include="Formatting\IEditPiecesConfiguration.cs" />
     <Compile Include="Formatting\IndentDirection.cs" />
     <Compile Include="Formatting\IndentedSourcePartEdit.cs" />
-    <Compile Include="Formatting\LineGroup.cs" />
-    <Compile Include="Formatting\StableLineGroup.cs" />
     <Compile Include="Test\Formatting\Comments.cs" />
     <Compile Include="Test\Formatting\CommentsOfLists.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
@@ -46,13 +44,10 @@
     <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\ISourcePosition.cs" />
     <Compile Include="Formatting\SplitItem.cs" />
-    <Compile Include="Formatting\WhiteSpaceView.cs" />
-    <Compile Include="Formatting\IResultItem.cs" />
-    <Compile Include="Formatting\Skeleton.cs" />
+    <Compile Include="Formatting\WhiteSpaces.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\ISourcePartEdit.cs" />
     <Compile Include="Formatting\Syntax.cs" />
-    <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="Helper\Syntax.cs" />
     <Compile Include="CompilerBrowser.cs" />
     <Compile Include="Extension.cs" />
@@ -62,7 +57,6 @@
     <Compile Include="Formatting\HierarchicalFormatter.cs" />
     <Compile Include="Formatting\IChainLink.cs" />
     <Compile Include="Formatting\IFormatter.cs" />
-    <Compile Include="Formatting\NewWhiteSpace.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="RestFul\Channel.cs" />
     <Compile Include="RestFul\ChannelRepo.cs" />

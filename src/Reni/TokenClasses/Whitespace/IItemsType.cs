@@ -5,6 +5,6 @@ namespace Reni.TokenClasses.Whitespace
 {
     interface IItemsType
     {
-        IEnumerable<WhitespaceItem> GetItems(SourcePart sourcePart, IParent parent);
+        IEnumerable<WhiteSpaceItem> GetItems(SourcePart sourcePart, IParent parent);
     }
 }

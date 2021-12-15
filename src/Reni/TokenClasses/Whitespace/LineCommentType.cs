@@ -28,7 +28,7 @@ namespace Reni.TokenClasses.Whitespace
 
         internal static readonly LineCommentType Instance = new();
 
-        IEnumerable<WhitespaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
+        IEnumerable<WhiteSpaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
         {
             var headLength = sourcePart.Start.Match(Lexer.Instance.LineCommentHead);
             headLength.AssertIsNotNull();

@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Helper;
 using JetBrains.Annotations;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Whitespace;
 
 namespace Reni.Helper
 {
@@ -208,12 +209,13 @@ namespace Reni.Helper
             }
         }
 
-        internal static string FlatFormat(this string target, WhitespaceItem prefix, bool areEmptyLinesPossible)
+        internal static string FlatFormat
+            (this string target, WhiteSpaceItem prefix, bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
         {
             if(prefix == null)
                 return target;   
 
-            var result = prefix.FlatFormat(areEmptyLinesPossible);
+            var result = prefix.FlatFormat(areEmptyLinesPossible, separatorRequests);
             return result == null? null : result + target;
         }
 
