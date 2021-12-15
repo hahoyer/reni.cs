@@ -19,7 +19,7 @@ namespace ReniUI.Formatting
     {
         readonly Configuration Configuration;
 
-        readonly bool IsSeparatorRequired;
+        readonly SeparatorRequests SeparatorRequests;
         readonly int MinimalLineBreakCount;
         readonly SourcePart SourcePart;
         readonly bool HasLines;
@@ -30,26 +30,22 @@ namespace ReniUI.Formatting
         (
             WhiteSpaceItem target
             , Configuration configuration
-            , bool isSeparatorRequired
+            , SeparatorRequests separatorRequests
             , int minimalLineBreakCount = 0
         )
         {
             (target != null).Assert();
             SourcePart = target.SourcePart;
             HasLines = target.TargetLineBreakCount > 0;
-            IsSeparatorRequired = isSeparatorRequired;
             MinimalLineBreakCount = minimalLineBreakCount;
             Configuration = configuration;
+            SeparatorRequests = separatorRequests;
             WhiteSpaceViewCache = new(() => new(target, this));
             StopByObjectIds();
         }
 
-        int? CommentGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
-        int? WhiteSpaceView.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
-        bool WhiteSpaceView.IConfiguration.IsSeparatorRequired => IsSeparatorRequired;
-
-        int CommentGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
-        int WhiteSpaceView.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
+        int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
+        SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => SeparatorRequests;
 
         /// <summary>
         ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
@@ -58,12 +54,16 @@ namespace ReniUI.Formatting
         /// <returns></returns>
         IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
-            if(!IsSeparatorRequired && MinimalLineBreakCount == 0 && SourcePart.Length == 0)
+            if(!SeparatorRequests.Head &&
+               !SeparatorRequests.Tail &&
+               !SeparatorRequests.Inner &&
+               MinimalLineBreakCount == 0 &&
+               SourcePart.Length == 0)
                 return new Edit[0];
 
             return WhiteSpaceView
                 .GetEdits(parameter.Indent)
-                .Select(edit => new Edit(edit.Location, edit.NewText, edit.Flag));
+                .Select(edit => new Edit(edit.Remove, edit.Insert, edit.Flag));
         }
 
         bool ISourcePartEdit.HasLines => HasLines;

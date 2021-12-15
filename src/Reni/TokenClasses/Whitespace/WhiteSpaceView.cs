@@ -1,35 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 
 namespace Reni.TokenClasses.Whitespace
 {
     class WhiteSpaceView : DumpableObject
     {
-        internal interface IConfiguration : CommentGroup.IConfiguration
-        {
-            new int MinimalLineBreakCount { get; }
-            new int? EmptyLineLimit { get; }
-            bool IsSeparatorRequired { get; }
-        }
+        internal interface IConfiguration : CommentGroup.IConfiguration { }
 
         readonly WhiteSpaceItem Target;
         readonly IConfiguration Configuration;
 
         [EnableDump]
-        readonly LineGroup[] Lines;
-
-        [EnableDump]
-        readonly SpacesGroup[] Spaces;
-
-        [EnableDump]
         readonly CommentGroup[] Comments;
+        readonly LinesAndSpaces LinesAndSpaces;
 
         internal WhiteSpaceView(WhiteSpaceItem target, IConfiguration configuration)
         {
             Target = target;
             Configuration = configuration;
-            (Comments, (Lines, Spaces)) = CommentGroup.Create(target.Items, configuration);
+            (Comments, LinesAndSpaces) = CommentGroup.Create(target.Items, configuration);
         }
 
         protected override string GetNodeDump() => Target.SourcePart.NodeDump + " " + base.GetNodeDump();
@@ -38,36 +29,17 @@ namespace Reni.TokenClasses.Whitespace
         {
             (indent == 0).Assert();
 
-            var edits = new List<Edit>();
-            edits.AddRange(Comments.SelectMany(
-                (item, index) => item.GetEdits(indent, index != 0 || Configuration.IsSeparatorRequired)));
+            var commentEdits = Comments
+                .SelectMany((item, index) => item.GetEdits(indent, IsSeparatorRequired(index)))
+                .ToArray();
 
-            if(Lines.Any())
-            {
-                var delta = Configuration.EmptyLineLimit ?? Lines.Length - Lines.Length;
+            var isSeparatorRequired = Configuration.SeparatorRequests.Tail && (Comments.LastOrDefault()?.IsSeparatorRequired??false);
+            var linesAndSpacesEdits = LinesAndSpaces.GetEdits(indent, isSeparatorRequired, Target.SourcePart.End).ToArray();
 
-                if(delta < 0)
-                {
-                    NotImplementedMethod(indent);
-                    return default;
-                }
-
-                if(delta > 0)
-                {
-                    NotImplementedMethod(indent);
-                    return default;
-                }
-
-                edits.AddRange(Lines.SelectMany(item => item.GetEdits()));
-            }
-
-            if(Spaces.Any())
-            {
-                NotImplementedMethod(indent);
-                return default;
-            }
-
-            return edits;
+            return T(commentEdits, linesAndSpacesEdits).ConcatMany();
         }
+
+        bool IsSeparatorRequired(int index)
+            => index == 0? Configuration.SeparatorRequests.Head : Configuration.SeparatorRequests.Inner;
     }
 }

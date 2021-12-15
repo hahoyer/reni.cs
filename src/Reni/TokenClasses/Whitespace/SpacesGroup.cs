@@ -2,33 +2,26 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 
 namespace Reni.TokenClasses.Whitespace
 {
     class SpacesGroup : DumpableObject
     {
-        [EnableDump]
-        readonly WhiteSpaceItem[] Items;
-        [EnableDump]
-        readonly WhiteSpaceItem Tail;
 
-        SpacesGroup(IEnumerable<WhiteSpaceItem> allItems)
+        SpacesGroup(WhiteSpaceItem item)
         {
-            var groups = allItems
-                .GroupBy(TailCondition)
-                .ToDictionary(item => item.Key, item => item.ToArray());
+            Item =item
+        }
 
-            groups.TryGetValue(false, out Items);
-            groups.TryGetValue(true, out var tails);
-
-            Tail = tails?.Single();
-            Items ??= new WhiteSpaceItem[0];
+        public SourcePart SourcePart
+        {
+            get { throw new System.NotImplementedException(); }
         }
 
         internal static SpacesGroup[] Create(WhiteSpaceItem[] items)
             => items != null
-                ? items.Split(TailCondition, false)
-                    .Select(items => new SpacesGroup(items))
+                ? items.Select(item => new SpacesGroup(item))
                     .ToArray()
                 : new SpacesGroup[0];
 

@@ -85,8 +85,6 @@ namespace Reni.TokenClasses
             StopByObjectIds();
         }
 
-        internal SourcePart FullToken => WhiteSpaces.SourcePart.Start.Span(Token.End);
-
         ValueCache ValueCache.IContainer.Cache { get; } = new();
 
         SourcePart ISyntax.All => SourcePart;
@@ -102,6 +100,8 @@ namespace Reni.TokenClasses
         int ITree<BinaryTree>.LeftDirectChildCount => 1;
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id}{InnerTokenClassPart})";
+
+        internal SourcePart FullToken => WhiteSpaces.SourcePart.Start.Span(Token.End);
 
         string InnerTokenClassPart => InnerTokenClass == TokenClass? "" : $"/{InnerTokenClass.Id}";
 
@@ -156,18 +156,6 @@ namespace Reni.TokenClasses
         public BinaryTree[] ParserLevelGroup
             => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? new BinaryTree[0]);
 
-        /// <summary>
-        /// Returns true when a separator is required between token and preceding token or comment
-        /// </summary>
-        /// <param name="areEmptyLinesPossible"></param>
-        /// <returns></returns>
-        public bool IsSeparatorRequired(bool areEmptyLinesPossible)
-            => SeparatorExtension.Get
-            (
-                LeftNeighbor?.InnerTokenClass,
-                WhiteSpaces.IsNotEmpty(areEmptyLinesPossible)? WhiteSpaces : InnerTokenClass as ISeparatorClass
-            );
-
 
         [DisableDump]
         IssueId BracketIssueId
@@ -208,6 +196,18 @@ namespace Reni.TokenClasses
         }
 
         bool IsBracketLevel => InnerTokenClass is IRightBracket;
+
+        /// <summary>
+        ///     Returns true when a separator is required between token and preceding token or comment
+        /// </summary>
+        /// <param name="areEmptyLinesPossible"></param>
+        /// <returns></returns>
+        public bool IsSeparatorRequired(bool areEmptyLinesPossible)
+            => SeparatorExtension.Get
+            (
+                LeftNeighbor?.InnerTokenClass,
+                WhiteSpaces.IsNotEmpty(areEmptyLinesPossible)? WhiteSpaces : InnerTokenClass as ISeparatorClass
+            );
 
         Issue GetIssue()
         {
@@ -321,10 +321,7 @@ namespace Reni.TokenClasses
 
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
-            var separatorRequests = new SeparatorRequests
-            {
-                Head = LeftNeighbor != null && LeftNeighbor.Token.Length > 0, Inner = true, Tail = Token.Length > 0
-            };
+            var separatorRequests = SeparatorRequests;
             var tokenString = Token.Id
                 .FlatFormat(Left == null? null : WhiteSpaces, areEmptyLinesPossible, separatorRequests);
 
@@ -344,10 +341,7 @@ namespace Reni.TokenClasses
             if(rightResult == null)
                 return null;
 
-            var gapSeparatorRequests = new SeparatorRequests
-            {
-                Head = Token.Length > 0, Inner = true, Tail = Right != null && Right.LeftMost.Token.Length > 0
-            };
+            var gapSeparatorRequests = GetGapSeparatorRequests();
             var gapString =
                 Right == null
                     ? ""
@@ -357,6 +351,20 @@ namespace Reni.TokenClasses
 
             return leftResult + tokenString + gapString + rightResult;
         }
+
+        SeparatorRequests GetGapSeparatorRequests() => new()
+        {
+            Head = Token.Length > 0 //
+            , Inner = true
+            , Tail = Right != null && Right.LeftMost.Token.Length > 0
+        };
+
+        internal SeparatorRequests SeparatorRequests => new()
+        {
+            Head = LeftNeighbor != null && LeftNeighbor.Token.Length > 0 //
+            , Inner = true
+            , Tail = Token.Length > 0
+        };
 
 
         internal bool HasAsParent(BinaryTree parent)

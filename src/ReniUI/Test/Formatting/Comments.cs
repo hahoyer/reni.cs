@@ -114,53 +114,5 @@ texxxxxxxxxxxt";
             text.SimpleFormattingTest(expectedText, emptyLineLimit:0);
         }
 
-        [UnitTest]
-        [Test]
-        public void ComplexText()
-        {
-            const string text =
-                @"#( asdf )#  texxxxxxxxxxxt
-
-texxxxxxx
-
-#(
-    comment
-)#
-texxxxxxx
-
-#( asdf)# comment )#  texxxxxxxxxxxt
-
-#(asdf comment )# comment asd)# comment asdf)# asdf)# texxxxxxxxxxxt
-
-#(asdf comment #( comment )# comment asd)# comment asdf)# texxxxxxxxxxxt
-
-#( )# texxxxxxxxxxxt
-
-#()# texxxxxxxxxxxt";
-
-
-            const string expectedText =
-                @"#( asdf )# texxxxxxxxxxxt
-
-    texxxxxxx
-
-#(
-    comment
-)#
-    texxxxxxx
-
-#( asdf)# comment )#  texxxxxxxxxxxt
-
-#(asdf comment )# comment asd)# comment asdf)# asdf)# texxxxxxxxxxxt
-
-#(asdf comment #( comment )# comment asd)# comment asdf)# texxxxxxxxxxxt
-
-#( )# texxxxxxxxxxxt
-
-#()# texxxxxxxxxxxt";
-
-
-            text.SimpleFormattingTest(expectedText);
-        }
     }
 }

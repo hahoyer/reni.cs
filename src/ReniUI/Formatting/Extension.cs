@@ -9,16 +9,14 @@ namespace ReniUI.Formatting
         public static IEnumerable<ISourcePartEdit> GetWhiteSpaceEdits
             (this BinaryTree target, Configuration configuration, int lineBreakCount)
         {
-            if(target == null)
-                yield break;
-            var isSeparatorRequired = target.IsSeparatorRequired(configuration.EmptyLineLimit!= 0);
-            yield return new  WhiteSpaces
-            (
-                target.WhiteSpaces
-                , configuration
-                , isSeparatorRequired,
-                lineBreakCount
-            );
+            if(target != null)
+                yield return new WhiteSpaces
+                (
+                    target.WhiteSpaces
+                    , configuration
+                    , target.SeparatorRequests
+                    , lineBreakCount
+                );
         }
 
         [UsedImplicitly]

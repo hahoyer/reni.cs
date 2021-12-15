@@ -137,6 +137,7 @@
     <Compile Include="Helper\IntegerResult.cs" />
     <Compile Include="Helper\ITree.cs" />
     <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
+    <Compile Include="TokenClasses\Whitespace\LinesAndSpaces.cs" />
     <Compile Include="TokenClasses\Whitespace\SeparatorExtension.cs" />
     <Compile Include="Helper\StringResult.cs" />
     <Compile Include="Helper\SyntaxView.cs" />
@@ -413,7 +414,6 @@
     <Compile Include="TokenClasses\Whitespace\LineEndType.cs" />
     <Compile Include="TokenClasses\Whitespace\LineGroup.cs" />
     <Compile Include="TokenClasses\Whitespace\RootType.cs" />
-    <Compile Include="TokenClasses\Whitespace\SpacesGroup.cs" />
     <Compile Include="TokenClasses\Whitespace\SpaceType.cs" />
     <Compile Include="TokenClasses\Whitespace\CommentGroup.cs" />
     <Compile Include="TokenClasses\Whitespace\VariantListType.cs" />
