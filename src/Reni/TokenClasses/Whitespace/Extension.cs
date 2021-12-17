@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 
 namespace Reni.TokenClasses.Whitespace
 {
@@ -24,33 +25,38 @@ namespace Reni.TokenClasses.Whitespace
                 : (result.Take(result.Length - 1).ToArray(), tail);
         }
 
-        public static IEnumerable<Edit> GetSpaceEdits(this WhiteSpaceItem[] items, bool isSeparatorRequired)
+        public static IEnumerable<Edit> GetSpaceEdits(this SourcePart spaces, int targetCount)
         {
-            var delta = (isSeparatorRequired? 1 : 0) - items.Length;
-
-            switch(delta)
+            if(spaces == null)
             {
-                case < 0:
-                    var start = items[0].SourcePart.Start;
-
-                    yield return new(start.Span(-delta), "", "-spaces");
-                    break;
-                case > 0:
-                    (!items.Any()).Assert();
-                    // because of lacking an anchor this has to be handled outside. 
-                    break;
+                (targetCount == 0).Assert();
+                yield break;
             }
+
+            var delta = targetCount - spaces.Length;
+            if(delta == 0)
+                yield break;
+            
+            yield return new
+            (
+                spaces.End.Span(T(delta, 0).Min()),
+                " ".Repeat(T(delta, 0).Max()),
+                "+/-spaces"
+            );
         }
 
-        public static IEnumerable<Edit> GetLineEdits(this LineGroup[] lineGroups, int indent, bool isSeparatorRequired)
+        public static IEnumerable<Edit> GetLineEdits(this LineGroup[] lineGroups)
         {
             if(!lineGroups.Any())
-                return Enumerable.Empty<Edit>();
+                yield break;
 
             var configuration = lineGroups[0].Configuration;
-            var targetLineCount = configuration.EmptyLineLimit ?? lineGroups.Length;
+
+            var targetLineCount
+                = T(configuration.EmptyLineLimit ?? lineGroups.Length, configuration.MinimalLineBreakCount)
+                    .Min();
+
             var delta = targetLineCount - lineGroups.Length;
-            var result = new List<Edit>();
             switch(delta)
             {
                 case < 0:
@@ -60,20 +66,15 @@ namespace Reni.TokenClasses.Whitespace
                         ? lineGroups[-delta].Main.SourcePart.Start
                         : lineGroups[-delta - 1].Main.SourcePart.End;
 
-                    result.Add(new(start.Span(end), "", "-extra Linebreaks"));
+                    yield return new(start.Span(end), "", "-extra Linebreaks");
                     break;
                 }
                 case > 0:
-                    Dumpable.NotImplementedFunction(indent);
+                    Dumpable.NotImplementedFunction();
                     break;
             }
-
-            result.AddRange(lineGroups.Skip(Dumpable.T(0, -delta - 1).Max()).SelectMany(item => item.GetEdits()));
-            if(!isSeparatorRequired || targetLineCount != 0)
-                return result;
-
-            result.Add(new(result.Last().Remove.End.Span(0), " ", "+separator(from line)"));
-            return result;
         }
+
+        static TValue[] T<TValue>(params TValue[] value) => value;
     }
 }

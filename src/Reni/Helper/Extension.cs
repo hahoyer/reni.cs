@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using JetBrains.Annotations;
-using Reni.TokenClasses;
-using Reni.TokenClasses.Whitespace;
 
 namespace Reni.Helper
 {

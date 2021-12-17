@@ -41,11 +41,11 @@ namespace ReniUI.Test.Formatting
                 .Assert(() => $@"
 new:
 ----------------------
-{newText}
+{newText.Replace("\n","|||\n")}|||
 ----------------------
 expected:
 ----------------------
-{expected}
+{expected.Replace("\n","|||\n")}|||
 ----------------------
 ", 1
                 );

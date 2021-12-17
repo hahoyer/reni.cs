@@ -42,13 +42,12 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
-        [DisableDump]
-        internal int TargetLineBreakCount => Items.Sum(item => item.TargetLineBreakCount);
-
         [EnableDump]
         internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
 
-        bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
+        [DisableDump]
+        internal bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
+
         bool HasVolatileLineBreak => Type is IVolatileLineBreak || Items.Any(item => item.HasVolatileLineBreak);
 
         public bool IsNotEmpty(bool areEmptyLinesPossible)
@@ -82,7 +81,7 @@ namespace Reni.TokenClasses
                 .Select(item => item.SourcePart.Id)
                 .Stringify(separatorRequests.Inner? " " : "");
             if(result == "")
-                return (separatorRequests.Flat? " " : "") ;
+                return separatorRequests.Flat? " " : "";
             return (separatorRequests.Head? " " : "") + result + (separatorRequests.Tail? " " : "");
         }
     }

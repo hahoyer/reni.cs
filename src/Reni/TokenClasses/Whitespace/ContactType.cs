@@ -1,5 +1,3 @@
-using Reni.Parser;
-
 namespace Reni.TokenClasses.Whitespace
 {
     sealed class ContactType

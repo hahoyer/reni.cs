@@ -21,8 +21,8 @@ namespace ReniUI.Formatting
 
         readonly SeparatorRequests SeparatorRequests;
         readonly int MinimalLineBreakCount;
+        readonly Syntax.Anchor Anchor;
         readonly SourcePart SourcePart;
-        readonly bool HasLines;
 
         readonly ValueCache<WhiteSpaceView> WhiteSpaceViewCache;
 
@@ -31,13 +31,16 @@ namespace ReniUI.Formatting
             WhiteSpaceItem target
             , Configuration configuration
             , SeparatorRequests separatorRequests
+            , Syntax.Anchor anchor
             , int minimalLineBreakCount = 0
         )
         {
             (target != null).Assert();
+            (minimalLineBreakCount > 0 || !target.HasStableLineBreak).Assert();
+
             SourcePart = target.SourcePart;
-            HasLines = target.TargetLineBreakCount > 0;
             MinimalLineBreakCount = minimalLineBreakCount;
+            Anchor = anchor;
             Configuration = configuration;
             SeparatorRequests = separatorRequests;
             WhiteSpaceViewCache = new(() => new(target, this));
@@ -45,6 +48,7 @@ namespace ReniUI.Formatting
         }
 
         int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
+        int LineGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
         SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => SeparatorRequests;
 
         /// <summary>
@@ -61,12 +65,13 @@ namespace ReniUI.Formatting
                SourcePart.Length == 0)
                 return new Edit[0];
 
+            var indent = Configuration.IndentCount*parameter.Indent;
             return WhiteSpaceView
-                .GetEdits(parameter.Indent)
-                .Select(edit => new Edit(edit.Remove, edit.Insert, edit.Flag));
+                .GetEdits(indent)
+                .Select(edit => new Edit(edit.Remove, edit.Insert, Anchor.TargetPosition + ":" + edit.Flag));
         }
 
-        bool ISourcePartEdit.HasLines => HasLines;
+        bool ISourcePartEdit.HasLines => MinimalLineBreakCount > 0;
 
         ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 

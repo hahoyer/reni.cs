@@ -17,19 +17,28 @@ namespace ReniUI.Formatting
             [DisableDump]
             readonly BinaryTree Target;
 
-            [EnableDump]
-            [EnableDumpExcept(0)]
+            [DisableDump]
+            readonly string Kind;
+
             int LineBreakCount;
 
-            Anchor(BinaryTree target) => Target = target;
+            Anchor(BinaryTree target, string kind)
+            {
+                Target = target;
+                Kind = kind;
+            }
+
+            protected override string GetNodeDump() => TargetPosition + " "+ base.GetNodeDump();
 
             [UsedImplicitly]
-            internal string TargetPosition => Target.FullToken.GetDumpAroundCurrent(5);
+            [DisableDump]
+            internal string TargetPosition => $"{Kind}:{(LineBreakCount > 0? LineBreakCount : "")} {Target.FullToken.GetDumpAroundCurrent(5)}";
 
-            internal static Anchor Create(BinaryTree anchor) => anchor == null? null : new Anchor(anchor);
+            internal static Anchor Create(BinaryTree anchor, string kind) 
+                => anchor == null? null : new Anchor(anchor, kind);
 
             internal ISourcePartEdit[] GetWhiteSpaceEdits(Configuration configuration)
-                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount).ToArray();
+                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount, this).ToArray();
 
             internal void EnsureLineBreaks(int count)
             {
@@ -64,7 +73,7 @@ namespace ReniUI.Formatting
 
         [EnableDump]
         internal readonly AnchorsClass Anchors = new();
-        
+
         [DisableDump]
         [PublicAPI]
         readonly Syntax Parent;
@@ -74,6 +83,8 @@ namespace ReniUI.Formatting
         [EnableDump(Order = -1)]
         readonly Formatter Formatter;
 
+        [EnableDump(Order = 4)]
+        [EnableDumpExcept(false)]
         readonly bool HasAdditionalIndent;
 
         [PublicAPI]
@@ -86,17 +97,16 @@ namespace ReniUI.Formatting
         {
             Main = child.FlatItem;
             Configuration = configuration;
-            Anchors.Prefix = Anchor.Create(child.PrefixAnchor);
+            Anchors.Prefix = Anchor.Create(child.PrefixAnchor, "p");
             HasAdditionalIndent = child.HasAdditionalIndent;
             Parent = parent;
             Formatter = child.Formatter;
             if(Main != null)
             {
                 var frameAnchors = Formatter.GetFrameAnchors(Main);
-                Anchors.Begin = Anchor.Create(frameAnchors.begin);
-                Anchors.End = Anchor.Create(frameAnchors.end);
+                Anchors.Begin = Anchor.Create(frameAnchors.begin, "b");
+                Anchors.End = Anchor.Create(frameAnchors.end, "e");
             }
-
             StopByObjectIds();
         }
 
@@ -134,17 +144,23 @@ namespace ReniUI.Formatting
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal ISourcePartEdit[] Edits => GetEdits();
 
-        [EnableDump(Order = 4)]
+        [EnableDump(Order = 5)]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal Syntax[] Children => this.CachedValue(GetChildren);
 
         ISourcePartEdit[] AnchorEdits => Anchors.GetEdits(Configuration);
 
         ISourcePartEdit[] ChildrenEdits
-            => Children
-                .SelectMany(GetChildEdits)
-                .Indent(IndentDirection)
-                .ToArray();
+        {
+            get
+            {
+                StopByObjectIds();
+                return Children
+                    .SelectMany(GetChildEdits)
+                    .Indent(IndentDirection)
+                    .ToArray();
+            }
+        }
 
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
             => new(new(null, target, false), configuration, null);
@@ -167,6 +183,7 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetChildEdits(Syntax child)
         {
+            StopByObjectIds();
             if(child == null)
                 return new ISourcePartEdit[0];
             var result = child.Edits;

@@ -1,4 +1,5 @@
 ﻿using hw.DebugFormatter;
+using hw.Helper;
 
 namespace ReniUI.Formatting
 {
@@ -13,5 +14,7 @@ namespace ReniUI.Formatting
         public bool AdditionalLineBreaksForMultilineItems = true;
         public bool LineBreaksBeforeListToken;
         public bool LineBreaksBeforeDeclarationToken;
+
+        public string Indent=> " ".Repeat(IndentCount);
     }
 }

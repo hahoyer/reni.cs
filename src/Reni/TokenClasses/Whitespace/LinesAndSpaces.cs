@@ -6,49 +6,58 @@ using hw.Scanner;
 
 namespace Reni.TokenClasses.Whitespace
 {
-    class LinesAndSpaces: DumpableObject
+    class LinesAndSpaces : DumpableObject
     {
+        internal interface IConfiguration : LineGroup.IConfiguration { }
+
         [EnableDump]
         readonly LineGroup[] Lines;
 
         [EnableDump]
-        readonly WhiteSpaceItem[] Spaces;
+        readonly SourcePart Spaces;
 
-        LinesAndSpaces(LineGroup[] lines, WhiteSpaceItem[] spaces)
+        readonly IConfiguration Configuration;
+
+        LinesAndSpaces(LineGroup[] lines, SourcePart spaces, IConfiguration configuration)
         {
             Lines = lines;
             Spaces = spaces;
+            Configuration = configuration;
         }
 
-        public static LinesAndSpaces Create (WhiteSpaceItem[] items, CommentGroup.IConfiguration configuration)
+        public static LinesAndSpaces Create(WhiteSpaceItem[] items, IConfiguration configuration)
         {
             var groups = items.SplitAndTail(LineGroup.TailCondition);
-            return new(groups.Items.Select(items => new LineGroup(items, configuration)).ToArray(), groups.Tail);
-
+            var tail = groups.Tail;
+            var spaces = items.LastOrDefault()?.SourcePart.End.Span(0);
+            if(tail.Any())
+                spaces = tail.First().SourcePart.Start.Span(tail.Last().SourcePart.End);
+            return new(groups.Items.Select(items => new LineGroup(items, configuration)).ToArray(), spaces
+                , configuration);
         }
 
-        internal IEnumerable<Edit> GetEdits(int indent, bool isSeparatorRequired, SourcePosition anchor)
+        internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
         {
-            if(indent > 0)
+            if(Lines.Any() && Spaces.Length > 0)
             {
-                NotImplementedMethod(indent, isSeparatorRequired, anchor);
+                NotImplementedMethod(isSeparatorRequired, indent);
                 return default;
             }
 
-            if(Lines.Any() && Spaces.Any())
-            {
-                NotImplementedMethod(indent, isSeparatorRequired, anchor);
-                return default;
-            }
+            var addLineBreaks = Configuration.MinimalLineBreakCount;
 
-            var lineEdits = Lines.GetLineEdits(indent, !Spaces.Any() && isSeparatorRequired).ToArray();
-            var spacesEdits = Spaces.GetSpaceEdits(isSeparatorRequired).ToArray();
+            var lineEdits = Lines.GetLineEdits().ToArray();
 
-            var separatorEdit = !Lines.Any() && !Spaces.Any() && isSeparatorRequired
-                ? new Edit[] { new(anchor.Span(0), " ", "+separator") }
-                : new Edit[0];
+            var addLineBreaksEdit = addLineBreaks == 0 || Lines.Any()
+                ? new Edit[0]
+                : new Edit[]
+                    { new(Spaces.Start.Span(0), "\n".Repeat(addLineBreaks), "+minimalLineBreaks") };
 
-            return T(lineEdits, spacesEdits, separatorEdit).ConcatMany();
+            (!isSeparatorRequired || addLineBreaks == 0).Assert();
+
+            var spacesCount = (isSeparatorRequired? 1 : 0) + (addLineBreaks > 0? indent : 0);
+            var spacesEdits = Spaces.GetSpaceEdits(spacesCount).ToArray();
+            return T(lineEdits, addLineBreaksEdit, spacesEdits).ConcatMany();
         }
     }
 }

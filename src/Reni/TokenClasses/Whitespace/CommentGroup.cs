@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
-using hw.Scanner;
 
 namespace Reni.TokenClasses.Whitespace
 {
     class CommentGroup : DumpableObject
     {
-        internal interface IConfiguration : LineGroup.IConfiguration { }
+        internal interface IConfiguration : LinesAndSpaces .IConfiguration { }
         
         [EnableDump]
         readonly LinesAndSpaces LinesAndSpaces;
@@ -16,12 +14,8 @@ namespace Reni.TokenClasses.Whitespace
         [EnableDump]
         readonly WhiteSpaceItem Main;
 
-        readonly IConfiguration Configuration;
-
         CommentGroup(IEnumerable<WhiteSpaceItem> allItems, IConfiguration configuration)
         {
-            Configuration = configuration;
-
             var groups = allItems
                 .GroupBy(TailCondition)
                 .ToDictionary(item => item.Key, item => item.ToArray());
@@ -45,7 +39,15 @@ namespace Reni.TokenClasses.Whitespace
                 , LinesAndSpaces.Create(groups.Tail, configuration));
         }
 
-        internal IEnumerable<Edit> GetEdits(int indent, bool isSeparatorRequired) 
-            => LinesAndSpaces.GetEdits(indent, isSeparatorRequired, Main.SourcePart.Start);
+        internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
+        {
+            if(indent > 0 ) 
+            {
+                NotImplementedMethod(isSeparatorRequired, indent);
+                return default;
+            }
+
+            return LinesAndSpaces.GetEdits(isSeparatorRequired, indent);
+        }
     }
 }

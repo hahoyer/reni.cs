@@ -197,6 +197,7 @@ namespace Reni.TokenClasses
 
         bool IsBracketLevel => InnerTokenClass is IRightBracket;
 
+        [DisableDump]
         internal SeparatorRequests SeparatorRequests
             => new()
             {

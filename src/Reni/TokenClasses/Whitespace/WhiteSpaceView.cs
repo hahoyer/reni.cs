@@ -7,13 +7,17 @@ namespace Reni.TokenClasses.Whitespace
 {
     class WhiteSpaceView : DumpableObject
     {
-        internal interface IConfiguration : CommentGroup.IConfiguration { }
+        internal interface IConfiguration : CommentGroup.IConfiguration
+        {
+        }
 
         readonly WhiteSpaceItem Target;
         readonly IConfiguration Configuration;
 
         [EnableDump]
         readonly CommentGroup[] Comments;
+
+        [EnableDump]
         readonly LinesAndSpaces LinesAndSpaces;
 
         internal WhiteSpaceView(WhiteSpaceItem target, IConfiguration configuration)
@@ -27,25 +31,28 @@ namespace Reni.TokenClasses.Whitespace
 
         internal IEnumerable<Edit> GetEdits(int indent)
         {
-            (indent == 0).Assert();
-
             var commentEdits = Comments
-                .SelectMany((item, index) => item.GetEdits(indent, IsSeparatorRequired(index)))
+                .SelectMany((item, index) => item.GetEdits(IsSeparatorRequired(index), indent))
                 .ToArray();
 
             var isSeparatorRequired =
-                Comments.Any()
-                    ? Configuration.SeparatorRequests.Tail && Comments.Last().IsSeparatorRequired
-                    : Configuration.SeparatorRequests.Flat;
-            
-            var linesAndSpacesEdits = LinesAndSpaces.GetEdits(indent, isSeparatorRequired, Target.SourcePart.End).ToArray();
+                Configuration.MinimalLineBreakCount == 0 &&
+                (
+                    Comments.Any()
+                        ? Configuration.SeparatorRequests.Tail && Comments.Last().IsSeparatorRequired
+                        : Configuration.SeparatorRequests.Flat
+                );
+
+
+            var linesAndSpacesEdits
+                = LinesAndSpaces.GetEdits(isSeparatorRequired, indent).ToArray();
 
             return T(commentEdits, linesAndSpacesEdits).ConcatMany();
         }
 
         bool IsSeparatorRequired(int index)
             => index == 0
-            ? Configuration.SeparatorRequests.Head 
-            : Configuration.SeparatorRequests.Inner;
+                ? Configuration.SeparatorRequests.Head
+                : Configuration.SeparatorRequests.Inner;
     }
 }

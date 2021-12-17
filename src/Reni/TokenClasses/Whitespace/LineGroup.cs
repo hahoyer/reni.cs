@@ -13,6 +13,7 @@ namespace Reni.TokenClasses.Whitespace
         {
             int? EmptyLineLimit { get; }
             SeparatorRequests SeparatorRequests { get; }
+            int MinimalLineBreakCount { get; }
         }
 
         [EnableDump]
@@ -21,10 +22,10 @@ namespace Reni.TokenClasses.Whitespace
         [EnableDump]
         internal readonly WhiteSpaceItem Main;
 
-        [EnableDump]
-        readonly WhiteSpaceItem[] Spaces;
-
         internal readonly IConfiguration Configuration;
+
+        [EnableDump]
+        readonly int Spaces;
 
         internal LineGroup(IEnumerable<WhiteSpaceItem> allItems, IConfiguration configuration)
         {
@@ -38,9 +39,11 @@ namespace Reni.TokenClasses.Whitespace
 
             Main = tails.AssertNotNull().Single();
 
-            Spaces = items ?? new WhiteSpaceItem[0];
+            Spaces = items?.Length ?? 0;
             SourcePart = allItems.Select(item => item.SourcePart).Combine();
         }
+
+        protected override string GetNodeDump() => SourcePart.GetDumpAroundCurrent(5) + base.GetNodeDump();
 
         internal static(LineGroup[], WhiteSpaceItem[]) Create(WhiteSpaceItem[] items, IConfiguration configuration)
         {
@@ -53,7 +56,7 @@ namespace Reni.TokenClasses.Whitespace
 
         internal IEnumerable<Edit> GetEdits()
         {
-            if(Spaces.Any())
+            if(Spaces > 0)
             {
                 NotImplementedMethod();
                 return default;
