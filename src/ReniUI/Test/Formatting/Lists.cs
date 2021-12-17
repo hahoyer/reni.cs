@@ -180,24 +180,5 @@ ccccc";
             text.SimpleFormattingTest(expectedText, 10, 1);
         }
 
-        [Test]
-        [UnitTest]
-        public void MultilineBreakTest11()
-        {
-            const string text =
-                @"1;
-
-repeat:
-    @ ^ while()
-    then
-    (
-        ^ body(),
-        repeat(^)
-    );
-
-2";
-
-            text.SimpleFormattingTest(null, 20, 0);
-        }
     }
 }
