@@ -136,6 +136,11 @@
     <Compile Include="Helper\IFormatResult.cs" />
     <Compile Include="Helper\IntegerResult.cs" />
     <Compile Include="Helper\ITree.cs" />
+    <Compile Include="hw\UnitTest\CategoryAttribute.cs" />
+    <Compile Include="hw\UnitTest\DependantAttribute.cs" />
+    <Compile Include="hw\UnitTest\DependenceProvider.cs" />
+    <Compile Include="hw\UnitTest\ITestFixture.cs" />
+    <Compile Include="hw\UnitTest\TestExtender.cs" />
     <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
     <Compile Include="TokenClasses\Whitespace\LinesAndSpaces.cs" />
     <Compile Include="TokenClasses\Whitespace\SeparatorExtension.cs" />
@@ -216,11 +221,6 @@
     <Compile Include="hw\Scanner\StringSourceProvider.cs" />
     <Compile Include="hw\Scanner\TwoLayerScanner.cs" />
     <Compile Include="hw\Scanner\WhiteSpaceTokenType.cs" />
-    <Compile Include="hw\UnitTest\CategoryAttribute.cs" />
-    <Compile Include="hw\UnitTest\DependantAttribute.cs" />
-    <Compile Include="hw\UnitTest\DependenceProvider.cs" />
-    <Compile Include="hw\UnitTest\ITestFixture.cs" />
-    <Compile Include="hw\UnitTest\TestExtender.cs" />
     <Compile Include="hw\UnitTest\TestMethod.cs" />
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
