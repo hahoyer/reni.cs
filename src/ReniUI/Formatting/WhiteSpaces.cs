@@ -46,7 +46,6 @@ namespace ReniUI.Formatting
             StopByObjectIds();
         }
 
-        SourcePosition LinesAndSpaces.IConfiguration.Anchor => SourcePart.End;
         int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
         int LineGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
         SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => SeparatorRequests;

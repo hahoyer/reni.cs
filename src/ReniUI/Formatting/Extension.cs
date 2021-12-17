@@ -14,7 +14,10 @@ namespace ReniUI.Formatting
                 (
                     target.WhiteSpaces
                     , configuration
-                    , target.SeparatorRequests, kind, lineBreakCount);
+                    , target.SeparatorRequests
+                    , kind
+                    , lineBreakCount
+                );
         }
 
         [UsedImplicitly]

@@ -7,9 +7,7 @@ namespace Reni.TokenClasses.Whitespace
 {
     class WhiteSpaceView : DumpableObject
     {
-        internal interface IConfiguration : CommentGroup.IConfiguration
-        {
-        }
+        internal interface IConfiguration : CommentGroup.IConfiguration { }
 
         readonly WhiteSpaceItem Target;
         readonly IConfiguration Configuration;
@@ -24,7 +22,9 @@ namespace Reni.TokenClasses.Whitespace
         {
             Target = target;
             Configuration = configuration;
-            (Comments, LinesAndSpaces) = CommentGroup.Create(target.Items, configuration);
+            (Comments, LinesAndSpaces) = target.Items.Any()
+                ?CommentGroup.Create(target.Items, configuration)
+                : CommentGroup.Create(target.SourcePart.Start, configuration);
         }
 
         protected override string GetNodeDump() => Target.SourcePart.NodeDump + " " + base.GetNodeDump();

@@ -10,7 +10,6 @@ namespace Reni.TokenClasses.Whitespace
     {
         internal interface IConfiguration : LineGroup.IConfiguration
         {
-            SourcePosition Anchor { get; }
         }
 
         [EnableDump]
@@ -24,21 +23,25 @@ namespace Reni.TokenClasses.Whitespace
         LinesAndSpaces(LineGroup[] lines, SourcePart spaces, IConfiguration configuration)
         {
             Lines = lines;
-            Spaces = spaces ?? configuration.Anchor.Span(0);
+            Spaces = spaces;
             Spaces.AssertIsNotNull();
             Configuration = configuration;
         }
 
-        public static LinesAndSpaces Create(WhiteSpaceItem[] items, IConfiguration configuration)
+        internal static LinesAndSpaces Create(WhiteSpaceItem[] items, IConfiguration configuration)
         {
+            (items != null && items.Any()).Assert();
             var groups = items.SplitAndTail(LineGroup.TailCondition);
             var tail = groups.Tail;
-            var spaces = items?.LastOrDefault()?.SourcePart.End.Span(0);
+            var spaces = items.Last().SourcePart.End.Span(0);
             if(tail.Any())
                 spaces = tail.First().SourcePart.Start.Span(tail.Last().SourcePart.End);
             return new(groups.Items.Select(items => new LineGroup(items, configuration)).ToArray(), spaces
                 , configuration);
         }
+
+        internal static LinesAndSpaces Create(SourcePosition anchor, CommentGroup.IConfiguration configuration) 
+            => new(new LineGroup[0], anchor.Span(0), configuration);
 
         internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
         {
@@ -63,5 +66,6 @@ namespace Reni.TokenClasses.Whitespace
             var spacesEdits = Spaces.GetSpaceEdits(spacesCount).ToArray();
             return T(lineEdits, addLineBreaksEdit, spacesEdits).ConcatMany();
         }
+
     }
 }
