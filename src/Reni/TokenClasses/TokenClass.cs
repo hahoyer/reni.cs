@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
                     : Lexer.IsAlphaLike(Id)
                         ? ContactType.AlphaNum
                         : Lexer.IsSymbolLike(Id)
-                            ? ContactType.Incompatible
+                            ? ContactType.Symbol
                             : ContactType.Compatible;
 
         string ITokenClass.Id => Id;

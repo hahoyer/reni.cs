@@ -1,11 +1,18 @@
+using JetBrains.Annotations;
+
 namespace Reni.TokenClasses.Whitespace
 {
     sealed class ContactType
     {
-        internal static readonly ContactType AlphaNum = new ContactType();
-        internal static readonly ContactType Text = new ContactType();
-        internal static readonly ContactType Incompatible = new ContactType();
-        internal static readonly ContactType Compatible = new ContactType();
+        [UsedImplicitly]
+        readonly string Tag;
+        internal static readonly ContactType AlphaNum = new ContactType(nameof(AlphaNum));
+        internal static readonly ContactType Text = new ContactType(nameof(Text));
+        internal static readonly ContactType Incompatible = new ContactType(nameof(Incompatible));
+        internal static readonly ContactType Compatible = new ContactType(nameof(Compatible));
+        internal static readonly ContactType Symbol = new ContactType(nameof(Symbol));
+
+        ContactType(string tag) => Tag = tag;
 
         internal bool IsCompatible(ContactType other)
         {
