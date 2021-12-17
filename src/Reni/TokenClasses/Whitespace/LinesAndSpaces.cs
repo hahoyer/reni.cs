@@ -8,7 +8,10 @@ namespace Reni.TokenClasses.Whitespace
 {
     class LinesAndSpaces : DumpableObject
     {
-        internal interface IConfiguration : LineGroup.IConfiguration { }
+        internal interface IConfiguration : LineGroup.IConfiguration
+        {
+            SourcePosition Anchor { get; }
+        }
 
         [EnableDump]
         readonly LineGroup[] Lines;
@@ -21,7 +24,8 @@ namespace Reni.TokenClasses.Whitespace
         LinesAndSpaces(LineGroup[] lines, SourcePart spaces, IConfiguration configuration)
         {
             Lines = lines;
-            Spaces = spaces;
+            Spaces = spaces ?? configuration.Anchor.Span(0);
+            Spaces.AssertIsNotNull();
             Configuration = configuration;
         }
 
@@ -29,7 +33,7 @@ namespace Reni.TokenClasses.Whitespace
         {
             var groups = items.SplitAndTail(LineGroup.TailCondition);
             var tail = groups.Tail;
-            var spaces = items.LastOrDefault()?.SourcePart.End.Span(0);
+            var spaces = items?.LastOrDefault()?.SourcePart.End.Span(0);
             if(tail.Any())
                 spaces = tail.First().SourcePart.Start.Span(tail.Last().SourcePart.End);
             return new(groups.Items.Select(items => new LineGroup(items, configuration)).ToArray(), spaces

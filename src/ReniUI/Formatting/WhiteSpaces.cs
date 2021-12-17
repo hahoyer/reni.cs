@@ -36,7 +36,6 @@ namespace ReniUI.Formatting
         )
         {
             (target != null).Assert();
-            (minimalLineBreakCount > 0 || !target.HasStableLineBreak).Assert();
 
             SourcePart = target.SourcePart;
             MinimalLineBreakCount = minimalLineBreakCount;
@@ -47,6 +46,7 @@ namespace ReniUI.Formatting
             StopByObjectIds();
         }
 
+        SourcePosition LinesAndSpaces.IConfiguration.Anchor => SourcePart.End;
         int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
         int LineGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
         SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => SeparatorRequests;
@@ -65,7 +65,7 @@ namespace ReniUI.Formatting
                SourcePart.Length == 0)
                 return new Edit[0];
 
-            var indent = Configuration.IndentCount*parameter.Indent;
+            var indent = Configuration.IndentCount * parameter.Indent;
             return WhiteSpaceView
                 .GetEdits(indent)
                 .Select(edit => new Edit(edit.Remove, edit.Insert, Anchor.TargetPosition + ":" + edit.Flag));

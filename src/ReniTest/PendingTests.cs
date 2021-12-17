@@ -1,4 +1,4 @@
-//20:37:14.039 15.12.2021 ran 177 of 183 
+//16:37:57.014 17.12.2021 ran 176 of 183 
 
 // ReSharper disable once CheckNamespace
 namespace hw.UnitTest
@@ -10,6 +10,10 @@ namespace hw.UnitTest
         
 // error 
 
+TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment1);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment2);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment3);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Comments().SeparatorBeforeComment4);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Basics().BreakLine);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Basics().One);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Basics().Two);
@@ -35,12 +39,10 @@ TestRunner.RunTest(new ReniUI.Test.Formatting.Lists().ListTest2);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Lists().MultilineBreakTest);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Lists().MultilineBreakTest1);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Lists().MultilineBreakTest11);
-TestRunner.RunTest(new ReniUI.Test.Formatting.ThenElse().SimpleThen);
-TestRunner.RunTest(new ReniUI.Test.Formatting.ThenElse().SimpleThenElse);
-TestRunner.RunTest(new ReniUI.Test.Formatting.ThenElse().SimpleThenElse1);
 
 // dependanterror 
 
+TestRunner.RunTest(new ReniUI.Test.StrangeExpressions().StringPrefix);
 TestRunner.RunTest(new ReniUI.Test.Formatting.BadThings().BadArgDeclaration);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat);
 TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat1_120);

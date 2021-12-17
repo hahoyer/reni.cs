@@ -54,7 +54,7 @@ namespace Reni.TokenClasses.Whitespace
 
             var targetLineCount
                 = T(configuration.EmptyLineLimit ?? lineGroups.Length, configuration.MinimalLineBreakCount)
-                    .Min();
+                    .Max();
 
             var delta = targetLineCount - lineGroups.Length;
             switch(delta)
