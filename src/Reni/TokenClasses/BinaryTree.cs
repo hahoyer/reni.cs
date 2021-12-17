@@ -320,6 +320,7 @@ namespace Reni.TokenClasses
 
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
+            Tracer.ConditionalBreak(ObjectId == 5);
             var separatorRequests = SeparatorRequests;
             var tokenString = Left == null? "" : WhiteSpaces.FlatFormat(areEmptyLinesPossible, separatorRequests);
 
@@ -354,6 +355,7 @@ namespace Reni.TokenClasses
             Head = Token.Length > 0 //
             , Inner = true
             , Tail = Right != null && Right.LeftMost.Token.Length > 0
+            , Flat = SeparatorExtension.Get(InnerTokenClass, Right?.LeftMost.InnerTokenClass) //
         };
 
 
