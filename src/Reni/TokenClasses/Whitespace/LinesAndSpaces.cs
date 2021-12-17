@@ -8,9 +8,7 @@ namespace Reni.TokenClasses.Whitespace
 {
     class LinesAndSpaces : DumpableObject
     {
-        internal interface IConfiguration : LineGroup.IConfiguration
-        {
-        }
+        internal interface IConfiguration : LineGroup.IConfiguration { }
 
         [EnableDump]
         readonly LineGroup[] Lines;
@@ -40,32 +38,25 @@ namespace Reni.TokenClasses.Whitespace
                 , configuration);
         }
 
-        internal static LinesAndSpaces Create(SourcePosition anchor, CommentGroup.IConfiguration configuration) 
+        internal static LinesAndSpaces Create(SourcePosition anchor, CommentGroup.IConfiguration configuration)
             => new(new LineGroup[0], anchor.Span(0), configuration);
 
         internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
         {
-            if(Lines.Any() && Spaces.Length > 0)
-            {
-                NotImplementedMethod(isSeparatorRequired, indent);
-                return default;
-            }
+            foreach(var edit in Lines.GetLineEdits())
+                yield return edit;
 
-            var addLineBreaks = Configuration.MinimalLineBreakCount;
+            var minimalLineBreakCount = Configuration.MinimalLineBreakCount;
 
-            var lineEdits = Lines.GetLineEdits().ToArray();
+            // when there are no lines, minimal line break count should be ensured here 
+            if(!Lines.Any() && minimalLineBreakCount > 0)
+                yield return new(Spaces.Start.Span(0), "\n".Repeat(minimalLineBreakCount), "+minimalLineBreaks");
 
-            var addLineBreaksEdit = addLineBreaks == 0 || Lines.Any()
-                ? new Edit[0]
-                : new Edit[]
-                    { new(Spaces.Start.Span(0), "\n".Repeat(addLineBreaks), "+minimalLineBreaks") };
-
-            (!isSeparatorRequired || addLineBreaks == 0).Assert();
-
-            var spacesCount = (isSeparatorRequired? 1 : 0) + (addLineBreaks > 0? indent : 0);
-            var spacesEdits = Spaces.GetSpaceEdits(spacesCount).ToArray();
-            return T(lineEdits, addLineBreaksEdit, spacesEdits).ConcatMany();
+            (!isSeparatorRequired || minimalLineBreakCount == 0).Assert();
+            var spacesCount = (isSeparatorRequired? 1 : 0) + (minimalLineBreakCount > 0? indent : 0);
+            var spacesEdit = Spaces.GetSpaceEdits(spacesCount);
+            if(spacesEdit != null)
+                yield return spacesEdit;
         }
-
     }
 }

@@ -25,19 +25,19 @@ namespace Reni.TokenClasses.Whitespace
                 : (result.Take(result.Length - 1).ToArray(), tail);
         }
 
-        public static IEnumerable<Edit> GetSpaceEdits(this SourcePart spaces, int targetCount)
+        public static Edit GetSpaceEdits(this SourcePart spaces, int targetCount)
         {
             if(spaces == null)
             {
                 (targetCount == 0).Assert();
-                yield break;
+                return null;
             }
 
             var delta = targetCount - spaces.Length;
             if(delta == 0)
-                yield break;
-            
-            yield return new
+                return null;
+
+            return new
             (
                 spaces.End.Span(T(delta, 0).Min()),
                 " ".Repeat(T(delta, 0).Max()),
