@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
+using JetBrains.Annotations;
 
 namespace Reni.TokenClasses.Whitespace
 {
@@ -25,6 +24,7 @@ namespace Reni.TokenClasses.Whitespace
                 : (result.Take(result.Length - 1).ToArray(), tail);
         }
 
+        [UsedImplicitly]
         static TValue[] T<TValue>(params TValue[] value) => value;
     }
 }

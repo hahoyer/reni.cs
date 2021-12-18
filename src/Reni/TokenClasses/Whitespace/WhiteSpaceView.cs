@@ -32,7 +32,7 @@ namespace Reni.TokenClasses.Whitespace
         internal IEnumerable<Edit> GetEdits(int indent)
         {
             var commentEdits = Comments
-                .SelectMany((item, index) => item.GetEdits(IsSeparatorRequired(index), indent))
+                .SelectMany((item, index) => item.GetEdits(IsSeparatorRequired(index==0), indent))
                 .ToArray();
 
             var isSeparatorRequired =
@@ -50,8 +50,8 @@ namespace Reni.TokenClasses.Whitespace
             return T(commentEdits, linesAndSpacesEdits).ConcatMany();
         }
 
-        bool IsSeparatorRequired(int index)
-            => index == 0
+        bool IsSeparatorRequired(bool isTop)
+            => isTop
                 ? Configuration.SeparatorRequests.Head
                 : Configuration.SeparatorRequests.Inner;
     }

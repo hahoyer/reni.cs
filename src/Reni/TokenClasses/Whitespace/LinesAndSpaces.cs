@@ -16,19 +16,37 @@ namespace Reni.TokenClasses.Whitespace
         [EnableDump]
         readonly SourcePart Spaces;
 
-        readonly int TargetLineCount;
-        readonly int LinesDelta;
+        readonly IConfiguration Configuration;
 
         LinesAndSpaces(LineGroup[] lines, SourcePart spaces, IConfiguration configuration)
         {
             Lines = lines;
             Spaces = spaces;
+            Configuration = configuration;
             Spaces.AssertIsNotNull();
-
-            var maximalLineBreakCount = T(configuration.EmptyLineLimit ?? Lines.Length, Lines.Length).Min();
-            TargetLineCount = T(configuration.MinimalLineBreakCount, maximalLineBreakCount).Max();
-            LinesDelta = TargetLineCount - Lines.Length;
         }
+
+        int TargetLineCount
+        {
+            get
+            {
+                var maximalLineBreakCount = T(Configuration.EmptyLineLimit ?? Lines.Length, Lines.Length).Min();
+                return T(Configuration.MinimalLineBreakCount, maximalLineBreakCount).Max();
+            }
+        }
+
+        int LinesDelta => TargetLineCount - Lines.Length;
+
+        /// <summary>
+        ///     Indent cannot be handled with spaces, when there are neither lines nor spaces
+        ///     since it would anchor the same source position as the edit for adding line breaks.
+        /// </summary>
+        bool IndentAtSpaces => Lines.Any() || Spaces.Length > 0;
+
+        /// <summary>
+        ///     Currently had no lines but now should have lines
+        /// </summary>
+        bool MakeLines => TargetLineCount > 0 && !Lines.Any();
 
         internal static LinesAndSpaces Create(WhiteSpaceItem[] items, IConfiguration configuration)
         {
@@ -42,7 +60,7 @@ namespace Reni.TokenClasses.Whitespace
                 , configuration);
         }
 
-        internal static LinesAndSpaces Create(SourcePosition anchor, CommentGroup.IConfiguration configuration)
+        internal static LinesAndSpaces Create(SourcePosition anchor, IConfiguration configuration)
             => new(new LineGroup[0], anchor.Span(0), configuration);
 
         internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
@@ -50,26 +68,16 @@ namespace Reni.TokenClasses.Whitespace
             foreach(var edit in GetLineEdits())
                 yield return edit;
 
-            // Indent cannot be handled with spaces, when there are neither lines or spaces
-            // since it would anchor the same source position
-            var indentAtSpaces = Lines.Any() || Spaces.Length > 0;
-
-            if(TargetLineCount > 0)
+            // when there are no lines, minimal line break count and probably indent should be ensured here 
+            if(MakeLines)
             {
-                (!isSeparatorRequired).Assert();
-
-                // when there are no lines, minimal line break count and probably indent should be ensured here 
-                if(!Lines.Any())
-                {
-                    var insert = "\n".Repeat(TargetLineCount) + " ".Repeat(indentAtSpaces? 0 : indent);
-                    yield return new(Spaces.Start.Span(0), insert, "+minimalLineBreaks");
-                }
-
+                var insert = "\n".Repeat(TargetLineCount) + " ".Repeat(IndentAtSpaces? 0 : indent);
+                yield return new(Spaces.Start.Span(0), insert, "+minimalLineBreaks");
             }
 
             var targetSpacesCount
                 = TargetLineCount > 0
-                    ? indentAtSpaces
+                    ? IndentAtSpaces
                         ? indent
                         : 0
                     : isSeparatorRequired
@@ -83,15 +91,11 @@ namespace Reni.TokenClasses.Whitespace
 
         Edit GetSpaceEdits(int targetCount)
         {
-            if(Spaces == null)
-            {
-                (targetCount == 0).Assert();
-                return null;
-            }
-
-            var delta = targetCount - Spaces.Length;
+            var delta = targetCount - (Spaces?.Length ?? 0);
             if(delta == 0)
                 return null;
+
+            Spaces.AssertIsNotNull();
 
             return new
             (

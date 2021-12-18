@@ -32,7 +32,7 @@ namespace ReniUI.Formatting
 
             [UsedImplicitly]
             [DisableDump]
-            internal string TargetPosition => $"{Kind}:{(LineBreakCount > 0? LineBreakCount : "")} {Target.FullToken.GetDumpAroundCurrent(5)}";
+            internal string TargetPosition => $"{Kind}:{(LineBreakCount > 0? LineBreakCount : "")} {Target.FullToken.LogDump()}";
 
             internal static Anchor Create(BinaryTree anchor, string kind) 
                 => anchor == null? null : new Anchor(anchor, kind);
@@ -107,7 +107,7 @@ namespace ReniUI.Formatting
                 Anchors.Begin = Anchor.Create(frameAnchors.begin, "b");
                 Anchors.End = Anchor.Create(frameAnchors.end, "e");
             }
-            StopByObjectIds(410);
+            StopByObjectIds();
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();

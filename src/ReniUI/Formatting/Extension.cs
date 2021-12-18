@@ -7,7 +7,7 @@ namespace ReniUI.Formatting
     static class Extension
     {
         public static IEnumerable<ISourcePartEdit> GetWhiteSpaceEdits
-            (this BinaryTree target, Configuration configuration, int lineBreakCount, Syntax.Anchor kind)
+            (this BinaryTree target, Configuration configuration, int lineBreakCount, Syntax.Anchor anchor)
         {
             if(target != null)
                 yield return new WhiteSpaces
@@ -15,7 +15,7 @@ namespace ReniUI.Formatting
                     target.WhiteSpaces
                     , configuration
                     , target.SeparatorRequests
-                    , kind.TargetPosition
+                    , anchor.TargetPosition
                     , lineBreakCount
                 );
         }
