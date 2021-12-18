@@ -24,7 +24,7 @@ namespace ReniUI.Formatting
             StopByObjectIds(230);
         }
 
-        bool ISourcePartEdit.HasLines => NewText.Contains("\n");
+        bool ISourcePartEdit.IsIndentTarget => NewText.Contains("\n");
         ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
         SourcePart ISourcePartEdit.SourcePart => Location;

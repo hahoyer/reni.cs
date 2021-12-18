@@ -27,7 +27,7 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        bool ISourcePartEdit.HasLines => Target.HasLines;
+        bool ISourcePartEdit.IsIndentTarget => Target.IsIndentTarget;
 
         ISourcePartEdit ISourcePartEdit.Indent(int count)
         {

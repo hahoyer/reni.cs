@@ -21,28 +21,28 @@ namespace ReniUI.Formatting
 
         readonly SeparatorRequests SeparatorRequests;
         readonly int MinimalLineBreakCount;
-        readonly Syntax.Anchor Anchor;
         readonly SourcePart SourcePart;
 
         readonly ValueCache<WhiteSpaceView> WhiteSpaceViewCache;
+        readonly string AnchorTargetPositionForDebug;
 
         internal WhiteSpaces
         (
             WhiteSpaceItem target
             , Configuration configuration
             , SeparatorRequests separatorRequests
-            , Syntax.Anchor anchor
-            , int minimalLineBreakCount = 0
+            , string anchorTargetPositionForDebug
+            , int minimalLineBreakCount
         )
         {
             (target != null).Assert();
 
             SourcePart = target.SourcePart;
             MinimalLineBreakCount = minimalLineBreakCount;
-            Anchor = anchor;
             Configuration = configuration;
             SeparatorRequests = separatorRequests;
             WhiteSpaceViewCache = new(() => new(target, this));
+            AnchorTargetPositionForDebug = anchorTargetPositionForDebug;
             StopByObjectIds();
         }
 
@@ -57,6 +57,7 @@ namespace ReniUI.Formatting
         /// <returns></returns>
         IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
+            StopByObjectIds();
             if(!SeparatorRequests.Head &&
                !SeparatorRequests.Tail &&
                !SeparatorRequests.Inner &&
@@ -67,10 +68,10 @@ namespace ReniUI.Formatting
             var indent = Configuration.IndentCount * parameter.Indent;
             return WhiteSpaceView
                 .GetEdits(indent)
-                .Select(edit => new Edit(edit.Remove, edit.Insert, Anchor.TargetPosition + ":" + edit.Flag));
+                .Select(edit => new Edit(edit.Remove, edit.Insert, AnchorTargetPositionForDebug + ":" + edit.Flag));
         }
 
-        bool ISourcePartEdit.HasLines => MinimalLineBreakCount > 0;
+        bool ISourcePartEdit.IsIndentTarget => true;
 
         ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 

@@ -16,7 +16,7 @@ namespace ReniUI.Test.Formatting
 text1
 ";
             var expectedText =
-                @"#asdf1
+                @"#asdf1_
 text1
 ";
 

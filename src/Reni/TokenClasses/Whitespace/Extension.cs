@@ -25,56 +25,6 @@ namespace Reni.TokenClasses.Whitespace
                 : (result.Take(result.Length - 1).ToArray(), tail);
         }
 
-        public static Edit GetSpaceEdits(this SourcePart spaces, int targetCount)
-        {
-            if(spaces == null)
-            {
-                (targetCount == 0).Assert();
-                return null;
-            }
-
-            var delta = targetCount - spaces.Length;
-            if(delta == 0)
-                return null;
-
-            return new
-            (
-                spaces.End.Span(T(delta, 0).Min()),
-                " ".Repeat(T(delta, 0).Max()),
-                "+/-spaces"
-            );
-        }
-
-        public static IEnumerable<Edit> GetLineEdits(this LineGroup[] lineGroups)
-        {
-            if(!lineGroups.Any())
-                yield break;
-
-            var configuration = lineGroups[0].Configuration;
-
-            var targetLineCount
-                = T(configuration.EmptyLineLimit ?? lineGroups.Length, configuration.MinimalLineBreakCount)
-                    .Max();
-
-            var delta = targetLineCount - lineGroups.Length;
-            switch(delta)
-            {
-                case < 0:
-                {
-                    var start = lineGroups[0].SourcePart.Start;
-                    var end = -delta < lineGroups.Length
-                        ? lineGroups[-delta].Main.SourcePart.Start
-                        : lineGroups[-delta - 1].Main.SourcePart.End;
-
-                    yield return new(start.Span(end), "", "-extra Linebreaks");
-                    break;
-                }
-                case > 0:
-                    Dumpable.NotImplementedFunction();
-                    break;
-            }
-        }
-
         static TValue[] T<TValue>(params TValue[] value) => value;
     }
 }

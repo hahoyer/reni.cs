@@ -43,7 +43,7 @@ namespace Reni.TokenClasses.Whitespace
             SourcePart = allItems.Select(item => item.SourcePart).Combine();
         }
 
-        protected override string GetNodeDump() => SourcePart.GetDumpAroundCurrent(5) + base.GetNodeDump();
+        protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
         internal static(LineGroup[], WhiteSpaceItem[]) Create(WhiteSpaceItem[] items, IConfiguration configuration)
         {
@@ -57,12 +57,7 @@ namespace Reni.TokenClasses.Whitespace
         internal IEnumerable<Edit> GetEdits()
         {
             if(Spaces > 0)
-            {
-                NotImplementedMethod();
-                return default;
-            }
-
-            return new Edit[0];
+                yield return new(Main.SourcePart.Start.Span(-Spaces), "", "-spaces");
         }
     }
 }

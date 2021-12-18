@@ -4,7 +4,7 @@ namespace ReniUI.Formatting
 {
     interface ISourcePartEdit
     {
-        bool HasLines {get;}
+        bool IsIndentTarget {get;}
         SourcePart SourcePart { get; }
         ISourcePartEdit Indent(int count);
     }

@@ -15,7 +15,7 @@ namespace ReniUI.Formatting
                     target.WhiteSpaces
                     , configuration
                     , target.SeparatorRequests
-                    , kind
+                    , kind.TargetPosition
                     , lineBreakCount
                 );
         }

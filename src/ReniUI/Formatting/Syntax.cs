@@ -107,7 +107,7 @@ namespace ReniUI.Formatting
                 Anchors.Begin = Anchor.Create(frameAnchors.begin, "b");
                 Anchors.End = Anchor.Create(frameAnchors.end, "e");
             }
-            StopByObjectIds();
+            StopByObjectIds(410);
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();

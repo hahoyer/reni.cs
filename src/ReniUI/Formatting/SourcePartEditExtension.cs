@@ -41,6 +41,6 @@ namespace ReniUI.Formatting
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
 
         public static ISourcePartEdit CreateIndent(this ISourcePartEdit target, int count)
-            => count != 0 && target.HasLines? new IndentedSourcePartEdit(target, count) : target;
+            => count != 0 && target.IsIndentTarget? new IndentedSourcePartEdit(target, count) : target;
     }
 }

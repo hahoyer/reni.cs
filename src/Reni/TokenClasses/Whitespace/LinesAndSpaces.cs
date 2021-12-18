@@ -16,14 +16,18 @@ namespace Reni.TokenClasses.Whitespace
         [EnableDump]
         readonly SourcePart Spaces;
 
-        readonly IConfiguration Configuration;
+        readonly int TargetLineCount;
+        readonly int LinesDelta;
 
         LinesAndSpaces(LineGroup[] lines, SourcePart spaces, IConfiguration configuration)
         {
             Lines = lines;
             Spaces = spaces;
             Spaces.AssertIsNotNull();
-            Configuration = configuration;
+
+            var maximalLineBreakCount = T(configuration.EmptyLineLimit ?? Lines.Length, Lines.Length).Min();
+            TargetLineCount = T(configuration.MinimalLineBreakCount, maximalLineBreakCount).Max();
+            LinesDelta = TargetLineCount - Lines.Length;
         }
 
         internal static LinesAndSpaces Create(WhiteSpaceItem[] items, IConfiguration configuration)
@@ -43,20 +47,72 @@ namespace Reni.TokenClasses.Whitespace
 
         internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
         {
-            foreach(var edit in Lines.GetLineEdits())
+            foreach(var edit in GetLineEdits())
                 yield return edit;
 
-            var minimalLineBreakCount = Configuration.MinimalLineBreakCount;
+            var actualIndent = TargetLineCount > 0? indent : 0;
+            var indentAtSpaces = Spaces.Length == 0? 0 : actualIndent;
+            var indentAtEmptyLineBranch = Spaces.Length == 0? actualIndent : 0;
 
-            // when there are no lines, minimal line break count should be ensured here 
-            if(!Lines.Any() && minimalLineBreakCount > 0)
-                yield return new(Spaces.Start.Span(0), "\n".Repeat(minimalLineBreakCount), "+minimalLineBreaks");
 
-            (!isSeparatorRequired || minimalLineBreakCount == 0).Assert();
-            var spacesCount = (isSeparatorRequired? 1 : 0) + (minimalLineBreakCount > 0? indent : 0);
-            var spacesEdit = Spaces.GetSpaceEdits(spacesCount);
+            // when there are no lines, minimal line break count and probably indent should be ensured here 
+            if(!Lines.Any() && TargetLineCount > 0)
+            {
+                var insert = "\n".Repeat(TargetLineCount) + " ".Repeat(indentAtEmptyLineBranch);
+                yield return new(Spaces.Start.Span(0), insert, "+minimalLineBreaks");
+            }
+
+            (!isSeparatorRequired || TargetLineCount == 0).Assert();
+            var spacesEdit = GetSpaceEdits((isSeparatorRequired? 1 : 0) + indentAtSpaces);
             if(spacesEdit != null)
                 yield return spacesEdit;
+        }
+
+        Edit GetSpaceEdits(int targetCount)
+        {
+            if(Spaces == null)
+            {
+                (targetCount == 0).Assert();
+                return null;
+            }
+
+            var delta = targetCount - Spaces.Length;
+            if(delta == 0)
+                return null;
+
+            return new
+            (
+                Spaces.End.Span(T(delta, 0).Min()),
+                " ".Repeat(T(delta, 0).Max()),
+                "+/-spaces"
+            );
+        }
+
+        IEnumerable<Edit> GetLineEdits()
+        {
+            if(!Lines.Any())
+                yield break;
+
+            switch(LinesDelta)
+            {
+                case < 0:
+                {
+                    var start = Lines[0].SourcePart.Start;
+                    var end = -LinesDelta < Lines.Length
+                        ? Lines[-LinesDelta].Main.SourcePart.Start
+                        : Lines[-LinesDelta - 1].Main.SourcePart.End;
+
+                    yield return new(start.Span(end), "", "-extra Linebreaks");
+                    break;
+                }
+                case > 0:
+                    NotImplementedFunction();
+                    break;
+                case 0:
+                    foreach(var edit in Lines.SelectMany(item => item.GetEdits()))
+                        yield return edit;
+                    break;
+            }
         }
     }
 }
