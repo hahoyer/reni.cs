@@ -68,8 +68,7 @@ namespace hw.Helper
             return "\n" + left + Indent("\n" + data) + "\n" + right;
         }
 
-        public static string SaveConcat
-            (this string delimiter, params string[] data)
+        public static string SaveConcat(this string delimiter, params string[] data)
             => data.Where(d => !string.IsNullOrEmpty(d)).Stringify(delimiter);
 
         /// <summary>
@@ -136,8 +135,8 @@ namespace hw.Helper
         public static string ExecuteCommand(this string command)
         {
             var procStartInfo = new ProcessStartInfo("cmd", "/c " + command)
-                { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
-            var proc = new Process { StartInfo = procStartInfo };
+                {RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true};
+            var proc = new Process {StartInfo = procStartInfo};
             proc.Start();
             return proc.StandardOutput.ReadToEnd();
         }
