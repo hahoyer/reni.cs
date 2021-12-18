@@ -50,20 +50,33 @@ namespace Reni.TokenClasses.Whitespace
             foreach(var edit in GetLineEdits())
                 yield return edit;
 
-            var actualIndent = TargetLineCount > 0? indent : 0;
-            var indentAtSpaces = Spaces.Length == 0? 0 : actualIndent;
-            var indentAtEmptyLineBranch = Spaces.Length == 0? actualIndent : 0;
+            // Indent cannot be handled with spaces, when there are neither lines or spaces
+            // since it would anchor the same source position
+            var indentAtSpaces = Lines.Any() || Spaces.Length > 0;
 
-
-            // when there are no lines, minimal line break count and probably indent should be ensured here 
-            if(!Lines.Any() && TargetLineCount > 0)
+            if(TargetLineCount > 0)
             {
-                var insert = "\n".Repeat(TargetLineCount) + " ".Repeat(indentAtEmptyLineBranch);
-                yield return new(Spaces.Start.Span(0), insert, "+minimalLineBreaks");
+                (!isSeparatorRequired).Assert();
+
+                // when there are no lines, minimal line break count and probably indent should be ensured here 
+                if(!Lines.Any())
+                {
+                    var insert = "\n".Repeat(TargetLineCount) + " ".Repeat(indentAtSpaces? 0 : indent);
+                    yield return new(Spaces.Start.Span(0), insert, "+minimalLineBreaks");
+                }
+
             }
 
-            (!isSeparatorRequired || TargetLineCount == 0).Assert();
-            var spacesEdit = GetSpaceEdits((isSeparatorRequired? 1 : 0) + indentAtSpaces);
+            var targetSpacesCount
+                = TargetLineCount > 0
+                    ? indentAtSpaces
+                        ? indent
+                        : 0
+                    : isSeparatorRequired
+                        ? 1
+                        : 0;
+
+            var spacesEdit = GetSpaceEdits(targetSpacesCount);
             if(spacesEdit != null)
                 yield return spacesEdit;
         }
