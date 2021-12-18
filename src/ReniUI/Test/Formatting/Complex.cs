@@ -158,12 +158,12 @@ repeat:
         [UnitTest]
         public void TwoLevelParenthesis()
         {
-            const string text = @"aaaaa;llll:bbbbb;(cccccsssss)";
+            const string text = @"aaaaa;llll:bbbbb;(cccccxsssss)";
             const string expectedText = @"aaaaa;
 llll: bbbbb;
 
 (
-    cccccsssss
+    cccccxsssss
 )";
 
             text.SimpleFormattingTest(expectedText, 12, 1);
