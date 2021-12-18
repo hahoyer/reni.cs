@@ -15,7 +15,7 @@ namespace ReniUI.Formatting
     ///     The member names by default belong to thing on the left side of the token.
     ///     Things on the right side contain this fact in their name.
     /// </summary>
-    sealed class WhiteSpaces : DumpableObject, ISourcePartEdit, IEditPieces, WhiteSpaceView.IConfiguration
+    sealed class WhiteSpaces : DumpableObject, ISourcePartEdit, IEditPieces, LineGroup.IConfiguration
     {
         readonly Configuration Configuration;
 

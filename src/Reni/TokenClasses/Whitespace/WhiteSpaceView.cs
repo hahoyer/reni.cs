@@ -7,10 +7,7 @@ namespace Reni.TokenClasses.Whitespace
 {
     class WhiteSpaceView : DumpableObject
     {
-        internal interface IConfiguration : CommentGroup.IConfiguration { }
-
         readonly WhiteSpaceItem Target;
-        readonly IConfiguration Configuration;
 
         [EnableDump]
         readonly CommentGroup[] Comments;
@@ -18,12 +15,11 @@ namespace Reni.TokenClasses.Whitespace
         [EnableDump]
         readonly LinesAndSpaces LinesAndSpaces;
 
-        internal WhiteSpaceView(WhiteSpaceItem target, IConfiguration configuration)
+        internal WhiteSpaceView(WhiteSpaceItem target, LineGroup.IConfiguration  configuration)
         {
             Target = target;
-            Configuration = configuration;
             (Comments, LinesAndSpaces) = target.Items.Any()
-                ?CommentGroup.Create(target.Items, configuration)
+                ? CommentGroup.Create(target.Items, configuration)
                 : CommentGroup.Create(target.SourcePart.Start, configuration);
         }
 
@@ -32,27 +28,13 @@ namespace Reni.TokenClasses.Whitespace
         internal IEnumerable<Edit> GetEdits(int indent)
         {
             var commentEdits = Comments
-                .SelectMany((item, index) => item.GetEdits(IsSeparatorRequired(index==0), indent))
+                .SelectMany((item, index) => item.GetEdits(indent))
                 .ToArray();
 
-            var isSeparatorRequired =
-                Configuration.MinimalLineBreakCount == 0 &&
-                (
-                    Comments.Any()
-                        ? Configuration.SeparatorRequests.Tail && Comments.Last().IsSeparatorRequired
-                        : Configuration.SeparatorRequests.Flat
-                );
-
-
             var linesAndSpacesEdits
-                = LinesAndSpaces.GetEdits(isSeparatorRequired, indent).ToArray();
+                = LinesAndSpaces.GetEdits(indent).ToArray();
 
             return T(commentEdits, linesAndSpacesEdits).ConcatMany();
         }
-
-        bool IsSeparatorRequired(bool isTop)
-            => isTop
-                ? Configuration.SeparatorRequests.Head
-                : Configuration.SeparatorRequests.Inner;
     }
 }

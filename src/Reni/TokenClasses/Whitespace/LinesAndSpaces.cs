@@ -8,7 +8,11 @@ namespace Reni.TokenClasses.Whitespace
 {
     class LinesAndSpaces : DumpableObject
     {
-        internal interface IConfiguration : LineGroup.IConfiguration { }
+        internal interface IConfiguration : LineGroup.IConfiguration
+        {
+            bool IsSeparatorRequired { get; }
+            new int MinimalLineBreakCount { get; }
+        }
 
         [EnableDump]
         readonly LineGroup[] Lines;
@@ -63,8 +67,9 @@ namespace Reni.TokenClasses.Whitespace
         internal static LinesAndSpaces Create(SourcePosition anchor, IConfiguration configuration)
             => new(new LineGroup[0], anchor.Span(0), configuration);
 
-        internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
+        internal IEnumerable<Edit> GetEdits(int indent)
         {
+
             foreach(var edit in GetLineEdits())
                 yield return edit;
 
@@ -80,7 +85,7 @@ namespace Reni.TokenClasses.Whitespace
                     ? IndentAtSpaces
                         ? indent
                         : 0
-                    : isSeparatorRequired
+                    : IsSeparatorRequired
                         ? 1
                         : 0;
 
@@ -131,5 +136,7 @@ namespace Reni.TokenClasses.Whitespace
                     break;
             }
         }
+
+        bool IsSeparatorRequired => Configuration.IsSeparatorRequired;
     }
 }

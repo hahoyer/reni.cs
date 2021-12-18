@@ -2,12 +2,63 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses.Whitespace
 {
     class CommentGroup : DumpableObject
     {
-        internal interface IConfiguration : LinesAndSpaces.IConfiguration { }
+        class LinesAndSpacesConfiguration : DumpableObject, LinesAndSpaces.IConfiguration
+        {
+            [EnableDump]
+            readonly LineGroup.IConfiguration Configuration;
+
+            [EnableDump]
+            readonly CommentGroup Prefix;
+
+            [EnableDump]
+            readonly bool IsForTail;
+
+            internal LinesAndSpacesConfiguration
+                (LineGroup.IConfiguration configuration, CommentGroup prefix, bool isForTail = false)
+            {
+                Configuration = configuration;
+                Prefix = prefix;
+                IsForTail = isForTail;
+                StopByObjectIds();
+            }
+
+            int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
+
+            bool LinesAndSpaces.IConfiguration.IsSeparatorRequired
+            {
+                get
+                {
+                    if(IsForTail)
+                        return Configuration.MinimalLineBreakCount == 0 &&
+                        (
+                            Prefix == null
+                                ? Configuration.SeparatorRequests.Flat
+                                : Configuration.SeparatorRequests.Tail && Prefix.IsSeparatorRequired
+                        );
+
+                    return Prefix == null
+                        ? Configuration.SeparatorRequests.Head
+                        : Configuration.SeparatorRequests.Inner && Prefix.Main.Type is IInline;
+                }
+            }
+
+            int LinesAndSpaces.IConfiguration.MinimalLineBreakCount
+                => T
+                    (
+                        ((LineGroup.IConfiguration)this).MinimalLineBreakCount - (Prefix?.Main.Type is ILine? 1 : 0)
+                        , 0
+                    )
+                    .Max();
+
+            int LineGroup.IConfiguration.MinimalLineBreakCount => Configuration.MinimalLineBreakCount;
+            SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => Configuration.SeparatorRequests;
+        }
 
         [EnableDump]
         readonly LinesAndSpaces LinesAndSpaces;
@@ -15,7 +66,11 @@ namespace Reni.TokenClasses.Whitespace
         [EnableDump]
         readonly WhiteSpaceItem Main;
 
-        CommentGroup(IEnumerable<WhiteSpaceItem> allItems, IConfiguration configuration)
+        CommentGroup
+        (
+            IEnumerable<WhiteSpaceItem> allItems
+            , LinesAndSpaces.IConfiguration configuration
+        )
         {
             var groups = allItems
                 .GroupBy(TailCondition)
@@ -35,36 +90,48 @@ namespace Reni.TokenClasses.Whitespace
         static bool TailCondition(WhiteSpaceItem item) => item.Type is IComment;
 
         internal static(CommentGroup[], LinesAndSpaces) Create
-            (IEnumerable<WhiteSpaceItem> items, IConfiguration configuration)
+            (IEnumerable<WhiteSpaceItem> allItems, LineGroup.IConfiguration configuration)
         {
-            var groups = items.SplitAndTail(TailCondition);
-            var commentGroups = groups
-                .Items
-                .Select(items => new CommentGroup(items, configuration))
-                .ToArray();
+            var groups = allItems.SplitAndTail(TailCondition);
 
+
+            var commentGroups = new List<CommentGroup>();
+            CommentGroup commentGroup = default;
+            foreach(var items in groups.Items)
+            {
+                commentGroup = new(items, new LinesAndSpacesConfiguration(configuration, commentGroup));
+                commentGroups.Add(commentGroup);
+            }
+
+            var linesAndSpacesConfiguration
+                = new LinesAndSpacesConfiguration(configuration, commentGroup,
+                    true);
             var linesAndSpaces =
                     groups.Tail.Any()
-                        ? LinesAndSpaces.Create(groups.Tail, configuration)
-                        : LinesAndSpaces.Create(items.Last().SourcePart.End, configuration)
+                        ? LinesAndSpaces.Create(groups.Tail, linesAndSpacesConfiguration)
+                        : LinesAndSpaces.Create(allItems.Last().SourcePart.End, linesAndSpacesConfiguration)
                 ;
 
-            return (commentGroups, linesAndSpaces);
+            return (commentGroups.ToArray(), linesAndSpaces);
         }
 
         internal static(CommentGroup[] Comments, LinesAndSpaces LinesAndSpaces) Create
-            (SourcePosition anchor, WhiteSpaceView.IConfiguration configuration)
-            => (new CommentGroup[0], LinesAndSpaces.Create(anchor, configuration));
+            (SourcePosition anchor, LineGroup.IConfiguration configuration)
+        {
+            var linesAndSpacesConfiguration
+                = new LinesAndSpacesConfiguration(configuration, null, true);
+            return (new CommentGroup[0], LinesAndSpaces.Create(anchor, linesAndSpacesConfiguration));
+        }
 
-        internal IEnumerable<Edit> GetEdits(bool isSeparatorRequired, int indent)
+        internal IEnumerable<Edit> GetEdits(int indent)
         {
             if(indent > 0)
             {
-                NotImplementedMethod(isSeparatorRequired, indent);
+                NotImplementedMethod(indent);
                 return default;
             }
 
-            return LinesAndSpaces.GetEdits(isSeparatorRequired, indent);
+            return LinesAndSpaces.GetEdits(indent);
         }
     }
 }
