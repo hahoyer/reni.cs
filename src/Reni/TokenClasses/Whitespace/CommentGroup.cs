@@ -123,15 +123,6 @@ namespace Reni.TokenClasses.Whitespace
             return (new CommentGroup[0], LinesAndSpaces.Create(anchor, linesAndSpacesConfiguration));
         }
 
-        internal IEnumerable<Edit> GetEdits(int indent)
-        {
-            if(indent > 0)
-            {
-                NotImplementedMethod(indent);
-                return default;
-            }
-
-            return LinesAndSpaces.GetEdits(indent);
-        }
+        internal IEnumerable<Edit> GetEdits(int indent) => LinesAndSpaces.GetEdits(indent);
     }
 }

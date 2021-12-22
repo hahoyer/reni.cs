@@ -71,7 +71,7 @@ namespace hw.DebugFormatter
             if(dumpData != null)
                 return dumpData.Dump(type, data);
 
-            var memberCheck = Configuration.GetMemberCheck(type);
+&            var memberCheck = Configuration.GetMemberCheck(type);
             var results = type
                 .GetFields(AnyBinding)
                 .Cast<MemberInfo>()

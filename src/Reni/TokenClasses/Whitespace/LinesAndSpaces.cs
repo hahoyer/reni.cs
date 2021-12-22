@@ -128,7 +128,9 @@ namespace Reni.TokenClasses.Whitespace
                     break;
                 }
                 case > 0:
-                    NotImplementedFunction();
+                    foreach(var edit in Lines.SelectMany(item => item.GetEdits()))
+                        yield return edit;
+                    yield return new(Lines.Last().SourcePart.End.Span(0), "\n".Repeat(LinesDelta), "+linebreaks");
                     break;
                 case 0:
                     foreach(var edit in Lines.SelectMany(item => item.GetEdits()))

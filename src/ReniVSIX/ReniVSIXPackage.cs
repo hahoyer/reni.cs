@@ -2,7 +2,9 @@
 using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
+using hw.DebugFormatter;
 using JetBrains.Annotations;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.Shell;
 using ReniUI.Formatting;
 
@@ -63,6 +65,7 @@ namespace ReniVSIX
 
         new void Initialize()
         {
+            Tracer.Dumper.Configuration.Handlers.Add(typeof(ParseRequest),);
             var serviceContainer = this as IServiceContainer;
             var langService = new ReniService();
             langService.SetSite(this);
@@ -72,7 +75,7 @@ namespace ReniVSIX
         internal IFormatter CreateFormattingProvider()
         {
             var pd = (Properties)GetDialogPage(typeof(Properties));
-            return new Configuration
+            return new ReniUI.Formatting.Configuration
             {
                 MaxLineLength = pd.MaxLineLength //
                 , EmptyLineLimit = pd.EmptyLineLimit
