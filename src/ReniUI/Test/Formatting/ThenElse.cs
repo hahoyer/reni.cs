@@ -45,14 +45,14 @@ then aaaaaa", 10);
     public void NestedThenElseWithLineBreak()
     {
         const string text = @"cond1 then cond2 then then2 else cond3 else else3 ";
-        // It is not as expected: 
+        // It is not as expected:
         text.SimpleFormattingTest(@"cond1
-then 
-    cond2 
+then
+    cond2
     then then2
-else 
-   else2
-   else else1", 7);
+else
+    cond3
+    else else3", 7);
         // since it is :
         // (cond1 then (cond2 then then2)) else (cond3 else else3)
         // so better use some brackets:
