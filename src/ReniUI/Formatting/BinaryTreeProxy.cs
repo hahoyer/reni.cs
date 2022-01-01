@@ -36,7 +36,19 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
-    internal bool IsLineSplit => HasAlreadyLineBreakOrIsTooLong;
+    internal bool IsLineSplit
+    {
+        get
+        {
+            if(FlatItem.TokenClass is ILeftBracket)
+                return Parent.IsLineSplit;
+            return HasAlreadyLineBreakOrIsTooLong || ForceLineSplit;
+        }
+    }
+
+    [EnableDump(Order = 3)]
+    [EnableDumpExcept(false)]
+    bool ForceLineSplit => PositionParent!= null && PositionParent.ForceLinesSplit;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     bool HasAlreadyLineBreakOrIsTooLong
@@ -139,7 +151,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
             case RightParenthesis:
                 Left.SetPosition(new PositionParent.Left(this));
                 Left.RightNeighbor.SetPosition(new PositionParent.InnerLeft(this));
-                Left.Right.SetPosition(new PositionParent.IndentAll(this));
+                Left.Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit(this));
                 SetPosition(new PositionParent.InnerRight(this));
                 RightNeighbor.SetPosition(new PositionParent.Right(this));
                 return;

@@ -23,7 +23,7 @@ abstract class PositionParent : DumpableObject
     internal class IndentAll : PositionParent
     {
         internal IndentAll(BinaryTreeProxy parent)
-            : base(parent, false, true) { }
+            : base(parent, indent: true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
@@ -32,6 +32,13 @@ abstract class PositionParent : DumpableObject
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
+    }
+
+    internal class IndentAllAndForceLineSplit : PositionParent
+    {
+        internal IndentAllAndForceLineSplit(BinaryTreeProxy parent)
+            : base(parent, indent: true, forceLinesSplit: true) { }
+
     }
 
     internal class BeforeToken : PositionParent
@@ -155,6 +162,7 @@ abstract class PositionParent : DumpableObject
 
     internal readonly bool Indent;
     internal readonly bool AnchorIndent;
+    internal readonly bool ForceLinesSplit;
 
     internal bool HasAdditionalLineBreak;
     readonly bool HasLineBreak;
@@ -163,17 +171,22 @@ abstract class PositionParent : DumpableObject
     readonly BinaryTreeProxy Parent;
 
 
-    protected PositionParent(BinaryTreeProxy parent, bool hasLineBreak, bool indent = false, bool anchorIndent = false)
+    protected PositionParent
+    (
+        BinaryTreeProxy parent
+        , bool hasLineBreak = false
+        , bool indent = false
+        , bool anchorIndent = false
+        , bool forceLinesSplit = false
+    )
     {
         parent.AssertIsNotNull();
         Parent = parent;
         Indent = indent;
         AnchorIndent = anchorIndent;
         HasLineBreak = hasLineBreak;
+        ForceLinesSplit = forceLinesSplit;
     }
-
-    protected PositionParent(BinaryTreeProxy parent)
-        : this(parent, false) { }
 
     internal virtual PositionParent Combine(PositionParent other)
     {
