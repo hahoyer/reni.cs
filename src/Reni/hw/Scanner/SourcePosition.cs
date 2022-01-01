@@ -142,7 +142,7 @@ namespace hw.Scanner
         /// <returns>the "FileName(lineNumber,ColNr): tag: " string</returns>
         public string FilePosition(string flagText) => Source.FilePosition(Position, Position, flagText);
 
-        public string GetDumpAroundCurrent(int dumpWidth)
+        public string GetDumpAroundCurrent(int? dumpWidth = null)
         {
             if(IsValid)
                 return

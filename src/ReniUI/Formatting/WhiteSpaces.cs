@@ -43,7 +43,7 @@ namespace ReniUI.Formatting
             SeparatorRequests = separatorRequests;
             WhiteSpaceViewCache = new(() => new(target, this));
             AnchorTargetPositionForDebug = anchorTargetPositionForDebug;
-            StopByObjectIds();
+            StopByObjectIds(421);
         }
 
         int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
@@ -57,7 +57,7 @@ namespace ReniUI.Formatting
         /// <returns></returns>
         IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
-            StopByObjectIds();
+            StopByObjectIds(394);
             if(!SeparatorRequests.Head &&
                !SeparatorRequests.Tail &&
                !SeparatorRequests.Inner &&
@@ -68,7 +68,8 @@ namespace ReniUI.Formatting
             var indent = Configuration.IndentCount * parameter.Indent;
             return WhiteSpaceView
                 .GetEdits(indent)
-                .Select(edit => new Edit(edit.Remove, edit.Insert, AnchorTargetPositionForDebug + ":" + edit.Flag));
+                .Select(edit => new Edit(edit.Remove, edit.Insert, AnchorTargetPositionForDebug + ":" + edit.Flag))
+                .ToArray();
         }
 
         bool ISourcePartEdit.IsIndentTarget => true;

@@ -20,12 +20,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Formatting\FormatterByBinaryTree.cs" />
     <Compile Include="Formatting\IEditPieces.cs" />
     <Compile Include="Formatting\IEditPiecesConfiguration.cs" />
     <Compile Include="Formatting\IndentDirection.cs" />
     <Compile Include="Formatting\IndentedSourcePartEdit.cs" />
+    <Compile Include="Formatting\BinaryTreeProxy.cs" />
+    <Compile Include="Formatting\PositionParent.cs" />
     <Compile Include="Test\Formatting\Comments.cs" />
     <Compile Include="Test\Formatting\CommentsOfLists.cs" />
+    <Compile Include="Test\Formatting\Exclamation.cs" />
+    <Compile Include="Test\Formatting\FlatStrings.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
     <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
@@ -47,7 +52,7 @@
     <Compile Include="Formatting\WhiteSpaces.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\ISourcePartEdit.cs" />
-    <Compile Include="Formatting\Syntax.cs" />
+    <Compile Include="Formatting\SyntaxTreeProxy.cs" />
     <Compile Include="Helper\Syntax.cs" />
     <Compile Include="CompilerBrowser.cs" />
     <Compile Include="Extension.cs" />
@@ -57,7 +62,6 @@
     <Compile Include="Formatting\HierarchicalFormatter.cs" />
     <Compile Include="Formatting\IChainLink.cs" />
     <Compile Include="Formatting\IFormatter.cs" />
-    <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="RestFul\Channel.cs" />
     <Compile Include="RestFul\ChannelRepo.cs" />
     <Compile Include="RestFul\IChannelRepo.cs" />

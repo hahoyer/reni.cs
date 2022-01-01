@@ -6,28 +6,28 @@ namespace ReniUI.Formatting
     public sealed class Edit : DumpableObject, ISourcePartEdit
     {
         [DisableDump]
-        internal readonly SourcePart Location;
+        internal readonly SourcePart Remove;
 
         [EnableDump(Order = 1)]
-        string Position => Location.NodeDump;
+        string Position => Remove.NodeDump;
 
         [EnableDump(Order = 2)]
-        internal readonly string NewText;
+        internal readonly string Insert;
 
         readonly string Flag;
 
-        internal Edit(SourcePart location, string newText, string flag)
+        internal Edit(SourcePart remove, string insert, string flag)
         {
-            Location = location;
-            NewText = newText;
+            Remove = remove;
+            Insert = insert;
             Flag = flag;
             StopByObjectIds();
         }
 
-        bool ISourcePartEdit.IsIndentTarget => NewText.Contains("\n");
+        bool ISourcePartEdit.IsIndentTarget => Insert.Contains("\n");
         ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
-        SourcePart ISourcePartEdit.SourcePart => Location;
+        SourcePart ISourcePartEdit.SourcePart => Remove;
 
         protected override string GetNodeDump() => Flag ?? base.GetNodeDump();
 

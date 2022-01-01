@@ -113,7 +113,7 @@ namespace hw.Scanner
         public string FileErrorPosition(string errorTag)
             => "\n" + Source.FilePosition(Position, EndPosition, Id.Quote(), "error " + errorTag);
 
-        public string GetDumpAroundCurrent(int dumpWidth)
+        public string GetDumpAroundCurrent(int? dumpWidth = null)
             => Source.GetDumpBeforeCurrent(Position, dumpWidth) +
                 "[" +
                 DumpCurrent +

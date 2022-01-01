@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -16,17 +17,18 @@ namespace ReniUI.Formatting
             if(compilerBrowser.IsTooSmall(targetPart))
                 return new Edit[0];
 
-            var item = Syntax.Create(compilerBrowser.Syntax.FlatItem, Configuration);
-            //item.t();
+            var item = SyntaxTreeProxy.Create(compilerBrowser.Syntax.FlatItem, Configuration);
+            var trace = DateTime.Today.Year > 2020;
+            if(trace) item.t();
             item.SetupLineBreaks();
-            //item.LogDump().Log(FilePositionTag.Debug);
+            if(trace) item.LogDump().Log(FilePositionTag.Debug);
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces
                 = sourcePartEdits
                     .GetEditPieces()
                     .Where(editPiece => IsRelevant(editPiece, targetPart))
                     .ToArray();
-            //editPieces.LogDump().Log(FilePositionTag.Debug);
+            if(trace) editPieces.LogDump().Log(FilePositionTag.Debug);
             return editPieces;
         }
 
@@ -34,7 +36,7 @@ namespace ReniUI.Formatting
         {
             if(targetPart == null)
                 return true;
-            var sourcePart = editPiece.Location;
+            var sourcePart = editPiece.Remove;
             return targetPart.Source == sourcePart.Source &&
                 targetPart.Position <= sourcePart.EndPosition &&
                 sourcePart.Position <= targetPart.EndPosition;

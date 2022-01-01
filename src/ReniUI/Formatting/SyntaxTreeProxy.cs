@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax>
+    sealed class SyntaxTreeProxy : DumpableObject, ValueCache.IContainer, ITree<SyntaxTreeProxy>
     {
         internal sealed class Anchor : DumpableObject
         {
@@ -38,7 +38,7 @@ namespace ReniUI.Formatting
                 => anchor == null? null : new Anchor(anchor, kind);
 
             internal ISourcePartEdit[] GetWhiteSpaceEdits(Configuration configuration)
-                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount, this).ToArray();
+                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount, this.TargetPosition).ToArray();
 
             internal void EnsureLineBreaks(int count)
             {
@@ -76,7 +76,7 @@ namespace ReniUI.Formatting
 
         [DisableDump]
         [PublicAPI]
-        readonly Syntax Parent;
+        readonly SyntaxTreeProxy Parent;
 
         readonly IItem Main;
 
@@ -88,12 +88,12 @@ namespace ReniUI.Formatting
         readonly bool HasAdditionalIndent;
 
         [PublicAPI]
-        Syntax LeftNeighbor;
+        SyntaxTreeProxy LeftNeighbor;
 
         [UsedImplicitly]
-        Syntax[] ChildrenForDebug;
+        SyntaxTreeProxy[] ChildrenForDebug;
 
-        Syntax(Formatter.Child child, Configuration configuration, Syntax parent)
+        SyntaxTreeProxy(Formatter.Child child, Configuration configuration, SyntaxTreeProxy parent)
         {
             Main = child.FlatItem;
             Configuration = configuration;
@@ -112,11 +112,11 @@ namespace ReniUI.Formatting
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-        int ITree<Syntax>.DirectChildCount => Children.Length;
+        int ITree<SyntaxTreeProxy>.DirectChildCount => Children.Length;
 
-        Syntax ITree<Syntax>.GetDirectChild(int index) => Children[index];
+        SyntaxTreeProxy ITree<SyntaxTreeProxy>.GetDirectChild(int index) => Children[index];
 
-        int ITree<Syntax>.LeftDirectChildCount => 0;
+        int ITree<SyntaxTreeProxy>.LeftDirectChildCount => 0;
 
         bool IsIndentRequired => Formatter.IsIndentRequired;
 
@@ -146,7 +146,7 @@ namespace ReniUI.Formatting
 
         [EnableDump(Order = 5)]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal Syntax[] Children => this.CachedValue(GetChildren);
+        internal SyntaxTreeProxy[] Children => this.CachedValue(GetChildren);
 
         ISourcePartEdit[] AnchorEdits => Anchors.GetEdits(Configuration);
 
@@ -162,12 +162,12 @@ namespace ReniUI.Formatting
             }
         }
 
-        internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
+        internal static SyntaxTreeProxy Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
             => new(new(null, target, false), configuration, null);
 
-        Syntax Create(Formatter.Child child) => child == null? null : new(child, Configuration, this);
+        SyntaxTreeProxy Create(Formatter.Child child) => child == null? null : new(child, Configuration, this);
 
-        Syntax[] GetChildren()
+        SyntaxTreeProxy[] GetChildren()
         {
             var result = Formatter.GetChildren(Main).Select(Create).ToArray();
             for(var index = 0; index < result.Length - 1; index++)
@@ -181,7 +181,7 @@ namespace ReniUI.Formatting
                 .ConcatMany()
                 .ToArray();
 
-        IEnumerable<ISourcePartEdit> GetChildEdits(Syntax child)
+        IEnumerable<ISourcePartEdit> GetChildEdits(SyntaxTreeProxy child)
         {
             StopByObjectIds();
             if(child == null)

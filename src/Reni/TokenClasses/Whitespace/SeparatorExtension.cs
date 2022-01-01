@@ -30,13 +30,13 @@ namespace Reni.TokenClasses.Whitespace
                 return null;
             if(left is BeginOfText || right is EndOfText)
                 return false;
-            if((left is List || left is Colon) && !(right is RightParenthesis))
+            if((left is List || left is Colon) && !(right is IRightBracket))
                 return true;
 
-            if(right is RightParenthesis ||
-               right is LeftParenthesis ||
+            if(right is IRightBracket ||
+               right is ILeftBracket||
                right is List ||
-               left is LeftParenthesis
+               left is ILeftBracket
               )
                 return false;
 

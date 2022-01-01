@@ -74,18 +74,18 @@ namespace ReniVSIX
             var sourcePart = Data.ToSourcePart(span);
             var reformat = provider
                 .GetEditPieces(Compiler, sourcePart)
-                .OrderByDescending(p => p.Location.EndPosition)
+                .OrderByDescending(p => p.Remove.EndPosition)
                 .ToArray();
 
-            var unused = reformat.Select(r => r.Location.Position).ToArray();
+            var unused = reformat.Select(r => r.Remove.Position).ToArray();
 
             // ReSharper disable once LoopCanBePartlyConvertedToQuery
             foreach(var edit in reformat)
             {
                 var editSpan = new EditSpan
                 (
-                    edit.Location.ToTextSpan(),
-                    edit.NewText
+                    edit.Remove.ToTextSpan(),
+                    edit.Insert
                 );
                 mgr.Add(editSpan);
             }

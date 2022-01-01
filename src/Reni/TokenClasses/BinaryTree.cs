@@ -199,14 +199,20 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal SeparatorRequests SeparatorRequests
-            => new()
+        {
+            get
             {
-                Head = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, WhiteSpaces) //
-                , Inner = true
-                , Tail = SeparatorExtension.Get(WhiteSpaces, InnerTokenClass as ISeparatorClass) //
-                , Flat = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass
-                    , InnerTokenClass as ISeparatorClass) //
-            };
+                StopByObjectIds(3);
+                var flat = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass as ISeparatorClass);
+                return new()
+                {
+                    Head = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, WhiteSpaces) //
+                    , Inner = true
+                    , Tail = SeparatorExtension.Get(WhiteSpaces, InnerTokenClass as ISeparatorClass) //
+                    , Flat = flat //
+                };
+            }
+        }
 
 
         Issue GetIssue()

@@ -84,5 +84,8 @@ namespace Reni.TokenClasses
                 return separatorRequests.Flat? " " : "";
             return (separatorRequests.Head? " " : "") + result + (separatorRequests.Tail? " " : "");
         }
+
+        internal bool HasLineBreak
+            => HasStableLineBreak || HasVolatileLineBreak;
     }
 }

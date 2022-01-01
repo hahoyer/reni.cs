@@ -8,7 +8,7 @@ namespace ReniUI.Formatting
     static class FormatterExtension
     {
         public static IFormatter Create(this Configuration configuration)
-            => new HierarchicalFormatter(configuration ?? new Configuration());
+            => new FormatterByBinaryTree(configuration ?? new Configuration());
 
         internal static string Combine(this IEnumerable<Edit> pieces, SourcePart targetPart)
         {
@@ -21,20 +21,20 @@ namespace ReniUI.Formatting
             var result = "";
 
             var edits = pieces
-                .OrderBy(edit => edit.Location.Position)
-                .Where(edit => edit.Location.Intersect(targetPart) != null)
+                .OrderBy(edit => edit.Remove.Position)
+                .Where(edit => edit.Remove.Intersect(targetPart) != null)
                 .ToArray();
 
             foreach(var edit in edits)
             {
-                (edit.Location.EndPosition <= originalEndPosition).Assert("not implemented.");
-                var newPosition = edit.Location.EndPosition - originalPosition;
+                (edit.Remove.EndPosition <= originalEndPosition).Assert("not implemented.");
+                var newPosition = edit.Remove.EndPosition - originalPosition;
                 if(currentPosition < 0)
                     (newPosition <= 0).Assert();
                 else
                 {
-                    var length = edit.Location.Position - originalPosition - currentPosition;
-                    var itemResult = original.Substring(currentPosition, length) + edit.NewText;
+                    var length = edit.Remove.Position - originalPosition - currentPosition;
+                    var itemResult = original.Substring(currentPosition, length) + edit.Insert;
                     result += itemResult;
                 }
 

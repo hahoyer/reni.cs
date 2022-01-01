@@ -52,7 +52,7 @@ namespace ReniUI.Formatting
                     , target.Anchor.Items.FirstOrDefault(item => item.TokenClass is RightParenthesis)
                 );
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
             {
                 SetupLineBreaksForChildren(target, hasLineBreakAtTop: true);
                 target.Anchors.End?.EnsureLineBreaks(1);
@@ -78,7 +78,7 @@ namespace ReniUI.Formatting
                 return (center, null);
             }
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
             {
                 // Why this was there?:
                 // target.Anchors.Prefix.AssertIsNull(target.Dump);
@@ -102,7 +102,7 @@ namespace ReniUI.Formatting
                 return result;
             }
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
                 => SetupLineBreaksForChildren(target, putLineBreaksBeforePrefix: true);
 
             static Reni.SyntaxTree.Syntax GetWagon(IItem flatItem, bool checkForBracketLevel)
@@ -157,7 +157,7 @@ namespace ReniUI.Formatting
             protected internal override IEnumerable<Child> GetChildren(IItem target)
                 => throw new NotImplementedException();
 
-            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
+            internal override void SetupLineBreaks(SyntaxTreeProxy target) => throw new NotImplementedException();
         }
 
         sealed class Declaration : Formatter
@@ -181,7 +181,7 @@ namespace ReniUI.Formatting
                 yield return new(target.Anchor.Main, declarationSyntax.Value, true);
             }
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
                 => SetupLineBreaksForChildren(target
                     , putLineBreaksBeforePrefix: target.Configuration.LineBreaksBeforeDeclarationToken
                     , useAdditionalLineBreaksForMultilineItems: false
@@ -192,7 +192,7 @@ namespace ReniUI.Formatting
         {
             internal static readonly Formatter Instance = new FlatChildCompound();
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
                 => SetupLineBreaksForChildren(target
                     , hasLineBreakAtTop: true
                     , putLineBreaksBeforePrefix: target.Configuration.LineBreaksBeforeListToken
@@ -203,7 +203,7 @@ namespace ReniUI.Formatting
         {
             internal static readonly Formatter Instance = new FlatRootCompound();
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
             {
                 SetupLineBreaksForChildren(target
                     , putLineBreaksBeforePrefix: target.Configuration.LineBreaksBeforeListToken
@@ -213,7 +213,7 @@ namespace ReniUI.Formatting
                     target.Anchors.End.EnsureLineBreaks(1);
             }
 
-            internal override void SetupUnconditionalLineBreaks(Syntax target)
+            internal override void SetupUnconditionalLineBreaks(SyntaxTreeProxy target)
             {
                 if(target.Configuration.LineBreakAtEndOfText == true)
                     target.Anchors.End.EnsureLineBreaks(1);
@@ -261,7 +261,7 @@ namespace ReniUI.Formatting
                 return children;
             }
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
             {
                 var thenClause = target.Children[1];
                 if(target.Children[0] != null)
@@ -291,7 +291,7 @@ namespace ReniUI.Formatting
                 yield return new Child(target.Anchor.Items[0], target.DirectChildren[1], false);
             }
 
-            internal override void SetupLineBreaks(Syntax target)
+            internal override void SetupLineBreaks(SyntaxTreeProxy target)
             {
                 if(target.Children.Length == 1)
                     return;
@@ -304,7 +304,7 @@ namespace ReniUI.Formatting
         {
             internal static readonly Formatter Instance = new Special();
 
-            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
+            internal override void SetupLineBreaks(SyntaxTreeProxy target) => throw new NotImplementedException();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
                 => target.SpecialAnchor.GetNodesFromLeftToRight().Select(GetChild);
@@ -316,7 +316,7 @@ namespace ReniUI.Formatting
         {
             internal static readonly Formatter Instance = new DeclarerIssue();
 
-            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
+            internal override void SetupLineBreaks(SyntaxTreeProxy target) => throw new NotImplementedException();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
                 => target
@@ -329,11 +329,11 @@ namespace ReniUI.Formatting
 
         protected internal abstract IEnumerable<Child> GetChildren(IItem target);
 
-        internal abstract void SetupLineBreaks(Syntax target);
+        internal abstract void SetupLineBreaks(SyntaxTreeProxy target);
 
         internal virtual(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target) => (default, default);
 
-        internal virtual void SetupUnconditionalLineBreaks(Syntax target) { }
+        internal virtual void SetupUnconditionalLineBreaks(SyntaxTreeProxy target) { }
 
         [DisableDump]
         internal virtual bool IsIndentRequired => false;
@@ -396,7 +396,7 @@ namespace ReniUI.Formatting
 
         static void SetupLineBreaksForChildren
         (
-            Syntax target
+            SyntaxTreeProxy target
             , object _ = null
             , bool hasLineBreakAtTop = false
             , bool putLineBreaksBeforePrefix = false
@@ -406,7 +406,7 @@ namespace ReniUI.Formatting
             var useAdditionalLineBreaks
                 = useAdditionalLineBreaksForMultilineItems ??
                 target.Configuration.AdditionalLineBreaksForMultilineItems;
-            Syntax leftNeighbor = null;
+            SyntaxTreeProxy leftNeighbor = null;
             foreach(var child in target.Children)
             {
                 var count = leftNeighbor == null
