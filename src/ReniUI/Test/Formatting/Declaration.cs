@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace ReniUI.Test.Formatting
 {
-    [TestFixture]
     [UnitTest]
     [TestFixture]
     [Lists]

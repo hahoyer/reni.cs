@@ -37,7 +37,7 @@ namespace ReniUI.Test.Formatting
                     .Create()
             );
 
-            (newText.Canonize(spaceReplacement) == expected.Canonize(spaceReplacement))
+                (newText.Canonize(spaceReplacement) == expected.Canonize(spaceReplacement))
                 .Assert(() => $@"
 new:
 ----------------------

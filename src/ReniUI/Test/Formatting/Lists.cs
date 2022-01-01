@@ -1,3 +1,4 @@
+using System;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
@@ -6,8 +7,8 @@ namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    public sealed class Lists
-        : DependenceProvider
+    [FlatStrings]
+    public sealed class Lists : DependenceProvider
     {
         [Test]
         [UnitTest]
@@ -54,6 +55,18 @@ namespace ReniUI.Test.Formatting
 )";
             text.SimpleFormattingTest(expectedText, 10, 1);
         }
+        [Test]
+        [UnitTest]
+        public void StraightList3()
+        {
+            const string text = @"(aaaaa;bbbbb;ccccc)";
+            const string expectedText = @"(
+    aaaaa;
+    bbbbb;
+    ccccc
+)";
+            text.SimpleFormattingTest(expectedText, 10, 1);
+        }
 
         [Test]
         [UnitTest]
@@ -88,7 +101,7 @@ namespace ReniUI.Test.Formatting
     ccccc;
 )";
 
-            text.SimpleFormattingTest(expectedText, 20, 1);
+            text.SimpleFormattingTest(expectedText, 19, 1);
         }
 
         [Test]
