@@ -20,7 +20,6 @@ namespace ReniUI.Test.Formatting
         {
             const string text =
                 @"1;
-
 repeat:
     @ ^ while()
     then
@@ -28,10 +27,21 @@ repeat:
         ^ body(),
         repeat(^)
     );
-
 2";
 
-            text.SimpleFormattingTest(null, 20, 0);
+            const string expected=
+                @"1;
+
+repeat: @
+    ^ while()
+    then
+    (
+        ^ body(),
+        repeat(^)
+    );
+
+2";
+            text.SimpleFormattingTest(expected, 20, 0);
         }
 
         [Test]

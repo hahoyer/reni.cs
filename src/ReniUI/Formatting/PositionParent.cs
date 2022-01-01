@@ -5,19 +5,25 @@ namespace ReniUI.Formatting;
 
 abstract class PositionParent : DumpableObject
 {
+    internal class Function : PositionParent
+    {
+        internal Function(BinaryTreeProxy parent)
+            : base(parent) { }
+    }
+
     internal class LineBreak : PositionParent
     {
         internal LineBreak(BinaryTreeProxy parent)
             : base(parent, true) { }
 
         internal override PositionParent Combine(PositionParent other)
-            => other is Left? this: base.Combine(other);
+            => other is Left? this : base.Combine(other);
     }
 
     internal class IndentAll : PositionParent
     {
         internal IndentAll(BinaryTreeProxy parent)
-            : base(parent, false, indent: true) { }
+            : base(parent, false, true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
@@ -49,7 +55,12 @@ abstract class PositionParent : DumpableObject
             : base(parent, true, anchorIndent: true) { }
 
         internal override PositionParent Combine(PositionParent other)
-            => other is Left? new LeftAfterColonToken(Parent, other) : base.Combine(other);
+            => other switch
+            {
+                Left => new LeftAfterColonToken(Parent, other) //
+                , Function => null
+                , _ => base.Combine(other)
+            };
     }
 
     internal sealed class Left : PositionParent
@@ -89,9 +100,7 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Right => null
-                , AfterListToken => this
-                , _ => base.Combine(other)
+                Right => null, AfterListToken => this, _ => base.Combine(other)
             };
     }
 

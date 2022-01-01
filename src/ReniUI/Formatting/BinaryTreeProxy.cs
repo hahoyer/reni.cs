@@ -193,6 +193,22 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 Right.SetPosition(new PositionParent.IndentAll(this));
                 return;
 
+            case Function:
+                if(Left!= null)
+                {
+                    (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
+                    Tracer.TraceBreak();
+                    return;
+                }   
+                
+                if(!Right.IsLineSplit)
+                    return;
+
+                SetPosition(new PositionParent.Function(this));
+                RightNeighbor.SetPosition(new PositionParent.LineBreak(this));
+                Right.SetPosition(new PositionParent.IndentAll(this));
+                return;
+
             default:
                 (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
                 Tracer.TraceBreak();
