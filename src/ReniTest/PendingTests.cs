@@ -1,4 +1,4 @@
-//20:33:16.133 01.01.2022 ran 179 of 184 
+//23:28:53.457 01.01.2022 ran 179 of 184 
 
 // ReSharper disable once CheckNamespace
 namespace hw.UnitTest
@@ -10,8 +10,7 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.Formatting.Exclamation().MultipleTags);
-TestRunner.RunTest(new ReniUI.Test.Formatting.ThenElse().SimpleThenElse1);
+TestRunner.RunTest(new ReniUI.Test.Formatting.ThenElse().NestedThenElseWithLineBreak);
 
 // dependanterror 
 

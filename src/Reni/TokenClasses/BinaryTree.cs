@@ -202,7 +202,7 @@ namespace Reni.TokenClasses
         {
             get
             {
-                StopByObjectIds(3);
+                StopByObjectIds();
                 var flat = SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass as ISeparatorClass);
                 return new()
                 {

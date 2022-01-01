@@ -43,7 +43,7 @@ namespace ReniUI.Formatting
             SeparatorRequests = separatorRequests;
             WhiteSpaceViewCache = new(() => new(target, this));
             AnchorTargetPositionForDebug = anchorTargetPositionForDebug;
-            StopByObjectIds(421);
+            StopByObjectIds();
         }
 
         int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
