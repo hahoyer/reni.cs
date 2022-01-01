@@ -3,7 +3,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Helper;
 using Reni.TokenClasses;
 
@@ -12,18 +11,11 @@ namespace ReniUI.Formatting;
 sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTree>, ValueCache.IContainer
 {
     [DisableDump]
-    internal readonly Configuration Configuration;
-
-    [EnableDump(Order = 4)]
-    [EnableDumpExcept(false)]
-    readonly bool HasAdditionalIndent;
+    readonly Configuration Configuration;
 
     [EnableDump(Order = 2)]
+    [EnableDumpExcept(null)]
     PositionParent PositionParent;
-
-    [UsedImplicitly]
-    BinaryTreeProxy[] ChildrenForDebug;
-
 
     BinaryTreeProxy(BinaryTree flatItem, Configuration configuration, BinaryTreeProxy parent)
         : base(flatItem, parent)
@@ -38,15 +30,9 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
     protected override BinaryTreeProxy Create
         (BinaryTree child) => child == null? null : new(child, Configuration, this);
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    bool IsIndentRequired => PositionParent?.Indent ?? false;
-
     [EnableDump(Order = -3)]
     string MainPosition
         => FlatItem.SourcePart.GetDumpAroundCurrent() + " " + FlatItem.TokenClass.GetType().PrettyName();
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    int IndentDirection => IsIndentRequired? 1 : 0;
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
@@ -68,7 +54,6 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal ISourcePartEdit[] Edits => GetEdits();
 
-    //[EnableDump(Order = 5)]
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ISourcePartEdit[] ChildrenEdits
     {
@@ -82,7 +67,12 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
         }
     }
 
+    [EnableDump(Order = 4)]
+    [EnableDumpExcept(null)]
     BinaryTreeProxy Left => DirectChildren[0];
+
+    [EnableDump(Order = 5)]
+    [EnableDumpExcept(null)]
     BinaryTreeProxy Right => DirectChildren[1];
 
     ISourcePartEdit[] AnchorEdits
@@ -91,7 +81,6 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
             .Indent(PositionParent is { AnchorIndent: true }? 1 : 0)
             .ToArray();
 
-    [EnableDump]
     SourcePart Token => FlatItem.FullToken;
 
     int LineBreakCount => PositionParent?.LineBreakCount ?? 0;
@@ -150,7 +139,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
             case RightParenthesis:
                 Left.SetPosition(new PositionParent.Left(this));
                 Left.RightNeighbor.SetPosition(new PositionParent.InnerLeft(this));
-                Left.Right.SetPosition(new PositionParent.BracketKernel(this));
+                Left.Right.SetPosition(new PositionParent.IndentAll(this));
                 SetPosition(new PositionParent.InnerRight(this));
                 RightNeighbor.SetPosition(new PositionParent.Right(this));
                 return;
@@ -172,7 +161,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                         item.IsLineSplit;
 
                     if(Configuration.LineBreaksBeforeListToken)
-                        node.SetPosition(new PositionParent.BeforeListToken(this));
+                        node.SetPosition(new PositionParent.BeforeToken(this));
                     else
                     {
                         if(node.FlatItem.TokenClass == FlatItem.TokenClass)
@@ -194,6 +183,16 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
             case Colon:
                 RightNeighbor.SetPosition(new PositionParent.AfterColonToken(this));
                 return;
+            case ElseToken:
+            case ThenToken:
+                SetPosition(new PositionParent.BeforeToken(this));
+                if(Right is not { IsLineSplit: true })
+                    return;
+
+                RightNeighbor.SetPosition(new PositionParent.LineBreak(this));
+                Right.SetPosition(new PositionParent.IndentAll(this));
+                return;
+
             default:
                 (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
                 Tracer.TraceBreak();

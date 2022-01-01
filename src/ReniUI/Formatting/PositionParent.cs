@@ -5,19 +5,36 @@ namespace ReniUI.Formatting;
 
 abstract class PositionParent : DumpableObject
 {
-    internal class BracketKernel : PositionParent
+    internal class LineBreak : PositionParent
     {
-        internal BracketKernel(BinaryTreeProxy parent)
-            : base(parent, indent: true) { }
+        internal LineBreak(BinaryTreeProxy parent)
+            : base(parent, true) { }
 
         internal override PositionParent Combine(PositionParent other)
-            => other is InnerRight? other : base.Combine(other);
+            => other is Left? this: base.Combine(other);
     }
 
-    internal class BeforeListToken : PositionParent
+    internal class IndentAll : PositionParent
     {
-        internal BeforeListToken(BinaryTreeProxy parent)
+        internal IndentAll(BinaryTreeProxy parent)
+            : base(parent, false, indent: true) { }
+
+        internal override PositionParent Combine(PositionParent other)
+            => other switch
+            {
+                BeforeToken => new LineBreakAndIndent(Parent, other) //
+                , InnerRight => other
+                , _ => base.Combine(other)
+            };
+    }
+
+    internal class BeforeToken : PositionParent
+    {
+        internal BeforeToken(BinaryTreeProxy parent)
             : base(parent, true) { }
+
+        internal override PositionParent Combine(PositionParent other)
+            => other is Right? this : base.Combine(other);
     }
 
     internal class AfterListToken : PositionParent
@@ -41,7 +58,7 @@ abstract class PositionParent : DumpableObject
             : base(parent) { }
 
         internal override PositionParent Combine(PositionParent other)
-            => other is InnerLeft? new BracketClusterLeft(Parent, other.Parent) : base.Combine(other);
+            => other is InnerLeft? null : base.Combine(other);
     }
 
     internal sealed class InnerLeft : PositionParent
@@ -52,8 +69,8 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Left => new InnerBracketClusterLeft(Parent, other.Parent)
-                , BracketKernel when other.Parent == Parent => new InnerLeftSimple(Parent)
+                Left => null
+                , IndentAll when other.Parent == Parent => new InnerLeftSimple(Parent)
                 , _ => base.Combine(other)
             };
     }
@@ -72,7 +89,7 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Right => new InnerBracketClusterRight(Parent, other.Parent)
+                Right => null
                 , AfterListToken => this
                 , _ => base.Combine(other)
             };
@@ -84,7 +101,7 @@ abstract class PositionParent : DumpableObject
             : base(parent) { }
 
         internal override PositionParent Combine(PositionParent other)
-            => other is InnerRight? new BracketClusterRight(Parent, other.Parent) : base.Combine(other);
+            => other is InnerRight? null : base.Combine(other);
     }
 
     internal class Begin : PositionParent
@@ -103,6 +120,15 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other) => this;
     }
 
+    class LineBreakAndIndent : PositionParent
+    {
+        readonly PositionParent Other;
+
+        internal LineBreakAndIndent(BinaryTreeProxy parent, PositionParent other)
+            : base(parent, true, true)
+            => Other = other;
+    }
+
     class LeftAfterColonToken : PositionParent
     {
         readonly PositionParent Other;
@@ -118,42 +144,6 @@ abstract class PositionParent : DumpableObject
             : base(parent, true, true) { }
     }
 
-    class BracketClusterLeft : PositionParent
-    {
-        readonly BinaryTreeProxy OtherParent;
-
-        internal BracketClusterLeft(BinaryTreeProxy parent, BinaryTreeProxy otherParent)
-            : base(parent)
-            => OtherParent = otherParent;
-    }
-
-    class InnerBracketClusterLeft : PositionParent
-    {
-        readonly BinaryTreeProxy OtherParent;
-
-        internal InnerBracketClusterLeft(BinaryTreeProxy parent, BinaryTreeProxy otherParent)
-            : base(parent)
-            => OtherParent = otherParent;
-    }
-
-    class BracketClusterRight : PositionParent
-    {
-        readonly BinaryTreeProxy OtherParent;
-
-        internal BracketClusterRight(BinaryTreeProxy parent, BinaryTreeProxy otherParent)
-            : base(parent)
-            => OtherParent = otherParent;
-    }
-
-    class InnerBracketClusterRight : PositionParent
-    {
-        readonly BinaryTreeProxy OtherParent;
-
-        internal InnerBracketClusterRight(BinaryTreeProxy parent, BinaryTreeProxy otherParent)
-            : base(parent)
-            => OtherParent = otherParent;
-    }
-
     internal readonly bool Indent;
     internal readonly bool AnchorIndent;
 
@@ -164,8 +154,7 @@ abstract class PositionParent : DumpableObject
     readonly BinaryTreeProxy Parent;
 
 
-    protected PositionParent
-        (BinaryTreeProxy parent, bool hasLineBreak = false, bool indent = false, bool anchorIndent = false)
+    protected PositionParent(BinaryTreeProxy parent, bool hasLineBreak, bool indent = false, bool anchorIndent = false)
     {
         parent.AssertIsNotNull();
         Parent = parent;
@@ -173,6 +162,9 @@ abstract class PositionParent : DumpableObject
         AnchorIndent = anchorIndent;
         HasLineBreak = hasLineBreak;
     }
+
+    protected PositionParent(BinaryTreeProxy parent)
+        : this(parent, false) { }
 
     internal virtual PositionParent Combine(PositionParent other)
     {
