@@ -14,127 +14,132 @@ using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
 
-namespace ReniUI
+namespace ReniUI;
+
+public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 {
-    public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
+    readonly ValueCache<Compiler> ParentCache;
+    readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
+
+    CompilerBrowser(Func<Compiler> parent) => ParentCache = new(parent);
+
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+    public Source Source => Compiler.Source;
+
+    internal Compiler Compiler => ParentCache.Value;
+
+    public StringStream Result
     {
-        readonly ValueCache<Compiler> ParentCache;
-        readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
-
-        CompilerBrowser(Func<Compiler> parent) => ParentCache = new(parent);
-
-        ValueCache ValueCache.IContainer.Cache { get; } = new();
-
-        public Source Source => Compiler.Source;
-
-        internal Compiler Compiler => ParentCache.Value;
-
-        public StringStream Result
+        get
         {
-            get
+            var result = new StringStream();
+            Compiler.Parameters.OutStream = result;
+            Compiler.Execute();
+            return result;
+        }
+    }
+
+    internal IExecutionContext ExecutionContext => Compiler;
+    public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
+
+    internal IEnumerable<Issue> Issues => Compiler.Issues;
+
+    internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
+
+    public static CompilerBrowser FromText
+        (string text, CompilerParameters parameters, string sourceIdentifier = null)
+        => new(() => Compiler.FromText(text, parameters, sourceIdentifier));
+
+    public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
+        => new(() => Compiler.FromText(text, null, sourceIdentifier));
+
+    public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
+        => new(() => Compiler.FromFile(fileName, parameters));
+
+    public Item Locate(SourcePosition offset)
+    {
+        this.CachedItem(GetSyntax).IsValid = true;
+        return Item.LocateByPosition(Compiler.BinaryTree, offset);
+    }
+
+    public IEnumerable<Item> Locate(int start, int end)
+    {
+        var current = start;
+        do
+        {
+            var result = Locate(current);
+            yield return result;
+            if(result.SourcePart.Length > 0)
+                current = result.EndPosition;
+            else
+                current++;
+        }
+        while(current < end);
+    }
+
+    public string FlatFormat(bool areEmptyLinesPossible)
+        => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
+
+    public Item Locate(int offset) => Locate(Source + offset);
+
+    internal BinaryTree Locate(SourcePart span)
+        => Item.Locate(Compiler.BinaryTree, span);
+
+    internal FunctionType Function(int index)
+        => Compiler.Root.Function(index);
+
+
+    internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
+        => (formatter ?? new Formatting.Configuration().Create())
+            .GetEditPieces(this, targetPart)
+            .Combine(Compiler.Source.All);
+
+    internal void Ensure() => Compiler.Execute();
+
+    internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
+
+    internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
+        => (formatter ?? new Formatting.Configuration().Create())
+            .GetEditPieces(this, sourcePart);
+
+    Helper.Syntax GetSyntax()
+    {
+        try
+        {
+            var trace = Debugger.IsAttached && DateTime.MinValue == DateTime.MinValue + TimeSpan.FromDays(1);
+
+            var compilerSyntax = Compiler.Syntax;
+            if(trace)
             {
-                var result = new StringStream();
-                Compiler.Parameters.OutStream = result;
-                Compiler.Execute();
-                return result;
+                compilerSyntax.Dump().FlaggedLine();
+                compilerSyntax.Anchor.Dump().FlaggedLine();
             }
+
+            var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
+
+            syntax.GetNodesFromLeftToRight().ToArray().AssertNotNull();
+            PositionDictionary.AssertValid(Compiler.BinaryTree);
+            if(trace)
+                syntax.Dump().FlaggedLine();
+            return syntax;
         }
-
-        internal IExecutionContext ExecutionContext => Compiler;
-        public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
-
-        internal IEnumerable<Issue> Issues => Compiler.Issues;
-
-        internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
-
-        public static CompilerBrowser FromText
-            (string text, CompilerParameters parameters, string sourceIdentifier = null)
-            => new(() => Compiler.FromText(text, parameters, sourceIdentifier));
-
-        public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
-            => new(() => Compiler.FromText(text, null, sourceIdentifier));
-
-        public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
-            => new(() => Compiler.FromFile(fileName, parameters));
-
-        public Item Locate(SourcePosition offset)
+        catch(Exception e)
         {
-            this.CachedItem(GetSyntax).IsValid = true;
-            return Item.LocateByPosition(Compiler.BinaryTree, offset);
+            $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
+            throw;
         }
+    }
 
-        public IEnumerable<Item> Locate(int start, int end)
-        {
-            var current = start;
-            do
-            {
-                var result = Locate(current);
-                yield return result;
-                if(result.SourcePart.Length > 0)
-                    current = result.EndPosition;
-                else
-                    current++;
-            }
-            while(current < end);
-        }
+    internal string[] DeclarationOptions(int offset)
+    {
+        NotImplementedMethod(offset);
+        return default;
+    }
 
-        public string FlatFormat(bool areEmptyLinesPossible)
-            => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
-
-        public Item Locate(int offset) => Locate(Source + offset);
-
-        internal BinaryTree Locate(SourcePart span)
-            => Item.Locate(Compiler.BinaryTree, span);
-
-        internal FunctionType Function(int index)
-            => Compiler.Root.Function(index);
-
-
-        internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
-            => (formatter ?? new Formatting.Configuration().Create())
-                .GetEditPieces(this, targetPart)
-                .Combine(Compiler.Source.All);
-
-        internal void Ensure() => Compiler.Execute();
-
-        internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
-
-        internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
-            => (formatter ?? new Formatting.Configuration().Create())
-                .GetEditPieces(this, sourcePart);
-
-        Helper.Syntax GetSyntax()
-        {
-            try
-            {
-                var trace = Debugger.IsAttached && DateTime.MinValue == DateTime.MinValue + TimeSpan.FromDays(1);
-
-                var compilerSyntax = Compiler.Syntax;
-                if(trace)
-                {
-                    compilerSyntax.Dump().FlaggedLine();
-                    compilerSyntax.Anchor.Dump().FlaggedLine();
-                }
-
-                var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
-
-                syntax.GetNodesFromLeftToRight().ToArray().AssertNotNull();
-                PositionDictionary.AssertValid(Compiler.BinaryTree);
-                if(trace)
-                    syntax.Dump().FlaggedLine();
-                return syntax;
-            }
-            catch(Exception e)
-            {
-                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
-                throw;
-            }
-        }
-
-        internal string[] DeclarationOptions(int offset)
-        {
-            NotImplementedMethod(offset);
-            return default;
-        }
+    internal (string Text, SourcePart Span ) GetDataTipText(int line, int column)
+    {
+        NotImplementedMethod(line, column);
+        return default;
     }
 }
