@@ -75,7 +75,7 @@ namespace ReniVSIX
             //hold on to a snapshot of the current character
             var caret = snapshotSpan.Snapshot == Caret.Value.Snapshot
                 ? Caret.Value
-                : Caret.Value.TranslateTo(snapshotSpan.Snapshot, PointTrackingMode.Positive);
+                : Caret.Value.TranslateTo(snapshotSpan.Snapshot, PointTrackingMode.Negative);
 
             var item = Compiler.Locate(caret.Position);
             var belongingItems = item?.Belonging;
