@@ -2,25 +2,25 @@ using hw.DebugFormatter;
 
 namespace ReniUI.Formatting;
 
-abstract class PositionParent : DumpableObject
+abstract class Position : DumpableObject
 {
-    internal sealed class Function : PositionParent { }
+    internal sealed class Function : Position { }
 
-    internal sealed class LineBreak : PositionParent
+    internal sealed class LineBreak : Position
     {
         internal LineBreak()
             : base(true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other is Left? this : base.Combine(other);
     }
 
-    internal sealed class IndentAll : PositionParent
+    internal sealed class IndentAll : Position
     {
         internal IndentAll()
             : base(indent: true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other switch
             {
                 BeforeToken => new LineBreakAndIndent() //
@@ -29,12 +29,12 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal sealed class IndentAllAndForceLineSplit : PositionParent
+    internal sealed class IndentAllAndForceLineSplit : Position
     {
         internal IndentAllAndForceLineSplit()
             : base(indent: true, forceLineBreak: true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other switch
             {
                 BeforeToken => new LineBreakAndIndentAndForceLineBreak() //
@@ -43,33 +43,33 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal sealed class BeforeToken : PositionParent
+    internal sealed class BeforeToken : Position
     {
         internal BeforeToken()
             : base(true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other is Right? this : base.Combine(other);
     }
 
-    internal sealed class AfterListToken : PositionParent
+    internal sealed class AfterListToken : Position
     {
         internal AfterListToken()
             : base(true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other switch
             {
                 Left => this, _ => base.Combine(other)
             };
     }
 
-    internal sealed class AfterColonToken : PositionParent
+    internal sealed class AfterColonToken : Position
     {
         internal AfterColonToken()
             : base(true, anchorIndent: true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other switch
             {
                 Left => new LeftAfterColonToken() //
@@ -78,38 +78,38 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal sealed class Left : PositionParent
+    internal sealed class Left : Position
     {
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other is InnerLeft? null : base.Combine(other);
     }
 
-    internal sealed class InnerLeft : PositionParent
+    internal sealed class InnerLeft : Position
     {
         public InnerLeft()
             : base(true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other switch
             {
                 Left => null
-                , IndentAllAndForceLineSplit when other.Parent == Parent => new InnerLeftSimple()
+                , IndentAllAndForceLineSplit => new InnerLeftSimple()
                 , _ => base.Combine(other)
             };
     }
 
-    internal sealed class Inner : PositionParent
+    internal sealed class Inner : Position
     {
         public Inner()
             : base(true, anchorIndent: true) { }
     }
 
-    internal sealed class InnerRight : PositionParent
+    internal sealed class InnerRight : Position
     {
         public InnerRight()
             : base(true) { }
 
-        internal override PositionParent Combine(PositionParent other)
+        internal override Position Combine(Position other)
             => other switch
             {
                 Right => this //
@@ -118,40 +118,40 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal sealed class Right : PositionParent { }
+    internal sealed class Right : Position { }
 
-    internal sealed class Begin : PositionParent
+    internal sealed class Begin : Position
     {
-        internal override PositionParent Combine(PositionParent other) => this;
+        internal override Position Combine(Position other) => this;
     }
 
-    internal sealed class End : PositionParent
+    internal sealed class End : Position
     {
         internal End(bool hasLineBreak)
             : base(hasLineBreak) { }
 
-        internal override PositionParent Combine(PositionParent other) => this;
+        internal override Position Combine(Position other) => this;
     }
 
-    sealed class LineBreakAndIndentAndForceLineBreak : PositionParent
+    sealed class LineBreakAndIndentAndForceLineBreak : Position
     {
         internal LineBreakAndIndentAndForceLineBreak()
             : base(true, true, forceLineBreak: true) { }
     }
 
-    sealed class LineBreakAndIndent : PositionParent
+    sealed class LineBreakAndIndent : Position
     {
         internal LineBreakAndIndent()
             : base(true, true) { }
     }
 
-    sealed class LeftAfterColonToken : PositionParent
+    sealed class LeftAfterColonToken : Position
     {
         internal LeftAfterColonToken()
             : base(true) { }
     }
 
-    sealed class InnerLeftSimple : PositionParent
+    sealed class InnerLeftSimple : Position
     {
         internal InnerLeftSimple()
             : base(true, true, forceLineBreak: true) { }
@@ -164,9 +164,7 @@ abstract class PositionParent : DumpableObject
     internal bool HasAdditionalLineBreak;
     readonly bool HasLineBreak;
 
-    readonly BinaryTreeProxy Parent;
-
-    PositionParent
+    Position
     (
         bool hasLineBreak = false
         , bool indent = false
@@ -180,7 +178,7 @@ abstract class PositionParent : DumpableObject
         ForceLineBreak = forceLineBreak;
     }
 
-    internal virtual PositionParent Combine(PositionParent other)
+    internal virtual Position Combine(Position other)
     {
         NotImplementedMethod(other);
         return default;
