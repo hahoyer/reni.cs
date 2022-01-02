@@ -6,9 +6,9 @@ using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses.Whitespace
 {
-    class CommentGroup : DumpableObject
+    sealed class CommentGroup : DumpableObject
     {
-        class LinesAndSpacesConfiguration : DumpableObject, LinesAndSpaces.IConfiguration
+        sealed class LinesAndSpacesConfiguration : DumpableObject, LinesAndSpaces.IConfiguration
         {
             [EnableDump]
             readonly LineGroup.IConfiguration Configuration;
