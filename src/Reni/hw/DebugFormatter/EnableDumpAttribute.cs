@@ -10,7 +10,7 @@ namespace hw.DebugFormatter
     [PublicAPI]
     public sealed class EnableDumpAttribute : DumpEnabledAttribute
     {
-        public int Order;
+        public double Order;
 
         public EnableDumpAttribute()
             : base(true) { }

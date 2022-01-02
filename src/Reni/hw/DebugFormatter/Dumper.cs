@@ -84,7 +84,8 @@ namespace hw.DebugFormatter
             return FormatMemberDump(results);
         }
 
-        static int GetOrderPriority(MemberInfo memberInfo) => memberInfo.GetAttribute<EnableDumpAttribute>(true)?.Order?? default;
+        static double GetOrderPriority(MemberInfo memberInfo) 
+            => memberInfo.GetAttribute<EnableDumpAttribute>(true)?.Order?? default;
 
         static string FormatMemberDump(string[] results)
         {
