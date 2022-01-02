@@ -1,4 +1,3 @@
-using System;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;

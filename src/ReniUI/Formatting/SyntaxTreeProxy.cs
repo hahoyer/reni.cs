@@ -38,7 +38,7 @@ namespace ReniUI.Formatting
                 => anchor == null? null : new Anchor(anchor, kind);
 
             internal ISourcePartEdit[] GetWhiteSpaceEdits(Configuration configuration)
-                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount, this.TargetPosition).ToArray();
+                => Target.GetWhiteSpaceEdits(configuration, LineBreakCount, TargetPosition).ToArray();
 
             internal void EnsureLineBreaks(int count)
             {
@@ -121,7 +121,7 @@ namespace ReniUI.Formatting
         bool IsIndentRequired => Formatter.IsIndentRequired;
 
         [EnableDump(Order = -3)]
-        string MainPosition => (Main as Reni.SyntaxTree.Syntax)?.Position;
+        string MainPosition => (Main as Syntax)?.Position;
 
         int IndentDirection => IsIndentRequired? 1 : 0;
 
@@ -162,7 +162,7 @@ namespace ReniUI.Formatting
             }
         }
 
-        internal static SyntaxTreeProxy Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
+        internal static SyntaxTreeProxy Create(Syntax target, Configuration configuration)
             => new(new(null, target, false), configuration, null);
 
         SyntaxTreeProxy Create(Formatter.Child child) => child == null? null : new(child, Configuration, this);

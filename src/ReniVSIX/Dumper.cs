@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.Package;
 
 namespace ReniVSIX
@@ -29,6 +30,7 @@ namespace ReniVSIX
             return default;
         }
 
+        [UsedImplicitly]
         static string Dump(Type type, ParseRequest target)
         {
             Tracer.TraceBreak();

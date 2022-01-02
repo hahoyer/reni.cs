@@ -1,5 +1,4 @@
-﻿using System.Windows.Navigation;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;

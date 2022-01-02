@@ -105,7 +105,7 @@ namespace ReniUI.Formatting
             internal override void SetupLineBreaks(SyntaxTreeProxy target)
                 => SetupLineBreaksForChildren(target, putLineBreaksBeforePrefix: true);
 
-            static Reni.SyntaxTree.Syntax GetWagon(IItem flatItem, bool checkForBracketLevel)
+            static Syntax GetWagon(IItem flatItem, bool checkForBracketLevel)
             {
                 if(checkForBracketLevel && HasBrackets(flatItem))
                     return null;
@@ -149,7 +149,7 @@ namespace ReniUI.Formatting
                     .ToArray();
 
             static Child GetChild(IItem target, IStatementSyntax node, int index)
-                => new(index == 0? null : target.Anchor.Items[index], (Reni.SyntaxTree.Syntax)node, false);
+                => new(index == 0? null : target.Anchor.Items[index], (Syntax)node, false);
         }
 
         abstract class CompoundWithCleanup : Formatter

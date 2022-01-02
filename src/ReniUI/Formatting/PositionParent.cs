@@ -42,7 +42,7 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndentAndForceLineBreak(Parent, other) //
+                BeforeToken => new LineBreakAndIndentAndForceLineBreak(Parent) //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
@@ -131,9 +131,6 @@ abstract class PositionParent : DumpableObject
     {
         public Right(BinaryTreeProxy parent)
             : base(parent) { }
-
-        internal override PositionParent Combine(PositionParent other)
-            => other is InnerRight? null : base.Combine(other);
     }
 
     internal class Begin : PositionParent
@@ -154,29 +151,23 @@ abstract class PositionParent : DumpableObject
 
     class LineBreakAndIndentAndForceLineBreak : PositionParent
     {
-        readonly PositionParent Other;
-
-        internal LineBreakAndIndentAndForceLineBreak(BinaryTreeProxy parent, PositionParent other)
+        internal LineBreakAndIndentAndForceLineBreak(BinaryTreeProxy parent)
             : base(parent, true, true, forceLineBreak: true)
-            => Other = other;
+        { }
     }
 
     class LineBreakAndIndent : PositionParent
     {
-        readonly PositionParent Other;
-
         internal LineBreakAndIndent(BinaryTreeProxy parent, PositionParent other)
             : base(parent, true, true)
-            => Other = other;
+        { }
     }
 
     class LeftAfterColonToken : PositionParent
     {
-        readonly PositionParent Other;
-
         internal LeftAfterColonToken(BinaryTreeProxy parent, PositionParent other)
             : base(parent, true)
-            => Other = other;
+        { }
     }
 
     sealed class InnerLeftSimple : PositionParent
