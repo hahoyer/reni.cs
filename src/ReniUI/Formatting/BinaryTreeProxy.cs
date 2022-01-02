@@ -48,7 +48,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
-    bool ForceLineSplit => PositionParent!= null && PositionParent.ForceLinesSplit;
+    bool ForceLineSplit => PositionParent!= null && PositionParent.ForceLineBreak;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     bool HasAlreadyLineBreakOrIsTooLong

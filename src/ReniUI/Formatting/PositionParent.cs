@@ -28,7 +28,8 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                InnerRight => other
+                BeforeToken => new LineBreakAndIndent(Parent, other) //
+                , InnerRight => other
                 , _ => base.Combine(other)
             };
     }
@@ -36,12 +37,12 @@ abstract class PositionParent : DumpableObject
     internal class IndentAllAndForceLineSplit : PositionParent
     {
         internal IndentAllAndForceLineSplit(BinaryTreeProxy parent)
-            : base(parent, indent: true, forceLinesSplit: true) { }
+            : base(parent, indent: true, forceLineBreak: true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndent(Parent, other) //
+                BeforeToken => new LineBreakAndIndentAndForceLineBreak(Parent, other) //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
@@ -142,12 +143,21 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other) => this;
     }
 
+    class LineBreakAndIndentAndForceLineBreak : PositionParent
+    {
+        readonly PositionParent Other;
+
+        internal LineBreakAndIndentAndForceLineBreak(BinaryTreeProxy parent, PositionParent other)
+            : base(parent, true, true, forceLineBreak: true)
+            => Other = other;
+    }
+
     class LineBreakAndIndent : PositionParent
     {
         readonly PositionParent Other;
 
         internal LineBreakAndIndent(BinaryTreeProxy parent, PositionParent other)
-            : base(parent, true, true, forceLinesSplit:true)
+            : base(parent, true, true)
             => Other = other;
     }
 
@@ -163,12 +173,12 @@ abstract class PositionParent : DumpableObject
     sealed class InnerLeftSimple : PositionParent
     {
         internal InnerLeftSimple(BinaryTreeProxy parent)
-            : base(parent, true, true, forceLinesSplit:true) { }
+            : base(parent, true, true, forceLineBreak: true) { }
     }
 
     internal readonly bool Indent;
     internal readonly bool AnchorIndent;
-    internal readonly bool ForceLinesSplit;
+    internal readonly bool ForceLineBreak;
 
     internal bool HasAdditionalLineBreak;
     readonly bool HasLineBreak;
@@ -183,7 +193,7 @@ abstract class PositionParent : DumpableObject
         , bool hasLineBreak = false
         , bool indent = false
         , bool anchorIndent = false
-        , bool forceLinesSplit = false
+        , bool forceLineBreak = false
     )
     {
         parent.AssertIsNotNull();
@@ -191,7 +201,7 @@ abstract class PositionParent : DumpableObject
         Indent = indent;
         AnchorIndent = anchorIndent;
         HasLineBreak = hasLineBreak;
-        ForceLinesSplit = forceLinesSplit;
+        ForceLineBreak = forceLineBreak;
     }
 
     internal virtual PositionParent Combine(PositionParent other)
