@@ -91,8 +91,8 @@ repeat: @
     Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
     !mutable FreePointer: Memory array_reference mutable;
 
-    repeat:
-        @ ^ while()
+    repeat: @
+        ^ while()
         then
         (
             ^ body(),
