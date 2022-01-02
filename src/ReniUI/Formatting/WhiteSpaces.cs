@@ -57,7 +57,7 @@ namespace ReniUI.Formatting
         /// <returns></returns>
         IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
         {
-            StopByObjectIds(394);
+            StopByObjectIds();
             if(!SeparatorRequests.Head &&
                !SeparatorRequests.Tail &&
                !SeparatorRequests.Inner &&
