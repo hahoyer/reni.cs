@@ -5,13 +5,13 @@ namespace ReniUI.Formatting;
 
 abstract class PositionParent : DumpableObject
 {
-    internal class Function : PositionParent
+    internal sealed class Function : PositionParent
     {
         internal Function(BinaryTreeProxy parent)
             : base(parent) { }
     }
 
-    internal class LineBreak : PositionParent
+    internal sealed class LineBreak : PositionParent
     {
         internal LineBreak(BinaryTreeProxy parent)
             : base(parent, true) { }
@@ -20,7 +20,7 @@ abstract class PositionParent : DumpableObject
             => other is Left? this : base.Combine(other);
     }
 
-    internal class IndentAll : PositionParent
+    internal sealed class IndentAll : PositionParent
     {
         internal IndentAll(BinaryTreeProxy parent)
             : base(parent, indent: true) { }
@@ -28,13 +28,13 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndent(Parent, other) //
+                BeforeToken => new LineBreakAndIndent(Parent) //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
     }
 
-    internal class IndentAllAndForceLineSplit : PositionParent
+    internal sealed class IndentAllAndForceLineSplit : PositionParent
     {
         internal IndentAllAndForceLineSplit(BinaryTreeProxy parent)
             : base(parent, indent: true, forceLineBreak: true) { }
@@ -48,7 +48,7 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal class BeforeToken : PositionParent
+    internal sealed class BeforeToken : PositionParent
     {
         internal BeforeToken(BinaryTreeProxy parent)
             : base(parent, true) { }
@@ -57,7 +57,7 @@ abstract class PositionParent : DumpableObject
             => other is Right? this : base.Combine(other);
     }
 
-    internal class AfterListToken : PositionParent
+    internal sealed class AfterListToken : PositionParent
     {
         internal AfterListToken(BinaryTreeProxy parent)
             : base(parent, true) { }
@@ -70,7 +70,7 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal class AfterColonToken : PositionParent
+    internal sealed class AfterColonToken : PositionParent
     {
         internal AfterColonToken(BinaryTreeProxy parent)
             : base(parent, true, anchorIndent: true) { }
@@ -78,7 +78,7 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Left => new LeftAfterColonToken(Parent, other) //
+                Left => new LeftAfterColonToken(Parent) //
                 , Function => null
                 , _ => base.Combine(other)
             };
@@ -133,7 +133,7 @@ abstract class PositionParent : DumpableObject
             : base(parent) { }
     }
 
-    internal class Begin : PositionParent
+    internal sealed class Begin : PositionParent
     {
         internal Begin(BinaryTreeProxy parent)
             : base(parent) { }
@@ -141,7 +141,7 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other) => this;
     }
 
-    internal class End : PositionParent
+    internal sealed class End : PositionParent
     {
         internal End(BinaryTreeProxy parent, bool hasLineBreak)
             : base(parent, hasLineBreak) { }
@@ -149,23 +149,23 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other) => this;
     }
 
-    class LineBreakAndIndentAndForceLineBreak : PositionParent
+    sealed class LineBreakAndIndentAndForceLineBreak : PositionParent
     {
         internal LineBreakAndIndentAndForceLineBreak(BinaryTreeProxy parent)
             : base(parent, true, true, forceLineBreak: true)
         { }
     }
 
-    class LineBreakAndIndent : PositionParent
+    sealed class LineBreakAndIndent : PositionParent
     {
-        internal LineBreakAndIndent(BinaryTreeProxy parent, PositionParent other)
+        internal LineBreakAndIndent(BinaryTreeProxy parent)
             : base(parent, true, true)
         { }
     }
 
-    class LeftAfterColonToken : PositionParent
+    sealed class LeftAfterColonToken : PositionParent
     {
-        internal LeftAfterColonToken(BinaryTreeProxy parent, PositionParent other)
+        internal LeftAfterColonToken(BinaryTreeProxy parent)
             : base(parent, true)
         { }
     }
