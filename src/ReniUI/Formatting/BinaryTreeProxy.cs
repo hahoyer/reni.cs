@@ -48,7 +48,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
-    bool ForceLineSplit => PositionParent!= null && PositionParent.ForceLineBreak;
+    bool ForceLineSplit => PositionParent != null && PositionParent.ForceLineBreak;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     bool HasAlreadyLineBreakOrIsTooLong
@@ -150,13 +150,9 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
             case RightParenthesis:
                 if(Left?.Right?.FlatItem.TokenClass is IRightBracket)
-                {
-                    (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
-                    Tracer.TraceBreak();
-                    return;
+                    return; //Bracket cluster
 
-                }
-
+                Left.AssertIsNotNull();
                 Left.SetPosition(new PositionParent.Left(this));
                 if(Left.Right != null)
                 {
@@ -164,7 +160,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                     Left.Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit(this));
                     SetPosition(new PositionParent.InnerRight(this));
                 }
-                
+
                 RightNeighbor.SetPosition(new PositionParent.Right(this));
                 return;
 
@@ -218,13 +214,13 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 return;
 
             case Function:
-                if(Left!= null)
+                if(Left != null)
                 {
                     (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
                     Tracer.TraceBreak();
                     return;
-                }   
-                
+                }
+
                 if(!Right.IsLineSplit)
                     return;
 
@@ -232,6 +228,11 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 RightNeighbor.SetPosition(new PositionParent.LineBreak(this));
                 Right.SetPosition(new PositionParent.IndentAll(this));
                 return;
+            case IssueTokenClass:
+                (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
+                Tracer.TraceBreak();
+                return;
+
 
             default:
                 (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
