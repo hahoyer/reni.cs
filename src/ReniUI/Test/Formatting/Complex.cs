@@ -214,9 +214,8 @@ llll: bbbbb;
             const string text = @"System:
 (
     ssssss";
-            const string expectedText = text;
 
-            text.SimpleFormattingTest(expectedText, 12, 1);
+            text.SimpleFormattingTest(maxLineLength: 12, emptyLineLimit: 1);
         }
     }
 }
