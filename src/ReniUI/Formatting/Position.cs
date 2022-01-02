@@ -4,11 +4,17 @@ namespace ReniUI.Formatting;
 
 abstract class Position : DumpableObject
 {
-    internal sealed class Function : Position { }
+    internal sealed class Function : Position
+    {
+        internal static readonly Function Instance = new();
+        Function() { }
+    }
 
     internal sealed class LineBreak : Position
     {
-        internal LineBreak()
+        internal static readonly LineBreak Instance = new();
+
+        LineBreak()
             : base(true) { }
 
         internal override Position Combine(Position other)
@@ -17,13 +23,15 @@ abstract class Position : DumpableObject
 
     internal sealed class IndentAll : Position
     {
-        internal IndentAll()
+        internal static readonly IndentAll Instance = new();
+
+        IndentAll()
             : base(indent: true) { }
 
         internal override Position Combine(Position other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndent() //
+                BeforeToken => LineBreakAndIndent.Instance //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
@@ -31,13 +39,15 @@ abstract class Position : DumpableObject
 
     internal sealed class IndentAllAndForceLineSplit : Position
     {
-        internal IndentAllAndForceLineSplit()
+        internal static readonly IndentAllAndForceLineSplit Instance = new();
+
+        IndentAllAndForceLineSplit()
             : base(indent: true, forceLineBreak: true) { }
 
         internal override Position Combine(Position other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndentAndForceLineBreak() //
+                BeforeToken => LineBreakAndIndentAndForceLineBreak.Instance //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
@@ -45,7 +55,9 @@ abstract class Position : DumpableObject
 
     internal sealed class BeforeToken : Position
     {
-        internal BeforeToken()
+        internal static BeforeToken Instance { get; } = new();
+
+        BeforeToken()
             : base(true) { }
 
         internal override Position Combine(Position other)
@@ -54,7 +66,9 @@ abstract class Position : DumpableObject
 
     internal sealed class AfterListToken : Position
     {
-        internal AfterListToken()
+        internal static AfterListToken Instance { get; } = new();
+
+        AfterListToken()
             : base(true) { }
 
         internal override Position Combine(Position other)
@@ -66,13 +80,15 @@ abstract class Position : DumpableObject
 
     internal sealed class AfterColonToken : Position
     {
-        internal AfterColonToken()
+        internal static AfterColonToken Instance { get; } = new();
+
+        AfterColonToken()
             : base(true, anchorIndent: true) { }
 
         internal override Position Combine(Position other)
             => other switch
             {
-                Left => new LeftAfterColonToken() //
+                Left => LeftAfterColonToken.Instance //
                 , Function => null
                 , _ => base.Combine(other)
             };
@@ -80,33 +96,41 @@ abstract class Position : DumpableObject
 
     internal sealed class Left : Position
     {
+        internal static Left Instance { get; } = new();
+
+        Left() { }
+
         internal override Position Combine(Position other)
             => other is InnerLeft? null : base.Combine(other);
     }
 
     internal sealed class InnerLeft : Position
     {
-        public InnerLeft()
+        internal static InnerLeft Instance { get; } = new();
+
+        InnerLeft()
             : base(true) { }
 
         internal override Position Combine(Position other)
             => other switch
             {
-                Left => null
-                , IndentAllAndForceLineSplit => new InnerLeftSimple()
-                , _ => base.Combine(other)
+                Left => null, IndentAllAndForceLineSplit => InnerLeftSimple.Instance, _ => base.Combine(other)
             };
     }
 
     internal sealed class Inner : Position
     {
-        public Inner()
+        internal static Inner Instance { get; } = new();
+
+        Inner()
             : base(true, anchorIndent: true) { }
     }
 
     internal sealed class InnerRight : Position
     {
-        public InnerRight()
+        internal static InnerRight Instance { get; } = new();
+
+        InnerRight()
             : base(true) { }
 
         internal override Position Combine(Position other)
@@ -118,42 +142,59 @@ abstract class Position : DumpableObject
             };
     }
 
-    internal sealed class Right : Position { }
+    internal sealed class Right : Position
+    {
+        internal static Right Instance { get; } = new();
+
+        Right() { }
+    }
 
     internal sealed class Begin : Position
     {
+        public static Begin Instance { get; } = new();
+        Begin() { }
         internal override Position Combine(Position other) => this;
     }
 
     internal sealed class End : Position
     {
-        internal End(bool hasLineBreak)
+        End(bool hasLineBreak)
             : base(hasLineBreak) { }
 
         internal override Position Combine(Position other) => this;
+
+        public static End CreateInstance(bool hasLineBreak) => new(hasLineBreak);
     }
 
     sealed class LineBreakAndIndentAndForceLineBreak : Position
     {
-        internal LineBreakAndIndentAndForceLineBreak()
+        public static LineBreakAndIndentAndForceLineBreak Instance { get; } = new();
+
+        LineBreakAndIndentAndForceLineBreak()
             : base(true, true, forceLineBreak: true) { }
     }
 
     sealed class LineBreakAndIndent : Position
     {
-        internal LineBreakAndIndent()
+        public static LineBreakAndIndent Instance { get; } = new();
+
+        LineBreakAndIndent()
             : base(true, true) { }
     }
 
     sealed class LeftAfterColonToken : Position
     {
-        internal LeftAfterColonToken()
+        public static LeftAfterColonToken Instance { get; } = new();
+
+        LeftAfterColonToken()
             : base(true) { }
     }
 
     sealed class InnerLeftSimple : Position
     {
-        internal InnerLeftSimple()
+        public static InnerLeftSimple Instance { get; } = new();
+
+        InnerLeftSimple()
             : base(true, true, forceLineBreak: true) { }
     }
 
