@@ -119,9 +119,8 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 return;
             case EndOfText:
                 (Left.FlatItem.TokenClass is BeginOfText).Assert();
-                Left.RightNeighbor.SetPosition(new PositionParent.Begin(this));
-                SetPosition(new PositionParent.End(this
-                    , Configuration.LineBreakAtEndOfText ?? FlatItem.WhiteSpaces.HasLineBreak));
+                Left.RightNeighbor.SetPosition(new PositionParent.Begin());
+                SetPosition(new PositionParent.End(Configuration.LineBreakAtEndOfText ?? FlatItem.WhiteSpaces.HasLineBreak));
                 return;
             case Definable:
             {
@@ -139,7 +138,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                     if(hasAdditionalLineSplit && formerItem.PositionParent is PositionParent.Inner inner)
                         inner.HasAdditionalLineBreak = true;
 
-                    var positionParent = new PositionParent.Inner(this);
+                    var positionParent = new PositionParent.Inner();
                     if(hasAdditionalLineSplit)
                         positionParent.HasAdditionalLineBreak = true;
                     chain[index].SetPosition(positionParent);
@@ -153,15 +152,15 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                     return; //Bracket cluster
 
                 Left.AssertIsNotNull();
-                Left.SetPosition(new PositionParent.Left(this));
+                Left.SetPosition(new PositionParent.Left());
                 if(Left.Right != null)
                 {
-                    Left.RightNeighbor.SetPosition(new PositionParent.InnerLeft(this));
-                    Left.Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit(this));
-                    SetPosition(new PositionParent.InnerRight(this));
+                    Left.RightNeighbor.SetPosition(new PositionParent.InnerLeft());
+                    Left.Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit());
+                    SetPosition(new PositionParent.InnerRight());
                 }
 
-                RightNeighbor.SetPosition(new PositionParent.Right(this));
+                RightNeighbor.SetPosition(new PositionParent.Right());
                 return;
 
             case List:
@@ -181,12 +180,12 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                         item.IsLineSplit;
 
                     if(Configuration.LineBreaksBeforeListToken)
-                        node.SetPosition(new PositionParent.BeforeToken(this));
+                        node.SetPosition(new PositionParent.BeforeToken());
                     else
                     {
                         if(node.FlatItem.TokenClass == FlatItem.TokenClass)
                         {
-                            var positionParent = new PositionParent.AfterListToken(this);
+                            var positionParent = new PositionParent.AfterListToken();
                             node.RightNeighbor.SetPosition(positionParent);
 
                             if(hasAdditionalLineSplit)
@@ -201,16 +200,16 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 return;
             }
             case Colon:
-                RightNeighbor.SetPosition(new PositionParent.AfterColonToken(this));
+                RightNeighbor.SetPosition(new PositionParent.AfterColonToken());
                 return;
             case ElseToken:
             case ThenToken:
-                SetPosition(new PositionParent.BeforeToken(this));
+                SetPosition(new PositionParent.BeforeToken());
                 if(Right is not { IsLineSplit: true })
                     return;
 
-                RightNeighbor.SetPosition(new PositionParent.LineBreak(this));
-                Right.SetPosition(new PositionParent.IndentAll(this));
+                RightNeighbor.SetPosition(new PositionParent.LineBreak());
+                Right.SetPosition(new PositionParent.IndentAll());
                 return;
 
             case Function:
@@ -224,16 +223,16 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 if(!Right.IsLineSplit)
                     return;
 
-                SetPosition(new PositionParent.Function(this));
-                RightNeighbor.SetPosition(new PositionParent.LineBreak(this));
-                Right.SetPosition(new PositionParent.IndentAll(this));
+                SetPosition(new PositionParent.Function());
+                RightNeighbor.SetPosition(new PositionParent.LineBreak());
+                Right.SetPosition(new PositionParent.IndentAll());
                 return;
             case IssueTokenClass:
-                SetPosition(new PositionParent.Left(this));
+                SetPosition(new PositionParent.Left());
                 if(Right != null)
                 {
-                    RightNeighbor.SetPosition(new PositionParent.InnerLeft(this));
-                    Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit(this));
+                    RightNeighbor.SetPosition(new PositionParent.InnerLeft());
+                    Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit());
                 }
 
                 return;

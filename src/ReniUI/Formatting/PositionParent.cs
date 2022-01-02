@@ -1,20 +1,15 @@
 using hw.DebugFormatter;
-using Reni.Parser;
 
 namespace ReniUI.Formatting;
 
 abstract class PositionParent : DumpableObject
 {
-    internal sealed class Function : PositionParent
-    {
-        internal Function(BinaryTreeProxy parent)
-            : base(parent) { }
-    }
+    internal sealed class Function : PositionParent { }
 
     internal sealed class LineBreak : PositionParent
     {
-        internal LineBreak(BinaryTreeProxy parent)
-            : base(parent, true) { }
+        internal LineBreak()
+            : base(true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other is Left? this : base.Combine(other);
@@ -22,13 +17,13 @@ abstract class PositionParent : DumpableObject
 
     internal sealed class IndentAll : PositionParent
     {
-        internal IndentAll(BinaryTreeProxy parent)
-            : base(parent, indent: true) { }
+        internal IndentAll()
+            : base(indent: true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndent(Parent) //
+                BeforeToken => new LineBreakAndIndent() //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
@@ -36,13 +31,13 @@ abstract class PositionParent : DumpableObject
 
     internal sealed class IndentAllAndForceLineSplit : PositionParent
     {
-        internal IndentAllAndForceLineSplit(BinaryTreeProxy parent)
-            : base(parent, indent: true, forceLineBreak: true) { }
+        internal IndentAllAndForceLineSplit()
+            : base(indent: true, forceLineBreak: true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                BeforeToken => new LineBreakAndIndentAndForceLineBreak(Parent) //
+                BeforeToken => new LineBreakAndIndentAndForceLineBreak() //
                 , InnerRight => other
                 , _ => base.Combine(other)
             };
@@ -50,8 +45,8 @@ abstract class PositionParent : DumpableObject
 
     internal sealed class BeforeToken : PositionParent
     {
-        internal BeforeToken(BinaryTreeProxy parent)
-            : base(parent, true) { }
+        internal BeforeToken()
+            : base(true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other is Right? this : base.Combine(other);
@@ -59,26 +54,25 @@ abstract class PositionParent : DumpableObject
 
     internal sealed class AfterListToken : PositionParent
     {
-        internal AfterListToken(BinaryTreeProxy parent)
-            : base(parent, true) { }
+        internal AfterListToken()
+            : base(true) { }
 
-        internal override PositionParent Combine(PositionParent other) 
+        internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Left => this
-                , _ => base.Combine(other)
+                Left => this, _ => base.Combine(other)
             };
     }
 
     internal sealed class AfterColonToken : PositionParent
     {
-        internal AfterColonToken(BinaryTreeProxy parent)
-            : base(parent, true, anchorIndent: true) { }
+        internal AfterColonToken()
+            : base(true, anchorIndent: true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Left => new LeftAfterColonToken(Parent) //
+                Left => new LeftAfterColonToken() //
                 , Function => null
                 , _ => base.Combine(other)
             };
@@ -86,37 +80,34 @@ abstract class PositionParent : DumpableObject
 
     internal sealed class Left : PositionParent
     {
-        public Left(BinaryTreeProxy parent)
-            : base(parent) { }
-
         internal override PositionParent Combine(PositionParent other)
             => other is InnerLeft? null : base.Combine(other);
     }
 
     internal sealed class InnerLeft : PositionParent
     {
-        public InnerLeft(BinaryTreeProxy parent)
-            : base(parent, true) { }
+        public InnerLeft()
+            : base(true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
                 Left => null
-                , IndentAllAndForceLineSplit when other.Parent == Parent => new InnerLeftSimple(Parent)
+                , IndentAllAndForceLineSplit when other.Parent == Parent => new InnerLeftSimple()
                 , _ => base.Combine(other)
             };
     }
 
     internal sealed class Inner : PositionParent
     {
-        public Inner(BinaryTreeProxy parent)
-            : base(parent, true, anchorIndent: true) { }
+        public Inner()
+            : base(true, anchorIndent: true) { }
     }
 
     internal sealed class InnerRight : PositionParent
     {
-        public InnerRight(BinaryTreeProxy parent)
-            : base(parent, true) { }
+        public InnerRight()
+            : base(true) { }
 
         internal override PositionParent Combine(PositionParent other)
             => other switch
@@ -127,53 +118,43 @@ abstract class PositionParent : DumpableObject
             };
     }
 
-    internal sealed class Right : PositionParent
-    {
-        public Right(BinaryTreeProxy parent)
-            : base(parent) { }
-    }
+    internal sealed class Right : PositionParent { }
 
     internal sealed class Begin : PositionParent
     {
-        internal Begin(BinaryTreeProxy parent)
-            : base(parent) { }
-
         internal override PositionParent Combine(PositionParent other) => this;
     }
 
     internal sealed class End : PositionParent
     {
-        internal End(BinaryTreeProxy parent, bool hasLineBreak)
-            : base(parent, hasLineBreak) { }
+        internal End(bool hasLineBreak)
+            : base(hasLineBreak) { }
 
         internal override PositionParent Combine(PositionParent other) => this;
     }
 
     sealed class LineBreakAndIndentAndForceLineBreak : PositionParent
     {
-        internal LineBreakAndIndentAndForceLineBreak(BinaryTreeProxy parent)
-            : base(parent, true, true, forceLineBreak: true)
-        { }
+        internal LineBreakAndIndentAndForceLineBreak()
+            : base(true, true, forceLineBreak: true) { }
     }
 
     sealed class LineBreakAndIndent : PositionParent
     {
-        internal LineBreakAndIndent(BinaryTreeProxy parent)
-            : base(parent, true, true)
-        { }
+        internal LineBreakAndIndent()
+            : base(true, true) { }
     }
 
     sealed class LeftAfterColonToken : PositionParent
     {
-        internal LeftAfterColonToken(BinaryTreeProxy parent)
-            : base(parent, true)
-        { }
+        internal LeftAfterColonToken()
+            : base(true) { }
     }
 
     sealed class InnerLeftSimple : PositionParent
     {
-        internal InnerLeftSimple(BinaryTreeProxy parent)
-            : base(parent, true, true, forceLineBreak: true) { }
+        internal InnerLeftSimple()
+            : base(true, true, forceLineBreak: true) { }
     }
 
     internal readonly bool Indent;
@@ -183,21 +164,16 @@ abstract class PositionParent : DumpableObject
     internal bool HasAdditionalLineBreak;
     readonly bool HasLineBreak;
 
-    [DisableDump]
     readonly BinaryTreeProxy Parent;
 
-
-    protected PositionParent
+    PositionParent
     (
-        BinaryTreeProxy parent
-        , bool hasLineBreak = false
+        bool hasLineBreak = false
         , bool indent = false
         , bool anchorIndent = false
         , bool forceLineBreak = false
     )
     {
-        parent.AssertIsNotNull();
-        Parent = parent;
         Indent = indent;
         AnchorIndent = anchorIndent;
         HasLineBreak = hasLineBreak;
@@ -217,7 +193,4 @@ abstract class PositionParent : DumpableObject
                 ? 2
                 : 1
             : 0;
-
-    [EnableDump]
-    internal ITokenClass TokenClass => Parent.FlatItem.TokenClass;
 }
