@@ -66,10 +66,24 @@ abstract class Position : DumpableObject
 
     internal sealed class AfterListToken : Position
     {
-        internal static AfterListToken Instance { get; } = new();
+        internal static Position Instance { get; } = new AfterListToken();
 
         AfterListToken()
             : base(true) { }
+
+        internal override Position Combine(Position other)
+            => other switch
+            {
+                Left => this, _ => base.Combine(other)
+            };
+    }
+
+    internal sealed class AfterListTokenWithAdditionalLineBreak : Position
+    {
+        internal static Position Instance { get; } = new AfterListTokenWithAdditionalLineBreak();
+
+        AfterListTokenWithAdditionalLineBreak()
+            : base(true, hasAdditionalLineBreak:true) { }
 
         internal override Position Combine(Position other)
             => other switch
@@ -120,10 +134,18 @@ abstract class Position : DumpableObject
 
     internal sealed class Inner : Position
     {
-        internal static Inner Instance { get; } = new();
+        internal static Position Instance { get; } = new Inner();
 
         Inner()
             : base(true, anchorIndent: true) { }
+    }
+
+    internal sealed class InnerWithAdditionalLineBreak : Position
+    {
+        internal static Position Instance { get; } = new InnerWithAdditionalLineBreak();
+
+        InnerWithAdditionalLineBreak()
+            : base(true, anchorIndent: true, hasAdditionalLineBreak: true) { }
     }
 
     internal sealed class InnerRight : Position
@@ -138,6 +160,7 @@ abstract class Position : DumpableObject
             {
                 Right => this //
                 , AfterListToken => this
+                , AfterListTokenWithAdditionalLineBreak => this
                 , _ => base.Combine(other)
             };
     }
@@ -201,8 +224,7 @@ abstract class Position : DumpableObject
     internal readonly bool Indent;
     internal readonly bool AnchorIndent;
     internal readonly bool ForceLineBreak;
-
-    internal bool HasAdditionalLineBreak;
+    internal readonly bool HasAdditionalLineBreak;
     readonly bool HasLineBreak;
 
     Position
@@ -211,12 +233,14 @@ abstract class Position : DumpableObject
         , bool indent = false
         , bool anchorIndent = false
         , bool forceLineBreak = false
+        , bool hasAdditionalLineBreak = false
     )
     {
         Indent = indent;
         AnchorIndent = anchorIndent;
         HasLineBreak = hasLineBreak;
         ForceLineBreak = forceLineBreak;
+        HasAdditionalLineBreak = hasAdditionalLineBreak;
     }
 
     internal virtual Position Combine(Position other)

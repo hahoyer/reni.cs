@@ -136,12 +136,12 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                         formerItem.Right != null &&
                         formerItem.Right.IsLineSplit;
 
-                    if(hasAdditionalLineSplit && formerItem.LineBreakBehaviour is Position.Inner inner)
-                        inner.HasAdditionalLineBreak = true;
+                    if(hasAdditionalLineSplit && formerItem.LineBreakBehaviour is Position.Inner)
+                        formerItem.LineBreakBehaviour = Position.InnerWithAdditionalLineBreak.Instance;
 
-                    var positionParent = Position.Inner.Instance;
-                    if(hasAdditionalLineSplit)
-                        positionParent.HasAdditionalLineBreak = true;
+                    var positionParent = hasAdditionalLineSplit
+                        ? Position.InnerWithAdditionalLineBreak.Instance
+                        : Position.Inner.Instance;
                     chain[index].SetPosition(positionParent);
                 }
 
@@ -174,11 +174,10 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 for(var index = 0; index < chain.Length; index++)
                 {
                     var node = chain[index];
-
                     var item = node.FlatItem.TokenClass == FlatItem.TokenClass? node.Left : node;
 
-                    var hasAdditionalLineSplit = Configuration.AdditionalLineBreaksForMultilineItems &&
-                        item.IsLineSplit;
+                    var hasAdditionalLineSplit
+                        = Configuration.AdditionalLineBreaksForMultilineItems && item.IsLineSplit;
 
                     if(Configuration.LineBreaksBeforeListToken)
                         node.SetPosition(Position.BeforeToken.Instance);
@@ -186,15 +185,19 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                     {
                         if(node.FlatItem.TokenClass == FlatItem.TokenClass)
                         {
-                            var positionParent = Position.AfterListToken.Instance;
+                            var positionParent = hasAdditionalLineSplit
+                                ? Position.AfterListTokenWithAdditionalLineBreak.Instance
+                                : Position.AfterListToken.Instance;
                             node.RightNeighbor.SetPosition(positionParent);
-
-                            if(hasAdditionalLineSplit)
-                                positionParent.HasAdditionalLineBreak = true;
                         }
 
                         if(hasAdditionalLineSplit && index > 0)
-                            chain[index - 1].RightNeighbor.LineBreakBehaviour.HasAdditionalLineBreak = true;
+                        {
+                            var neighbor = chain[index - 1].RightNeighbor;
+                            (neighbor.LineBreakBehaviour is Position.AfterListToken
+                                or Position.AfterListTokenWithAdditionalLineBreak).Assert();
+                            neighbor.LineBreakBehaviour = Position.AfterListTokenWithAdditionalLineBreak.Instance;
+                        }
                     }
                 }
 
