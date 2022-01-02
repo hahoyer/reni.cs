@@ -149,10 +149,22 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
             }
 
             case RightParenthesis:
+                if(Left?.Right?.FlatItem.TokenClass is IRightBracket)
+                {
+                    (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
+                    Tracer.TraceBreak();
+                    return;
+
+                }
+
                 Left.SetPosition(new PositionParent.Left(this));
-                Left.RightNeighbor.SetPosition(new PositionParent.InnerLeft(this));
-                Left.Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit(this));
-                SetPosition(new PositionParent.InnerRight(this));
+                if(Left.Right != null)
+                {
+                    Left.RightNeighbor.SetPosition(new PositionParent.InnerLeft(this));
+                    Left.Right.SetPosition(new PositionParent.IndentAllAndForceLineSplit(this));
+                    SetPosition(new PositionParent.InnerRight(this));
+                }
+                
                 RightNeighbor.SetPosition(new PositionParent.Right(this));
                 return;
 

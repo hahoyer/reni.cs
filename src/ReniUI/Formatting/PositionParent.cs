@@ -61,6 +61,13 @@ abstract class PositionParent : DumpableObject
     {
         internal AfterListToken(BinaryTreeProxy parent)
             : base(parent, true) { }
+
+        internal override PositionParent Combine(PositionParent other) 
+            => other switch
+            {
+                Left => this
+                , _ => base.Combine(other)
+            };
     }
 
     internal class AfterColonToken : PositionParent
@@ -114,7 +121,9 @@ abstract class PositionParent : DumpableObject
         internal override PositionParent Combine(PositionParent other)
             => other switch
             {
-                Right => null, AfterListToken => this, _ => base.Combine(other)
+                Right => this //
+                , AfterListToken => this
+                , _ => base.Combine(other)
             };
     }
 
