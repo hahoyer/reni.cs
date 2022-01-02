@@ -9,7 +9,7 @@ namespace Reni.Helper
     public abstract class SyntaxView<TTarget> : DumpableObject, ValueCache.IContainer, ITree<TTarget>
         where TTarget : SyntaxView<TTarget>
     {
-        class CacheContainer
+        sealed class CacheContainer
         {
             public FunctionCache<int, TTarget> DirectChildren;
             public FunctionCache<SourcePosition, (TTarget, int)> LocateByPosition;

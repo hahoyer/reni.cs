@@ -1,7 +1,6 @@
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.Parser;
 
 namespace Reni.ParserTest

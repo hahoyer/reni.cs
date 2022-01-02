@@ -15,7 +15,7 @@ namespace Reni
 {
     sealed class Result : DumpableObject, IAggregateable<Result>
     {
-        class DataContainer
+        sealed class DataContainer
         {
             internal Closures Closure;
             internal CodeBase Code;

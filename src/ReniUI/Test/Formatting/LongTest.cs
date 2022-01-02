@@ -1,6 +1,5 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.TokenClasses;
 
 // ReSharper disable StringLiteralTypo

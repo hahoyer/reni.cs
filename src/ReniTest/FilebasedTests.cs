@@ -2,16 +2,13 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using hw.UnitTest;
-using NUnit.Framework;
 
 namespace ReniTest
 {
     [UnitTest]
-    [TestFixture]
-    sealed class FilebasedTests
+    sealed class FileBasedTests
     {
         [UnitTest]
-        [Test]
         public void TestMethod()
         {
             var fileName = Extension.SolutionDir + @"\renisource\tests";

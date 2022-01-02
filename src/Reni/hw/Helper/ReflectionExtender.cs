@@ -93,7 +93,9 @@ namespace hw.Helper
                 ; referencedAssemblies.GetEnumerator().MoveNext()
                 ; result = result.Concat(referencedAssemblies).ToArray())
             {
-                var assemblyNames = referencedAssemblies.SelectMany(assembly => assembly.GetReferencedAssemblies())
+                var assemblyNames = referencedAssemblies
+                    //.Where(assembly => !assembly.GetName().Name.Contains("nunit.framework"))
+                    .SelectMany(assembly => assembly.GetReferencedAssemblies())
                     .ToArray();
                 var assemblies = assemblyNames.Select(AssemblyLoad).ToArray();
                 var enumerable = assemblies.Distinct().ToArray();

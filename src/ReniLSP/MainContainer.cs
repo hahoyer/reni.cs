@@ -63,9 +63,9 @@ namespace ReniLSP
             };
     }
 
-    class LoggerFactory : DumpableObject, ILoggerFactory
+    sealed class LoggerFactory : DumpableObject, ILoggerFactory
     {
-        class Logger : DumpableObject, ILogger
+        sealed class Logger : DumpableObject, ILogger
         {
             readonly string CategoryName;
             public Logger(string categoryName) => CategoryName = categoryName;

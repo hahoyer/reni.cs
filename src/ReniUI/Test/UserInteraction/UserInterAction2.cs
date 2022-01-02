@@ -2,7 +2,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
-using NUnit.Framework;
 
 namespace ReniUI.Test.UserInteraction
 {
