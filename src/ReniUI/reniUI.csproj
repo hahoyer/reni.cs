@@ -31,8 +31,10 @@
     <Compile Include="Test\Formatting\CommentsOfLists.cs" />
     <Compile Include="Test\Formatting\Exclamation.cs" />
     <Compile Include="Test\Formatting\FlatStrings.cs" />
+    <Compile Include="Test\Formatting\TrainWreck.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
+    <Compile Include="Test\UserInteraction\BigExample.cs" />
     <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
     <Compile Include="Test\UserInteraction\UserInterAction.cs" />
     <Compile Include="Test\UserInteraction\UserInterAction2.cs" />

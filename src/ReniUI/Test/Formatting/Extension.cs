@@ -37,15 +37,18 @@ namespace ReniUI.Test.Formatting
                     .Create()
             );
 
-                (newText.Canonize(spaceReplacement) == expected.Canonize(spaceReplacement))
+            string LocalCanonize(string target) => target.Replace("\r\n","\n")
+                .Replace("\n","|||\n")
+            ;
+            (newText.Canonize(spaceReplacement) == expected.Canonize(spaceReplacement))
                 .Assert(() => $@"
 new:
 ----------------------
-{newText.Replace("\r\n","\n").Replace("\n","|||\n")}|||
+{LocalCanonize(newText)}
 ----------------------
 expected:
 ----------------------
-{expected.Replace("\r\n","\n").Replace("\n","|||\n")}|||
+{LocalCanonize(expected)}
 ----------------------
 ", 1
                 );

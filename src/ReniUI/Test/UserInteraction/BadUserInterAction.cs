@@ -46,6 +46,7 @@ repeat: @ ^ while() then(^ body(), repeat(^));
                 var t = compiler.Locate(i);
                 (t != null).Assert(() => (new Source(text) + i).Dump());
             }
+
         }
     }
 }
