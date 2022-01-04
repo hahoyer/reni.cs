@@ -98,7 +98,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
     int LineBreakCount => LineBreakBehaviour?.LineBreakCount ?? 0;
 
     void SetPosition(Position position)
-        => LineBreakBehaviour = LineBreakBehaviour == null? position : LineBreakBehaviour+(position);
+        => LineBreakBehaviour += position;
 
     internal void SetupPositions()
     {
@@ -124,6 +124,7 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 SetPosition(Position.End[hasLineBreak]);
                 return;
             case Definable:
+            case InstanceToken:
             {
                 if(Parent.FlatItem.TokenClass is Definable)
                     return;
@@ -231,7 +232,6 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
                 SetPosition(Position.Function);
                 RightNeighbor.SetPosition(Position.LineBreak);
-                Right.SetPosition(Position.IndentAll);
                 return;
             case IssueTokenClass:
                 SetPosition(Position.Left);
