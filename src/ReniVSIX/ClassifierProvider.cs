@@ -13,7 +13,7 @@ namespace ReniVSIX
     [Export(typeof(IViewTaggerProvider))]
     [TagType(typeof(IErrorTag))]
     [TagType(typeof(ITextMarkerTag))]
-    [ContentType("reni")]
+    [ContentType(Constants.LanguageName)]
     class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
     {
         [UsedImplicitly]

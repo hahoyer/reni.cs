@@ -27,18 +27,14 @@ namespace ReniVSIX
     ///     </para>
     /// </remarks>
     [ProvideService(typeof(ReniService), ServiceName = "Reni Language Service")]
-    [ProvideLanguageService(typeof(ReniService), "Reni", 106)]
+    [ProvideLanguageService(typeof(ReniService), Constants.LanguageName, 106)]
     [ProvideLanguageExtension(typeof(ReniService), ".reni")]
     [UsedImplicitly]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(PackageGuidString)]
+    [Guid(Constants.PackageGuidString)]
+    [ProvideLanguageEditorOptionPage(typeof(Properties), Constants.LanguageName, "Advanced", "", "100")]
     public sealed class ReniVSIXPackage : AsyncPackage
     {
-        /// <summary>
-        ///     ReniVSIXPackage GUID string.
-        /// </summary>
-        public const string PackageGuidString = "7e499f22-1bbb-4366-a9d7-89c1c01eac86";
-
         /// <summary>
         ///     Initialization of the package; this method is called right after the package is sited, so this is the place
         ///     where you can put all the initialization code that rely on services provided by VisualStudio.

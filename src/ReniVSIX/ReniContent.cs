@@ -8,14 +8,14 @@ namespace ReniVSIX
     {
         [UsedImplicitly]
         [Export]
-        [Name("reni")]
+        [Name(Constants.LanguageName)]
         [BaseDefinition("code")]
         public static ContentTypeDefinition ContentType;
 
         [UsedImplicitly]
         [Export]
         [FileExtension(".reni")]
-        [ContentType("reni")]
+        [ContentType(Constants.LanguageName)]
         public static FileExtensionToContentTypeDefinition FileExtension;
     }
 }

@@ -32,7 +32,7 @@ namespace ReniVSIX
 
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 
-        public override string Name => "Reni";
+        public override string Name => Constants.LanguageName;
 
         public ReniVSIXPackage Package
             => (ReniVSIXPackage)GetLanguagePreferences().GetSite();

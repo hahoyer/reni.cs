@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace ReniVSIX
 {
-    [ContentType("reni")]
+    [ContentType(Constants.LanguageName)]
     [Export(typeof(ILanguageClient))]
     public class LanguageClient : ILanguageClient
     {
