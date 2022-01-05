@@ -6,12 +6,13 @@ namespace Reni.SyntaxFactory
 {
     sealed class CleanupHandler : DumpableObject, IValueProvider
     {
-        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameAnchor)
         {
             var statements = factory.GetStatementsSyntax(target.Left, null, target.Left?.TokenClass);
             var cleanup = factory.GetValueSyntax(target.Right);
             var cleanupSection = new CleanupSyntax(cleanup, Anchor.Create(target));
-            return CompoundSyntax.Create(statements, cleanupSection, frameItems);
+            var anchor = Anchor.Create(target.Left?.ParserLevelGroup).Combine(frameAnchor);
+            return CompoundSyntax.Create(statements, cleanupSection, anchor);
         }
     }
 }
