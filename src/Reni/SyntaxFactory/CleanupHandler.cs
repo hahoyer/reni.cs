@@ -4,7 +4,7 @@ using Reni.TokenClasses;
 
 namespace Reni.SyntaxFactory
 {
-    class CleanupHandler : DumpableObject, IValueProvider
+    sealed class CleanupHandler : DumpableObject, IValueProvider
     {
         ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         {
