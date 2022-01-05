@@ -5,7 +5,7 @@ using hw.Helper;
 
 namespace Reni.TokenClasses.Whitespace
 {
-    class WhiteSpaceView : DumpableObject
+    sealed class WhiteSpaceView : DumpableObject
     {
         readonly WhiteSpaceItem Target;
 
