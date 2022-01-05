@@ -5,7 +5,7 @@ using Reni.TokenClasses;
 
 namespace Reni.SyntaxFactory
 {
-    class ListHandler : DumpableObject, IStatementsProvider
+    sealed class ListHandler : DumpableObject, IStatementsProvider
     {
         IStatementSyntax[] IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
         {
