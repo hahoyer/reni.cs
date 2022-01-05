@@ -17,8 +17,8 @@ sealed class FormatterByBinaryTree : DumpableObject, IFormatter
         if(compilerBrowser.IsTooSmall(targetPart))
             return new Edit[0];
 
-        var item = BinaryTreeProxy.Create(compilerBrowser.Compiler.BinaryTree, Configuration);
-        var trace = DateTime.Today.Year < 2020;
+        var item = BinaryTreeProxy.Create(compilerBrowser.Compiler.BinaryTreeWithSyntaxLink, Configuration);
+        var trace = DateTime.Today.Year > 2020;
         item.SetupPositions();
         if(trace) item.LogDump().Log(FilePositionTag.Debug);
         var sourcePartEdits = item.Edits.ToArray();

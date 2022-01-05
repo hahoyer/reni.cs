@@ -11,6 +11,7 @@ using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
+using Reni.Helper;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.Runtime;
@@ -79,9 +80,9 @@ namespace Reni
             //Tracer.FlaggedLine(PrettyDump);
 
             Root = new(this);
-            CodeContainerCache = NewValueCache(GetCodeContainer);
-            BinaryTreeCache = NewValueCache(() => Parse(Source));
-            ValueSyntaxCache = NewValueCache(GetSyntax);
+            CodeContainerCache = new(GetCodeContainer);
+            BinaryTreeCache = new(() => Parse(Source));
+            ValueSyntaxCache = new(GetSyntax);
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -106,7 +107,26 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal ValueSyntax Syntax => ValueSyntaxCache.Value;
+        internal BinaryTree BinaryTreeWithSyntaxLink
+        {
+            get
+            {
+                ValueSyntaxCache.IsValid = true;
+                return BinaryTree;
+            }
+        }
+
+        [Node]
+        [DisableDump]
+        internal ValueSyntax Syntax
+        {
+            get
+            {
+                var result = ValueSyntaxCache.Value;
+                AssertValidSyntaxLinkForBinaryTree();
+                return result;
+            }
+        }
 
         [Node]
         [DisableDump]
@@ -273,6 +293,14 @@ namespace Reni
         ValueSyntax GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
 
         static ValueSyntax GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
+
+        void AssertValidSyntaxLinkForBinaryTree()
+        {
+            var anchor = BinaryTree;
+            (anchor.TokenClass is EndOfText).Assert();
+            foreach(var item in anchor.GetNodesFromLeftToRight())
+                item.Syntax.AssertIsNotNull();
+        }
 
         CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data);
 

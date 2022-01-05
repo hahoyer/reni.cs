@@ -79,7 +79,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     }
 
     public string FlatFormat(bool areEmptyLinesPossible)
-        => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
+        => Compiler.BinaryTree.GetFlatString(areEmptyLinesPossible);
 
     public Item Locate(int offset) => Locate(Source + offset);
 
@@ -107,7 +107,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
         try
         {
-            var trace = Debugger.IsAttached && DateTime.MinValue == DateTime.MinValue + TimeSpan.FromDays(1);
+            var trace = Debugger.IsAttached && DateTime.Today.Year < 2020;
 
             var compilerSyntax = Compiler.Syntax;
             if(trace)
