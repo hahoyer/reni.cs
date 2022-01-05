@@ -21,7 +21,6 @@ using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
-using static hw.Helper.ValueCacheExtension;
 
 namespace Reni
 {
@@ -299,7 +298,7 @@ namespace Reni
             var anchor = BinaryTree;
             (anchor.TokenClass is EndOfText).Assert();
             foreach(var item in anchor.GetNodesFromLeftToRight())
-                item.Syntax.AssertIsNotNull();
+                item.Syntax.AssertIsNotNull(()=>item.LogDump());
         }
 
         CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data);
