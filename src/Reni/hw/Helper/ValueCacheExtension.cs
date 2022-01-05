@@ -8,6 +8,7 @@ namespace hw.Helper
     [PublicAPI]
     public static class ValueCacheExtension
     {
+        [Obsolete("just use new! (Thanks C# 9.0)")]
         public static ValueCache<TValueType> NewValueCache<TValueType>(Func<TValueType> target)
             => new(target);
 
