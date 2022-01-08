@@ -24,7 +24,7 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == Left
+                => other == LeftBracketOuter
                     ? this
                     : other == IndentAll
                         ? LineBreakAndIndent
@@ -39,13 +39,11 @@ abstract class Position : DumpableObject
             protected override Position Combine(Position other)
                 => other == BeforeToken
                     ? LineBreakAndIndent
-                    : other == InnerRight
+                    : other == RightBracketInner
                         ? other
-                        : other == Inner
-                            ? InnerWithIndent
-                            : other == LeftCoupling
-                                ? LeftCouplingWithIndent
-                                : base.Combine(other);
+                        : other == LeftCoupling
+                            ? LeftCouplingWithIndent
+                            : base.Combine(other);
         }
 
         internal sealed class IndentAllAndForceLineSplit : Position
@@ -56,7 +54,7 @@ abstract class Position : DumpableObject
             protected override Position Combine(Position other)
                 => other == BeforeToken
                     ? LineBreakAndIndentAndForceLineBreak
-                    : other == InnerRight
+                    : other == RightBracketInner
                         ? other
                         : base.Combine(other);
         }
@@ -67,7 +65,7 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == Right? this : base.Combine(other);
+                => other == RightBracketOuter? this : base.Combine(other);
         }
 
         internal sealed class AfterListToken : Position
@@ -76,7 +74,7 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == Left? this : base.Combine(other);
+                => other == LeftBracketOuter? this : base.Combine(other);
         }
 
         internal sealed class AfterListTokenWithAdditionalLineBreak : Position
@@ -85,35 +83,37 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Extended) { }
 
             protected override Position Combine(Position other)
-                => other == Left? this : base.Combine(other);
+                => other == LeftBracketOuter? this : base.Combine(other);
         }
 
         internal sealed class AfterColonToken : Position
         {
             internal AfterColonToken()
-                : base(lineBreaks: Flag.LineBreaks.Simple, anchorIndent: Flag.AnchorIndent.True) { }
-
-            protected override Position Combine(Position other)
-                => other == Left
-                    ? LeftAfterColonToken
-                    : other == Function
-                        ? null
-                        : base.Combine(other);
-        }
-
-        internal sealed class Left : Position
-        {
-            protected override Position Combine(Position other)
-                => other is InnerLeft? null : base.Combine(other);
-        }
-
-        internal sealed class InnerLeft : Position
-        {
-            internal InnerLeft()
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == Left
+                => other == LeftBracketOuter
+                    ? LeftAfterColonToken
+                    : other == Function
+                        ? null
+                        : other == IndentAll
+                            ? AfterColonTokenWithIndentAll
+                            : base.Combine(other);
+        }
+
+        internal sealed class LeftBracketOuter : Position
+        {
+            protected override Position Combine(Position other)
+                => other is LeftBracketInner? null : base.Combine(other);
+        }
+
+        internal sealed class LeftBracketInner : Position
+        {
+            internal LeftBracketInner()
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
+
+            protected override Position Combine(Position other)
+                => other == LeftBracketOuter
                     ? null
                     : other == IndentAllAndForceLineSplit
                         ? InnerLeftWithIndentAllAndForceLineSplit
@@ -122,48 +122,16 @@ abstract class Position : DumpableObject
                             : base.Combine(other);
         }
 
-        internal sealed class InnerRight : Position
+        internal sealed class RightBracketInner : Position
         {
-            internal InnerRight()
+            internal RightBracketInner()
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == Right ||
+                => other == RightBracketOuter ||
                     other == AfterListToken ||
                     other == AfterListTokenWithAdditionalLineBreak
                         ? this
-                        : base.Combine(other);
-        }
-
-        internal sealed class InnerWithAdditionalLineBreak : Position
-        {
-            internal InnerWithAdditionalLineBreak()
-                : base(lineBreaks: Flag.LineBreaks.Extended, anchorIndent: Flag.AnchorIndent.True) { }
-
-            protected override Position Combine(Position other)
-                => other == InnerRight? other : base.Combine(other);
-        }
-
-        internal sealed class InnerWithIndent : Position
-        {
-            internal InnerWithIndent()
-                : base(lineBreaks: Flag.LineBreaks.Simple, anchorIndent: Flag.AnchorIndent.True
-                    , indent: Flag.Indent.True) { }
-
-            protected override Position Combine(Position other)
-                => other == Right? this : base.Combine(other);
-        }
-
-        internal sealed class Inner : Position
-        {
-            internal Inner()
-                : base(lineBreaks: Flag.LineBreaks.Simple, anchorIndent: Flag.AnchorIndent.True) { }
-
-            protected override Position Combine(Position other)
-                => other == InnerRight
-                    ? other
-                    : other == Right
-                        ? LineBreak
                         : base.Combine(other);
         }
 
@@ -180,13 +148,22 @@ abstract class Position : DumpableObject
             protected override Position Combine(Position other) => this;
         }
 
+        internal sealed class LeftCouplingWithIndent : Position
+        {
+            internal LeftCouplingWithIndent()
+                : base(lineBreaks: Flag.LineBreaks.Simple, indent: Flag.Indent.True) { }
+
+            protected override Position Combine(Position other)
+                => other == RightBracketOuter? this : base.Combine(other);
+        }
+
         internal sealed class LeftCoupling : Position
         {
             internal LeftCoupling()
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == Right? this : base.Combine(other);
+                => other == RightBracketOuter? this : base.Combine(other);
         }
 
         internal sealed class RightCoupling : Position
@@ -194,7 +171,19 @@ abstract class Position : DumpableObject
             internal RightCoupling()
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
-            protected override Position Combine(Position other) => other == Left? this : base.Combine(other);
+            protected override Position Combine(Position other)
+                => other == LeftBracketOuter? this : base.Combine(other);
+        }
+
+        internal sealed class AfterColonTokenWithIndentAll : Position
+        {
+            internal AfterColonTokenWithIndentAll()
+                : base(lineBreaks: Flag.LineBreaks.Simple
+                    , indent: Flag.Indent.True
+                    , anchorIndent: Flag.AnchorIndent.True) { }
+
+            protected override Position Combine(Position other)
+                => other == Function? other : base.Combine(other);
         }
 
         internal sealed class Simple : Position
@@ -222,15 +211,11 @@ abstract class Position : DumpableObject
         = new Classes.AfterListTokenWithAdditionalLineBreak();
 
     internal static readonly Position AfterColonToken = new Classes.AfterColonToken();
-    internal static readonly Position Left = new Classes.Left();
-    internal static readonly Position InnerLeft = new Classes.InnerLeft();
-    internal static readonly Position Inner = new Classes.Inner();
 
-    internal static readonly Position InnerWithAdditionalLineBreak
-        = new Classes.InnerWithAdditionalLineBreak();
-
-    internal static readonly Position InnerRight = new Classes.InnerRight();
-    internal static readonly Position Right = new Classes.Simple("Right");
+    internal static readonly Position LeftBracketOuter = new Classes.LeftBracketOuter();
+    internal static readonly Position LeftBracketInner = new Classes.LeftBracketInner();
+    internal static readonly Position RightBracketInner = new Classes.RightBracketInner();
+    internal static readonly Position RightBracketOuter = new Classes.Simple("RightBracketOuter");
 
     internal static readonly Dictionary<bool, Position> End
         = new()
@@ -244,10 +229,7 @@ abstract class Position : DumpableObject
     internal static readonly Position LeftCoupling = new Classes.LeftCoupling();
     internal static readonly Position RightCoupling = new Classes.RightCoupling();
 
-    static readonly Position LeftCouplingWithIndent
-        = new Classes.Simple("LeftCouplingWithIndent", indent: Flag.Indent.True, lineBreaks: Flag.LineBreaks.Simple);
-
-    static readonly Position InnerWithIndent = new Classes.InnerWithIndent();
+    static readonly Position LeftCouplingWithIndent = new Classes.LeftCouplingWithIndent();
 
     static readonly Position LineBreakAndIndentAndForceLineBreak
         = new Classes.Simple("LineBreakAndIndentAndForceLineBreak"
@@ -259,6 +241,7 @@ abstract class Position : DumpableObject
         = new Classes.Simple("LineBreakAndIndent", Flag.LineBreaks.Simple, Flag.Indent.True);
 
     static readonly Position LeftAfterColonToken = new Classes.Simple("LeftAfterColonToken", Flag.LineBreaks.Simple);
+    static readonly Position AfterColonTokenWithIndentAll = new Classes.AfterColonTokenWithIndentAll();
 
     static readonly Position InnerLeftWithIndentAllAndForceLineSplit
         = new Classes.Simple("InnerLeftWithIndentAllAndForceLineSplit"

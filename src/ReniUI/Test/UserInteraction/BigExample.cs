@@ -11,7 +11,7 @@ public sealed class BigExample : DependenceProvider
     const string Text = @"# System definitions
 
 #(doc
-Basic things, 
+Basic things,
 text class, ...
 doc)#
 
@@ -35,8 +35,8 @@ system:
     {
         ! public result:
         (
-            ((^ elementType) * 1) 
-            array_reference 
+            ((^ elementType) * 1)
+            array_reference
             mutable
         )
         instance(systemdata FreePointer enable_reinterpretation).
@@ -48,7 +48,7 @@ system:
         repeat
         (
             while: @ position < count,
-  
+
             body: @
             (
                 result(position) := initializer(position),
@@ -56,8 +56,8 @@ system:
             )
         ).
 
-        systemdata FreePointer 
-            := 
+        systemdata FreePointer
+            :=
             (systemdata FreePointer type)
                 instance((result + count) mutable enable_reinterpretation)
     }
@@ -66,7 +66,7 @@ system:
 
 Text: @
 {
-    value: ^.  
+    value: ^.
 
     !public result:
     {
@@ -74,12 +74,12 @@ Text: @
         this: @! ^^.
         !public count: ^ count.
 
-        !public data: 
-             system 
+        !public data:
+             system
                  NewMemory
                  (
                      elementType: value(0) type.
-                     count: value count^^^.
+                     count: value count.
                      initializer: @ value(^)
                  ).
 
@@ -107,7 +107,7 @@ Text: @
                other: ^;
                count: this count + other count;
 
-               !mix_in: @ 
+               !mix_in: @
                     ^ < this count
                     then this data(^ enable_cut)
                     else other data((^ - this count)enable_cut);
@@ -120,7 +120,7 @@ result
     const string Expected = @"# System definitions
 
 #(doc
-Basic things, 
+Basic things,
 text class, ...
 doc)#
 
@@ -142,14 +142,14 @@ system:
 
     !public NewMemory: @
         {
-            ! public result:
-            (
-                ((^ elementType) * 1) 
-                array_reference 
-                mutable
-            )
-            instance(systemdata FreePointer enable_reinterpretation).
-            
+            !public result:
+                (
+                    ((^ elementType) * 1)
+                    array_reference
+                    mutable
+                )
+                instance(systemdata FreePointer enable_reinterpretation).
+
             initializer: ^ initializer.
             count: ^ count.
             !mutable position: count type instance(0).
@@ -157,7 +157,7 @@ system:
             repeat
             (
                 while: @ position < count,
-  
+
                 body: @
                 (
                     result(position) := initializer(position),
@@ -165,9 +165,9 @@ system:
                 )
             ).
 
-            systemdata 
-            FreePointer 
-            := 
+            systemdata
+            FreePointer
+            :=
                 (systemdata FreePointer type)
                 instance((result + count) mutable enable_reinterpretation)
         }
@@ -176,7 +176,7 @@ system:
 
 Text: @
     {
-        value: ^.  
+        value: ^.
 
         !public result:
         {
@@ -184,12 +184,12 @@ Text: @
             this: @! ^^.
             !public count: ^ count.
 
-            !public data: 
-                system 
+            !public data:
+                system
                 NewMemory
                 (
                     elementType: value(0) type.
-                    count: value count^^^.
+                    count: value count.
                     initializer: @ value(^)
                 ).
 
@@ -212,16 +212,16 @@ Text: @
             !public << : @ concat(count: ^ count, data: ^).
 
             concat: @
-               Text
-               (
-                   other: ^;
-                   count: this count + other count;
+                Text
+                (
+                    other: ^;
+                    count: this count + other count;
 
-                   !mix_in: @ 
+                    !mix_in: @
                         ^ < this count
                         then this data(^ enable_cut)
-                        else other data((^ - this count)enable_cut);
-               )
+                        else other data((^ - this count) enable_cut);
+                )
         }
     }
     result

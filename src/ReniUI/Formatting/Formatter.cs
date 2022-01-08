@@ -41,7 +41,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             if(!item.IsLineSplitRight)
                 return;
             item.RightNeighbor.SetPosition(Position.RightCoupling);
-            if(item.Right.IsLineSplit)
+            if(item.Right.IsLineSplit && item.Right.FlatItem.TokenClass is IRightBracket)
                 return;
             item.Right.SetPosition(Position.IndentAll);
         }
@@ -60,8 +60,10 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         }
     }
 
-    abstract class FlatCompound : Formatter
+    sealed class FlatCompound : Formatter
     {
+        internal static readonly Formatter Instance = new FlatCompound();
+
         protected override void SetupPositions(BinaryTreeProxy[] list)
         {
             if(!list.Any())
@@ -119,20 +121,12 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         {
             var target = targets.Single();
             target.RightNeighbor.SetPosition(Position.AfterColonToken);
+            if(target.Right.FlatItem.TokenClass is not IRightBracket)
+                target.Right.SetPosition(Position.IndentAll);
 
             if(target.Left.IsLineSplit)
                 NotImplementedMethod(target.Left);
         }
-    }
-
-    sealed class FlatChildCompound : FlatCompound
-    {
-        internal static readonly Formatter Instance = new FlatChildCompound();
-    }
-
-    sealed class FlatRootCompound : FlatCompound
-    {
-        internal static readonly Formatter Instance = new FlatRootCompound();
     }
 
     sealed class RootCompoundWithCleanup : CompoundWithCleanup
@@ -182,6 +176,8 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
 
             target.SetPosition(Position.Function);
             target.RightNeighbor.SetPosition(Position.LineBreak);
+            if(target.Right.FlatItem.TokenClass is not IRightBracket)
+                target.Right.SetPosition(Position.IndentAll);
         }
     }
 
@@ -192,11 +188,11 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
             var target = targets.First();
-            target.SetPosition(Position.Left);
+            target.SetPosition(Position.LeftBracketOuter);
             if(target.Right == null)
                 return;
 
-            target.RightNeighbor.SetPosition(Position.InnerLeft);
+            target.RightNeighbor.SetPosition(Position.LeftBracketInner);
             target.Right.SetPosition(Position.IndentAllAndForceLineSplit);
         }
     }
@@ -233,13 +229,13 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             return;
         }
 
-        left.First().SetPosition(Position.Left);
-        left.Last().RightNeighbor.SetPosition(Position.InnerLeft);
+        left.First().SetPosition(Position.LeftBracketOuter);
+        left.Last().RightNeighbor.SetPosition(Position.LeftBracketInner);
         left.Last().Right.SetPosition(Position.IndentAll);
         (!configuration.LineBreaksBeforeListToken).Assert();
 
-        right.First().SetPosition(Position.InnerRight);
-        right.Last().RightNeighbor.SetPosition(Position.Right);
+        right.First().SetPosition(Position.RightBracketInner);
+        right.Last().RightNeighbor.SetPosition(Position.RightBracketOuter);
     }
 
     static(BinaryTreeProxy[], BinaryTreeProxy[], BinaryTreeProxy[]) SplitFrame(BinaryTreeProxy target)
@@ -304,14 +300,11 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         => flatItem?.Anchor?.Items?.FirstOrDefault()?.TokenClass is LeftParenthesis;
 
     static Formatter CreateCompound(CompoundSyntax compound)
-    {
-        if(compound.Anchor.Items.FirstOrDefault()?.TokenClass is BeginOfText)
-            return compound.CleanupSection == null
-                ? FlatRootCompound.Instance
-                : RootCompoundWithCleanup.Instance;
-
-        return compound.CleanupSection == null? FlatChildCompound.Instance : ChildCompoundWithCleanup.Instance;
-    }
+        => compound.CleanupSection == null
+            ? FlatCompound.Instance
+            : compound.Anchor.Items.FirstOrDefault()?.TokenClass is BeginOfText
+                ? RootCompoundWithCleanup.Instance
+                : ChildCompoundWithCleanup.Instance;
 
     internal static void SetFormatters(BinaryTree target)
     {

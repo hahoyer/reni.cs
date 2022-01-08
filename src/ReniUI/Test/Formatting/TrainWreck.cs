@@ -142,4 +142,32 @@ result
 )";
         text.SimpleFormattingTest();
     }
+
+    [UnitTest]
+    public void WithOperator()
+    {
+        const string text = @"(
+    systemdata
+    FreePointer
+    :=
+        (systemdata FreePointer type)
+        instance((result + count) mutable enable_reinterpretation)
+)";
+        text.SimpleFormattingTest();
+    }
+
+    [UnitTest]
+    public void EnoughIndent()
+    {
+        const string text = @"(
+    first.
+
+    !public data:
+        system
+        NewMemory
+        (
+        ).
+)";
+        text.SimpleFormattingTest();
+    }
 }
