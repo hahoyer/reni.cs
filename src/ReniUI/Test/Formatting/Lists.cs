@@ -168,7 +168,7 @@ ccccc";
     ccccc,
 
     aaaaa
-        bbbbb,
+    bbbbb,
 )".Replace("\r\n", "\n");
 
             text.SimpleFormattingTest(expectedText, 10, 1);
@@ -185,7 +185,7 @@ ccccc";
     ccccc,
 
     aaaaa
-        bbbbb
+    bbbbb
 )".Replace("\r\n", "\n");
 
             text.SimpleFormattingTest(expectedText, 10, 1);

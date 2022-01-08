@@ -33,6 +33,18 @@ else bbbbbbb", 10);
 
     [UnitTest]
     [Test]
+    public void ThenElseWithLineBreakAndBrackets()
+    {
+        const string text = @"(ccccccc then aaaaaa else bbbbbbb)";
+        text.SimpleFormattingTest(@"(
+    ccccccc
+    then aaaaaa
+    else bbbbbbb
+)", 10);
+    }
+
+    [UnitTest]
+    [Test]
     public void ThenWithLineBreak()
     {
         const string text = @"ccccccc then aaaaaa ";

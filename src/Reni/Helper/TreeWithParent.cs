@@ -29,7 +29,9 @@ abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.ICo
         get
         {
             var cachedItem = this.CachedItem(() => FlatItem.DirectChildCount.Select(CreateDirectChild).ToArray());
-            return IsInDump && !cachedItem.IsValid? null : cachedItem.Value;
+            return 
+                //IsInDump && !cachedItem.IsValid? null : 
+                    cachedItem.Value;
         }
     }
 

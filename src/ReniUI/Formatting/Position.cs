@@ -114,8 +114,10 @@ abstract class Position : DumpableObject
                 => other == Left
                     ? null
                     : other == IndentAllAndForceLineSplit
-                        ? InnerLeftSimple
-                        : base.Combine(other);
+                        ? InnerLeftWithIndentAllAndForceLineSplit
+                        : other == IndentAll
+                            ? InnerLeftWithIndentAll
+                            : base.Combine(other);
         }
 
         internal sealed class InnerRight : Position
@@ -176,6 +178,23 @@ abstract class Position : DumpableObject
             protected override Position Combine(Position other) => this;
         }
 
+        internal sealed class LeftCoupling : Position
+        {
+            internal LeftCoupling()
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
+
+            protected override Position Combine(Position other) 
+                => other == Right? this: base.Combine(other);
+        }
+
+        internal sealed class RightCoupling : Position
+        {
+            internal RightCoupling()
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
+
+            protected override Position Combine(Position other) => other == Left? this : base.Combine(other);
+        }
+
         internal sealed class Simple : Position
         {
             public Simple
@@ -233,11 +252,20 @@ abstract class Position : DumpableObject
 
     static readonly Position LeftAfterColonToken = new Classes.Simple("LeftAfterColonToken", Flag.LineBreaks.Simple);
 
-    static readonly Position InnerLeftSimple
-        = new Classes.Simple("InnerLeftSimple"
+    static readonly Position InnerLeftWithIndentAllAndForceLineSplit
+        = new Classes.Simple("InnerLeftWithIndentAllAndForceLineSplit"
             , Flag.LineBreaks.Simple
             , Flag.Indent.True
             , forceLineBreak: Flag.ForceLineBreak.True);
+
+    static readonly Position InnerLeftWithIndentAll
+        = new Classes.Simple("InnerLeftWithIndentAll"
+            , Flag.LineBreaks.Simple
+            , Flag.Indent.True);
+
+    internal static readonly Position LeftCoupling = new Classes.LeftCoupling();
+    internal static readonly Position RightCoupling = new Classes.RightCoupling();
+
 
     static int NextObjectId;
 
@@ -274,7 +302,7 @@ abstract class Position : DumpableObject
     }
 
     protected override string GetNodeDump()
-        => $"{Tag}({LineBreaks}" +
+        => $"{Tag}({LineBreaks:d}" +
             $"{(ForceLineBreak == default? "" : "!")}" +
             $"{(Indent == default? "" : ">")}{(AnchorIndent == default? "" : "-")})";
 

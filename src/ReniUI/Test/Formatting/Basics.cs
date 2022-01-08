@@ -13,7 +13,7 @@ namespace ReniUI.Test.Formatting
         public void BreakLine()
         {
             @"aaaaa bbbbb".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
-    bbbbb");
+bbbbb");
         }
 
         [Test]
@@ -35,8 +35,8 @@ namespace ReniUI.Test.Formatting
         public void BreakLine3()
         {
             @"aaaaa bbbbb ccccc".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
-    bbbbb
-    ccccc");
+bbbbb
+ccccc");
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace ReniUI.Test.Formatting
             @"aaaaa 
 
 bbbbb".SimpleFormattingTest(@"aaaaa
-    bbbbb",
+bbbbb",
                 emptyLineLimit: 1);
         }
 
@@ -70,7 +70,7 @@ bbbbb".SimpleFormattingTest(@"aaaaa bbbbb",
 b";
 
             var expectedText = @"a
-    b"
+b"
                 .Replace("\r\n", "\n");
 
             text.SimpleFormattingTest(expectedText);

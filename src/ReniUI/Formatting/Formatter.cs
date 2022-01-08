@@ -54,7 +54,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 , target.Anchor.Items.FirstOrDefault(item => item.TokenClass is RightParenthesis)
             );
 
-        protected override void SetupPositions(BinaryTreeProxy target) => NotImplementedMethod(target);
+        protected override void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target);
 
         [DisableDump]
         internal bool IsIndentRequired => true;
@@ -77,7 +77,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 , target.Anchor.Items.FirstOrDefault(item => item.TokenClass is RightParenthesis)
             );
 
-        protected override void SetupPositions(BinaryTreeProxy target) => NotImplementedMethod(target);
+        protected override void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target);
 
         [DisableDump]
         internal bool IsIndentRequired => true;
@@ -139,6 +139,44 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             return result;
         }
 
+        protected override void SetupPositions(BinaryTreeProxy[] target)
+        {
+            var items = GetWagons(target.Single());
+            var isTop = true;
+            foreach(var item in items)
+            {
+                SetPositionForItem(item, isTop);
+                isTop = false;
+            }
+        }
+
+        static void SetPositionForItem(BinaryTreeProxy item, bool isTop)
+        {
+            if(!isTop)
+                item.SetPosition(Position.LeftCoupling);
+            if(item.Right == null)
+                return;
+            if(!item.IsLineSplitRight)
+                return;
+            item.RightNeighbor.SetPosition(Position.RightCoupling);
+            if(item.Right.IsLineSplit)
+                return;
+            item.Right.SetPosition(Position.IndentAll);
+        }
+
+        static BinaryTreeProxy[] GetWagons(BinaryTreeProxy target)
+            => target
+                .Chain(item => GetWagon(item, target == item))
+                .Reverse()
+                .ToArray();
+
+        static BinaryTreeProxy GetWagon(BinaryTreeProxy current, bool isTop)
+        {
+            if(isTop || current.FlatItem.Formatter == null)
+                return current.Left;
+            return null;
+        }
+
         static Syntax GetWagon(IItem flatItem, bool checkForBracketLevel)
         {
             if(checkForBracketLevel && HasBrackets(flatItem))
@@ -178,6 +216,52 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
 
     abstract class FlatCompound : Formatter
     {
+        protected override void SetupPositions(BinaryTreeProxy[] list)
+        {
+            if(!list.Any())
+                return;
+
+            var configuration = list.First().Configuration;
+            list.All(item => item.FlatItem.TokenClass is List).Assert();
+            var last = list.Last();
+            if(last.Right != null)
+                list = T(list, T(last.Right)).ConcatMany().ToArray();
+
+            (((CompoundSyntax)list.First().FlatItem.Syntax).Statements.Length == list.Length).Assert();
+
+            for(var index = 0; index < list.Length; index++)
+            {
+                var node = list[index];
+                var item = node.FlatItem.TokenClass is List? node.Left : node;
+
+                var hasAdditionalLineSplit
+                    = configuration.AdditionalLineBreaksForMultilineItems && item.IsLineSplit;
+
+                if(configuration.LineBreaksBeforeListToken)
+                    node.SetPosition(Position.BeforeToken);
+                else
+                {
+                    if(node.FlatItem.TokenClass is List)
+                    {
+                        var positionParent = hasAdditionalLineSplit
+                            ? Position.AfterListTokenWithAdditionalLineBreak
+                            : Position.AfterListToken;
+                        node.RightNeighbor.SetPosition(positionParent);
+                    }
+
+                    if(hasAdditionalLineSplit && index > 0)
+                    {
+                        var neighbor = list[index - 1].RightNeighbor;
+                        (neighbor.LineBreakBehaviour == Position.AfterListToken //
+                                ||
+                                neighbor.LineBreakBehaviour == Position.AfterListTokenWithAdditionalLineBreak)
+                            .Assert();
+                        neighbor.LineBreakBehaviour = Position.AfterListTokenWithAdditionalLineBreak;
+                    }
+                }
+            }
+        }
+
         protected internal override IEnumerable<Child> GetChildren(IItem target)
             => ((CompoundSyntax)target)
                 .Statements
@@ -215,62 +299,14 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
 
             yield return new(target.Anchor.Main, declarationSyntax.Value, Flag.HasAdditionalIndent.True);
         }
+
+        protected override void SetupPositions(BinaryTreeProxy[] target)
+            => target.Single().RightNeighbor.SetPosition(Position.AfterColonToken);
     }
 
     sealed class FlatChildCompound : FlatCompound
     {
         internal static readonly Formatter Instance = new FlatChildCompound();
-
-        protected override void SetupPositions(BinaryTreeProxy target)
-        {
-            var (left, list, right) = Split1N1(target);
-            (left.FlatItem.TokenClass is ILeftBracket).Assert();
-            (right.FlatItem.TokenClass is IRightBracket).Assert();
-            list.All(item=>item.FlatItem.TokenClass is List).Assert();
-            (((CompoundSyntax)target.FlatItem.Syntax).Statements.Length == list.Length).Assert();
-
-            left.SetPosition(Position.Left);
-            left.RightNeighbor.SetPosition(Position.InnerLeft);
-            left.RightNeighbor.SetPosition(Position.IndentAll);
-            (!target.Configuration.LineBreaksBeforeListToken).Assert();
-
-            var configuration = target.Configuration;
-
-            for(var index = 0; index < list.Length; index++)
-            {
-                var node = list[index];
-                var item = node.FlatItem.TokenClass == target.FlatItem.TokenClass? node.Left : node;
-
-                var hasAdditionalLineSplit
-                    = configuration.AdditionalLineBreaksForMultilineItems && item.IsLineSplit;
-
-                if(configuration.LineBreaksBeforeListToken)
-                    node.SetPosition(Position.BeforeToken);
-                else
-                {
-                    if(node.FlatItem.TokenClass == target.FlatItem.TokenClass)
-                    {
-                        var positionParent = hasAdditionalLineSplit
-                            ? Position.AfterListTokenWithAdditionalLineBreak
-                            : Position.AfterListToken;
-                        node.RightNeighbor.SetPosition(positionParent);
-                    }
-
-                    if(hasAdditionalLineSplit && index > 0)
-                    {
-                        var neighbor = list[index - 1].RightNeighbor;
-                        (neighbor.LineBreakBehaviour == Position.AfterListToken //
-                                ||
-                                neighbor.LineBreakBehaviour == Position.AfterListTokenWithAdditionalLineBreak)
-                            .Assert();
-                        neighbor.LineBreakBehaviour = Position.AfterListTokenWithAdditionalLineBreak;
-                    }
-                }
-            }
-
-            right.SetPosition(Position.InnerRight);
-            right.RightNeighbor.SetPosition(Position.Right);
-        }
     }
 
     sealed class FlatRootCompound : FlatCompound
@@ -279,15 +315,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
 
         internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
             => (target.Anchor.Items.First(), target.Anchor.Items.Last());
-
-        protected override void SetupPositions(BinaryTreeProxy target)
-        {
-            var (begin, end) = Split2(target);
-
-            begin.RightNeighbor.SetPosition(Position.Begin);
-            var hasLineBreak = target.Configuration.LineBreakAtEndOfText ?? target.FlatItem.WhiteSpaces.HasLineBreak;
-            end.SetPosition(Position.End[hasLineBreak]);
-        }
     }
 
     sealed class RootCompoundWithCleanup : CompoundWithCleanup
@@ -327,6 +354,19 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 children.Add(new(target.Anchor.Items[1], target.DirectChildren[2]));
             return children;
         }
+
+        protected override void SetupPositions(BinaryTreeProxy[] target)
+        {
+            foreach(var item in target)
+            {
+                item.SetPosition(Position.BeforeToken);
+                if(item.Right != null && item.Right.IsLineSplit)
+                {
+                    item.RightNeighbor.SetPosition(Position.LineBreak);
+                    item.Right.SetPosition(Position.IndentAll);
+                }
+            }
+        }
     }
 
     sealed class Function : Formatter
@@ -339,6 +379,40 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 yield return new(null, target.DirectChildren[0]);
 
             yield return new Child(target.Anchor.Items[0], target.DirectChildren[1]);
+        }
+
+        protected override void SetupPositions(BinaryTreeProxy[] targets)
+        {
+            var target = targets.Single();
+
+            if(target.Left != null)
+            {
+                NotImplementedMethod(target);
+                return;
+            }
+
+            if(!target.Right.IsLineSplit)
+                return;
+
+            target.SetPosition(Position.Function);
+            target.RightNeighbor.SetPosition(Position.LineBreak);
+        }
+    }
+
+    sealed class Issue : Formatter
+    {
+        internal static readonly Formatter Instance = new Issue();
+        protected internal override IEnumerable<Child> GetChildren(IItem target) => throw new NotImplementedException();
+
+        protected override void SetupPositions(BinaryTreeProxy[] targets)
+        {
+            var target = targets.First();
+            target.SetPosition(Position.Left);
+            if(target.Right == null)
+                return;
+
+            target.RightNeighbor.SetPosition(Position.InnerLeft);
+            target.Right.SetPosition(Position.IndentAllAndForceLineSplit);
         }
     }
 
@@ -365,28 +439,57 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         static Child GetChild(BinaryTree target) => new(target, null);
     }
 
-    void BinaryTree.IFormatter.SetupPositions(BinaryTree.IPositionTarget target)
-        => SetupPositions((BinaryTreeProxy)target);
+    void BinaryTree.IFormatter.SetupPositions(BinaryTree.IPositionTarget positionTarget)
+    {
+        var target = (BinaryTreeProxy)positionTarget;
+        var configuration = target.Configuration;
+        var (left, center, right) = SplitFrame(target);
+        SetupFramePositions(left, right);
+        SetupPositions(center);
+    }
 
     protected internal abstract IEnumerable<Child> GetChildren(IItem target);
 
     internal virtual(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target) => (default, default);
 
-    protected virtual void SetupPositions(BinaryTreeProxy target) => NotImplementedMethod(target);
+    protected virtual void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target, "", "");
 
-    static(BinaryTreeProxy, BinaryTreeProxy ) Split2(BinaryTreeProxy target)
+    static void SetupFramePositions(BinaryTreeProxy[] left, BinaryTreeProxy[] right)
     {
-        var anchors = target.FlatItem.Syntax.Anchor.Items.Select(target.Convert).ToArray();
-        (anchors.Length == 2).Assert();
-        return (anchors[0], anchors[1]);
+        if(!left.Any())
+            return;
+
+        var configuration = left.First().Configuration;
+        if(left.First().FlatItem.TokenClass is BeginOfText)
+        {
+            var begin = left.Single();
+            var end = right.Single();
+
+            begin.RightNeighbor.SetPosition(Position.Begin);
+            var hasLineBreak = configuration.LineBreakAtEndOfText ?? end.FlatItem.WhiteSpaces.HasLineBreak;
+            end.SetPosition(Position.End[hasLineBreak]);
+            return;
+        }
+
+        left.First().SetPosition(Position.Left);
+        left.Last().RightNeighbor.SetPosition(Position.InnerLeft);
+        left.Last().Right.SetPosition(Position.IndentAll);
+        (!configuration.LineBreaksBeforeListToken).Assert();
+
+        right.First().SetPosition(Position.InnerRight);
+        right.Last().RightNeighbor.SetPosition(Position.Right);
     }
 
-    static(BinaryTreeProxy, BinaryTreeProxy[], BinaryTreeProxy ) Split1N1(BinaryTreeProxy target)
+    static(BinaryTreeProxy[], BinaryTreeProxy[], BinaryTreeProxy[]) SplitFrame(BinaryTreeProxy target)
     {
         var anchors = target.FlatItem.Syntax.Anchor.Items.Select(target.Convert).ToArray();
-        (anchors.Length >= 2).Assert();
+        var left = anchors.TakeWhile(item => item.FlatItem.TokenClass is ILeftBracket).ToArray();
+        var center = anchors.Skip(left.Length).Take(anchors.Length - 2 * left.Length).ToArray();
+        var right = anchors.Skip(left.Length + center.Length).ToArray();
+        center.All(item => item.FlatItem.TokenClass is not ILeftBracket or IRightBracket).Assert();
+        right.All(item => item.FlatItem.TokenClass is IRightBracket).Assert();
 
-        return (anchors[0], anchors.Skip(1).Take(anchors.Length - 2).ToArray(), anchors.Last());
+        return (left, center, right);
     }
 
     static Formatter Create([NotNull] BinaryTree target)
@@ -397,25 +500,25 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         if(target != syntax.MainAnchor)
             return null;
 
+        if(target.Left == null && target.Right == null)
+            return null;
+
+        if(target.TokenClass is IssueTokenClass)
+            return Issue.Instance;
+
         switch(syntax)
         {
             case CompoundSyntax compound:
                 return CreateCompound(compound);
-            case ExpressionSyntax { Left: null, Right: null }:
-            case InfixSyntax { Left: null, Right: null }:
-            case PrefixSyntax { Right: null }:
-            case SuffixSyntax { Left: null }:
-            case TerminalSyntax:
-            case DeclarerSyntax.NameSyntax:
-            case DeclarerSyntax.TagSyntax:
-            case EmptyList:
-                return Terminal.Instance;
 
             case ExpressionSyntax:
             case InfixSyntax:
             case PrefixSyntax:
             case SuffixSyntax:
-                return TrainWreck.Instance;
+            case TerminalSyntax:
+                return !HasBrackets(syntax) && target.Parent.Formatter == TrainWreck.Instance
+                    ? null
+                    : TrainWreck.Instance;
             case DeclarationSyntax:
                 return Declaration.Instance;
             case CondSyntax:
@@ -424,7 +527,8 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 return Function.Instance;
             case DeclarerSyntax.IssueSyntax:
                 return DeclarerIssue.Instance;
-
+            case EmptyList:
+                return null;
             default:
                 NotImplementedFunction(syntax);
                 return default;

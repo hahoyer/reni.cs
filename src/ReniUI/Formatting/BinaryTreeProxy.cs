@@ -44,18 +44,52 @@ sealed class BinaryTreeProxy
 
     [EnableDump(Order = -3)]
     string MainPosition
-        => FlatItem.SourcePart.GetDumpAroundCurrent() + " " + FlatItem.TokenClass.GetType().PrettyName();
+        => FlatItem.SourcePart.GetDumpAroundCurrent() +
+            " " +
+            FlatItem.TokenClass.GetType().PrettyName() +
+            (FlatItem.Formatter == default? "": " " + FlatItem.Formatter.GetType().Name);
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
-    internal bool IsLineSplit => GetIsLineSplit(FlatItem, Configuration, ForceLineSplit);
+    internal bool IsLineSplit => GetIsLineSplit();
+
+    [EnableDump(Order = 3.1)]
+    [EnableDumpExcept(false)]
+    internal bool IsLineSplitRight
+    {
+        get
+        {
+            if(!IsLineSplit)
+                return false;
+
+            if(Right == null)
+                return false;
+
+            if(Right.FlatItem == null)
+            {
+                IsInDump.Assert();
+                return false;
+            }
+            var flatLength = Right.FlatLength;
+            if(flatLength == null)
+                return true;
+            
+            var maxLength = Configuration.MaxLineLength;
+            if(maxLength == null)
+                return false;
+            if(FlatItem.Token.Length + flatLength > maxLength.Value)
+                return true;
+            else
+                return false;
+        }
+    }
 
     [EnableDump(Order = 3.1)]
     [EnableDumpExcept(false)]
     bool ForceLineSplit => LineBreakBehaviour != null && LineBreakBehaviour.ForceLineBreak != default;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    bool HasAlreadyLineBreakOrIsTooLong => GetHasAlreadyLineBreakOrIsTooLong(FlatItem, Configuration);
+    bool HasAlreadyLineBreakOrIsTooLong => GetHasAlreadyLineBreakOrIsTooLong();
 
     [DisableDump]
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -80,7 +114,7 @@ sealed class BinaryTreeProxy
 
     [EnableDump(Order = 5)]
     [EnableDumpExcept(null)]
-    BinaryTreeProxy Right => DirectChildren == null? YetUnknown : DirectChildren[1];
+    internal BinaryTreeProxy Right => DirectChildren == null? YetUnknown : DirectChildren[1];
 
     ISourcePartEdit[] AnchorEdits
         => FlatItem
@@ -92,20 +126,22 @@ sealed class BinaryTreeProxy
 
     int LineBreakCount => (int)(LineBreakBehaviour?.LineBreaks ?? Position.Flag.LineBreaks.False);
 
-    static bool GetIsLineSplit(BinaryTree binaryTree, Configuration configuration, bool forceLineSplit)
+    bool GetIsLineSplit()
     {
-        if(binaryTree.TokenClass is ILeftBracket)
-            return GetIsLineSplit(binaryTree.Parent, configuration, false);
-        return GetHasAlreadyLineBreakOrIsTooLong(binaryTree, configuration) || forceLineSplit;
+        if(FlatItem.TokenClass is ILeftBracket)
+            return Parent.IsLineSplit;
+        return HasAlreadyLineBreakOrIsTooLong || ForceLineSplit;
     }
 
-    static bool GetHasAlreadyLineBreakOrIsTooLong(BinaryTree binaryTree, Configuration configuration)
+    bool GetHasAlreadyLineBreakOrIsTooLong()
     {
-        if(binaryTree == null)
+        if(FlatItem == null)
             return false;
-        var lineLength = binaryTree.GetFlatLength(configuration.EmptyLineLimit != 0);
-        return lineLength == null || lineLength > configuration.MaxLineLength;
+        var lineLength = FlatLength;
+        return lineLength == null || lineLength > Configuration.MaxLineLength;
     }
+
+    int? FlatLength => FlatItem.GetFlatLength(Configuration.EmptyLineLimit != 0);
 
     internal void SetPosition(Position position)
         => LineBreakBehaviour += position;

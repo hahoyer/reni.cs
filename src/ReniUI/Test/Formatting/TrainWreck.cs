@@ -25,7 +25,7 @@ result
     first.
 
     system
-        NewMemory.
+    NewMemory.
 
     second.
 }";
@@ -39,8 +39,8 @@ result
     first.
 
     system
-        NewMemory
-        Attribute.
+    NewMemory
+    Attribute.
 
     second.
 }";
@@ -54,11 +54,81 @@ result
     first.
 
     (system parameters)
-        NewMemory.
+    NewMemory.
 
     second.
 }";
         text.SimpleFormattingTest();
     }
 
+    [UnitTest]
+    public void ShortCargo()
+    {
+        const string text = @"{
+    first.
+
+    (system parameters)
+    NewMemory(cargo, 12)
+    Attribute.
+
+    second.
+}";
+        text.SimpleFormattingTest();
+    }
+
+    [UnitTest]
+    public void MediumCargo()
+    {
+        const string text = @"{
+    first.
+
+    (system parameters)
+    NewMemory(cargo,cargo)
+    Attribute.
+
+    second.
+}";
+        const string expected = @"{
+    first.
+
+    (system parameters)
+    NewMemory
+        (cargo, cargo)
+    Attribute.
+
+    second.
+}";
+
+        text.SimpleFormattingTest(expected, 20);
+    }
+
+    [UnitTest]
+    public void LongCargo()
+    {
+        const string text = @"{
+    first.
+
+    (system parameters)
+    NewMemory(cargo, 
+12)
+    Attribute.
+
+    second.
+}";
+        const string expected = @"{
+    first.
+
+    (system parameters)
+    NewMemory
+    (
+        cargo,
+        12
+    )
+    Attribute.
+
+    second.
+}";
+
+        text.SimpleFormattingTest(expected);
+    }
 }

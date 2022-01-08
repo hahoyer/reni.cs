@@ -5,59 +5,55 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Parser;
 
-namespace Reni.TokenClasses.Whitespace
+namespace Reni.TokenClasses.Whitespace;
+
+sealed class LineGroup : DumpableObject
 {
-    class LineGroup : DumpableObject
+    internal interface IConfiguration
     {
-        internal interface IConfiguration
-        {
-            int? EmptyLineLimit { get; }
-            SeparatorRequests SeparatorRequests { get; }
-            int MinimalLineBreakCount { get; }
-        }
+        int? EmptyLineLimit { get; }
+        SeparatorRequests SeparatorRequests { get; }
+        int MinimalLineBreakCount { get; }
+    }
 
-        [EnableDump]
-        internal readonly SourcePart SourcePart;
+    [EnableDump]
+    internal readonly SourcePart SourcePart;
 
-        [EnableDump]
-        internal readonly WhiteSpaceItem Main;
+    [EnableDump]
+    internal readonly WhiteSpaceItem Main;
 
-        internal readonly IConfiguration Configuration;
+    [EnableDump]
+    readonly int Spaces;
 
-        [EnableDump]
-        readonly int Spaces;
+    internal LineGroup(IEnumerable<WhiteSpaceItem> allItems)
+    {
+        var groups = allItems
+            .GroupBy(TailCondition)
+            .ToDictionary(item => item.Key, item => item.ToArray());
 
-        internal LineGroup(IEnumerable<WhiteSpaceItem> allItems, IConfiguration configuration)
-        {
-            Configuration = configuration;
-            var groups = allItems
-                .GroupBy(TailCondition)
-                .ToDictionary(item => item.Key, item => item.ToArray());
+        groups.TryGetValue(false, out var items);
+        groups.TryGetValue(true, out var tails);
 
-            groups.TryGetValue(false, out var items);
-            groups.TryGetValue(true, out var tails);
+        Main = tails.AssertNotNull().Single();
 
-            Main = tails.AssertNotNull().Single();
+        Spaces = items?.Length ?? 0;
+        SourcePart = allItems.Select(item => item.SourcePart).Combine();
+    }
 
-            Spaces = items?.Length ?? 0;
-            SourcePart = allItems.Select(item => item.SourcePart).Combine();
-        }
+    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
-        protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
+    internal static(LineGroup[], WhiteSpaceItem[]) Create(WhiteSpaceItem[] items, IConfiguration configuration)
+    {
+        var groups = items.SplitAndTail(TailCondition);
+        return (groups.Items.Select(items => new LineGroup(items)).ToArray()
+            , (groups.Tail));
+    }
 
-        internal static(LineGroup[], WhiteSpaceItem[]) Create(WhiteSpaceItem[] items, IConfiguration configuration)
-        {
-            var groups = items.SplitAndTail(TailCondition);
-            return (groups.Items.Select(items => new LineGroup(items, configuration)).ToArray()
-                , (groups.Tail));
-        }
+    internal static bool TailCondition(WhiteSpaceItem item) => item.Type is IVolatileLineBreak;
 
-        internal static bool TailCondition(WhiteSpaceItem item) => item.Type is IVolatileLineBreak;
-
-        internal IEnumerable<Edit> GetEdits()
-        {
-            if(Spaces > 0)
-                yield return new(Main.SourcePart.Start.Span(-Spaces), "", "-spaces");
-        }
+    internal IEnumerable<Edit> GetEdits()
+    {
+        if(Spaces > 0)
+            yield return new(Main.SourcePart.Start.Span(-Spaces), "", "-spaces");
     }
 }
