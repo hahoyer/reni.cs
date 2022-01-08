@@ -168,6 +168,7 @@
     <Compile Include="hw\Helper\TextPart.cs" />
     <Compile Include="hw\Helper\TypeLibrary.cs" />
     <Compile Include="hw\Helper\TypeNameExtender.cs" />
+    <Compile Include="hw\Helper\UtilDiff.cs" />
     <Compile Include="hw\Helper\ValueCache.cs" />
     <Compile Include="hw\Helper\ValueCacheExtension.cs" />
     <Compile Include="hw\Parser\BelongsToAttribute.cs" />
