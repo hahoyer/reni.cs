@@ -91,12 +91,12 @@ repeat: @
     !mutable FreePointer: Memory array_reference mutable;
 
     repeat: @
-    ^ while()
-    then
-    (
-        ^ body(),
-        repeat(^)
-    );
+        ^ while()
+        then
+        (
+            ^ body(),
+            repeat(^)
+        );
 };
 
 1 = 1 then 2 else 4;
