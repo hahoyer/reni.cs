@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
 
@@ -6,12 +7,21 @@ namespace ReniUI.Formatting;
 
 abstract class Position : DumpableObject
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    internal static class Flag
+    {
+        internal enum AnchorIndent { False, True }
+        internal enum ForceLineBreak { False, True }
+        internal enum Indent { False, True }
+        internal enum LineBreaks { False = 0, Simple = 1, Extended = 2 }
+    }
+
     static class Classes
     {
         internal sealed class LineBreak : Position
         {
             internal LineBreak()
-                : base(hasLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
                 => other == Left
@@ -24,7 +34,7 @@ abstract class Position : DumpableObject
         internal sealed class IndentAll : Position
         {
             internal IndentAll()
-                : base(indent: true) { }
+                : base(indent: Flag.Indent.True) { }
 
             protected override Position Combine(Position other)
                 => other == BeforeToken
@@ -39,7 +49,7 @@ abstract class Position : DumpableObject
         internal sealed class IndentAllAndForceLineSplit : Position
         {
             internal IndentAllAndForceLineSplit()
-                : base(indent: true, forceLineBreak: true) { }
+                : base(indent: Flag.Indent.True, forceLineBreak: Flag.ForceLineBreak.True) { }
 
             protected override Position Combine(Position other)
                 => other == BeforeToken
@@ -52,7 +62,7 @@ abstract class Position : DumpableObject
         internal sealed class BeforeToken : Position
         {
             internal BeforeToken()
-                : base(hasLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
                 => other == Right? this : base.Combine(other);
@@ -61,7 +71,7 @@ abstract class Position : DumpableObject
         internal sealed class AfterListToken : Position
         {
             internal AfterListToken()
-                : base(hasLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
                 => other == Left? this : base.Combine(other);
@@ -70,7 +80,7 @@ abstract class Position : DumpableObject
         internal sealed class AfterListTokenWithAdditionalLineBreak : Position
         {
             internal AfterListTokenWithAdditionalLineBreak()
-                : base(hasLineBreak: true, hasAdditionalLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Extended) { }
 
             protected override Position Combine(Position other)
                 => other == Left? this : base.Combine(other);
@@ -79,7 +89,7 @@ abstract class Position : DumpableObject
         internal sealed class AfterColonToken : Position
         {
             internal AfterColonToken()
-                : base(hasLineBreak: true, anchorIndent: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple, anchorIndent: Flag.AnchorIndent.True) { }
 
             protected override Position Combine(Position other)
                 => other == Left
@@ -98,7 +108,7 @@ abstract class Position : DumpableObject
         internal sealed class InnerLeft : Position
         {
             internal InnerLeft()
-                : base(hasLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
                 => other == Left
@@ -111,7 +121,7 @@ abstract class Position : DumpableObject
         internal sealed class InnerRight : Position
         {
             internal InnerRight()
-                : base(hasLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
                 => other == Right ||
@@ -124,7 +134,7 @@ abstract class Position : DumpableObject
         internal sealed class InnerWithAdditionalLineBreak : Position
         {
             internal InnerWithAdditionalLineBreak()
-                : base(hasLineBreak: true, anchorIndent: true, hasAdditionalLineBreak: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Extended, anchorIndent: Flag.AnchorIndent.True) { }
 
             protected override Position Combine(Position other)
                 => other == InnerRight? other : base.Combine(other);
@@ -133,7 +143,8 @@ abstract class Position : DumpableObject
         internal sealed class InnerWithIndent : Position
         {
             internal InnerWithIndent()
-                : base(hasLineBreak: true, anchorIndent: true, indent: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple, anchorIndent: Flag.AnchorIndent.True
+                    , indent: Flag.Indent.True) { }
 
             protected override Position Combine(Position other)
                 => other == Right? this : base.Combine(other);
@@ -142,12 +153,14 @@ abstract class Position : DumpableObject
         internal sealed class Inner : Position
         {
             internal Inner()
-                : base(hasLineBreak: true, anchorIndent: true) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple, anchorIndent: Flag.AnchorIndent.True) { }
 
             protected override Position Combine(Position other)
-                => other == InnerRight? other 
-                    :other == Right? LineBreak
-                    : base.Combine(other);
+                => other == InnerRight
+                    ? other
+                    : other == Right
+                        ? LineBreak
+                        : base.Combine(other);
         }
 
         internal sealed class Begin : Position
@@ -157,8 +170,8 @@ abstract class Position : DumpableObject
 
         internal sealed class End : Position
         {
-            internal End(bool hasLineBreak)
-                : base(hasLineBreak: hasLineBreak) { }
+            internal End(Flag.LineBreaks lineBreaks)
+                : base(lineBreaks: lineBreaks) { }
 
             protected override Position Combine(Position other) => this;
         }
@@ -168,13 +181,12 @@ abstract class Position : DumpableObject
             public Simple
             (
                 string tag,
-                bool hasLineBreak = false
-                , bool indent = false
-                , bool anchorIndent = false
-                , bool forceLineBreak = false
-                , bool hasAdditionalLineBreak = false
+                Flag.LineBreaks lineBreaks = default
+                , Flag.Indent indent = default
+                , Flag.AnchorIndent anchorIndent = default
+                , Flag.ForceLineBreak forceLineBreak = default
             )
-                : base(tag, hasLineBreak, indent, anchorIndent, forceLineBreak, hasAdditionalLineBreak) { }
+                : base(tag, lineBreaks, indent, anchorIndent, forceLineBreak) { }
         }
     }
 
@@ -202,8 +214,8 @@ abstract class Position : DumpableObject
     internal static readonly Dictionary<bool, Position> End
         = new()
         {
-            [true] = new Classes.End(true)
-            , [false] = new Classes.End(false)
+            [true] = new Classes.End(Flag.LineBreaks.Simple)
+            , [false] = new Classes.End(Flag.LineBreaks.False)
         };
 
     internal static readonly Position Function = new Classes.Simple("Function");
@@ -211,42 +223,48 @@ abstract class Position : DumpableObject
     static readonly Position InnerWithIndent = new Classes.InnerWithIndent();
 
     static readonly Position LineBreakAndIndentAndForceLineBreak
-        = new Classes.Simple("LineBreakAndIndentAndForceLineBreak", true, true, forceLineBreak: true);
+        = new Classes.Simple("LineBreakAndIndentAndForceLineBreak"
+            , Flag.LineBreaks.Simple
+            , Flag.Indent.True
+            , forceLineBreak: Flag.ForceLineBreak.True);
 
-    static readonly Position LineBreakAndIndent = new Classes.Simple("LineBreakAndIndent", true, true);
-    static readonly Position LeftAfterColonToken = new Classes.Simple("LeftAfterColonToken", true);
+    static readonly Position LineBreakAndIndent
+        = new Classes.Simple("LineBreakAndIndent", Flag.LineBreaks.Simple, Flag.Indent.True);
+
+    static readonly Position LeftAfterColonToken = new Classes.Simple("LeftAfterColonToken", Flag.LineBreaks.Simple);
 
     static readonly Position InnerLeftSimple
-        = new Classes.Simple("InnerLeftSimple", true, true, forceLineBreak: true);
+        = new Classes.Simple("InnerLeftSimple"
+            , Flag.LineBreaks.Simple
+            , Flag.Indent.True
+            , forceLineBreak: Flag.ForceLineBreak.True);
 
     static int NextObjectId;
 
     [UsedImplicitly]
     internal readonly string Tag;
 
-    internal readonly bool Indent;
-    internal readonly bool AnchorIndent;
-    internal readonly bool ForceLineBreak;
-    readonly bool HasAdditionalLineBreak;
-    readonly bool HasLineBreak;
+    internal readonly Flag.Indent Indent;
+    internal readonly Flag.AnchorIndent AnchorIndent;
+    internal readonly Flag.ForceLineBreak ForceLineBreak;
+    internal readonly Flag.LineBreaks LineBreaks;
 
     Position
     (
         string tag = null,
-        bool hasLineBreak = false
-        , bool indent = false
-        , bool anchorIndent = false
-        , bool forceLineBreak = false
-        , bool hasAdditionalLineBreak = false
+        Flag.LineBreaks lineBreaks = default
+        , Flag.Indent indent = default
+        , Flag.AnchorIndent anchorIndent = default
+        , Flag.ForceLineBreak forceLineBreak = default
     )
         : base(NextObjectId++)
     {
         Tag = tag ?? GetType().Name;
+
+        LineBreaks = lineBreaks;
         Indent = indent;
         AnchorIndent = anchorIndent;
-        HasLineBreak = hasLineBreak;
         ForceLineBreak = forceLineBreak;
-        HasAdditionalLineBreak = hasAdditionalLineBreak;
     }
 
     protected virtual Position Combine(Position other)
@@ -256,16 +274,9 @@ abstract class Position : DumpableObject
     }
 
     protected override string GetNodeDump()
-        => $"{Tag}({LineBreakCount}" +
-            $"{(ForceLineBreak? "!" : "")}" +
-            $"{(Indent? ">" : "")}{(AnchorIndent? "-" : "")})";
-
-    internal int LineBreakCount
-        => HasLineBreak
-            ? HasAdditionalLineBreak
-                ? 2
-                : 1
-            : 0;
+        => $"{Tag}({LineBreaks}" +
+            $"{(ForceLineBreak == default? "" : "!")}" +
+            $"{(Indent == default? "" : ">")}{(AnchorIndent == default? "" : "-")})";
 
     public static Position operator +(Position first, Position other)
         => first == null

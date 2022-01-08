@@ -4,31 +4,43 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Helper;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting;
 
-sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTree>, ValueCache.IContainer
+sealed class BinaryTreeProxy
+    : TreeWithParentExtended<BinaryTreeProxy, BinaryTree>
+        , ValueCache.IContainer
+        , BinaryTree.IPositionTarget
 {
+    static readonly BinaryTreeProxy YetUnknown = new();
+
     [DisableDump]
-    readonly Configuration Configuration;
+    public readonly Configuration Configuration;
 
     [EnableDump(Order = 2)]
     [EnableDumpExcept(null)]
-    Position LineBreakBehaviour;
+    internal Position LineBreakBehaviour;
 
-    BinaryTreeProxy(BinaryTree flatItem, Configuration configuration, BinaryTreeProxy parent)
-        : base(flatItem, parent)
+    BinaryTreeProxy(BinaryTree target, Configuration configuration, BinaryTreeProxy parent)
+        : base(target, parent)
     {
         Configuration = configuration;
+        Formatter.SetFormatters(target);
         StopByObjectIds();
     }
+
+    BinaryTreeProxy()
+        : base(null, null) { }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    protected override BinaryTreeProxy Create
-        (BinaryTree child) => child == null? null : new(child, Configuration, this);
+    protected override string Dump(bool isRecursion) => FlatItem == null? "?" : base.Dump(isRecursion);
+
+    protected override BinaryTreeProxy Create(BinaryTree child)
+        => child == null? null : new(child, Configuration, this);
 
     [EnableDump(Order = -3)]
     string MainPosition
@@ -36,31 +48,14 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
-    internal bool IsLineSplit
-    {
-        get
-        {
-            if(FlatItem.TokenClass is ILeftBracket)
-                return Parent.IsLineSplit;
-            return HasAlreadyLineBreakOrIsTooLong || ForceLineSplit;
-        }
-    }
+    internal bool IsLineSplit => GetIsLineSplit(FlatItem, Configuration, ForceLineSplit);
 
     [EnableDump(Order = 3.1)]
     [EnableDumpExcept(false)]
-    bool ForceLineSplit => LineBreakBehaviour != null && LineBreakBehaviour.ForceLineBreak;
+    bool ForceLineSplit => LineBreakBehaviour != null && LineBreakBehaviour.ForceLineBreak != default;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    bool HasAlreadyLineBreakOrIsTooLong
-    {
-        get
-        {
-            if(FlatItem == null)
-                return false;
-            var lineLength = FlatItem.GetFlatLength(Configuration.EmptyLineLimit != 0);
-            return lineLength == null || lineLength > Configuration.MaxLineLength;
-        }
-    }
+    bool HasAlreadyLineBreakOrIsTooLong => GetHasAlreadyLineBreakOrIsTooLong(FlatItem, Configuration);
 
     [DisableDump]
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -81,23 +76,38 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
 
     [EnableDump(Order = 4)]
     [EnableDumpExcept(null)]
-    BinaryTreeProxy Left => DirectChildren[0];
+    internal BinaryTreeProxy Left => DirectChildren == null? YetUnknown : DirectChildren[0];
 
     [EnableDump(Order = 5)]
     [EnableDumpExcept(null)]
-    BinaryTreeProxy Right => DirectChildren[1];
+    BinaryTreeProxy Right => DirectChildren == null? YetUnknown : DirectChildren[1];
 
     ISourcePartEdit[] AnchorEdits
         => FlatItem
             .GetWhiteSpaceEdits(Configuration, LineBreakCount, Token.LogDump())
-            .Indent(LineBreakBehaviour is { AnchorIndent: true }? 1 : 0)
+            .Indent(LineBreakBehaviour == null || LineBreakBehaviour .AnchorIndent == default? 0 : 1)
             .ToArray();
 
     SourcePart Token => FlatItem.FullToken;
 
-    int LineBreakCount => LineBreakBehaviour?.LineBreakCount ?? 0;
+    int LineBreakCount => (int)(LineBreakBehaviour?.LineBreaks ?? Position.Flag.LineBreaks.False);
 
-    void SetPosition(Position position)
+    static bool GetIsLineSplit(BinaryTree binaryTree, Configuration configuration, bool forceLineSplit)
+    {
+        if(binaryTree.TokenClass is ILeftBracket)
+            return GetIsLineSplit(binaryTree.Parent, configuration, false);
+        return GetHasAlreadyLineBreakOrIsTooLong(binaryTree, configuration) || forceLineSplit;
+    }
+
+    static bool GetHasAlreadyLineBreakOrIsTooLong(BinaryTree binaryTree, Configuration configuration)
+    {
+        if(binaryTree == null)
+            return false;
+        var lineLength = binaryTree.GetFlatLength(configuration.EmptyLineLimit != 0);
+        return lineLength == null || lineLength > configuration.MaxLineLength;
+    }
+
+    internal void SetPosition(Position position)
         => LineBreakBehaviour += position;
 
     internal void SetupPositions()
@@ -110,44 +120,44 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
         Right?.SetupPositions();
     }
 
+    internal BinaryTreeProxy Convert(BinaryTree target)
+        => FlatItem == target
+            ? this
+            : target.FullToken.End <= FlatItem.FullToken.Start
+                ? Left?.Convert(target)
+                : Right?.Convert(target);
+
     void SetupMainPositions()
     {
+        FlatItem.Formatter?.SetupPositions(this);
+        return;
+
+        switch(FlatItem.Syntax)
+        {
+            case ExpressionSyntax { Left: null, Right: null }:
+            case InfixSyntax { Left: null, Right: null }:
+            case PrefixSyntax { Right: null }:
+            case SuffixSyntax { Left: null }:
+            case TerminalSyntax:
+            case DeclarerSyntax.NameSyntax:
+            case DeclarerSyntax.TagSyntax:
+            case EmptyList:
+                return;
+
+            case ExpressionSyntax:
+            case InfixSyntax:
+            case PrefixSyntax:
+            case SuffixSyntax:
+                SetupTrainWreck();
+                return;
+        }
+
         switch(FlatItem.TokenClass)
         {
             case LeftParenthesis:
             case BeginOfText:
-                return;
             case EndOfText:
-                (Left.FlatItem.TokenClass is BeginOfText).Assert();
-                Left.RightNeighbor.SetPosition(Position.Begin);
-                var hasLineBreak = Configuration.LineBreakAtEndOfText ?? FlatItem.WhiteSpaces.HasLineBreak;
-                SetPosition(Position.End[hasLineBreak]);
                 return;
-            case Definable:
-            case InstanceToken:
-            {
-                if(Parent.FlatItem.TokenClass is Definable)
-                    return;
-
-                var chain = this.Chain(item => item.Left).Reverse().ToArray();
-                for(var index = 1; index < chain.Length; index++)
-                {
-                    var formerItem = chain[index - 1];
-                    var hasAdditionalLineSplit = Configuration.AdditionalLineBreaksForMultilineItems &&
-                        formerItem.Right != null &&
-                        formerItem.Right.IsLineSplit;
-
-                    if(hasAdditionalLineSplit && formerItem.LineBreakBehaviour == Position.Inner)
-                        formerItem.LineBreakBehaviour = Position.InnerWithAdditionalLineBreak;
-
-                    var positionParent = hasAdditionalLineSplit
-                        ? Position.InnerWithAdditionalLineBreak
-                        : Position.Inner;
-                    chain[index].SetPosition(positionParent);
-                }
-
-                return;
-            }
 
             case RightParenthesis:
                 if(Left?.Right?.FlatItem.TokenClass is IRightBracket)
@@ -242,12 +252,33 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
                 }
 
                 return;
+        }
 
 
-            default:
-                (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
-                Tracer.TraceBreak();
-                return;
+        (FlatItem.FullToken.NodeDump + " " + FlatItem.TokenClass.GetType().Name).Log();
+        Tracer.TraceBreak();
+    }
+
+    void SetupTrainWreck()
+    {
+        if(Parent.FlatItem.TokenClass is Definable)
+            return;
+
+        var chain = this.Chain(item => item.Left).Reverse().ToArray();
+        for(var index = 1; index < chain.Length; index++)
+        {
+            var formerItem = chain[index - 1];
+            var hasAdditionalLineSplit = Configuration.AdditionalLineBreaksForMultilineItems &&
+                formerItem.Right != null &&
+                formerItem.Right.IsLineSplit;
+
+            if(hasAdditionalLineSplit && formerItem.LineBreakBehaviour == Position.Inner)
+                formerItem.LineBreakBehaviour = Position.InnerWithAdditionalLineBreak;
+
+            var positionParent = hasAdditionalLineSplit
+                ? Position.InnerWithAdditionalLineBreak
+                : Position.Inner;
+            chain[index].SetPosition(positionParent);
         }
     }
 
@@ -257,6 +288,6 @@ sealed class BinaryTreeProxy : TreeWithParentExtended<BinaryTreeProxy, BinaryTre
     ISourcePartEdit[] GetEdits()
         => T(AnchorEdits, ChildrenEdits)
             .ConcatMany()
-            .Indent(LineBreakBehaviour is { Indent : true }? 1 : 0)
+            .Indent(LineBreakBehaviour == null || LineBreakBehaviour.Indent == default ? 0 : 1)
             .ToArray();
 }

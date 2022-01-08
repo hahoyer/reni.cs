@@ -17,6 +17,13 @@ namespace Reni.TokenClasses
 {
     public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, ITree<BinaryTree>
     {
+        internal interface IFormatter
+        {
+            void SetupPositions(IPositionTarget target);
+        }
+
+        internal interface IPositionTarget { }
+
         internal sealed class BracketNodes
         {
             internal BinaryTree Center;
@@ -56,11 +63,14 @@ namespace Reni.TokenClasses
         BinaryTree LeftNeighbor;
 
         [DisableDump]
-        BinaryTree Parent;
+        internal BinaryTree Parent;
 
         [DisableDump]
         [UsedImplicitly]
         BinaryTree RightNeighbor;
+
+        [PublicAPI]
+        internal IFormatter Formatter;
 
         int Depth;
 
