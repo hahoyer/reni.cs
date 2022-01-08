@@ -156,6 +156,7 @@
     <Compile Include="hw\Helper\Box.cs" />
     <Compile Include="hw\Helper\DateRange.cs" />
     <Compile Include="hw\Helper\DateTimeExtender.cs" />
+    <Compile Include="hw\Helper\Diff.cs" />
     <Compile Include="hw\Helper\EnumEx.cs" />
     <Compile Include="hw\Helper\FunctionCache.cs" />
     <Compile Include="hw\Helper\IUniqueIdProvider.cs" />
