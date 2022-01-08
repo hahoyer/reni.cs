@@ -43,7 +43,9 @@ abstract class Position : DumpableObject
                         ? other
                         : other == Inner
                             ? InnerWithIndent
-                            : base.Combine(other);
+                            : other == LeftCoupling
+                                ? LeftCouplingWithIndent
+                                : base.Combine(other);
         }
 
         internal sealed class IndentAllAndForceLineSplit : Position
@@ -183,8 +185,8 @@ abstract class Position : DumpableObject
             internal LeftCoupling()
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
-            protected override Position Combine(Position other) 
-                => other == Right? this: base.Combine(other);
+            protected override Position Combine(Position other)
+                => other == Right? this : base.Combine(other);
         }
 
         internal sealed class RightCoupling : Position
@@ -239,6 +241,12 @@ abstract class Position : DumpableObject
 
     internal static readonly Position Function = new Classes.Simple("Function");
 
+    internal static readonly Position LeftCoupling = new Classes.LeftCoupling();
+    internal static readonly Position RightCoupling = new Classes.RightCoupling();
+
+    static readonly Position LeftCouplingWithIndent
+        = new Classes.Simple("LeftCouplingWithIndent", indent: Flag.Indent.True, lineBreaks: Flag.LineBreaks.Simple);
+
     static readonly Position InnerWithIndent = new Classes.InnerWithIndent();
 
     static readonly Position LineBreakAndIndentAndForceLineBreak
@@ -262,10 +270,6 @@ abstract class Position : DumpableObject
         = new Classes.Simple("InnerLeftWithIndentAll"
             , Flag.LineBreaks.Simple
             , Flag.Indent.True);
-
-    internal static readonly Position LeftCoupling = new Classes.LeftCoupling();
-    internal static readonly Position RightCoupling = new Classes.RightCoupling();
-
 
     static int NextObjectId;
 

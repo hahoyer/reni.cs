@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
-using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -13,131 +9,17 @@ namespace ReniUI.Formatting;
 
 abstract class Formatter : DumpableObject, BinaryTree.IFormatter
 {
-    internal sealed class Child : DumpableObject
+    sealed class TrainWreckPart : Formatter, ITrainWreckPart
     {
-        internal readonly BinaryTree PrefixAnchor;
-        internal readonly IItem FlatItem;
-        internal readonly Flag.HasAdditionalIndent HasAdditionalIndent;
-        internal readonly Formatter Formatter;
-
-        internal Child
-        (
-            BinaryTree prefixAnchor
-            , IItem flatItem
-            , Flag.HasAdditionalIndent hasAdditionalIndent = default
-            , Flag.IgnoreBracketLevel ignoreBracketLevel = default
-            , Formatter forcedFormatter = default
-        )
-        {
-            FlatItem = flatItem;
-            HasAdditionalIndent = hasAdditionalIndent;
-            PrefixAnchor = prefixAnchor;
-            Formatter = Create(flatItem.Anchor.Main);
-            StopByObjectIds();
-        }
+        internal static readonly Formatter Instance = new TrainWreckPart();
+        protected override void SetupPositions(BinaryTreeProxy[] target) { }
     }
 
-    internal sealed class BracketLevel : Formatter
-    {
-        internal static readonly Formatter Instance = new BracketLevel();
+    interface ITrainWreckPart { }
 
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-        {
-            if(target is EmptyList)
-                return new Child[0];
-            return T(new Child(null, target));
-        }
-
-        internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
-            => (
-                target.Anchor.Items.First()
-                , target.Anchor.Items.FirstOrDefault(item => item.TokenClass is RightParenthesis)
-            );
-
-        protected override void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target);
-
-        [DisableDump]
-        internal bool IsIndentRequired => true;
-    }
-
-    internal sealed class ListLevel : Formatter
-    {
-        internal static readonly Formatter Instance = new ListLevel();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-        {
-            if(target is EmptyList)
-                return new Child[0];
-            return T(new Child(null, target));
-        }
-
-        internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
-            => (
-                target.Anchor.Items.First()
-                , target.Anchor.Items.FirstOrDefault(item => item.TokenClass is RightParenthesis)
-            );
-
-        protected override void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target);
-
-        [DisableDump]
-        internal bool IsIndentRequired => true;
-    }
-
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    internal static class Flag
-    {
-        internal enum HasAdditionalIndent { False, True }
-        internal enum IgnoreBracketLevel { False, True }
-    }
-
-    internal abstract class Modifier : DumpableObject
-    {
-        protected virtual Modifier Combine(Modifier other)
-        {
-            NotImplementedMethod(other);
-            return default;
-        }
-
-        public static Modifier operator +(Modifier a, Modifier b)
-            => a == null
-                ? b
-                : b == null
-                    ? a
-                    : a.Combine(b);
-    }
-
-
-    sealed class Terminal : Formatter
-    {
-        internal static readonly Formatter Instance = new Terminal();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target) => new Child[0];
-
-        internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
-        {
-            var center = target
-                .Anchor
-                .Main
-                .Chain(item => item.BracketKernel?.Center)
-                .Last();
-            return (center, null);
-        }
-    }
-
-    sealed class TrainWreck : Formatter
+    sealed class TrainWreck : Formatter, ITrainWreckPart
     {
         internal static readonly Formatter Instance = new TrainWreck();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-        {
-            var result = target
-                .Chain(node => GetWagon(node, node != target))
-                .Select(node => GetCargo(node, node != target))
-                .Reverse()
-                .ToArray();
-            result.All(child => child.FlatItem != target).Assert();
-            return result;
-        }
 
         protected override void SetupPositions(BinaryTreeProxy[] target)
         {
@@ -172,45 +54,9 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
 
         static BinaryTreeProxy GetWagon(BinaryTreeProxy current, bool isTop)
         {
-            if(isTop || current.FlatItem.Formatter == null)
+            if(isTop || current.FlatItem.Formatter == TrainWreckPart.Instance)
                 return current.Left;
             return null;
-        }
-
-        static Syntax GetWagon(IItem flatItem, bool checkForBracketLevel)
-        {
-            if(checkForBracketLevel && HasBrackets(flatItem))
-                return null;
-            return flatItem switch
-            {
-                ExpressionSyntax expression => expression.Left
-                , SuffixSyntax suffix => suffix.Left
-                , InfixSyntax infix => infix.Left
-                , _ => null
-            };
-        }
-
-        static Child GetCargo(IItem node, bool checkForBracketLevel)
-        {
-            if(checkForBracketLevel && HasBrackets(node))
-                return new(null, node);
-            var prefixAnchor = node
-                .Anchor
-                .Items
-                .First(item => item.TokenClass is not LeftParenthesis);
-            switch(node)
-            {
-                case ExpressionSyntax target:
-                    return new(prefixAnchor, target.Right
-                        , target.Left == null? default : Flag.HasAdditionalIndent.True);
-                case InfixSyntax target:
-                    return new(prefixAnchor, target.Right
-                        , target.Left == null? default : Flag.HasAdditionalIndent.True);
-                case SuffixSyntax target:
-                    return new(prefixAnchor, null, target.Left == null? default : Flag.HasAdditionalIndent.True);
-                default:
-                    return new(prefixAnchor, null);
-            }
         }
     }
 
@@ -261,47 +107,22 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 }
             }
         }
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-            => ((CompoundSyntax)target)
-                .Statements
-                .Select((node, index) => GetChild(target, node, index))
-                .ToArray();
-
-
-        static Child GetChild(IItem target, IStatementSyntax node, int index)
-            => new(index == 0? null : target.Anchor.Items[index], (Syntax)node);
     }
 
-    abstract class CompoundWithCleanup : Formatter
-    {
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-            => throw new NotImplementedException();
-    }
+    abstract class CompoundWithCleanup : Formatter { }
 
     sealed class Declaration : Formatter
     {
         internal static readonly Formatter Instance = new Declaration();
 
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
+        protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
-            var declarationSyntax = (DeclarationSyntax)target;
-            var declarer = declarationSyntax.Declarer;
+            var target = targets.Single();
+            target.RightNeighbor.SetPosition(Position.AfterColonToken);
 
-            if(declarer.Issue != null)
-                yield return new(null, declarer.Issue);
-
-            foreach(var tag in declarer.Tags)
-                yield return new(null, tag);
-
-            if(declarer.Name != null)
-                yield return new(null, declarer.Name);
-
-            yield return new(target.Anchor.Main, declarationSyntax.Value, Flag.HasAdditionalIndent.True);
+            if(target.Left.IsLineSplit)
+                NotImplementedMethod(target.Left);
         }
-
-        protected override void SetupPositions(BinaryTreeProxy[] target)
-            => target.Single().RightNeighbor.SetPosition(Position.AfterColonToken);
     }
 
     sealed class FlatChildCompound : FlatCompound
@@ -312,24 +133,11 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class FlatRootCompound : FlatCompound
     {
         internal static readonly Formatter Instance = new FlatRootCompound();
-
-        internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
-            => (target.Anchor.Items.First(), target.Anchor.Items.Last());
     }
 
     sealed class RootCompoundWithCleanup : CompoundWithCleanup
     {
         internal static readonly Formatter Instance = new RootCompoundWithCleanup();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-        {
-            NotImplementedMethod(target, "Children", target.DirectChildren, nameof(target.Anchor), target.Anchor);
-            return default;
-        }
-
-        internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors
-            (IItem target)
-            => (target.Anchor.Items.First(), target.Anchor.Items.Last());
     }
 
     sealed class ChildCompoundWithCleanup : CompoundWithCleanup
@@ -340,20 +148,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class Conditional : Formatter
     {
         internal static readonly Formatter Instance = new Conditional();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-        {
-            var anchorCount = target.Anchor.Items.Length;
-            (anchorCount is 1 or 2).Assert();
-            var children = new List<Child>
-            {
-                target.DirectChildren[0] == null? null : new(null, target.DirectChildren[0])
-                , new(target.Anchor.Items[0], target.DirectChildren[1])
-            };
-            if(anchorCount == 2)
-                children.Add(new(target.Anchor.Items[1], target.DirectChildren[2]));
-            return children;
-        }
 
         protected override void SetupPositions(BinaryTreeProxy[] target)
         {
@@ -372,14 +166,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class Function : Formatter
     {
         internal static readonly Formatter Instance = new Function();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-        {
-            if(target.DirectChildren[0] != null)
-                yield return new(null, target.DirectChildren[0]);
-
-            yield return new Child(target.Anchor.Items[0], target.DirectChildren[1]);
-        }
 
         protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
@@ -402,7 +188,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class Issue : Formatter
     {
         internal static readonly Formatter Instance = new Issue();
-        protected internal override IEnumerable<Child> GetChildren(IItem target) => throw new NotImplementedException();
 
         protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
@@ -416,41 +201,18 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         }
     }
 
-    sealed class Special : Formatter
-    {
-        internal static readonly Formatter Instance = new Special();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-            => target.SpecialAnchor.GetNodesFromLeftToRight().Select(GetChild);
-
-        static Child GetChild(BinaryTree target) => new(target, null);
-    }
-
     sealed class DeclarerIssue : Formatter
     {
         internal static readonly Formatter Instance = new DeclarerIssue();
-
-        protected internal override IEnumerable<Child> GetChildren(IItem target)
-            => target
-                .Anchor
-                .Items
-                .Select(GetChild);
-
-        static Child GetChild(BinaryTree target) => new(target, null);
     }
 
     void BinaryTree.IFormatter.SetupPositions(BinaryTree.IPositionTarget positionTarget)
     {
         var target = (BinaryTreeProxy)positionTarget;
-        var configuration = target.Configuration;
         var (left, center, right) = SplitFrame(target);
         SetupFramePositions(left, right);
         SetupPositions(center);
     }
-
-    protected internal abstract IEnumerable<Child> GetChildren(IItem target);
-
-    internal virtual(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target) => (default, default);
 
     protected virtual void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target, "", "");
 
@@ -516,8 +278,8 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             case PrefixSyntax:
             case SuffixSyntax:
             case TerminalSyntax:
-                return !HasBrackets(syntax) && target.Parent.Formatter == TrainWreck.Instance
-                    ? null
+                return !HasBrackets(syntax) && target.Parent.Syntax.MainAnchor.Formatter is ITrainWreckPart
+                    ? TrainWreckPart.Instance
                     : TrainWreck.Instance;
             case DeclarationSyntax:
                 return Declaration.Instance;
@@ -528,7 +290,10 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             case DeclarerSyntax.IssueSyntax:
                 return DeclarerIssue.Instance;
             case EmptyList:
+            case DeclarerSyntax.NameSyntax:
+            case DeclarerSyntax.TagSyntax:
                 return null;
+
             default:
                 NotImplementedFunction(syntax);
                 return default;

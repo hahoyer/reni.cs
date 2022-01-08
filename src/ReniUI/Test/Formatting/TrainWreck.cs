@@ -109,7 +109,7 @@ result
     first.
 
     (system parameters)
-    NewMemory(cargo, 
+    NewMemory(cargo,
 12)
     Attribute.
 
@@ -130,5 +130,16 @@ result
 }";
 
         text.SimpleFormattingTest(expected);
+    }
+
+    [UnitTest]
+    public void TrainWreckInBrackets()
+    {
+        const string text = @"(
+    ((^ elementType) * 1)
+    array_reference
+    mutable
+)";
+        text.SimpleFormattingTest();
     }
 }
