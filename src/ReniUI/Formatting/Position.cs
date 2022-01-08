@@ -10,7 +10,6 @@ abstract class Position : DumpableObject
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     internal static class Flag
     {
-        internal enum AnchorIndent { False, True }
         internal enum ForceLineBreak { False, True }
         internal enum Indent { False, True }
         internal enum LineBreaks { False = 0, Simple = 1, Extended = 2 }
@@ -178,9 +177,7 @@ abstract class Position : DumpableObject
         internal sealed class AfterColonTokenWithIndentAll : Position
         {
             internal AfterColonTokenWithIndentAll()
-                : base(lineBreaks: Flag.LineBreaks.Simple
-                    , indent: Flag.Indent.True
-                    , anchorIndent: Flag.AnchorIndent.True) { }
+                : base(lineBreaks: Flag.LineBreaks.Simple, indent: Flag.Indent.True) { }
 
             protected override Position Combine(Position other)
                 => other == Function? other : base.Combine(other);
@@ -193,10 +190,9 @@ abstract class Position : DumpableObject
                 string tag,
                 Flag.LineBreaks lineBreaks = default
                 , Flag.Indent indent = default
-                , Flag.AnchorIndent anchorIndent = default
                 , Flag.ForceLineBreak forceLineBreak = default
             )
-                : base(tag, lineBreaks, indent, anchorIndent, forceLineBreak) { }
+                : base(tag, lineBreaks, indent, forceLineBreak) { }
         }
     }
 
@@ -235,7 +231,7 @@ abstract class Position : DumpableObject
         = new Classes.Simple("LineBreakAndIndentAndForceLineBreak"
             , Flag.LineBreaks.Simple
             , Flag.Indent.True
-            , forceLineBreak: Flag.ForceLineBreak.True);
+            , Flag.ForceLineBreak.True);
 
     static readonly Position LineBreakAndIndent
         = new Classes.Simple("LineBreakAndIndent", Flag.LineBreaks.Simple, Flag.Indent.True);
@@ -247,7 +243,7 @@ abstract class Position : DumpableObject
         = new Classes.Simple("InnerLeftWithIndentAllAndForceLineSplit"
             , Flag.LineBreaks.Simple
             , Flag.Indent.True
-            , forceLineBreak: Flag.ForceLineBreak.True);
+            , Flag.ForceLineBreak.True);
 
     static readonly Position InnerLeftWithIndentAll
         = new Classes.Simple("InnerLeftWithIndentAll"
@@ -260,7 +256,6 @@ abstract class Position : DumpableObject
     internal readonly string Tag;
 
     internal readonly Flag.Indent Indent;
-    internal readonly Flag.AnchorIndent AnchorIndent;
     internal readonly Flag.ForceLineBreak ForceLineBreak;
     internal readonly Flag.LineBreaks LineBreaks;
 
@@ -269,7 +264,6 @@ abstract class Position : DumpableObject
         string tag = null,
         Flag.LineBreaks lineBreaks = default
         , Flag.Indent indent = default
-        , Flag.AnchorIndent anchorIndent = default
         , Flag.ForceLineBreak forceLineBreak = default
     )
         : base(NextObjectId++)
@@ -278,7 +272,6 @@ abstract class Position : DumpableObject
 
         LineBreaks = lineBreaks;
         Indent = indent;
-        AnchorIndent = anchorIndent;
         ForceLineBreak = forceLineBreak;
     }
 
@@ -291,7 +284,7 @@ abstract class Position : DumpableObject
     protected override string GetNodeDump()
         => $"{Tag}({LineBreaks:d}" +
             $"{(ForceLineBreak == default? "" : "!")}" +
-            $"{(Indent == default? "" : ">")}{(AnchorIndent == default? "" : "-")})";
+            $"{(Indent == default? "" : ">")}";
 
     public static Position operator +(Position first, Position other)
         => first == null

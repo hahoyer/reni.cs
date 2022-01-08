@@ -118,7 +118,6 @@ sealed class BinaryTreeProxy
     ISourcePartEdit[] AnchorEdits
         => FlatItem
             .GetWhiteSpaceEdits(Configuration, LineBreakCount, Token.LogDump())
-            .Indent(LineBreakBehaviour == null || LineBreakBehaviour.AnchorIndent == default? 0 : 1)
             .ToArray();
 
     SourcePart Token => FlatItem.FullToken;

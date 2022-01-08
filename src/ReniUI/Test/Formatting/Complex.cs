@@ -32,12 +32,12 @@ repeat:
             @"1;
 
 repeat: @
-^ while()
-then
-(
-    ^ body(),
-    repeat(^)
-);
+    ^ while()
+    then
+    (
+        ^ body(),
+        repeat(^)
+    );
 
 2";
         text.SimpleFormattingTest(expected, 20, 0);

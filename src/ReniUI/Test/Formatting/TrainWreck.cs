@@ -10,10 +10,10 @@ public sealed class TrainWreck : DependenceProvider
     public void FunctionWithTrainWreck()
     {
         const string text = @"Text: @
-{
-    value: ^.
-}
-result
+    {
+        value: ^.
+    }
+    result
 ";
         text.SimpleFormattingTest();
     }

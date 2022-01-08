@@ -18,16 +18,18 @@ sealed class FormatterByBinaryTree : DumpableObject, IFormatter
             return new Edit[0];
 
         var item = BinaryTreeProxy.Create(compilerBrowser.Compiler.BinaryTreeWithSyntaxLink, Configuration);
-        var trace = DateTime.Today.Year > 2020;
+        var trace = DateTime.Today.Year < 2020;
         item.SetupPositions();
-        if(trace) item.LogDump().Log(FilePositionTag.Debug);
+        if(trace)
+            item.LogDump().Log(FilePositionTag.Debug);
         var sourcePartEdits = item.Edits.ToArray();
         var editPieces
             = sourcePartEdits
                 .GetEditPieces()
                 .Where(editPiece => IsRelevant(editPiece, targetPart))
                 .ToArray();
-        if(trace) editPieces.LogDump().Log(FilePositionTag.Debug);
+        if(trace)
+            editPieces.LogDump().Log(FilePositionTag.Debug);
         return editPieces;
     }
 
