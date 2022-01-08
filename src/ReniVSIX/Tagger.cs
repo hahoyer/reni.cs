@@ -10,7 +10,7 @@ using ReniUI.Classification;
 
 namespace ReniVSIX
 {
-    class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag>
+    sealed class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag>
     {
         SnapshotPoint? Caret;
 
