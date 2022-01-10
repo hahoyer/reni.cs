@@ -85,7 +85,7 @@ sealed class WhiteSpaces
 
     WhiteSpaceView CreateView(WhiteSpaceItem target)
     {
-        var (comments, tail) = target.Items.CreateCommentGroups(target.SourcePart.End, this, null);
+        var (comments, tail) = target.Items.CreateCommentGroups(target.SourcePart.End, this);
         return new(comments, tail, target.SourcePart);
     }
 }

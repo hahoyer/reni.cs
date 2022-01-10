@@ -23,18 +23,24 @@ sealed class LinesAndSpaces : DumpableObject
     readonly SourcePart Spaces;
 
     readonly IConfiguration Configuration;
-    readonly CommentGroup Predecessor;
     readonly bool IsLast;
+    readonly IItemType Predecessor;
 
     internal LinesAndSpaces
-        (LineGroup[] lines, SourcePart spaces, IConfiguration configuration, CommentGroup predecessor, bool isLast)
+    (
+        LineGroup[] lines
+        , SourcePart spaces
+        , IConfiguration configuration
+        , IItemType predecessor
+        , bool isLast
+    )
     {
         Lines = lines;
         Spaces = spaces;
         Configuration = configuration;
-        Predecessor = predecessor;
         IsLast = isLast;
         Spaces.AssertIsNotNull();
+        Predecessor = predecessor;
     }
 
     protected override string GetNodeDump() => SourcePartForTrace.NodeDump + " " + base.GetNodeDump();
@@ -52,7 +58,7 @@ sealed class LinesAndSpaces : DumpableObject
     SourcePart SourcePartForTrace => (Lines.FirstOrDefault()?.SourcePartForTrace ?? Spaces).Start.Span(Spaces.End);
 
     int TargetLineCountRespectingLineComment
-        => T(TargetLineCount - (Predecessor?.Comment.Type is ILine? 1 : 0), 0).Max();
+        => T(TargetLineCount - (Predecessor is ILine? 1 : 0), 0).Max();
 
     int LinesDelta => TargetLineCount - Lines.Length;
 
@@ -67,7 +73,9 @@ sealed class LinesAndSpaces : DumpableObject
     /// </summary>
     bool MakeLines => TargetLineCountRespectingLineComment > 0 && !Lines.Any();
 
-    bool IsSeparatorRequired => Configuration.SeparatorRequests.Get(Predecessor == null, IsLast);
+    bool IsSeparatorRequired
+        => Configuration.SeparatorRequests.Get(Predecessor == null, IsLast) &&
+            Predecessor is not ILine;
 
     internal IEnumerable<Edit> GetEdits(int indent)
     {

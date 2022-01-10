@@ -57,34 +57,49 @@ static class Extension
         this IEnumerable<WhiteSpaceItem> allItems
         , SourcePosition anchor
         , LinesAndSpaces.IConfiguration configuration
-        , CommentGroup predecessor
     )
     {
+        IItemType predecessor = null;
         var groups = SplitAndTail(allItems);
 
-        var commentGroups = new List<CommentGroup>();
-        foreach(var items in groups.Comments)
-        {
-            var head = CreateLinesAndSpaces(items.Lines, configuration, predecessor
-                , items.Main.SourcePart.Start, false);
-            var commentGroup = new CommentGroup(head, items.Main);
-            predecessor = commentGroup;
-            commentGroups.Add(commentGroup);
-        }
+        var commentGroups
+            = groups
+                .Comments
+                .Select(items => items.CreateCommentGroup(configuration, ref predecessor))
+                .ToArray();
 
-        var linesAndSpaces =
-                CreateLinesAndSpaces(groups.TailLines, configuration, predecessor, anchor, true)
-            ;
+        var linesAndSpaces
+            = groups
+                .TailLines
+                .CreateLinesAndSpaces(configuration, anchor, predecessor, true);
 
-        return (commentGroups.ToArray(), linesAndSpaces);
+        return (commentGroups, linesAndSpaces);
+    }
+
+    static CommentGroup CreateCommentGroup
+    (
+        this(((WhiteSpaceItem[] Head, WhiteSpaceItem Main)[] Items, WhiteSpaceItem[] Tail) Lines, WhiteSpaceItem Main)
+            items
+        , LinesAndSpaces.IConfiguration configuration
+        , ref IItemType predecessor
+    )
+    {
+        var head
+            = items
+                .Lines
+                .CreateLinesAndSpaces(configuration, items.Main.SourcePart.Start, predecessor, false);
+        var commentGroup = new CommentGroup(head, items.Main);
+        predecessor = commentGroup.Comment.Type;
+        return commentGroup;
     }
 
     static LinesAndSpaces CreateLinesAndSpaces
     (
-        ((WhiteSpaceItem[] Head, WhiteSpaceItem Main)[] Items, WhiteSpaceItem[] Tail) groups
+        this((WhiteSpaceItem[] Head, WhiteSpaceItem Main)[] Items, WhiteSpaceItem[] Tail) groups
         , LinesAndSpaces.IConfiguration configuration
-        , CommentGroup predecessor
-        , SourcePosition anchor, bool isLast
+        , SourcePosition anchor
+        , IItemType predecessorCommentType
+        , bool isLast
     )
     {
         groups.Tail.All(space => space.SourcePart.Length == 1).Assert();
@@ -93,6 +108,6 @@ static class Extension
             .Select(item => new LineGroup(item.Head.Length, item.Main))
             .ToArray();
         var spacePart = anchor.Span(-groups.Tail.Length);
-        return new(lineGroups, spacePart, configuration, predecessor, isLast);
+        return new(lineGroups, spacePart, configuration, predecessorCommentType, isLast);
     }
 }
