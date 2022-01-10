@@ -6,82 +6,88 @@ using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.TokenClasses.Whitespace;
 
-namespace ReniUI.Formatting
+namespace ReniUI.Formatting;
+
+/// <summary>
+///     Encapsulates all comment, line-break and space formatting for a token.
+///     This class has a very high complexity since the target is quite complex.
+///     It is mainly to ensure smooth behaviour of source editor where the formatting is made for.
+///     The member names by default belong to thing on the left side of the token.
+///     Things on the right side contain this fact in their name.
+/// </summary>
+sealed class WhiteSpaces
+    : DumpableObject, ISourcePartEdit, IEditPieces, LinesAndSpaces.IConfiguration, LinesAndSpaces.IPredecessor
 {
-    /// <summary>
-    ///     Encapsulates all comment, line-break and space formatting for a token.
-    ///     This class has a very high complexity since the target is quite complex.
-    ///     It is mainly to ensure smooth behaviour of source editor where the formatting is made for.
-    ///     The member names by default belong to thing on the left side of the token.
-    ///     Things on the right side contain this fact in their name.
-    /// </summary>
-    sealed class WhiteSpaces : DumpableObject, ISourcePartEdit, IEditPieces, LineGroup.IConfiguration
+    readonly Configuration Configuration;
+
+    readonly SeparatorRequests SeparatorRequests;
+    readonly int MinimalLineBreakCount;
+    readonly SourcePart SourcePart;
+    readonly string AnchorForDebug;
+
+    [DisableDump]
+    readonly WhiteSpaceView WhiteSpaceView;
+
+    internal WhiteSpaces
+    (
+        WhiteSpaceItem target
+        , Configuration configuration
+        , SeparatorRequests separatorRequests
+        , string anchorForDebug
+        , int minimalLineBreakCount
+    )
     {
-        readonly Configuration Configuration;
+        (target != null).Assert();
 
-        readonly SeparatorRequests SeparatorRequests;
-        readonly int MinimalLineBreakCount;
-        readonly SourcePart SourcePart;
+        SourcePart = target.SourcePart;
+        MinimalLineBreakCount = minimalLineBreakCount;
+        Configuration = configuration;
+        SeparatorRequests = separatorRequests;
+        WhiteSpaceView = CreateView(target);
+        AnchorForDebug = anchorForDebug;
+        StopByObjectIds();
+    }
 
-        readonly ValueCache<WhiteSpaceView> WhiteSpaceViewCache;
-        readonly string AnchorTargetPositionForDebug;
+    int? LinesAndSpaces.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
+    int LinesAndSpaces.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
+    SeparatorRequests LinesAndSpaces.IConfiguration.SeparatorRequests => SeparatorRequests;
 
-        internal WhiteSpaces
-        (
-            WhiteSpaceItem target
-            , Configuration configuration
-            , SeparatorRequests separatorRequests
-            , string anchorTargetPositionForDebug
-            , int minimalLineBreakCount
-        )
-        {
-            (target != null).Assert();
+    /// <summary>
+    ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
+    ///     The goal is, to change only things necessary to allow editors to work smoothly
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
+    {
+        StopByObjectIds();
+        if(!SeparatorRequests.Head &&
+           !SeparatorRequests.Tail &&
+           !SeparatorRequests.Inner &&
+           MinimalLineBreakCount == 0 &&
+           SourcePart.Length == 0)
+            return new Edit[0];
 
-            SourcePart = target.SourcePart;
-            MinimalLineBreakCount = minimalLineBreakCount;
-            Configuration = configuration;
-            SeparatorRequests = separatorRequests;
-            WhiteSpaceViewCache = new(() => new(target, this));
-            AnchorTargetPositionForDebug = anchorTargetPositionForDebug;
-            StopByObjectIds();
-        }
+        var indent = Configuration.IndentCount * parameter.Indent;
+        return WhiteSpaceView
+            .GetEdits(indent)
+            .Select(edit => new Edit(edit.Remove, edit.Insert, AnchorForDebug + ":" + edit.Flag))
+            .ToArray();
+    }
 
-        int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
-        int LineGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
-        SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => SeparatorRequests;
+    bool LinesAndSpaces.IPredecessor.IsLineComment => false;
 
-        /// <summary>
-        ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
-        ///     The goal is, to change only things necessary to allow editors to work smoothly
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
-        {
-            StopByObjectIds();
-            if(!SeparatorRequests.Head &&
-               !SeparatorRequests.Tail &&
-               !SeparatorRequests.Inner &&
-               MinimalLineBreakCount == 0 &&
-               SourcePart.Length == 0)
-                return new Edit[0];
+    ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
-            var indent = Configuration.IndentCount * parameter.Indent;
-            return WhiteSpaceView
-                .GetEdits(indent)
-                .Select(edit => new Edit(edit.Remove, edit.Insert, AnchorTargetPositionForDebug + ":" + edit.Flag))
-                .ToArray();
-        }
+    bool ISourcePartEdit.IsIndentTarget => true;
 
-        bool ISourcePartEdit.IsIndentTarget => true;
+    SourcePart ISourcePartEdit.SourcePart => SourcePart;
 
-        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+    protected override string GetNodeDump()
+        => SourcePart.GetDumpAroundCurrent(10).CSharpQuote() + " " + base.GetNodeDump();
 
-        SourcePart ISourcePartEdit.SourcePart => SourcePart;
-
-        protected override string GetNodeDump()
-            => SourcePart.GetDumpAroundCurrent(10).CSharpQuote() + " " + base.GetNodeDump();
-
-        [DisableDump]
-        WhiteSpaceView WhiteSpaceView => WhiteSpaceViewCache.Value;
+    WhiteSpaceView CreateView(WhiteSpaceItem target)
+    {
+        var (comments, tail) = target.Items.CreateCommentGroups(target.SourcePart.End, this, this);
+        return new(comments, tail, target.SourcePart);
     }
 }

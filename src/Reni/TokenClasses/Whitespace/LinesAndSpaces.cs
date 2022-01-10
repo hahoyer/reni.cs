@@ -3,16 +3,21 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses.Whitespace;
 
 sealed class LinesAndSpaces : DumpableObject
 {
-    internal interface IConfiguration : LineGroup.IConfiguration
+    internal interface IConfiguration
     {
-        bool IsSeparatorRequired { get; }
-        CommentGroup Prefix { get; }
+        int? EmptyLineLimit { get; }
+        SeparatorRequests SeparatorRequests { get; }
+        int MinimalLineBreakCount { get; }
+    }
+
+    internal interface IPredecessor
+    {
+        bool IsLineComment { get; }
     }
 
     [EnableDump]
@@ -22,14 +27,21 @@ sealed class LinesAndSpaces : DumpableObject
     readonly SourcePart Spaces;
 
     readonly IConfiguration Configuration;
+    readonly IPredecessor Predecessor;
+    readonly bool IsLast;
 
-    LinesAndSpaces(LineGroup[] lines, SourcePart spaces, IConfiguration configuration)
+    internal LinesAndSpaces
+        (LineGroup[] lines, SourcePart spaces, IConfiguration configuration, IPredecessor predecessor, bool isLast)
     {
         Lines = lines;
         Spaces = spaces;
         Configuration = configuration;
+        Predecessor = predecessor;
+        IsLast = isLast;
         Spaces.AssertIsNotNull();
     }
+
+    protected override string GetNodeDump() => SourcePartForTrace.NodeDump + " " + base.GetNodeDump();
 
     int TargetLineCount
     {
@@ -40,8 +52,11 @@ sealed class LinesAndSpaces : DumpableObject
         }
     }
 
+    [EnableDump]
+    SourcePart SourcePartForTrace => (Lines.FirstOrDefault()?.SourcePartForTrace ?? Spaces).Start.Span(Spaces.End);
+
     int TargetLineCountRespectingLineComment
-        => T(TargetLineCount - (Configuration.Prefix?.Main.Type is ILine? 1 : 0), 0).Max();
+        => T(TargetLineCount - (Predecessor.IsLineComment? 1 : 0), 0).Max();
 
     int LinesDelta => TargetLineCount - Lines.Length;
 
@@ -56,22 +71,7 @@ sealed class LinesAndSpaces : DumpableObject
     /// </summary>
     bool MakeLines => TargetLineCountRespectingLineComment > 0 && !Lines.Any();
 
-    bool IsSeparatorRequired => Configuration.IsSeparatorRequired;
-
-    internal static LinesAndSpaces Create(WhiteSpaceItem[] items, IConfiguration configuration)
-    {
-        (items != null && items.Any()).Assert();
-        var groups = items.SplitAndTail(LineGroup.TailCondition);
-        var tail = groups.Tail;
-        var spaces = items.Last().SourcePart.End.Span(0);
-        if(tail.Any())
-            spaces = tail.First().SourcePart.Start.Span(tail.Last().SourcePart.End);
-        return new(groups.Items.Select(items => new LineGroup(items)).ToArray(), spaces
-            , configuration);
-    }
-
-    internal static LinesAndSpaces Create(SourcePosition anchor, IConfiguration configuration)
-        => new(new LineGroup[0], anchor.Span(0), configuration);
+    bool IsSeparatorRequired => Configuration.SeparatorRequests.Get(Predecessor is not CommentGroup, IsLast);
 
     internal IEnumerable<Edit> GetEdits(int indent)
     {
@@ -124,10 +124,10 @@ sealed class LinesAndSpaces : DumpableObject
         {
             case < 0:
             {
-                var start = Lines[0].SourcePart.Start;
+                var start = Lines[0].SpacesPart.Start;
                 var end = -LinesDelta < Lines.Length
-                    ? Lines[-LinesDelta].Main.SourcePart.Start
-                    : Lines[-LinesDelta - 1].Main.SourcePart.End;
+                    ? Lines[-LinesDelta].LineBreak.SourcePart.Start
+                    : Lines[-LinesDelta - 1].LineBreak.SourcePart.End;
 
                 yield return new(start.Span(end), "", "-extra Linebreaks");
                 break;
@@ -135,7 +135,7 @@ sealed class LinesAndSpaces : DumpableObject
             case > 0:
                 foreach(var edit in Lines.SelectMany(item => item.GetEdits()))
                     yield return edit;
-                yield return new(Lines.Last().SourcePart.End.Span(0), "\n".Repeat(LinesDelta), "+linebreaks");
+                yield return new(Lines.Last().SpacesPart.End.Span(0), "\n".Repeat(LinesDelta), "+linebreaks");
                 break;
             case 0:
                 foreach(var edit in Lines.SelectMany(item => item.GetEdits()))

@@ -6,86 +6,88 @@ using JetBrains.Annotations;
 using Reni.TokenClasses.Whitespace;
 using Reni.TokenClasses.Whitespace.Comment;
 
-namespace Reni.TokenClasses
+namespace Reni.TokenClasses;
+
+/// <summary>
+///     Hierarchical structured whitespace cluster
+/// </summary>
+sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
 {
-    sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
+    internal readonly SourcePart SourcePart;
+
+    internal readonly IItemType Type;
+
+    [DisableDump]
+    [PublicAPI]
+    internal readonly IParent Parent;
+
+    WhiteSpaceItem[] ItemsCache;
+
+    internal WhiteSpaceItem(SourcePart sourcePart)
+        : this(RootType.Instance, sourcePart, null) { }
+
+    internal WhiteSpaceItem(IItemType type, SourcePart sourcePart, IParent parent)
     {
-        internal readonly SourcePart SourcePart;
+        Type = type;
+        SourcePart = sourcePart;
+        Parent = parent;
+    }
 
-        internal readonly IItemType Type;
+    IWhitespaceItem IParent.GetItem<TItemType>()
+        => Type is TItemType? this : Parent?.GetItem<TItemType>();
 
-        [DisableDump]
-        [PublicAPI]
-        internal readonly IParent Parent;
+    IParent IParent.Parent => Parent;
+    IItemType IParent.Type => Type;
 
-        WhiteSpaceItem[] ItemsCache;
+    ContactType ISeparatorClass.ContactType => ContactType.Incompatible;
 
-        internal WhiteSpaceItem(SourcePart sourcePart)
-            : this(RootType.Instance, sourcePart, null) { }
+    SourcePart IWhitespaceItem.SourcePart => SourcePart;
 
-        internal WhiteSpaceItem(IItemType type, SourcePart sourcePart, IParent parent)
-        {
-            Type = type;
-            SourcePart = sourcePart;
-            Parent = parent;
-        }
+    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
-        IWhitespaceItem IParent.GetItem<TItemType>()
-            => Type is TItemType? this : Parent?.GetItem<TItemType>();
+    [EnableDump]
+    internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
 
-        IParent IParent.Parent => Parent;
-        IItemType IParent.Type => Type;
+    [DisableDump]
+    internal bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
 
-        ContactType ISeparatorClass.ContactType => ContactType.Incompatible;
+    bool HasVolatileLineBreak => Type is IVolatileLineBreak || Items.Any(item => item.HasVolatileLineBreak);
 
-        SourcePart IWhitespaceItem.SourcePart => SourcePart;
+    internal bool HasLineBreak
+        => HasStableLineBreak || HasVolatileLineBreak;
 
-        protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
+    public bool IsNotEmpty(bool areEmptyLinesPossible)
+        => Items.Any(item => item.Type is IComment || areEmptyLinesPossible && item.Type is IVolatileLineBreak);
 
-        [EnableDump]
-        internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
+    WhiteSpaceItem[] GetItems()
+        => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhiteSpaceItem[0];
 
-        [DisableDump]
-        internal bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
+    internal WhiteSpaceItem LocateItem(SourcePosition offset)
+    {
+        (SourcePart.Start <= offset).Assert();
 
-        bool HasVolatileLineBreak => Type is IVolatileLineBreak || Items.Any(item => item.HasVolatileLineBreak);
+        if(SourcePart.End <= offset)
+            return null;
 
-        public bool IsNotEmpty(bool areEmptyLinesPossible)
-            => Items.Any(item => item.Type is IComment || areEmptyLinesPossible && item.Type is IVolatileLineBreak);
+        if(!Items.Any())
+            return this;
 
-        WhiteSpaceItem[] GetItems()
-            => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhiteSpaceItem[0];
+        return Items
+            .Select(item1 => item1.LocateItem(offset))
+            .FirstOrDefault(item => item != null);
+    }
 
-        internal WhiteSpaceItem LocateItem(SourcePosition offset)
-        {
-            (SourcePart.Start <= offset).Assert();
+    internal string FlatFormat(bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
+    {
+        if(HasStableLineBreak || areEmptyLinesPossible && HasVolatileLineBreak)
+            return null;
 
-            if(SourcePart.End <= offset)
-                return null;
-
-            if(!Items.Any())
-                return this;
-
-            return Items
-                .Select(item1 => item1.LocateItem(offset))
-                .FirstOrDefault(item => item != null);
-        }
-
-        internal string FlatFormat(bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
-        {
-            if(HasStableLineBreak || areEmptyLinesPossible && HasVolatileLineBreak)
-                return null;
-
-            var result = Items
-                .Where(item => item.Type is IInline)
-                .Select(item => item.SourcePart.Id)
-                .Stringify(separatorRequests.Inner? " " : "");
-            if(result == "")
-                return separatorRequests.Flat? " " : "";
-            return (separatorRequests.Head? " " : "") + result + (separatorRequests.Tail? " " : "");
-        }
-
-        internal bool HasLineBreak
-            => HasStableLineBreak || HasVolatileLineBreak;
+        var result = Items
+            .Where(item => item.Type is IInline)
+            .Select(item => item.SourcePart.Id)
+            .Stringify(separatorRequests.Inner? " " : "");
+        if(result == "")
+            return separatorRequests.Flat? " " : "";
+        return (separatorRequests.Head? " " : "") + result + (separatorRequests.Tail? " " : "");
     }
 }

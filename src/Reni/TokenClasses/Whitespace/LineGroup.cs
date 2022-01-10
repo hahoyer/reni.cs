@@ -1,59 +1,32 @@
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
-using Reni.Parser;
 
 namespace Reni.TokenClasses.Whitespace;
 
 sealed class LineGroup : DumpableObject
 {
-    internal interface IConfiguration
-    {
-        int? EmptyLineLimit { get; }
-        SeparatorRequests SeparatorRequests { get; }
-        int MinimalLineBreakCount { get; }
-    }
+    [EnableDump]
+    internal readonly WhiteSpaceItem LineBreak;
 
     [EnableDump]
-    internal readonly SourcePart SourcePart;
+    readonly int SpaceCount;
 
-    [EnableDump]
-    internal readonly WhiteSpaceItem Main;
-
-    [EnableDump]
-    readonly int Spaces;
-
-    internal LineGroup(IEnumerable<WhiteSpaceItem> allItems)
+    internal LineGroup(int spaceCount, WhiteSpaceItem lineBreak)
     {
-        var groups = allItems
-            .GroupBy(TailCondition)
-            .ToDictionary(item => item.Key, item => item.ToArray());
-
-        groups.TryGetValue(false, out var items);
-        groups.TryGetValue(true, out var tails);
-
-        Main = tails.AssertNotNull().Single();
-
-        Spaces = items?.Length ?? 0;
-        SourcePart = allItems.Select(item => item.SourcePart).Combine();
+        LineBreak = lineBreak;
+        SpaceCount = spaceCount;
     }
 
-    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
+    protected override string GetNodeDump() => SourcePartForTrace.NodeDump + " " + base.GetNodeDump();
 
-    internal static(LineGroup[], WhiteSpaceItem[]) Create(WhiteSpaceItem[] items, IConfiguration configuration)
-    {
-        var groups = items.SplitAndTail(TailCondition);
-        return (groups.Items.Select(items => new LineGroup(items)).ToArray()
-            , (groups.Tail));
-    }
+    internal SourcePart SourcePartForTrace => SpacesPart.Start.Span(LineBreak.SourcePart.End);
 
-    internal static bool TailCondition(WhiteSpaceItem item) => item.Type is IVolatileLineBreak;
+    internal SourcePart SpacesPart => LineBreak.SourcePart.Start.Span(-SpaceCount);
 
     internal IEnumerable<Edit> GetEdits()
     {
-        if(Spaces > 0)
-            yield return new(Main.SourcePart.Start.Span(-Spaces), "", "-spaces");
+        if(SpaceCount > 0)
+            yield return new(SpacesPart, "", "-spaces");
     }
 }
