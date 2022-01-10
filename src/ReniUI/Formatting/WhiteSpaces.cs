@@ -16,7 +16,7 @@ namespace ReniUI.Formatting;
 ///     Things on the right side contain this fact in their name.
 /// </summary>
 sealed class WhiteSpaces
-    : DumpableObject, ISourcePartEdit, IEditPieces, LinesAndSpaces.IConfiguration, LinesAndSpaces.IPredecessor
+    : DumpableObject, ISourcePartEdit, IEditPieces, LinesAndSpaces.IConfiguration
 {
     readonly Configuration Configuration;
 
@@ -74,8 +74,6 @@ sealed class WhiteSpaces
             .ToArray();
     }
 
-    bool LinesAndSpaces.IPredecessor.IsLineComment => false;
-
     ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
     bool ISourcePartEdit.IsIndentTarget => true;
@@ -87,7 +85,7 @@ sealed class WhiteSpaces
 
     WhiteSpaceView CreateView(WhiteSpaceItem target)
     {
-        var (comments, tail) = target.Items.CreateCommentGroups(target.SourcePart.End, this, this);
+        var (comments, tail) = target.Items.CreateCommentGroups(target.SourcePart.End, this, null);
         return new(comments, tail, target.SourcePart);
     }
 }

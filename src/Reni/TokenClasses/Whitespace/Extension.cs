@@ -57,7 +57,7 @@ static class Extension
         this IEnumerable<WhiteSpaceItem> allItems
         , SourcePosition anchor
         , LinesAndSpaces.IConfiguration configuration
-        , LinesAndSpaces.IPredecessor predecessor
+        , CommentGroup predecessor
     )
     {
         var groups = SplitAndTail(allItems);
@@ -83,7 +83,7 @@ static class Extension
     (
         ((WhiteSpaceItem[] Head, WhiteSpaceItem Main)[] Items, WhiteSpaceItem[] Tail) groups
         , LinesAndSpaces.IConfiguration configuration
-        , LinesAndSpaces.IPredecessor predecessor
+        , CommentGroup predecessor
         , SourcePosition anchor, bool isLast
     )
     {

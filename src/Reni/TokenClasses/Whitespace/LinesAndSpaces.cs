@@ -3,6 +3,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses.Whitespace;
 
@@ -15,11 +16,6 @@ sealed class LinesAndSpaces : DumpableObject
         int MinimalLineBreakCount { get; }
     }
 
-    internal interface IPredecessor
-    {
-        bool IsLineComment { get; }
-    }
-
     [EnableDump]
     readonly LineGroup[] Lines;
 
@@ -27,11 +23,11 @@ sealed class LinesAndSpaces : DumpableObject
     readonly SourcePart Spaces;
 
     readonly IConfiguration Configuration;
-    readonly IPredecessor Predecessor;
+    readonly CommentGroup Predecessor;
     readonly bool IsLast;
 
     internal LinesAndSpaces
-        (LineGroup[] lines, SourcePart spaces, IConfiguration configuration, IPredecessor predecessor, bool isLast)
+        (LineGroup[] lines, SourcePart spaces, IConfiguration configuration, CommentGroup predecessor, bool isLast)
     {
         Lines = lines;
         Spaces = spaces;
@@ -56,7 +52,7 @@ sealed class LinesAndSpaces : DumpableObject
     SourcePart SourcePartForTrace => (Lines.FirstOrDefault()?.SourcePartForTrace ?? Spaces).Start.Span(Spaces.End);
 
     int TargetLineCountRespectingLineComment
-        => T(TargetLineCount - (Predecessor.IsLineComment? 1 : 0), 0).Max();
+        => T(TargetLineCount - (Predecessor?.Comment.Type is ILine? 1 : 0), 0).Max();
 
     int LinesDelta => TargetLineCount - Lines.Length;
 
@@ -71,7 +67,7 @@ sealed class LinesAndSpaces : DumpableObject
     /// </summary>
     bool MakeLines => TargetLineCountRespectingLineComment > 0 && !Lines.Any();
 
-    bool IsSeparatorRequired => Configuration.SeparatorRequests.Get(Predecessor is not CommentGroup, IsLast);
+    bool IsSeparatorRequired => Configuration.SeparatorRequests.Get(Predecessor == null, IsLast);
 
     internal IEnumerable<Edit> GetEdits(int indent)
     {

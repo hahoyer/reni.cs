@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
-using Reni.TokenClasses.Whitespace.Comment;
 
 namespace Reni.TokenClasses.Whitespace;
 
-sealed class CommentGroup : DumpableObject, LinesAndSpaces.IPredecessor
+sealed class CommentGroup : DumpableObject
 {
     [EnableDump]
     internal readonly WhiteSpaceItem Comment;
@@ -17,8 +16,6 @@ sealed class CommentGroup : DumpableObject, LinesAndSpaces.IPredecessor
         Head = head;
         Comment = comment;
     }
-
-    bool LinesAndSpaces.IPredecessor.IsLineComment => Comment.Type is ILine;
 
     internal IEnumerable<Edit> GetEdits(int indent) => Head.GetEdits(indent);
 }
