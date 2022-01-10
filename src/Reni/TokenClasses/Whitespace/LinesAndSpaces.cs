@@ -50,7 +50,8 @@ sealed class LinesAndSpaces : DumpableObject
         get
         {
             var maximalLineBreakCount = T(Configuration.EmptyLineLimit ?? Lines.Length, Lines.Length).Min();
-            return T(Configuration.MinimalLineBreakCount, maximalLineBreakCount).Max();
+            var minimalLineBreakCount = IsLast? Configuration.MinimalLineBreakCount : 0;
+            return T(minimalLineBreakCount, maximalLineBreakCount).Max();
         }
     }
 
