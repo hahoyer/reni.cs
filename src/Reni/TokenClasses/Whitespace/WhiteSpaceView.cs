@@ -43,11 +43,4 @@ sealed class WhiteSpaceView : DumpableObject
 
         return T(commentEdits, linesAndSpacesEdits).ConcatMany();
     }
-
-    CommentGroup Predecessor(int? index = null)
-        => index == null
-            ? Comments.LastOrDefault()
-            : index > 0
-                ? Comments[index.Value - 1]
-                : null;
 }
