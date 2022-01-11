@@ -51,6 +51,7 @@ else bbbbbbb", 10);
         text.SimpleFormattingTest(@"ccccccc
 then aaaaaa", 10);
     }
+
     [UnitTest]
     [Test]
     public void NestedThenElseWithLineBreak()
@@ -84,5 +85,4 @@ then
 )
 else else1", 7);
     }
-
 }
