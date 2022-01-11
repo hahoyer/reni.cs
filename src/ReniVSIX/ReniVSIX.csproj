@@ -38,19 +38,14 @@
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
   </PropertyGroup>
   <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>  
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
     <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
   </PropertyGroup>
-  <Target Name="_ResolveCopyLocalNuGetPackagePdbs" 
-          Condition="$(CopyLocalLockFileAssemblies) == true" 
-          AfterTargets="ResolveReferences"
-          BeforeTargets="GetVsixSourceItems">
+  <Target Name="_ResolveCopyLocalNuGetPackagePdbs" Condition="$(CopyLocalLockFileAssemblies) == true" AfterTargets="ResolveReferences" BeforeTargets="GetVsixSourceItems">
     <ItemGroup>
-      <VSIXCopyLocalReferenceSourceItem 
-        Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).pdb')" 
-        Condition="Exists('%(RootDir)%(Directory)%(Filename).pdb')" />
+      <VSIXCopyLocalReferenceSourceItem Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).pdb')" Condition="Exists('%(RootDir)%(Directory)%(Filename).pdb')" />
     </ItemGroup>
   </Target>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -67,8 +62,9 @@
     <Compile Include="DummyScanner.cs" />
     <Compile Include="Dumper.cs" />
     <Compile Include="Extension.cs" />
+    <Compile Include="HighlightBracesScope.cs" />
     <Compile Include="LanguageClient.cs" />
-    <Compile Include="Properties.cs">
+    <Compile Include="ConfigurationProperties.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
