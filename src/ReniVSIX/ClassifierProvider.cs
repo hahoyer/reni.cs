@@ -7,24 +7,23 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
-namespace ReniVSIX
+namespace ReniVSIX;
+
+[Export(typeof(IClassifierProvider))]
+[Export(typeof(IViewTaggerProvider))]
+[TagType(typeof(IErrorTag))]
+[TagType(typeof(ITextMarkerTag))]
+[ContentType(Constants.LanguageName)]
+class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
 {
-    [Export(typeof(IClassifierProvider))]
-    [Export(typeof(IViewTaggerProvider))]
-    [TagType(typeof(IErrorTag))]
-    [TagType(typeof(ITextMarkerTag))]
-    [ContentType(Constants.LanguageName)]
-    class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
-    {
-        [UsedImplicitly]
-        [Import]
-        IClassificationTypeRegistryService ClassificationRegistry;
+    [UsedImplicitly]
+    [Import]
+    IClassificationTypeRegistryService ClassificationRegistry;
 
-        IClassifier IClassifierProvider.GetClassifier(ITextBuffer buffer)
-            => buffer.Properties.GetOrCreateSingletonProperty(()
-                => new Classifier(buffer, ClassificationRegistry));
+    IClassifier IClassifierProvider.GetClassifier(ITextBuffer buffer)
+        => buffer.Properties.GetOrCreateSingletonProperty(()
+            => new Classifier(buffer, ClassificationRegistry));
 
-        ITagger<T> IViewTaggerProvider.CreateTagger<T>(ITextView view, ITextBuffer buffer)
-            => new Tagger(view, buffer) as ITagger<T>;
-    }
+    ITagger<T> IViewTaggerProvider.CreateTagger<T>(ITextView view, ITextBuffer buffer)
+        => new Tagger(view, buffer) as ITagger<T>;
 }

@@ -2,20 +2,19 @@
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Utilities;
 
-namespace ReniVSIX
-{
-    public static class ReniContent
-    {
-        [UsedImplicitly]
-        [Export]
-        [Name(Constants.LanguageName)]
-        [BaseDefinition("code")]
-        public static ContentTypeDefinition ContentType;
+namespace ReniVSIX;
 
-        [UsedImplicitly]
-        [Export]
-        [FileExtension(".reni")]
-        [ContentType(Constants.LanguageName)]
-        public static FileExtensionToContentTypeDefinition FileExtension;
-    }
+public static class ReniContent
+{
+    [UsedImplicitly]
+    [Export]
+    [Name(Constants.LanguageName)]
+    [BaseDefinition("code")]
+    public static ContentTypeDefinition ContentType;
+
+    [UsedImplicitly]
+    [Export]
+    [FileExtension(".reni")]
+    [ContentType(Constants.LanguageName)]
+    public static FileExtensionToContentTypeDefinition FileExtension;
 }
