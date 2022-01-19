@@ -124,7 +124,7 @@ static class Extension
             , iEndLine = current.End.LineIndex, iEndIndex = current.End.ColumnIndex
         };
 
-    internal static Source CreateReniSource(this IVsTextLines buffer) => new(buffer);
+    internal static Source CreateReniSource(this IVsTextLines buffer) => new(buffer.GetAll());
 
     internal static SourcePart ToSourcePart(this hw.Scanner.Source data, TextSpan span)
         => data.FromLineAndColumn(span.iStartLine, span.iStartIndex)

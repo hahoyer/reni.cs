@@ -13,7 +13,7 @@ sealed class Source : DumpableObject
 {
     readonly ValueCache<CompilerBrowser> CompilerCache;
 
-    public Source(IVsTextLines text)
+    public Source(string text)
         => CompilerCache = new(() => CreateCompilerForCache(text));
 
     CompilerBrowser Compiler => CompilerCache.Value;

@@ -7,19 +7,19 @@ using ReniUI;
 
 namespace ReniVSIX;
 
-class BufferContainer : DumpableObject
+sealed class BufferContainer : DumpableObject
 {
-    protected readonly ITextBuffer Buffer;
-    protected readonly ValueCache<CompilerBrowser> CompilerCache;
+    internal readonly ITextBuffer Buffer;
+    readonly ValueCache<CompilerBrowser> CompilerCache;
 
-    protected BufferContainer(ITextBuffer buffer)
+    internal BufferContainer(ITextBuffer buffer)
     {
         Buffer = buffer;
         CompilerCache = new(GetCompiler);
         Buffer.Changed += (sender, args) => CompilerCache.IsValid = false;
     }
 
-    protected CompilerBrowser Compiler => CompilerCache.Value;
+    internal CompilerBrowser Compiler => CompilerCache.Value;
 
     CompilerBrowser GetCompiler()
     {
@@ -31,6 +31,6 @@ class BufferContainer : DumpableObject
         return CompilerBrowser.FromText(Buffer.CurrentSnapshot.GetText());
     }
 
-    protected SnapshotSpan ToSpan(SourcePart sourcePart)
+    internal SnapshotSpan ToSpan(SourcePart sourcePart)
         => new(Buffer.CurrentSnapshot, new(sourcePart.Position, sourcePart.Length));
 }

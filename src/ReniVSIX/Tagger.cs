@@ -10,13 +10,14 @@ using ReniUI.Classification;
 
 namespace ReniVSIX;
 
-sealed class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag>
+sealed class Tagger : DumpableObject, ITagger<IErrorTag>, ITagger<TextMarkerTag>
 {
+    readonly BufferContainer Buffer;
     SnapshotPoint? Caret;
 
     internal Tagger(ITextView view, ITextBuffer buffer)
-        : base(buffer)
     {
+        Buffer = new(buffer);
         view.Caret.PositionChanged += (sender, args) => UpdateAtCaretPosition(args.NewPosition);
         view.LayoutChanged += (sender, args) =>
         {
@@ -27,7 +28,7 @@ sealed class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag
 
     IEnumerable<ITagSpan<IErrorTag>> ITagger<IErrorTag>.GetTags(NormalizedSnapshotSpanCollection spans)
         => spans
-            .SelectMany(span => Compiler.Locate(span.Start.Position, span.End.Position))
+            .SelectMany(span => Buffer.Compiler.Locate(span.Start.Position, span.End.Position))
             .SelectMany(GetErrorTag)
             .ToArray();
 
@@ -40,15 +41,13 @@ sealed class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag
 
     void UpdateAtCaretPosition(CaretPosition caretPosition)
     {
-        Caret = caretPosition.Point.GetPoint(Buffer, caretPosition.Affinity);
+        Caret = caretPosition.Point.GetPoint(Buffer.Buffer, caretPosition.Affinity);
         if(Caret == null)
             return;
 
-        var tempEvent = TagsChanged;
-        if(tempEvent != null)
-            tempEvent(this
-                , new(new(Buffer.CurrentSnapshot, 0
-                    , Buffer.CurrentSnapshot.Length)));
+        TagsChanged?.Invoke(this
+            , new(new(Buffer.Buffer.CurrentSnapshot, 0
+                , Buffer.Buffer.CurrentSnapshot.Length)));
     }
 
     IEnumerable<ITagSpan<IErrorTag>> GetErrorTag(Item item)
@@ -56,7 +55,7 @@ sealed class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag
         if(item.IsError)
         {
             ("error " + item.ShortDump()).Log();
-            yield return new TagSpan<IErrorTag>(ToSpan(item.SourcePart)
+            yield return new TagSpan<IErrorTag>(Buffer.ToSpan(item.SourcePart)
                 , new ErrorTag(PredefinedErrorTypeNames.SyntaxError, item.Issue.Message));
         }
     }
@@ -77,13 +76,13 @@ sealed class Tagger : BufferContainer, ITagger<IErrorTag>, ITagger<TextMarkerTag
             ? Caret.Value
             : Caret.Value.TranslateTo(snapshotSpan.Snapshot, PointTrackingMode.Negative);
 
-        var item = Compiler.Locate(caret.Position);
+        var item = Buffer.Compiler.Locate(caret.Position);
         var belongingItems = item?.Belonging;
         if(belongingItems == null)
             yield break;
 
-        yield return new TagSpan<TextMarkerTag>(ToSpan(item.SourcePart), new("Brace"));
+        yield return new TagSpan<TextMarkerTag>(Buffer.ToSpan(item.SourcePart), new("Brace"));
         foreach(var belongingItem in belongingItems)
-            yield return new(ToSpan(belongingItem.SourcePart), new("blue"));
+            yield return new(Buffer.ToSpan(belongingItem.SourcePart), new("blue"));
     }
 }

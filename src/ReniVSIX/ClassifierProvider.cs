@@ -16,13 +16,20 @@ namespace ReniVSIX;
 [ContentType(Constants.LanguageName)]
 class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
 {
+    [Import]
+    public IEditorOptionsFactoryService EditorOptionsCache;
+
     [UsedImplicitly]
     [Import]
     IClassificationTypeRegistryService ClassificationRegistry;
 
     IClassifier IClassifierProvider.GetClassifier(ITextBuffer buffer)
-        => buffer.Properties.GetOrCreateSingletonProperty(()
-            => new Classifier(buffer, ClassificationRegistry));
+    {
+        Main.Instance.GetOptions(() => EditorOptionsCache.GetOptions(buffer));
+        return buffer
+            .Properties
+            .GetOrCreateSingletonProperty(() => new Classifier(buffer, ClassificationRegistry));
+    }
 
     ITagger<T> IViewTaggerProvider.CreateTagger<T>(ITextView view, ITextBuffer buffer)
         => new Tagger(view, buffer) as ITagger<T>;

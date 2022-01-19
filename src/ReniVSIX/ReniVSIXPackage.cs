@@ -1,9 +1,10 @@
 ﻿using System;
-using System.ComponentModel.Design;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Text.Editor;
 using ReniUI.Formatting;
 
 namespace ReniVSIX;
@@ -54,23 +55,11 @@ public sealed class ReniVSIXPackage : AsyncPackage
         // Do any initialization that requires the UI thread after switching to the UI thread.
     {
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-        Initialize();
-    }
-
-    new void Initialize()
-    {
-        Dumper.Register();
-        var serviceContainer = this as IServiceContainer;
-        var langService = new ReniService();
-        langService.SetSite(this);
-        serviceContainer.AddService(typeof(ReniService), langService, true);
+        Main.Instance.RegisterPackage(this);
     }
 
     internal IFormatter CreateFormattingProvider()
     {
-        var s = (ReniService)(this as IServiceContainer).GetService(typeof(ReniService));
-
-
         var pd = (ConfigurationProperties)GetDialogPage(typeof(ConfigurationProperties));
         return new Configuration
         {
@@ -79,6 +68,15 @@ public sealed class ReniVSIXPackage : AsyncPackage
             , AdditionalLineBreaksForMultilineItems = pd.AdditionalLineBreaksForMultilineItems
             , LineBreakAtEndOfText = pd.LineBreakAtEndOfText
             , LineBreaksBeforeListToken = pd.LineBreaksBeforeListToken
+            , IndentCount = (int)Main.Instance.EditorOptions.GetOptionValue("Tabs/IndentSize")
         }.Create();
     }
+
+    [UsedImplicitly]
+    static EditorOptionDefinition[] Filter(IEditorOptions options)
+        => options
+            .SupportedOptions
+            //.Where(item => item.DefaultValue is int && (int)item.DefaultValue == 4)
+            .Where(item => item.Name.Contains("BeforeList"))
+            .ToArray();
 }

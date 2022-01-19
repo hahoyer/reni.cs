@@ -9,14 +9,15 @@ using ReniUI.Classification;
 
 namespace ReniVSIX;
 
-sealed class Classifier : BufferContainer, IClassifier
+sealed class Classifier : DumpableObject, IClassifier
 {
     readonly IClassificationTypeRegistryService Registry;
     readonly FunctionCache<string, IClassificationType> Types;
+    readonly BufferContainer Buffer;
 
     internal Classifier(ITextBuffer buffer, IClassificationTypeRegistryService registry)
-        : base(buffer)
     {
+        Buffer = new(buffer);
         Registry = registry;
         Types = new(GetClassificationType);
     }
@@ -24,7 +25,8 @@ sealed class Classifier : BufferContainer, IClassifier
     public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 
     IList<ClassificationSpan> IClassifier.GetClassificationSpans(SnapshotSpan span)
-        => Compiler
+        => Buffer
+            .Compiler
             .Locate(span.Start.Position, span.End.Position)
             .Select(GetClassificationSpan)
             .ToList();
@@ -58,7 +60,7 @@ sealed class Classifier : BufferContainer, IClassifier
     {
         //("class " + item.ShortDump()).Log();
         var sourcePart = item.SourcePart;
-        var snapshotSpan = ToSpan(sourcePart);
+        var snapshotSpan = Buffer.ToSpan(sourcePart);
         var formatTypeName = GetFormatTypeName(item);
         formatTypeName.AssertIsNotNull();
         return new(snapshotSpan, formatTypeName);

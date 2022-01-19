@@ -32,8 +32,7 @@ public sealed class ReniService : LanguageService
 
     public override string Name => Constants.LanguageName;
 
-    public ReniVSIXPackage Package
-        => (ReniVSIXPackage)GetLanguagePreferences().GetSite();
+    internal ReniVSIXPackage Package => (ReniVSIXPackage)Site;
 
     LanguagePreferences CreateLanguagePreferences()
         => new(Site, typeof(ReniService).GUID, Name)

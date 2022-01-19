@@ -27,7 +27,10 @@ sealed class SourceWrapper : Microsoft.VisualStudio.Package.Source
         using(ca)
         {
             ca.FlushEditActions();
-            Data.ReformatSpan(mgr, span, Parent.Package.CreateFormattingProvider());
+            var formattingProvider = Parent
+                .Package
+                .CreateFormattingProvider();
+            Data.ReformatSpan(mgr, span, formattingProvider);
         }
     }
 
