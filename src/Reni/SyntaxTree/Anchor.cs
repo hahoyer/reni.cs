@@ -11,9 +11,9 @@ using Reni.Validation;
 
 namespace Reni.SyntaxTree;
 
-public sealed class Anchor : DumpableObject, ValueCache.IContainer
+sealed class Anchor : DumpableObject, ValueCache.IContainer
 {
-    public readonly BinaryTree[] Items;
+    internal readonly BinaryTree[] Items;
 
     Anchor(params BinaryTree[] items)
     {
@@ -65,7 +65,7 @@ public sealed class Anchor : DumpableObject, ValueCache.IContainer
 
     internal static Anchor Create(params BinaryTree[] items) => new(items);
 
-    internal static Anchor CheckedCreate(params BinaryTree[] items) 
+    internal static Anchor CheckedCreate(params BinaryTree[] items)
         => items == null || items.Length == 0? null : new(items);
 
     internal Anchor Combine(Anchor other) => Combine(other?.Items);

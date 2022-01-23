@@ -7,204 +7,203 @@ using Reni.TokenClasses;
 using Reni.TokenClasses.Whitespace;
 using Reni.Validation;
 
-namespace ReniUI.Classification
+namespace ReniUI.Classification;
+
+public abstract class Item : DumpableObject
 {
-    public abstract class Item : DumpableObject
+    public sealed class Trimmed : DumpableObject
     {
-        public sealed class Trimmed : DumpableObject
+        [DisableDump]
+        internal readonly Item Item;
+
+        [DisableDump]
+        internal readonly SourcePart SourcePart;
+
+        internal Trimmed(Item item, SourcePart sourcePart)
         {
-            [DisableDump]
-            internal readonly Item Item;
-
-            [DisableDump]
-            internal readonly SourcePart SourcePart;
-
-            internal Trimmed(Item item, SourcePart sourcePart)
-            {
-                Item = item;
-                SourcePart = sourcePart.Intersect(item.SourcePart) ?? item.SourcePart.Start.Span(0);
-            }
-
-            public IEnumerable<char> GetCharArray()
-                => SourcePart
-                    .Id
-                    .ToCharArray();
+            Item = item;
+            SourcePart = sourcePart.Intersect(item.SourcePart) ?? item.SourcePart.Start.Span(0);
         }
 
-        internal BinaryTree Anchor { get; }
+        public IEnumerable<char> GetCharArray()
+            => SourcePart
+                .Id
+                .ToCharArray();
+    }
 
-        protected Item(BinaryTree anchor) => Anchor = anchor;
+    internal BinaryTree Anchor { get; }
 
-        [DisableDump]
-        public virtual SourcePart SourcePart => Anchor.Token;
+    protected Item(BinaryTree anchor) => Anchor = anchor;
 
-        [DisableDump]
-        public virtual bool IsKeyword => false;
+    [DisableDump]
+    public virtual SourcePart SourcePart => Anchor.Token;
 
-        [DisableDump]
-        public virtual bool IsIdentifier => false;
+    [DisableDump]
+    public virtual bool IsKeyword => false;
 
-        [DisableDump]
-        public virtual bool IsText => false;
+    [DisableDump]
+    public virtual bool IsIdentifier => false;
 
-        [DisableDump]
-        public virtual bool IsNumber => false;
+    [DisableDump]
+    public virtual bool IsText => false;
 
-        [DisableDump]
-        public virtual bool IsComment => false;
+    [DisableDump]
+    public virtual bool IsNumber => false;
 
-        [DisableDump]
-        public virtual bool IsSpace => false;
+    [DisableDump]
+    public virtual bool IsComment => false;
 
-        [DisableDump]
-        public virtual bool IsBraceLike => false;
+    [DisableDump]
+    public virtual bool IsSpace => false;
 
-        [DisableDump]
-        public virtual bool IsLineEnd => false;
+    [DisableDump]
+    public virtual bool IsBraceLike => false;
 
-        [DisableDump]
-        public virtual bool IsError => false;
+    [DisableDump]
+    public virtual bool IsLineEnd => false;
 
-        [DisableDump]
-        public virtual bool IsBrace => false;
+    [DisableDump]
+    public virtual bool IsError => false;
 
-        [DisableDump]
-        public virtual bool IsPunctuation => false;
+    [DisableDump]
+    public virtual bool IsBrace => false;
 
-        [DisableDump]
-        public virtual string State => "";
+    [DisableDump]
+    public virtual bool IsPunctuation => false;
 
-        [DisableDump]
-        public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
+    [DisableDump]
+    public virtual string State => "";
 
-        [DisableDump]
-        public virtual Issue Issue => null;
+    [DisableDump]
+    public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
 
-        internal virtual IWhitespaceItem GetItem<TItemType>()
-            where TItemType : IItemType
-            => null;
+    [DisableDump]
+    public virtual Issue Issue => null;
 
-        public override bool Equals(object obj)
-        {
-            if(ReferenceEquals(null, obj))
-                return false;
-            if(ReferenceEquals(this, obj))
-                return true;
-            if(obj.GetType() != GetType())
-                return false;
-            return Equals((Item)obj);
-        }
+    internal virtual IWhitespaceItem GetItem<TItemType>()
+        where TItemType : IItemType
+        => null;
 
-        public override int GetHashCode() => SourcePart.GetHashCode();
+    public override bool Equals(object obj)
+    {
+        if(ReferenceEquals(null, obj))
+            return false;
+        if(ReferenceEquals(this, obj))
+            return true;
+        if(obj.GetType() != GetType())
+            return false;
+        return Equals((Item)obj);
+    }
 
-        internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
+    public override int GetHashCode() => SourcePart.GetHashCode();
 
-        public char TypeCharacter
-        {
-            get
-            {
-                if(IsError)
-                    return 'e';
-                if(IsComment)
-                    return 'c';
-                if(IsSpace)
-                    return 'w';
-                if(IsLineEnd)
-                    return '$';
-                if(IsNumber)
-                    return 'n';
-                if(IsText)
-                    return 't';
-                if(IsKeyword)
-                    return 'k';
-                if(IsIdentifier)
-                    return 'i';
-                if(IsBrace)
-                    return 'b';
-                NotImplementedMethod();
-                return '?';
-            }
-        }
+    internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
 
-        string Types => GetTypes().Stringify(",");
-
-        public int StartPosition => SourcePart.Position;
-        public int EndPosition => SourcePart.EndPosition;
-
-        [DisableDump]
-        public Reni.SyntaxTree.Syntax Master => Anchor.Syntax;
-
-        [DisableDump]
-        public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
-
-        public IEnumerable<Item> Belonging
-        {
-            get
-            {
-                if(IsBraceLike)
-                    return Anchor.ParserLevelGroup.Select(item => new Syntax(item));
-                return new Item[0];
-            }
-        }
-
-        IEnumerable<string> GetTypes()
+    public char TypeCharacter
+    {
+        get
         {
             if(IsError)
-                yield return "error";
+                return 'e';
             if(IsComment)
-                yield return "comment";
+                return 'c';
             if(IsSpace)
-                yield return "space";
+                return 'w';
             if(IsLineEnd)
-                yield return "line-end";
+                return '$';
             if(IsNumber)
-                yield return "number";
+                return 'n';
             if(IsText)
-                yield return "text";
+                return 't';
             if(IsKeyword)
-                yield return "keyword";
+                return 'k';
             if(IsIdentifier)
-                yield return "identifier";
+                return 'i';
             if(IsBrace)
-                yield return "brace";
+                return 'b';
+            NotImplementedMethod();
+            return '?';
+        }
+    }
+
+    string Types => GetTypes().Stringify(",");
+
+    public int StartPosition => SourcePart.Position;
+    public int EndPosition => SourcePart.EndPosition;
+
+    [DisableDump]
+    internal Reni.SyntaxTree.Syntax Master => Anchor.Syntax;
+
+    [DisableDump]
+    public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
+
+    public IEnumerable<Item> Belonging
+    {
+        get
+        {
             if(IsBraceLike)
-                yield return "brace-like";
+                return Anchor.ParserLevelGroup.Select(item => new Syntax(item));
+            return new Item[0];
         }
+    }
 
-        internal Trimmed TrimLine(SourcePart span) => new(this, span);
+    IEnumerable<string> GetTypes()
+    {
+        if(IsError)
+            yield return "error";
+        if(IsComment)
+            yield return "comment";
+        if(IsSpace)
+            yield return "space";
+        if(IsLineEnd)
+            yield return "line-end";
+        if(IsNumber)
+            yield return "number";
+        if(IsText)
+            yield return "text";
+        if(IsKeyword)
+            yield return "keyword";
+        if(IsIdentifier)
+            yield return "identifier";
+        if(IsBrace)
+            yield return "brace";
+        if(IsBraceLike)
+            yield return "brace-like";
+    }
 
-        bool Equals(Item other) => SourcePart == other.SourcePart;
+    internal Trimmed TrimLine(SourcePart span) => new(this, span);
 
-        internal static Item LocateByPosition(BinaryTree target, SourcePosition offset)
-        {
-            var result = target.FindItem(offset);
-            result.AssertIsNotNull();
-            var item = result.WhiteSpaces.LocateItem(offset);
-            if(item == null)
-                return new Syntax(result);
-            return new WhiteSpaceItem(item, result);
-        }
+    bool Equals(Item other) => SourcePart == other.SourcePart;
 
-        internal static BinaryTree Locate(BinaryTree target, SourcePart span)
-        {
-            var start = LocateByPosition(target, span.Start);
-            var end = LocateByPosition(target, span.End);
-            var result = start.Anchor.CommonRoot(end.Anchor);
-            result.AssertIsNotNull();
-            return result;
-        }
+    internal static Item LocateByPosition(BinaryTree target, SourcePosition offset)
+    {
+        var result = target.FindItem(offset);
+        result.AssertIsNotNull();
+        var item = result.WhiteSpaces.LocateItem(offset);
+        if(item == null)
+            return new Syntax(result);
+        return new WhiteSpaceItem(item, result);
+    }
 
-        internal static Item GetRightNeighbor(Helper.Syntax target, int current)
-        {
-            NotImplementedFunction(target, current);
-            return default;
-        }
+    internal static BinaryTree Locate(BinaryTree target, SourcePart span)
+    {
+        var start = LocateByPosition(target, span.Start);
+        var end = LocateByPosition(target, span.End);
+        var result = start.Anchor.CommonRoot(end.Anchor);
+        result.AssertIsNotNull();
+        return result;
+    }
 
-        internal string ShortDump()
-        {
-            var start = SourcePart.Start.TextPosition;
-            return
-                $"{start.LineNumber}/{start.ColumnNumber}: {Types}: {SourcePart.Id.Quote()}";
-        }
+    internal static Item GetRightNeighbor(Helper.Syntax target, int current)
+    {
+        NotImplementedFunction(target, current);
+        return default;
+    }
+
+    internal string ShortDump()
+    {
+        var start = SourcePart.Start.TextPosition;
+        return
+            $"{start.LineNumber}/{start.ColumnNumber}: {Types}: {SourcePart.Id.Quote()}";
     }
 }
