@@ -56,7 +56,8 @@ sealed class Factory : DumpableObject
         switch(target.TokenClass)
         {
             case IDeclarationToken declarationToken:
-                anchor.AssertIsNull(anchor.Dump);
+                // ReSharper disable once ConvertClosureToMethodGroup
+                anchor.AssertIsNull();
                 return T(declarationToken.Provider.Get(target, factory));
             case IStatementsToken statementsToken when target.TokenClass.IsBelongingTo(master):
                 return statementsToken.Provider.Get(target, factory, anchor);
