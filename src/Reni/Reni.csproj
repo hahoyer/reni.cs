@@ -206,7 +206,6 @@
     <Compile Include="TokenClasses\Whitespace\LinesAndSpaces.cs" />
     <Compile Include="TokenClasses\Whitespace\SeparatorExtension.cs" />
     <Compile Include="Helper\StringResult.cs" />
-    <Compile Include="Helper\SyntaxView.cs" />
     <Compile Include="Helper\PositionDictionary.cs" />
     <Compile Include="Helper\TreeWithParent.cs" />
     <Compile Include="Helper\TreeWithParentExtended.cs" />
