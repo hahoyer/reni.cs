@@ -19,9 +19,17 @@ namespace ReniUI;
 public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 {
     readonly ValueCache<Compiler> ParentCache;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
 
-    CompilerBrowser(Func<Compiler> parent) => ParentCache = new(parent);
+    readonly ValueCache<Helper.Syntax> SyntaxCache;
+
+    CompilerBrowser(Func<Compiler> parent)
+    {
+        ParentCache = new(parent);
+        SyntaxCache = new(GetSyntax);
+    }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
@@ -45,7 +53,16 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-    internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    internal Helper.Syntax Syntax
+    {
+        get
+        {
+            if(IsInDump && !SyntaxCache.IsValid)
+                return null;
+            return SyntaxCache.Value;
+        }
+    }
 
     public static CompilerBrowser FromText
         (string text, CompilerParameters parameters, string sourceIdentifier = null)
@@ -107,6 +124,8 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
         try
         {
+            if(IsInDump)
+                return null;
             var trace = Debugger.IsAttached && DateTime.Today.Year < 2020;
 
             var compilerSyntax = Compiler.Syntax;
@@ -137,7 +156,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         return default;
     }
 
-    internal (string Text, SourcePart Span ) GetDataTipText(int line, int column)
+    internal(string Text, SourcePart Span ) GetDataTipText(int line, int column)
     {
         NotImplementedMethod(line, column);
         return default;
