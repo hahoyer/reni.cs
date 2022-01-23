@@ -14,6 +14,7 @@ namespace Reni.SyntaxTree;
 sealed class Anchor : DumpableObject, ValueCache.IContainer
 {
     internal readonly BinaryTree[] Items;
+    readonly string ReasonForEmptiness;
 
     Anchor(params BinaryTree[] items)
     {
@@ -27,9 +28,19 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         Main.AssertIsNotNull();
     }
 
+    Anchor(string reasonForEmptiness)
+    {
+        Items = new BinaryTree[0];
+        ReasonForEmptiness = reasonForEmptiness;
+    }
+
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
+    protected override string GetNodeDump()
+    {
+        var itemDump = ReasonForEmptiness ?? $"[{Items.Length}]";
+        return base.GetNodeDump() + itemDump;
+    }
 
     [DisableDump]
     internal SourcePart[] SourceParts => Items.SourceParts();
@@ -57,6 +68,9 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     internal Anchor GetRightOf(SourcePosition position)
         => new(Items.Where(item => position < item.Token).ToArray());
 
+    internal static Anchor Create(string reasonForEmptiness)
+        => new(reasonForEmptiness);
+
     internal static Anchor Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
         => new(leftAnchor, rightAnchor);
 
@@ -68,12 +82,17 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     internal static Anchor CheckedCreate(params BinaryTree[] items)
         => items == null || items.Length == 0? null : new(items);
 
-    internal Anchor Combine(Anchor other) => Combine(other?.Items);
+    internal Anchor Combine(Anchor other)
+    {
+        other?.ReasonForEmptiness.AssertIsNull(() => "Cannot combine with empty anchor.");
+        return Combine(other?.Items);
+    }
 
     internal Anchor Combine(BinaryTree[] other)
     {
         if(other == null || !other.Any())
             return this;
+        ReasonForEmptiness.AssertIsNull(() => "Cannot combine empty anchor.");
         return new(other.Concat(Items).ToArray());
     }
 

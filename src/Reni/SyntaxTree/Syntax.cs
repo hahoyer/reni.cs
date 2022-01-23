@@ -45,7 +45,8 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         : base(objectId)
     {
         Anchor = anchor;
-        Anchor.SourceParts.AssertIsNotNull();
+        if(!Anchor.IsEmpty)
+            Anchor.SourceParts.AssertIsNotNull();
         Issue = issue;
         Anchor.SetSyntax(this);
     }

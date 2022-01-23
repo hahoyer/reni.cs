@@ -10,85 +10,85 @@ using Reni.FeatureTest.Helper;
 using Reni.Runtime;
 using ReniUI;
 
-namespace ReniTest
+namespace ReniTest;
+
+static class MainContainer
 {
-    static class MainContainer
+    [UsedImplicitly]
+    const string Target = @"f: @ ^(); x: 1; f(@x) dump_print";
+
+    [UsedImplicitly]
+    const string Output = "1";
+
+    public static void Main()
     {
-        [UsedImplicitly]
-        const string Target = @"f: @ ^(); x: 1; f(@x) dump_print";
-        [UsedImplicitly]
-        const string Output = "1";
+        "Start".Log();
+        if(DateTime.Now.Year == 1)
+            TestRuntime();
+        RunAllTests();
+    }
 
-        public static void Main()
+    static void RunAllTests()
+    {
+        var configuration = TestRunner.Configuration;
+
+        configuration.IsBreakEnabled = Debugger.IsAttached;
+        configuration.SaveResults = true;
+
+        if(Debugger.IsAttached)
         {
-            "Start".Log();
-            if(DateTime.Now.Year == 1)
-                TestRuntime();
-            RunAllTests();
+            configuration.SkipSuccessfulMethods = true;
+            configuration.SaveResults = false;
+            PendingTests.Run();
         }
 
-        static void RunAllTests()
-        {
-            var configuration = TestRunner.Configuration;
+        configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
+        Assembly.GetExecutingAssembly().RunTests();
+    }
 
-            configuration.IsBreakEnabled = Debugger.IsAttached;
-            configuration.SaveResults = true;
+    // Keep this to ensure reference to ReniUI
+    [UsedImplicitly]
+    static void BrowseCompiler(CompilerBrowser compiler) { }
 
-            if(Debugger.IsAttached)
-            {
-                configuration.SkipSuccessfulMethods = true;
-                configuration.SaveResults = false;
-                PendingTests.Run();
-            }
+    [UsedImplicitly]
+    static Compiler CreateCompiler(string text)
+    {
+        Tracer.IsBreakDisabled = false;
+        const string fileName = "temptest.reni";
+        var f = fileName.ToSmbFile();
+        f.String = text;
+        var compiler = Compiler.FromText(fileName);
+        //Profiler.Measure(()=>compiler.Exec());
+        //Tracer.FlaggedLine(Profiler.Format(10,0.0));
+        return compiler;
+    }
 
-            configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
-            Assembly.GetExecutingAssembly().RunTests();
-        }
+    [UsedImplicitly]
+    static void Run<TTarget>()
+        where TTarget : CompilerTest, new()
+        => new TTarget().Run();
 
-        // Keep this to ensure reference to ReniUI
-        [UsedImplicitly]
-        static void BrowseCompiler(CompilerBrowser compiler) { }
+    static void TestRuntime()
+    {
+        Data.OutStream = new OutStream();
+        TestRuntimeCode();
+        Data.OutStream = null;
+    }
 
-        [UsedImplicitly]
-        static Compiler CreateCompiler(string text)
-        {
-            Tracer.IsBreakDisabled = false;
-            const string fileName = "temptest.reni";
-            var f = fileName.ToSmbFile();
-            f.String = text;
-            var compiler = Compiler.FromText(fileName);
-            //Profiler.Measure(()=>compiler.Exec());
-            //Tracer.FlaggedLine(Profiler.Format(10,0.0));
-            return compiler;
-        }
-
-        [UsedImplicitly]
-        static void Run<TTarget>()
-            where TTarget : CompilerTest, new()
-            => new TTarget().Run();
-
-        static void TestRuntime()
-        {
-            Data.OutStream = new OutStream();
-            TestRuntimeCode();
-            Data.OutStream = null;
-        }
-
-        static void TestRuntimeCode()
-        {
-            var data = Data.Create(18);
-            data.SizedPush(1, 10);
-            data.SizedPush(1, 4);
-            data.Push(data.Pointer(1));
-            data.Push(data.Pointer(8));
-            data.Assign(1);
-            data.Drop(1);
-            Data.PrintText("(");
-            data.Push(data.Get(1, 0).BitCast(5).BitCast(8));
-            data.Pull(1).PrintNumber();
-            Data.PrintText(", ");
-            Data.PrintText(")");
-            data.Drop(1);
-        }
+    static void TestRuntimeCode()
+    {
+        var data = Data.Create(18);
+        data.SizedPush(1, 10);
+        data.SizedPush(1, 4);
+        data.Push(data.Pointer(1));
+        data.Push(data.Pointer(8));
+        data.Assign(1);
+        data.Drop(1);
+        Data.PrintText("(");
+        data.Push(data.Get(1, 0).BitCast(5).BitCast(8));
+        data.Pull(1).PrintNumber();
+        Data.PrintText(", ");
+        Data.PrintText(")");
+        data.Drop(1);
     }
 }
