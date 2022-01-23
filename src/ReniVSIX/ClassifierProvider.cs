@@ -17,7 +17,7 @@ namespace ReniVSIX;
 class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
 {
     [Import]
-    public IEditorOptionsFactoryService EditorOptionsCache;
+    public IEditorOptionsFactoryService EditorOptions;
 
     [UsedImplicitly]
     [Import]
@@ -25,7 +25,7 @@ class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvi
 
     IClassifier IClassifierProvider.GetClassifier(ITextBuffer buffer)
     {
-        Main.Instance.GetOptions(() => EditorOptionsCache.GetOptions(buffer));
+        Main.Instance.GetOptions(() => EditorOptions.GetOptions(buffer));
         return buffer
             .Properties
             .GetOrCreateSingletonProperty(() => new Classifier(buffer, ClassificationRegistry));
