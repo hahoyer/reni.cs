@@ -30,6 +30,4 @@ sealed class Main : DumpableObject
     }
 
     internal void GetOptions(Func<IEditorOptions> getOptions) => EditorOptions = getOptions();
-    //var o1 = Filter(editorOptions);
-    //var g1 = Filter(editorOptions.GlobalOptions);
 }
