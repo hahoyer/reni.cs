@@ -8,7 +8,7 @@ namespace ReniUI.Helper;
 
 public sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax>
 {
-    internal readonly Reni.SyntaxTree.Syntax FlatItem;
+    readonly Reni.SyntaxTree.Syntax FlatItem;
 
     [DisableDump]
     [UsedImplicitly]

@@ -37,7 +37,7 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     IStatementSyntax IStatementSyntax.With(Anchor anchor)
         => anchor == null || !anchor.Items.Any()
             ? this
-            : Create(Declarer, Value, anchor.Combine(Anchor));
+            : Create(Declarer, Value, anchor.Combine(Anchor, true));
 
     [DisableDump]
     protected override int DirectChildCount => Declarer.DirectChildCount + 1;

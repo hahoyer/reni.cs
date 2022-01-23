@@ -76,7 +76,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     public Item Locate(SourcePosition offset)
     {
-        this.CachedItem(GetSyntax).IsValid = true;
+        SyntaxCache.IsValid = true;
         return Item.LocateByPosition(Compiler.BinaryTree, offset);
     }
 

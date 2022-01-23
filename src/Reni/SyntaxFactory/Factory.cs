@@ -56,7 +56,7 @@ sealed class Factory : DumpableObject
         switch(target.TokenClass)
         {
             case IDeclarationToken declarationToken:
-                anchor.AssertIsNull(() => anchor.Dump());
+                anchor.AssertIsNull(anchor.Dump);
                 return T(declarationToken.Provider.Get(target, factory));
             case IStatementsToken statementsToken when target.TokenClass.IsBelongingTo(master):
                 return statementsToken.Provider.Get(target, factory, anchor);
@@ -86,7 +86,7 @@ sealed class Factory : DumpableObject
             default:
                 return new EmptyList
                 (
-                    Anchor.CreateAll(target).Combine(anchor)
+                    Anchor.CreateAll(target).Combine(anchor, true)
                     , IssueId.InvalidExpression.Issue(target.Token)
                 );
         }
@@ -97,7 +97,7 @@ sealed class Factory : DumpableObject
         var node = tokenClass
             .Provider
             .Get(target, this);
-        anchor = Anchor.Create(target.ParserLevelGroup).Combine(anchor);
+        anchor = Anchor.Create(target.ParserLevelGroup).Combine(anchor, true);
         return CompoundSyntax.Create(node, null, anchor);
     }
 
@@ -112,11 +112,11 @@ sealed class Factory : DumpableObject
         if(issueId == IssueId.MissingLeftBracket)
         {
             target.Right.AssertIsNull();
-            return GetValueSyntax(target.Left, Anchor.Create(target).Combine(anchor));
+            return GetValueSyntax(target.Left, Anchor.Create(target).Combine(anchor, true));
         }
 
         NotImplementedMethod(issueId, target, anchor);
-        return new EmptyList(Anchor.CreateAll(target).Combine(anchor));
+        return new EmptyList(Anchor.CreateAll(target).Combine(anchor, true));
     }
 
     internal ValueSyntax GetValueSyntax(BinaryTree target)
@@ -144,7 +144,11 @@ sealed class Factory : DumpableObject
         return ExpressionSyntax
             .Create
             (
-                GetValueSyntax(target.Left),
-                definable, target.Token, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
+                GetValueSyntax(target.Left)
+                , definable
+                , target.Token
+                , GetValueSyntax(target.Right)
+                , Anchor.Create(target).Combine(anchor)
+            );
     }
 }

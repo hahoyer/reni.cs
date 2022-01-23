@@ -82,9 +82,10 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     internal static Anchor CheckedCreate(params BinaryTree[] items)
         => items == null || items.Length == 0? null : new(items);
 
-    internal Anchor Combine(Anchor other)
+    internal Anchor Combine(Anchor other, bool check = false)
     {
-        other?.ReasonForEmptiness.AssertIsNull(() => "Cannot combine with empty anchor.");
+        if(check)
+            other?.ReasonForEmptiness.AssertIsNull(() => "Cannot combine with empty anchor.");
         return Combine(other?.Items);
     }
 
@@ -114,5 +115,5 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
             ? right
             : right == null
                 ? left
-                : left.Combine(right);
+                : left.Combine(right, true);
 }

@@ -11,7 +11,7 @@ sealed class ElseHandler : DumpableObject, IValueProvider
         var condTarget = target.Left;
         BinaryTree thenTarget = null;
         BinaryTree thenAnchor = null;
-        
+
         if(condTarget?.TokenClass is ThenToken)
         {
             thenAnchor = condTarget;
