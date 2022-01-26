@@ -72,7 +72,7 @@ sealed class LinesAndSpaces : DumpableObject
     /// <summary>
     ///     Currently had no lines but now should have lines
     /// </summary>
-    bool MakeLines => TargetLineCountRespectingLineComment > 0 && !Lines.Any();
+    bool MakeLines => TargetLineCount > 0 && !Lines.Any();
 
     bool IsSeparatorRequired
         => Configuration.SeparatorRequests.Get(Predecessor == null, IsLast) &&
