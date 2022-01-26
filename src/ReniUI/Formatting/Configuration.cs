@@ -12,4 +12,5 @@ sealed class Configuration : DumpableObject
     public bool LineBreaksBeforeListToken;
     public bool LineBreaksBeforeDeclarationToken;
     public bool LineBreakAtComplexDeclarationValue;
+    public string LineBreakString = "\r\n";
 }

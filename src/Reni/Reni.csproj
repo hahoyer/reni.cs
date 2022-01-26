@@ -413,7 +413,6 @@
     <Compile Include="TokenClasses\Whitespace\IWhitespaceItem.cs" />
     <Compile Include="TokenClasses\Whitespace\LineCommentType.cs" />
     <Compile Include="TokenClasses\Whitespace\LineEndType.cs" />
-    <Compile Include="TokenClasses\Whitespace\LineGroup.cs" />
     <Compile Include="TokenClasses\Whitespace\RootType.cs" />
     <Compile Include="TokenClasses\Whitespace\SpaceType.cs" />
     <Compile Include="TokenClasses\Whitespace\CommentGroup.cs" />

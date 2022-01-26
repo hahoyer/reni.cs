@@ -49,7 +49,9 @@ sealed class WhiteSpaces
     }
 
     int? LinesAndSpaces.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
+    string LinesAndSpaces.IConfiguration.LineBreakString => Configuration.LineBreakString;
     int LinesAndSpaces.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
+
     SeparatorRequests LinesAndSpaces.IConfiguration.SeparatorRequests => SeparatorRequests;
 
     /// <summary>

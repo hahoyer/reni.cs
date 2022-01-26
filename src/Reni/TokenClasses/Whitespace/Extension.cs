@@ -105,9 +105,13 @@ static class Extension
         groups.Tail.All(space => space.SourcePart.Length == 1).Assert();
 
         var lineGroups = groups.Items
-            .Select(item => new LineGroup(item.Head.Length, item.Main))
+            .Select(item => item.Main.GetLineGroup(item.Head.Length))
             .ToArray();
         var spacePart = anchor.Span(-groups.Tail.Length);
         return new(lineGroups, spacePart, configuration, predecessorCommentType, isLast);
     }
+
+    static SourcePart GetLineGroup(this WhiteSpaceItem lineBreak, int spaceCount)
+        => (lineBreak.SourcePart.Start - spaceCount)
+            .Span(lineBreak.SourcePart.End);
 }

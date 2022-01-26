@@ -14,10 +14,11 @@ sealed class LinesAndSpaces : DumpableObject
         int? EmptyLineLimit { get; }
         SeparatorRequests SeparatorRequests { get; }
         int MinimalLineBreakCount { get; }
+        string LineBreakString { get; }
     }
 
     [EnableDump]
-    readonly LineGroup[] Lines;
+    readonly SourcePart[] Lines;
 
     [EnableDump]
     readonly SourcePart Spaces;
@@ -28,7 +29,7 @@ sealed class LinesAndSpaces : DumpableObject
 
     internal LinesAndSpaces
     (
-        LineGroup[] lines
+        SourcePart[] lines
         , SourcePart spaces
         , IConfiguration configuration
         , IItemType predecessor
@@ -45,122 +46,54 @@ sealed class LinesAndSpaces : DumpableObject
 
     protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
+    /// <summary>
+    ///     Target line count respects everything:
+    ///     the current number of lines (including any preceding line comment),
+    ///     the empty line limit of configuration if set and
+    ///     if it is the last lines and spaces-group, the minimal line break count of configuration
+    /// </summary>
     int TargetLineCount
     {
         get
         {
-            var maximalLineBreakCount = T(Configuration.EmptyLineLimit ?? Lines.Length, Lines.Length).Min();
+            var maximalLineBreakCount = Lines.Length;
+            if(Predecessor is ILine)
+                maximalLineBreakCount++;
+            if(Configuration.EmptyLineLimit != null && Configuration.EmptyLineLimit.Value < maximalLineBreakCount)
+                maximalLineBreakCount = Configuration.EmptyLineLimit.Value;
+
             var minimalLineBreakCount = IsLast? Configuration.MinimalLineBreakCount : 0;
             return T(minimalLineBreakCount, maximalLineBreakCount).Max();
         }
     }
 
     [EnableDump]
-    SourcePart SourcePart => (Lines.FirstOrDefault()?.SourcePart ?? Spaces).Start.Span(Spaces.End);
+    SourcePart SourcePart => (Lines.FirstOrDefault() ?? Spaces).Start.Span(Spaces.End);
 
-    int TargetLineCountRespectingLineComment
+    /// <summary>
+    ///     Actual target line count is like <see cref="TargetLineCount" /> but ignoring a preceding line comment
+    /// </summary>
+    int ActualTargetLineCount
         => T(TargetLineCount - (Predecessor is ILine? 1 : 0), 0).Max();
 
-    int LinesDelta => TargetLineCount - Lines.Length;
-
-    /// <summary>
-    ///     Indent cannot be handled with spaces, when there are neither lines nor spaces
-    ///     since it would anchor the same source position as the edit for adding line breaks.
-    /// </summary>
-    bool IndentAtSpaces => Lines.Any() || Spaces.Length > 0;
-
-    /// <summary>
-    ///     Currently had no lines but now should have lines
-    /// </summary>
-    bool MakeLines => TargetLineCount > 0 && !Lines.Any();
+    bool WillHaveLineBreak => TargetLineCount > 0;
 
     bool IsSeparatorRequired
         => Configuration.SeparatorRequests.Get(Predecessor == null, IsLast) &&
             Predecessor is not ILine;
 
-    internal IEnumerable<Edit> GetRemoves() { yield return new(SourcePart, "", "remove all"); }
+    string LineBreak => Configuration.LineBreakString;
 
-    internal IEnumerable<Edit> GetInserts(int indent)
+    internal IEnumerable<Edit> GetEdits(int indent)
     {
         var targetSpacesCount
-            = TargetLineCount > 0
+            = WillHaveLineBreak
                 ? indent
                 : IsSeparatorRequired
                     ? 1
                     : 0;
 
-        var insert = "\n".Repeat(TargetLineCountRespectingLineComment) + " ".Repeat(targetSpacesCount);
-        yield return new Edit(SourcePart.End.Span(0), insert, "inserts");
-    }
-
-    internal IEnumerable<Edit> GetEdits(int indent)
-    {
-        foreach(var edit in GetLineEdits())
-            yield return edit;
-
-        // when there are no lines, minimal line break count and probably indent should be ensured here 
-        if(MakeLines)
-        {
-            var insert = "\n".Repeat(TargetLineCountRespectingLineComment) + " ".Repeat(IndentAtSpaces? 0 : indent);
-            yield return new(Spaces.Start.Span(0), insert, "+minimalLineBreaks");
-        }
-
-        var targetSpacesCount
-            = TargetLineCount > 0
-                ? IndentAtSpaces
-                    ? indent
-                    : 0
-                : IsSeparatorRequired
-                    ? 1
-                    : 0;
-
-        var spacesEdit = GetSpaceEdits(targetSpacesCount);
-        if(spacesEdit != null)
-            yield return spacesEdit;
-    }
-
-    Edit GetSpaceEdits(int targetCount)
-    {
-        var delta = targetCount - (Spaces?.Length ?? 0);
-        if(delta == 0)
-            return null;
-
-        Spaces.AssertIsNotNull();
-
-        return new
-        (
-            Spaces.End.Span(T(delta, 0).Min()),
-            " ".Repeat(T(delta, 0).Max()),
-            "+/-spaces"
-        );
-    }
-
-    IEnumerable<Edit> GetLineEdits()
-    {
-        if(!Lines.Any())
-            yield break;
-
-        switch(LinesDelta)
-        {
-            case < 0:
-            {
-                var start = Lines[0].SpacesPart.Start;
-                var end = -LinesDelta < Lines.Length
-                    ? Lines[-LinesDelta].LineBreak.SourcePart.Start
-                    : Lines[-LinesDelta - 1].LineBreak.SourcePart.End;
-
-                yield return new(start.Span(end), "", "-extra Linebreaks");
-                break;
-            }
-            case > 0:
-                foreach(var edit in Lines.SelectMany(item => item.GetEdits()))
-                    yield return edit;
-                yield return new(Lines.Last().SpacesPart.End.Span(0), "\n".Repeat(LinesDelta), "+linebreaks");
-                break;
-            case 0:
-                foreach(var edit in Lines.SelectMany(item => item.GetEdits()))
-                    yield return edit;
-                break;
-        }
+        var insert = LineBreak.Repeat(ActualTargetLineCount) + " ".Repeat(targetSpacesCount);
+        return Edit.Create(SourcePart, insert);
     }
 }
