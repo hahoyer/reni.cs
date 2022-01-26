@@ -68,4 +68,19 @@ texxxxxxx
 
         text.SimpleFormattingTest(expectedText);
     }
+
+    [UnitTest]
+    public void LineCommentAfterListElement()
+    {
+        // ReSharper disable once StringLiteralTypo
+        const string text = @"Auswahl: @{Ja: (Type: ^^, Value: ""Ja""), #
+Nein: (Type: ^^, Value: ""Nein""),Vielleicht: (Type: ^^, Value: ""Vielleicht"")}";
+        const string expected = @"Auswahl: @
+{
+  Ja: (Type: ^^, Value: ""Ja""), #
+  Nein: (Type: ^^, Value: ""Nein""),
+  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
+}";
+        text.SimpleFormattingTest(expected, indentCount: 2);
+    }
 }
