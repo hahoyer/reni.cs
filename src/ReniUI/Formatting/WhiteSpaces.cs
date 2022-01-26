@@ -43,7 +43,7 @@ sealed class WhiteSpaces
         MinimalLineBreakCount = minimalLineBreakCount;
         Configuration = configuration;
         SeparatorRequests = separatorRequests;
-        WhiteSpaceView = CreateView(target);
+        WhiteSpaceView = CreateView(target, this);
         AnchorForDebug = anchorForDebug;
         StopByObjectIds();
     }
@@ -83,9 +83,10 @@ sealed class WhiteSpaces
     protected override string GetNodeDump()
         => SourcePart.GetDumpAroundCurrent(10).CSharpQuote() + " " + base.GetNodeDump();
 
-    WhiteSpaceView CreateView(WhiteSpaceItem target)
+    static WhiteSpaceView CreateView(WhiteSpaceItem target, LinesAndSpaces.IConfiguration configuration)
     {
-        var (comments, tail) = target.Items.CreateCommentGroups(target.SourcePart.End, this);
+        var (comments, tail)
+            = target.Items.CreateCommentGroups(target.SourcePart.End, configuration);
         return new(comments, tail, target.SourcePart);
     }
 }
