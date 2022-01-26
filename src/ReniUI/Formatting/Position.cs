@@ -180,7 +180,7 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple, indent: Flag.Indent.True) { }
 
             protected override Position Combine(Position other)
-                => other == Function? other : base.Combine(other);
+                => other == Function || other == LeftBracketOuter? other : base.Combine(other);
         }
 
         internal sealed class Simple : Position

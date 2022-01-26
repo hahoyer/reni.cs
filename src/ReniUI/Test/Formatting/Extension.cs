@@ -28,17 +28,25 @@ static class Extension
         , string expected = null
         , int? maxLineLength = null
         , int? emptyLineLimit = null
+        , int? indentCount = null
         , CompilerParameters parameters = null
         , char spaceReplacement = '\0'
+        , bool? lineBreakAtComplexDeclarationValue = null
     )
     {
         expected ??= text;
         expected = expected.Canonize(spaceReplacement);
 
         var compiler = CompilerBrowser.FromText(text.Canonize(spaceReplacement, false), parameters);
+        var configuration = new ReniUI.Formatting.Configuration
+            { MaxLineLength = maxLineLength, EmptyLineLimit = emptyLineLimit };
+        if(indentCount != null)
+            configuration.IndentCount = indentCount.Value;
+        if(lineBreakAtComplexDeclarationValue != null)
+            configuration.LineBreakAtComplexDeclarationValue = lineBreakAtComplexDeclarationValue.Value;
         var newText = compiler.Reformat
         (
-            new ReniUI.Formatting.Configuration { MaxLineLength = maxLineLength, EmptyLineLimit = emptyLineLimit }
+            configuration
                 .Create()
         );
 

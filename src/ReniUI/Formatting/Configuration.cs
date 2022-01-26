@@ -1,5 +1,4 @@
-﻿using System;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 
 namespace ReniUI.Formatting;
 
@@ -8,15 +7,9 @@ sealed class Configuration : DumpableObject
     public int? EmptyLineLimit;
     public int? MaxLineLength;
     public int IndentCount = 4;
-
-    [Obsolete]
-    public bool SpaceBeforeListItem = false;
-
-    [Obsolete]
-    public bool SpaceAfterListItem = true;
-
     public bool? LineBreakAtEndOfText = false;
     public bool AdditionalLineBreaksForMultilineItems = true;
     public bool LineBreaksBeforeListToken;
     public bool LineBreaksBeforeDeclarationToken;
+    public bool LineBreakAtComplexDeclarationValue;
 }

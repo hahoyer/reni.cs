@@ -202,12 +202,21 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         internal static readonly Formatter Instance = new DeclarerIssue();
     }
 
+    bool BinaryTree.IFormatter.HasComplexDeclarationValue(BinaryTree target)
+        => HasComplexDeclarationValue(target.Syntax);
+
     void BinaryTree.IFormatter.SetupPositions(BinaryTree.IPositionTarget positionTarget)
     {
         var target = (BinaryTreeProxy)positionTarget;
         var (left, center, right) = SplitFrame(target);
         SetupFramePositions(left, right);
         SetupPositions(center);
+    }
+
+    protected virtual bool HasComplexDeclarationValue(Syntax target)
+    {
+        NotImplementedMethod(target);
+        return default;
     }
 
     protected virtual void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target, "", "");
