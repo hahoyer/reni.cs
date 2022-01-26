@@ -18,9 +18,9 @@ sealed class LineGroup : DumpableObject
         SpaceCount = spaceCount;
     }
 
-    protected override string GetNodeDump() => SourcePartForTrace.NodeDump + " " + base.GetNodeDump();
+    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
-    internal SourcePart SourcePartForTrace => SpacesPart.Start.Span(LineBreak.SourcePart.End);
+    internal SourcePart SourcePart => SpacesPart.Start.Span(LineBreak.SourcePart.End);
 
     internal SourcePart SpacesPart => LineBreak.SourcePart.Start.Span(-SpaceCount);
 

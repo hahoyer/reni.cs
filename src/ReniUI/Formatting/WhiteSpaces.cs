@@ -68,6 +68,7 @@ sealed class WhiteSpaces
             return new Edit[0];
 
         var indent = Configuration.IndentCount * parameter.Indent;
+
         return WhiteSpaceView
             .GetEdits(indent)
             .Select(edit => new Edit(edit.Remove, edit.Insert, AnchorForDebug + ":" + edit.Flag))

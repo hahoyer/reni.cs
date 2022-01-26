@@ -43,7 +43,7 @@ sealed class LinesAndSpaces : DumpableObject
         Predecessor = predecessor;
     }
 
-    protected override string GetNodeDump() => SourcePartForTrace.NodeDump + " " + base.GetNodeDump();
+    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
     int TargetLineCount
     {
@@ -56,7 +56,7 @@ sealed class LinesAndSpaces : DumpableObject
     }
 
     [EnableDump]
-    SourcePart SourcePartForTrace => (Lines.FirstOrDefault()?.SourcePartForTrace ?? Spaces).Start.Span(Spaces.End);
+    SourcePart SourcePart => (Lines.FirstOrDefault()?.SourcePart ?? Spaces).Start.Span(Spaces.End);
 
     int TargetLineCountRespectingLineComment
         => T(TargetLineCount - (Predecessor is ILine? 1 : 0), 0).Max();
@@ -77,6 +77,21 @@ sealed class LinesAndSpaces : DumpableObject
     bool IsSeparatorRequired
         => Configuration.SeparatorRequests.Get(Predecessor == null, IsLast) &&
             Predecessor is not ILine;
+
+    internal IEnumerable<Edit> GetRemoves() { yield return new(SourcePart, "", "remove all"); }
+
+    internal IEnumerable<Edit> GetInserts(int indent)
+    {
+        var targetSpacesCount
+            = TargetLineCount > 0
+                ? indent
+                : IsSeparatorRequired
+                    ? 1
+                    : 0;
+
+        var insert = "\n".Repeat(TargetLineCountRespectingLineComment) + " ".Repeat(targetSpacesCount);
+        yield return new Edit(SourcePart.End.Span(0), insert, "inserts");
+    }
 
     internal IEnumerable<Edit> GetEdits(int indent)
     {
