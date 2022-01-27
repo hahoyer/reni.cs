@@ -36,5 +36,9 @@ sealed class SourceWrapper : Microsoft.VisualStudio.Package.Source
 
     public override TokenInfo GetTokenInfo(int line, int col) => Data.GetTokenInfo(line, col);
 
-    void OnChange() => Data = GetTextLines().CreateReniSource();
+    void OnChange()
+    {
+        var text = GetTextLines();
+        Data = text.CreateReniSource();
+    }
 }

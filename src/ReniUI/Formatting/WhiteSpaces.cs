@@ -16,7 +16,7 @@ namespace ReniUI.Formatting;
 ///     Things on the right side contain this fact in their name.
 /// </summary>
 sealed class WhiteSpaces
-    : DumpableObject, ISourcePartEdit, IEditPieces, LinesAndSpaces.IConfiguration
+    : DumpableObject, ISourcePartEdit, IEditPieces, LineGroup.IConfiguration
 {
     readonly Configuration Configuration;
 
@@ -48,11 +48,11 @@ sealed class WhiteSpaces
         StopByObjectIds();
     }
 
-    int? LinesAndSpaces.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
-    string LinesAndSpaces.IConfiguration.LineBreakString => Configuration.LineBreakString;
-    int LinesAndSpaces.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
+    int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
+    string LineGroup.IConfiguration.LineBreakString => Configuration.LineBreakString;
+    int LineGroup.IConfiguration.MinimalLineBreakCount => MinimalLineBreakCount;
 
-    SeparatorRequests LinesAndSpaces.IConfiguration.SeparatorRequests => SeparatorRequests;
+    SeparatorRequests LineGroup.IConfiguration.SeparatorRequests => SeparatorRequests;
 
     /// <summary>
     ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
@@ -86,7 +86,7 @@ sealed class WhiteSpaces
     protected override string GetNodeDump()
         => SourcePart.GetDumpAroundCurrent(10).CSharpQuote() + " " + base.GetNodeDump();
 
-    static WhiteSpaceView CreateView(WhiteSpaceItem target, LinesAndSpaces.IConfiguration configuration)
+    static WhiteSpaceView CreateView(WhiteSpaceItem target, LineGroup.IConfiguration configuration)
     {
         var (comments, tail)
             = target.Items.CreateCommentGroups(target.SourcePart.End, configuration);

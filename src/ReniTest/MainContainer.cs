@@ -9,7 +9,6 @@ using Reni;
 using Reni.FeatureTest.Helper;
 using Reni.Runtime;
 using ReniUI;
-using ReniUI.Test.Formatting;
 
 namespace ReniTest;
 
@@ -26,7 +25,6 @@ static class MainContainer
         "Start".Log();
         if(DateTime.Now.Year == 1)
             TestRuntime();
-        new CommentsOfLists().LineCommentAfterListElement();
         RunAllTests();
     }
 

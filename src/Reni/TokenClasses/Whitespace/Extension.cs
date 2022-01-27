@@ -52,11 +52,11 @@ static class Extension
     static bool CommentTailCondition(WhiteSpaceItem item) => item.Type is IComment;
     static bool LineBreakTailCondition(WhiteSpaceItem item) => item.Type is IVolatileLineBreak;
 
-    internal static(CommentGroup[], LinesAndSpaces) CreateCommentGroups
+    internal static(CommentGroup[], LineGroup) CreateCommentGroups
     (
         this IEnumerable<WhiteSpaceItem> allItems
         , SourcePosition anchor
-        , LinesAndSpaces.IConfiguration configuration
+        , LineGroup.IConfiguration configuration
     )
     {
         IItemType predecessor = null;
@@ -80,7 +80,7 @@ static class Extension
     (
         this(((WhiteSpaceItem[] Head, WhiteSpaceItem Main)[] Items, WhiteSpaceItem[] Tail) Lines, WhiteSpaceItem Main)
             items
-        , LinesAndSpaces.IConfiguration configuration
+        , LineGroup.IConfiguration configuration
         , ref IItemType predecessor
     )
     {
@@ -93,10 +93,10 @@ static class Extension
         return commentGroup;
     }
 
-    static LinesAndSpaces CreateLinesAndSpaces
+    static LineGroup CreateLinesAndSpaces
     (
         this((WhiteSpaceItem[] Head, WhiteSpaceItem Main)[] Items, WhiteSpaceItem[] Tail) groups
-        , LinesAndSpaces.IConfiguration configuration
+        , LineGroup.IConfiguration configuration
         , SourcePosition anchor
         , IItemType predecessorCommentType
         , bool isLast

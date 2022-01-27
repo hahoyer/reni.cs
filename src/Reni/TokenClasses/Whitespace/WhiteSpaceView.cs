@@ -20,10 +20,10 @@ sealed class WhiteSpaceView : DumpableObject
     ///     Lines and spaces that prefix the main token
     /// </summary>
     [EnableDump]
-    readonly LinesAndSpaces Tail;
+    readonly LineGroup Tail;
 
 
-    internal WhiteSpaceView(CommentGroup[] comments, LinesAndSpaces tail, SourcePart sourcePartForTrace)
+    internal WhiteSpaceView(CommentGroup[] comments, LineGroup tail, SourcePart sourcePartForTrace)
     {
         Comments = comments ?? new CommentGroup[0];
         Tail = tail;

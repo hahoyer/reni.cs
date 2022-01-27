@@ -9,9 +9,9 @@ sealed class CommentGroup : DumpableObject
     internal readonly WhiteSpaceItem Comment;
 
     [EnableDump]
-    readonly LinesAndSpaces Head;
+    readonly LineGroup Head;
 
-    internal CommentGroup(LinesAndSpaces head, WhiteSpaceItem comment)
+    internal CommentGroup(LineGroup head, WhiteSpaceItem comment)
     {
         Head = head;
         Comment = comment;

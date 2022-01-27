@@ -203,7 +203,7 @@
     <Compile Include="hw\UnitTest\ITestFixture.cs" />
     <Compile Include="hw\UnitTest\TestExtender.cs" />
     <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
-    <Compile Include="TokenClasses\Whitespace\LinesAndSpaces.cs" />
+    <Compile Include="TokenClasses\Whitespace\LineGroup.cs" />
     <Compile Include="TokenClasses\Whitespace\SeparatorExtension.cs" />
     <Compile Include="Helper\StringResult.cs" />
     <Compile Include="Helper\PositionDictionary.cs" />
