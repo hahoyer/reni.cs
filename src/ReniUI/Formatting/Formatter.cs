@@ -64,6 +64,9 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     {
         internal static readonly Formatter Instance = new FlatCompound();
 
+        protected override bool HasComplexDeclaration(Syntax target)
+            => ((CompoundSyntax)target).Statements.Any(IsComplex);
+
         protected override void SetupPositions(BinaryTreeProxy[] list)
         {
             if(!list.Any())
@@ -109,6 +112,15 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 }
             }
         }
+
+        static bool IsComplex(IStatementSyntax statement)
+            => IsComplex(statement.Declarer) || IsComplex(statement.Value);
+
+        static bool IsComplex(DeclarerSyntax target)
+            => target.Name != null && target.Tags.Any();
+
+        static bool IsComplex(ValueSyntax target)
+            => target is not TerminalSyntax;
     }
 
     abstract class CompoundWithCleanup : Formatter { }
@@ -202,8 +214,12 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         internal static readonly Formatter Instance = new DeclarerIssue();
     }
 
-    bool BinaryTree.IFormatter.HasComplexDeclarationValue(BinaryTree target)
-        => HasComplexDeclarationValue(target.Syntax);
+    bool BinaryTree.IFormatter.HasComplexDeclaration(BinaryTree target)
+    {
+        if(HasComplexDeclaration(target.Syntax))
+            return true;
+        return false;
+    }
 
     void BinaryTree.IFormatter.SetupPositions(BinaryTree.IPositionTarget positionTarget)
     {
@@ -213,8 +229,11 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         SetupPositions(center);
     }
 
-    protected virtual bool HasComplexDeclarationValue(Syntax target)
+    protected virtual bool HasComplexDeclaration(Syntax target)
     {
+        if(this is Declaration or Function)
+            return false;
+
         NotImplementedMethod(target);
         return default;
     }

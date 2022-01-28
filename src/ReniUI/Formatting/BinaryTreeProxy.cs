@@ -126,12 +126,20 @@ sealed class BinaryTreeProxy
 
     int? FlatLength => FlatItem.GetFlatLength(Configuration.EmptyLineLimit != 0);
 
+    bool HasLineBreaksBySyntax
+        => GetHasLineBreaksBySyntax() ||
+            Left != null && Left.HasLineBreaksBySyntax ||
+            Right != null && Right.HasLineBreaksBySyntax;
+
     bool GetIsLineSplit()
     {
         if(FlatItem.TokenClass is ILeftBracket)
             return Parent.IsLineSplit;
-        return HasAlreadyLineBreakOrIsTooLong || ForceLineSplit;
+        return HasAlreadyLineBreakOrIsTooLong || ForceLineSplit || HasLineBreaksBySyntax;
     }
+
+    bool GetHasLineBreaksBySyntax()
+        => Configuration.LineBreaksAtComplexDeclaration && FlatItem.HasComplexDeclaration;
 
     bool GetHasAlreadyLineBreakOrIsTooLong()
     {

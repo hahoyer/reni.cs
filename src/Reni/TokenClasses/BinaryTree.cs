@@ -20,7 +20,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     internal interface IFormatter
     {
         void SetupPositions(IPositionTarget target);
-        bool HasComplexDeclarationValue(BinaryTree target);
+        bool HasComplexDeclaration(BinaryTree target);
     }
 
     internal interface IPositionTarget { }
@@ -167,7 +167,6 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     public BinaryTree[] ParserLevelGroup
         => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? new BinaryTree[0]);
 
-
     [DisableDump]
     IssueId BracketIssueId
     {
@@ -224,6 +223,8 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
             };
         }
     }
+
+    internal bool HasComplexDeclaration => Formatter?.HasComplexDeclaration(this) ?? false;
 
 
     Issue GetIssue()
