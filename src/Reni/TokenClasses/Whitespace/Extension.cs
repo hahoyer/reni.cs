@@ -102,13 +102,14 @@ static class Extension
         , bool isLast
     )
     {
-        groups.Tail.All(space => space.SourcePart.Length == 1).Assert();
+        var spaces = groups.Tail;
+        spaces.All(space => space.SourcePart.Length == 1).Assert();
 
         var lineGroups = groups.Items
             .Select(item => item.Main.GetLineGroup(item.Head.Length))
             .ToArray();
 
-        var sourcePart = (lineGroups.FirstOrDefault()?.Start ?? anchor - groups.Tail.Length).Span(anchor);
+        var sourcePart = (lineGroups.FirstOrDefault()?.Start ?? anchor - spaces.Length).Span(anchor);
         return new(sourcePart, predecessorCommentType, lineGroups.Length, isLast, configuration);
     }
 

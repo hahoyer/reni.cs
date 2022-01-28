@@ -54,8 +54,7 @@ sealed class LineGroup : DumpableObject
     ///     Can be -1 if <br />
     ///     it is last,<br />
     ///     predecessor is a line comment and<br />
-    ///     minimal line break count by
-    ///     configuration is 0.
+    ///     minimal line break count by configuration is 0.
     /// </remarks>
     int MinimalLineBreakCount => IsLast? Configuration.MinimalLineBreakCount - PredecessorLine : 0;
 
@@ -69,10 +68,9 @@ sealed class LineGroup : DumpableObject
     ///     predecessor is a line comment and <br />
     ///     configuration line limit is 0.
     /// </remarks>
-    int LineBreaksToKeep => Configuration.EmptyLineLimit == null ||
-        Configuration.EmptyLineLimit.Value - PredecessorLine >= Lines
-            ? Lines
-            : (Configuration.EmptyLineLimit - PredecessorLine).Value;
+    int LineBreaksToKeep => Configuration.EmptyLineLimit == null
+        ? Lines
+        : T(Configuration.EmptyLineLimit.Value - PredecessorLine, Lines).Min();
 
     /// <summary>
     ///     Target line count respects everything:<br />
