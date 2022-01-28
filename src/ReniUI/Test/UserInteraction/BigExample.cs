@@ -228,5 +228,5 @@ Text: @
 ";
 
     [UnitTest]
-    public void Reformat() => Text.SimpleFormattingTest(Expected);
+    public void Reformat() => Text.SimpleFormattingTest(Expected, indentCount: 4);
 }

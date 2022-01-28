@@ -10,10 +10,10 @@ public sealed class TrainWreck : DependenceProvider
     public void FunctionWithTrainWreck()
     {
         const string text = @"Text: @
-    {
-        value: ^.
-    }
-    result
+  {
+    value: ^.
+  }
+  result
 ";
         text.SimpleFormattingTest();
     }
@@ -22,12 +22,12 @@ public sealed class TrainWreck : DependenceProvider
     public void TwoWagons()
     {
         const string text = @"{
-    first.
+  first.
 
-    system
-    NewMemory.
+  system
+  NewMemory.
 
-    second.
+  second.
 }";
         text.SimpleFormattingTest();
     }
@@ -36,13 +36,13 @@ public sealed class TrainWreck : DependenceProvider
     public void TreeWagons()
     {
         const string text = @"{
-    first.
+  first.
 
-    system
-    NewMemory
-    Attribute.
+  system
+  NewMemory
+  Attribute.
 
-    second.
+  second.
 }";
         text.SimpleFormattingTest();
     }
@@ -51,12 +51,12 @@ public sealed class TrainWreck : DependenceProvider
     public void ComplexHead()
     {
         const string text = @"{
-    first.
+  first.
 
-    (system parameters)
-    NewMemory.
+  (system parameters)
+  NewMemory.
 
-    second.
+  second.
 }";
         text.SimpleFormattingTest();
     }
@@ -65,13 +65,13 @@ public sealed class TrainWreck : DependenceProvider
     public void ShortCargo()
     {
         const string text = @"{
-    first.
+  first.
 
-    (system parameters)
-    NewMemory(cargo, 12)
-    Attribute.
+  (system parameters)
+  NewMemory(cargo, 12)
+  Attribute.
 
-    second.
+  second.
 }";
         text.SimpleFormattingTest();
     }
@@ -80,23 +80,23 @@ public sealed class TrainWreck : DependenceProvider
     public void MediumCargo()
     {
         const string text = @"{
-    first.
+  first.
 
-    (system parameters)
-    NewMemory(cargo,cargo)
-    Attribute.
+  (system parameters)
+  NewMemory(cargo,cargo)
+  Attribute.
 
-    second.
+  second.
 }";
         const string expected = @"{
-    first.
+  first.
 
-    (system parameters)
-    NewMemory
-        (cargo, cargo)
-    Attribute.
+  (system parameters)
+  NewMemory
+    (cargo, cargo)
+  Attribute.
 
-    second.
+  second.
 }";
 
         text.SimpleFormattingTest(expected, 20);
@@ -106,27 +106,27 @@ public sealed class TrainWreck : DependenceProvider
     public void LongCargo()
     {
         const string text = @"{
-    first.
+  first.
 
-    (system parameters)
-    NewMemory(cargo,
+  (system parameters)
+  NewMemory(cargo,
 12)
-    Attribute.
+  Attribute.
 
-    second.
+  second.
 }";
         const string expected = @"{
-    first.
+  first.
 
-    (system parameters)
-    NewMemory
-    (
-        cargo,
-        12
-    )
-    Attribute.
+  (system parameters)
+  NewMemory
+  (
+    cargo,
+    12
+  )
+  Attribute.
 
-    second.
+  second.
 }";
 
         text.SimpleFormattingTest(expected);
@@ -136,9 +136,9 @@ public sealed class TrainWreck : DependenceProvider
     public void TrainWreckInBrackets()
     {
         const string text = @"(
-    ((^ elementType) * 1)
-    array_reference
-    mutable
+  ((^ elementType) * 1)
+  array_reference
+  mutable
 )";
         text.SimpleFormattingTest();
     }
@@ -147,11 +147,11 @@ public sealed class TrainWreck : DependenceProvider
     public void WithOperator()
     {
         const string text = @"(
-    systemdata
-    FreePointer
-    :=
-        (systemdata FreePointer type)
-        instance((result + count) mutable enable_reinterpretation)
+  systemdata
+  FreePointer
+  :=
+    (systemdata FreePointer type)
+    instance((result + count) mutable enable_reinterpretation)
 )";
         text.SimpleFormattingTest();
     }
@@ -160,13 +160,13 @@ public sealed class TrainWreck : DependenceProvider
     public void EnoughIndent()
     {
         const string text = @"(
-    first.
+  first.
 
-    !public data:
-        system
-        NewMemory
-        (
-        ).
+  !public data:
+    system
+    NewMemory
+    (
+    ).
 )";
         text.SimpleFormattingTest();
     }

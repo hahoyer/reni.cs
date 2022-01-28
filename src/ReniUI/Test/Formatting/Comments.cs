@@ -120,8 +120,8 @@ texxxxxxxxxxxt";
     public void IndentWithLineComment()
     {
         const string text = @"(
-    cargo, #
-    12
+  cargo, #
+  12
 )";
         text.SimpleFormattingTest();
     }

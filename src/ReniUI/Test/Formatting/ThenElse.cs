@@ -37,9 +37,9 @@ else bbbbbbb", 10);
     {
         const string text = @"(ccccccc then aaaaaa else bbbbbbb)";
         text.SimpleFormattingTest(@"(
-    ccccccc
-    then aaaaaa
-    else bbbbbbb
+  ccccccc
+  then aaaaaa
+  else bbbbbbb
 )", 10);
     }
 
@@ -60,11 +60,11 @@ then aaaaaa", 10);
         // It is not as expected:
         text.SimpleFormattingTest(@"cond1
 then
-    cond2
-    then then2
+  cond2
+  then then2
 else
-    cond3
-    else else3", 7);
+  cond3
+  else else3", 7);
         // since it is :
         // (cond1 then (cond2 then then2)) else (cond3 else else3)
         // so better use some brackets:
@@ -79,9 +79,9 @@ else
         text.SimpleFormattingTest(@"cond1
 then
 (
-    cond2
-    then then2
-    else else2
+  cond2
+  then then2
+  else else2
 )
 else else1", 7);
     }

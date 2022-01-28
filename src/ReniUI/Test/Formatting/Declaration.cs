@@ -36,7 +36,7 @@ public sealed class Declaration
         const string expectedText = @"lllll:
     bbbbb";
 
-        text.SimpleFormattingTest(expectedText, 10, 1);
+        text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
     [Test]
@@ -51,7 +51,7 @@ public sealed class Declaration
     ccccc
 )";
 
-        text.SimpleFormattingTest(expectedText, 12, 1);
+        text.SimpleFormattingTest(expectedText, 12, 1, 4);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public sealed class Declaration
         const string expectedText = @"aaaaa;
 llll: bbbbb";
 
-        text.SimpleFormattingTest(expectedText, 15, 1);
+        text.SimpleFormattingTest(expectedText, 15, 1, 4);
     }
 
     [Test]
@@ -74,7 +74,7 @@ llll: bbbbb";
 llll: bbbbb;
 ccccc";
 
-        text.SimpleFormattingTest(expectedText, 20, 1);
+        text.SimpleFormattingTest(expectedText, 20, 1, 4);
     }
 
     [Test]
@@ -87,7 +87,7 @@ ccccc";
 llll:
     bbbbb";
 
-        text.SimpleFormattingTest(expectedText, 10, 1);
+        text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
     [Test]
@@ -102,7 +102,7 @@ llll:
 
 ccccc";
 
-        text.SimpleFormattingTest(expectedText, 10, 1);
+        text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
     [Test]
@@ -119,7 +119,7 @@ llll:
 ccccc;
 ddddd";
 
-        text.SimpleFormattingTest(expectedText, 10, 1);
+        text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
     [Test]
@@ -140,7 +140,7 @@ mmmmm:
 ccccc;
 ddddd";
 
-        text.SimpleFormattingTest(expectedText, 10, 1);
+        text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
     [Test]
@@ -150,7 +150,7 @@ ddddd";
         const string text = @"lllll:bbbbb";
         const string expectedText = @"lllll: bbbbb";
 
-        text.SimpleFormattingTest(expectedText, emptyLineLimit: 1);
+        text.SimpleFormattingTest(expectedText, emptyLineLimit: 1, indentCount: 4);
     }
 
     [Test]
@@ -160,7 +160,7 @@ ddddd";
         const string text = @"aaaaa;llll:bbbbb";
         const string expectedText = @"aaaaa; llll: bbbbb";
 
-        text.SimpleFormattingTest(expectedText, emptyLineLimit: 1);
+        text.SimpleFormattingTest(expectedText, emptyLineLimit: 1, indentCount: 4);
     }
 
     [Test]
@@ -170,6 +170,6 @@ ddddd";
         const string text = @"aaaaa;llll:bbbbb;ccccc";
         const string expectedText = @"aaaaa; llll: bbbbb; ccccc";
 
-        text.SimpleFormattingTest(expectedText, emptyLineLimit: 1);
+        text.SimpleFormattingTest(expectedText, emptyLineLimit: 1, indentCount: 4);
     }
 }

@@ -40,7 +40,7 @@ repeat: @
     );
 
 2";
-        text.SimpleFormattingTest(expected, 20, 0);
+        text.SimpleFormattingTest(expected, 20, 0, 4);
     }
 
     [Test]
@@ -68,7 +68,7 @@ repeat: @
 (Text('H') << 'allo') dump_print"
                 .Replace("\r\n", "\n");
 
-        text.SimpleFormattingTest(expectedText, 100, 0);
+        text.SimpleFormattingTest(expectedText, 100, 0, 4);
     }
 
     [Test]
@@ -103,7 +103,7 @@ repeat: @
 3;
 (Text('H') << 'allo') dump_print";
 
-        text.SimpleFormattingTest(expectedText, 120, 1);
+        text.SimpleFormattingTest(expectedText, 120, 1, 4);
     }
 
     [Test]
@@ -124,7 +124,7 @@ repeat: @
 )".Replace("\r\n", "\n");
 
 
-        text.SimpleFormattingTest(expectedText, 120, 1);
+        text.SimpleFormattingTest(expectedText, 120, 1, 4);
     }
 
     [UnitTest]
@@ -136,7 +136,7 @@ repeat: @
 )";
 
 
-        text.SimpleFormattingTest(maxLineLength: 120, emptyLineLimit: 1);
+        text.SimpleFormattingTest(maxLineLength: 120, emptyLineLimit: 1, indentCount: 4);
     }
 
     [Test]
@@ -159,7 +159,7 @@ repeat: @
     !mutable FreePointer: Memory array_reference mutable;
 };";
 
-        text.SimpleFormattingTest(expectedText, 60, 0);
+        text.SimpleFormattingTest(expectedText, 60, 0, 4);
     }
 
 
@@ -175,7 +175,7 @@ llll: bbbbb;
     cccccxsssss
 )";
 
-        text.SimpleFormattingTest(expectedText, 12, 1);
+        text.SimpleFormattingTest(expectedText, 12, 1, 4);
     }
 
     [Test]
@@ -188,8 +188,8 @@ llll: bbbbb;
         var expectedText =
             @"a:
 {
-    1234512345,
-    12345
+  1234512345,
+  12345
 }"
                 .Replace("\r\n", "\n");
 
@@ -214,6 +214,6 @@ llll: bbbbb;
 (
     ssssss";
 
-        text.SimpleFormattingTest(maxLineLength: 12, emptyLineLimit: 1);
+        text.SimpleFormattingTest(maxLineLength: 12, emptyLineLimit: 1, indentCount: 4);
     }
 }

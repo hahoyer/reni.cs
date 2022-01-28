@@ -26,7 +26,7 @@ public sealed class Lists : DependenceProvider
     {
         const string text = @"((aaaaaddddd))";
         const string expectedText = @"((
-    aaaaaddddd
+  aaaaaddddd
 ))";
 
         text.SimpleFormattingTest(expectedText, 10, 1);
@@ -48,8 +48,8 @@ public sealed class Lists : DependenceProvider
     {
         const string text = @"(aaaaa;ccccc)";
         const string expectedText = @"(
-    aaaaa;
-    ccccc
+  aaaaa;
+  ccccc
 )";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
@@ -60,9 +60,9 @@ public sealed class Lists : DependenceProvider
     {
         const string text = @"(aaaaa;bbbbb;ccccc)";
         const string expectedText = @"(
-    aaaaa;
-    bbbbb;
-    ccccc
+  aaaaa;
+  bbbbb;
+  ccccc
 )";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
@@ -73,8 +73,8 @@ public sealed class Lists : DependenceProvider
     {
         const string text = @"((aaaaa;ccccc))";
         const string expectedText = @"((
-    aaaaa;
-    ccccc
+  aaaaa;
+  ccccc
 ))";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
@@ -95,9 +95,9 @@ public sealed class Lists : DependenceProvider
     {
         const string text = @"(aaaaa;bbbbb;ccccc;)";
         const string expectedText = @"(
-    aaaaa;
-    bbbbb;
-    ccccc;
+  aaaaa;
+  bbbbb;
+  ccccc;
 )";
 
         text.SimpleFormattingTest(expectedText, 19, 1);
@@ -166,10 +166,10 @@ ccccc";
             @"(ccccc,aaaaa bbbbb, )";
 
         var expectedText = @"(
-    ccccc,
+  ccccc,
 
-    aaaaa
-    bbbbb,
+  aaaaa
+  bbbbb,
 )".Replace("\r\n", "\n");
 
         text.SimpleFormattingTest(expectedText, 10, 1);
@@ -183,10 +183,10 @@ ccccc";
             @"(ccccc,aaaaa bbbbb)";
 
         var expectedText = @"(
-    ccccc,
+  ccccc,
 
-    aaaaa
-    bbbbb
+  aaaaa
+  bbbbb
 )".Replace("\r\n", "\n");
 
         text.SimpleFormattingTest(expectedText, 10, 1);
