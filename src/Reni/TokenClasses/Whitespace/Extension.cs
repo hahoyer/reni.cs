@@ -107,8 +107,9 @@ static class Extension
         var lineGroups = groups.Items
             .Select(item => item.Main.GetLineGroup(item.Head.Length))
             .ToArray();
-        var spacePart = anchor.Span(-groups.Tail.Length);
-        return new(lineGroups, spacePart, configuration, predecessorCommentType, isLast);
+
+        var sourcePart = (lineGroups.FirstOrDefault()?.Start ?? anchor - groups.Tail.Length).Span(anchor);
+        return new(sourcePart, predecessorCommentType, lineGroups.Length, isLast, configuration);
     }
 
     static SourcePart GetLineGroup(this WhiteSpaceItem lineBreak, int spaceCount)

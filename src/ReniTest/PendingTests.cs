@@ -1,4 +1,4 @@
-//13:10:54.505 27.01.2022 run 185 of 186 ReniUI.Test.Formatting.LongTest.ReformatPart
+//15:09:12.639 27.01.2022 ran 186 of 186 
 
 // ReSharper disable once CheckNamespace
 namespace hw.UnitTest
@@ -8,7 +8,4 @@ namespace hw.UnitTest
         public static void Run()
         {
         
-// active 
-
-TestRunner.RunTest(new ReniUI.Test.Formatting.LongTest().ReformatPart);
 }}}
