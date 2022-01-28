@@ -161,4 +161,23 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         NotImplementedMethod(line, column);
         return default;
     }
+
+    internal bool IsTooSmall(SourcePart targetPart)
+    {
+        if(targetPart == null)
+            return false;
+        if(targetPart.Length == 0)
+            return true;
+
+        var start = Locate(targetPart.Start);
+        var end = Locate(targetPart.End + -1);
+        if(start != null && end != null)
+            return start.Anchor == end.Anchor && IsTooSmall(start.SourcePart, targetPart);
+
+        NotImplementedFunction(this, targetPart);
+        return default;
+    }
+
+    static bool IsTooSmall(SourcePart fullToken, SourcePart targetPart)
+        => fullToken.Contains(targetPart);
 }

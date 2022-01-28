@@ -92,4 +92,23 @@ sealed class WhiteSpaces
             = target.Items.CreateCommentGroups(target.SourcePart.End, configuration);
         return new(comments, tail, target.SourcePart);
     }
+
+    internal static IEnumerable<ISourcePartEdit> Create
+    (
+        BinaryTree target
+        , Configuration configuration
+        , int lineBreakCount
+        , string targetPositionForDebug
+    )
+    {
+        if(target != null)
+            yield return new WhiteSpaces
+            (
+                target.WhiteSpaces
+                , configuration
+                , target.SeparatorRequests
+                , targetPositionForDebug
+                , lineBreakCount
+            );
+    }
 }

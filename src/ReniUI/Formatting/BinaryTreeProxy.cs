@@ -116,8 +116,8 @@ sealed class BinaryTreeProxy
     internal BinaryTreeProxy Right => DirectChildren == null? YetUnknown : DirectChildren[1];
 
     ISourcePartEdit[] AnchorEdits
-        => FlatItem
-            .GetWhiteSpaceEdits(Configuration, LineBreakCount, Token.LogDump())
+        => WhiteSpaces
+            .Create(FlatItem, Configuration, LineBreakCount, Token.LogDump())
             .ToArray();
 
     SourcePart Token => FlatItem.FullToken;

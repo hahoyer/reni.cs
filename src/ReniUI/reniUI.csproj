@@ -48,7 +48,6 @@
     <Compile Include="Formatting\Edit.cs" />
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\Extension.cs" />
-    <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\ISourcePosition.cs" />
     <Compile Include="Formatting\WhiteSpaces.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
