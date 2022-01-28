@@ -196,12 +196,16 @@ ccccc";
     public void ListOfLists()
     {
         // ReSharper disable once StringLiteralTypo
-        const string text = @"Auswahl: @
+        const string text
+            = "Auswahl: @{  Ja: (Type: ^^, Value: \"Ja\"),  " +
+            "Nein: (Type: ^^, Value: \"Nein\"), " +
+            "Vielleicht: (Type: ^^, Value: \"Vielleicht\")}";
+        const string expected = @"Auswahl: @
 {
   Ja: (Type: ^^, Value: ""Ja""),
   Nein: (Type: ^^, Value: ""Nein""),
   Vielleicht: (Type: ^^, Value: ""Vielleicht"")
 }";
-        text.SimpleFormattingTest(indentCount: 2, lineBreaksAtComplexDeclaration: true);
+        text.SimpleFormattingTest(expected, indentCount: 2, lineBreaksAtComplexDeclaration: true);
     }
 }
