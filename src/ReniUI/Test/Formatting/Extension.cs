@@ -31,7 +31,7 @@ static class Extension
         , int? indentCount = null
         , CompilerParameters parameters = null
         , char spaceReplacement = '\0'
-        , bool? lineBreakAtComplexDeclarationValue = null
+        , bool? lineBreaksAtComplexDeclaration = null
     )
     {
         expected ??= text;
@@ -42,8 +42,8 @@ static class Extension
             { MaxLineLength = maxLineLength, EmptyLineLimit = emptyLineLimit };
         if(indentCount != null)
             configuration.IndentCount = indentCount.Value;
-        if(lineBreakAtComplexDeclarationValue != null)
-            configuration.LineBreakAtComplexDeclarationValue = lineBreakAtComplexDeclarationValue.Value;
+        if(lineBreaksAtComplexDeclaration != null)
+            configuration.LineBreaksAtComplexDeclaration = lineBreaksAtComplexDeclaration.Value;
         var newText = compiler.Reformat
         (
             configuration

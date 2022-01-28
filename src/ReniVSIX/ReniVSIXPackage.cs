@@ -25,21 +25,22 @@ public sealed class ReniVSIXPackage : AsyncPackage
         Main.Instance.RegisterPackage(this);
     }
 
-    internal IFormatter CreateFormattingProvider()
+    internal Configuration GetFormattingConfiguration()
     {
         var properties = (ConfigurationProperties)GetDialogPage(typeof(ConfigurationProperties));
         var editorOptions = Main.Instance.EditorOptions;
         var indentCount = (int)editorOptions.GetOptionValue("Tabs/IndentSize");
 
-        return new Configuration
+        return new()
         {
             MaxLineLength = properties.MaxLineLength //
             , EmptyLineLimit = properties.EmptyLineLimit
             , AdditionalLineBreaksForMultilineItems = properties.AdditionalLineBreaksForMultilineItems
             , LineBreakAtEndOfText = properties.LineBreakAtEndOfText
             , LineBreaksBeforeListToken = properties.LineBreaksBeforeListToken
+            , LineBreaksAtComplexDeclaration = properties.LineBreaksAtComplexDeclaration
             , IndentCount = indentCount
-        }.Create();
+        };
     }
 
     [UsedImplicitly]

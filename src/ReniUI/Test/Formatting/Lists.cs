@@ -202,6 +202,6 @@ ccccc";
   Nein: (Type: ^^, Value: ""Nein""),
   Vielleicht: (Type: ^^, Value: ""Vielleicht"")
 }";
-        text.SimpleFormattingTest(indentCount: 2, lineBreakAtComplexDeclarationValue: true);
+        text.SimpleFormattingTest(indentCount: 2, lineBreaksAtComplexDeclaration: true);
     }
 }

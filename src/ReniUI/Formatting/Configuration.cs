@@ -11,6 +11,6 @@ sealed class Configuration : DumpableObject
     public bool AdditionalLineBreaksForMultilineItems = true;
     public bool LineBreaksBeforeListToken;
     public bool LineBreaksBeforeDeclarationToken;
-    public bool LineBreakAtComplexDeclarationValue;
+    public bool LineBreaksAtComplexDeclaration;
     public string LineBreakString = "\r\n";
 }

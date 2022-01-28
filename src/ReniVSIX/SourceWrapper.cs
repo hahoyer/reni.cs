@@ -1,5 +1,8 @@
-﻿using Microsoft.VisualStudio.Package;
+﻿using System.Linq;
+using hw.Helper;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
+using ReniUI.Formatting;
 
 namespace ReniVSIX;
 
@@ -27,14 +30,25 @@ sealed class SourceWrapper : Microsoft.VisualStudio.Package.Source
         using(ca)
         {
             ca.FlushEditActions();
-            var formattingProvider = Parent
+            var configuration = Parent
                 .Package
-                .CreateFormattingProvider();
+                .GetFormattingConfiguration();
+            configuration.LineBreakString = GetLineBreakString();
+            var formattingProvider = configuration.Create();
             Data.ReformatSpan(mgr, span, formattingProvider);
         }
     }
 
     public override TokenInfo GetTokenInfo(int line, int col) => Data.GetTokenInfo(line, col);
+
+    string GetLineBreakString()
+        => GetLineCount()
+                .Select(GetNewLine)
+                .GroupBy(text => text)
+                .Select(group => (text: group.Key, count: group.Count()))
+                .OrderByDescending(group => group.count)
+                .FirstOrDefault().text ??
+            "\n";
 
     void OnChange()
     {
