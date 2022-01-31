@@ -12,7 +12,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class TrainWreckPart : Formatter, ITrainWreckPart
     {
         internal static readonly Formatter Instance = new TrainWreckPart();
-        protected override bool HasComplexDeclaration(Syntax target) => false;
         protected override void SetupPositions(BinaryTreeProxy[] target) { }
     }
 
@@ -21,8 +20,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class TrainWreck : Formatter, ITrainWreckPart
     {
         internal static readonly Formatter Instance = new TrainWreck();
-
-        protected override bool HasComplexDeclaration(Syntax target) => false;
 
         protected override void SetupPositions(BinaryTreeProxy[] target)
         {
@@ -132,8 +129,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     {
         internal static readonly Formatter Instance = new Declaration();
 
-        protected override bool HasComplexDeclaration(Syntax target) => false;
-
         protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
             var target = targets.Single();
@@ -160,8 +155,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     {
         internal static readonly Formatter Instance = new Conditional();
 
-        protected override bool HasComplexDeclaration(Syntax target) => false;
-
         protected override void SetupPositions(BinaryTreeProxy[] target)
         {
             foreach(var item in target)
@@ -179,8 +172,6 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     sealed class Function : Formatter
     {
         internal static readonly Formatter Instance = new Function();
-
-        protected override bool HasComplexDeclaration(Syntax target) => false;
 
         protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
@@ -224,11 +215,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     }
 
     bool BinaryTree.IFormatter.HasComplexDeclaration(BinaryTree target)
-    {
-        if(HasComplexDeclaration(target.Syntax))
-            return true;
-        return false;
-    }
+        => HasComplexDeclaration(target.Syntax);
 
     void BinaryTree.IFormatter.SetupPositions(BinaryTree.IPositionTarget positionTarget)
     {
@@ -238,11 +225,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         SetupPositions(center);
     }
 
-    protected virtual bool HasComplexDeclaration(Syntax target)
-    {
-        NotImplementedMethod(target);
-        return default;
-    }
+    protected virtual bool HasComplexDeclaration(Syntax target) => false;
 
     protected virtual void SetupPositions(BinaryTreeProxy[] target) => NotImplementedMethod(target, "", "");
 
