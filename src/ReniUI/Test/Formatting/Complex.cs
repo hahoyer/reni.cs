@@ -40,7 +40,7 @@ repeat: @
     );
 
 2";
-        text.SimpleFormattingTest(expected, 20, 0, 4);
+        text.SimpleFormattingTest(expected, 20, 0, 4, lineBreaksAtComplexDeclaration: true);
     }
 
     [Test]
@@ -60,7 +60,14 @@ repeat: @
     1 type instance();
     Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
     !mutable FreePointer: Memory array_reference mutable;
-    repeat: @ ^ while() then(^ body(), repeat(^));
+
+    repeat: @
+        ^ while()
+        then
+        (
+            ^ body(),
+            repeat(^)
+        );
 };
 
 1 = 1 then 2 else 4;
@@ -68,7 +75,7 @@ repeat: @
 (Text('H') << 'allo') dump_print"
                 .Replace("\r\n", "\n");
 
-        text.SimpleFormattingTest(expectedText, 100, 0, 4);
+        text.SimpleFormattingTest(expectedText, 100, 0, 4, lineBreaksAtComplexDeclaration: true);
     }
 
     [Test]
@@ -103,7 +110,7 @@ repeat: @
 3;
 (Text('H') << 'allo') dump_print";
 
-        text.SimpleFormattingTest(expectedText, 120, 1, 4);
+        text.SimpleFormattingTest(expectedText, 120, 1, 4, lineBreaksAtComplexDeclaration: true);
     }
 
     [Test]
@@ -124,7 +131,7 @@ repeat: @
 )".Replace("\r\n", "\n");
 
 
-        text.SimpleFormattingTest(expectedText, 120, 1, 4);
+        text.SimpleFormattingTest(expectedText, 120, 1, 4, lineBreaksAtComplexDeclaration: true);
     }
 
     [UnitTest]
@@ -136,7 +143,8 @@ repeat: @
 )";
 
 
-        text.SimpleFormattingTest(maxLineLength: 120, emptyLineLimit: 1, indentCount: 4);
+        text.SimpleFormattingTest(maxLineLength: 120, emptyLineLimit: 1, indentCount: 4
+            , lineBreaksAtComplexDeclaration: true);
     }
 
     [Test]
@@ -159,7 +167,7 @@ repeat: @
     !mutable FreePointer: Memory array_reference mutable;
 };";
 
-        text.SimpleFormattingTest(expectedText, 60, 0, 4);
+        text.SimpleFormattingTest(expectedText, 60, 0, 4, lineBreaksAtComplexDeclaration: true);
     }
 
 
@@ -175,7 +183,7 @@ llll: bbbbb;
     cccccxsssss
 )";
 
-        text.SimpleFormattingTest(expectedText, 12, 1, 4);
+        text.SimpleFormattingTest(expectedText, 12, 1, 4, lineBreaksAtComplexDeclaration: true);
     }
 
     [Test]
@@ -214,6 +222,7 @@ llll: bbbbb;
 (
     ssssss";
 
-        text.SimpleFormattingTest(maxLineLength: 12, emptyLineLimit: 1, indentCount: 4);
+        text.SimpleFormattingTest(maxLineLength: 12, emptyLineLimit: 1, indentCount: 4
+            , lineBreaksAtComplexDeclaration: true);
     }
 }
