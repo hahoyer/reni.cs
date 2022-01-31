@@ -17,11 +17,11 @@ namespace ReniVSIX;
 class ClassifierProvider : DumpableObject, IClassifierProvider, IViewTaggerProvider
 {
     [Import]
-    public IEditorOptionsFactoryService EditorOptions;
+    public IEditorOptionsFactoryService EditorOptions { get; set; }
 
     [UsedImplicitly]
     [Import]
-    IClassificationTypeRegistryService ClassificationRegistry;
+    IClassificationTypeRegistryService ClassificationRegistry { get; set; }
 
     IClassifier IClassifierProvider.GetClassifier(ITextBuffer buffer)
     {

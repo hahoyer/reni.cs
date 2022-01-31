@@ -22,7 +22,11 @@ sealed class Classifier : DumpableObject, IClassifier
         Types = new(GetClassificationType);
     }
 
-    public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
+    event EventHandler<ClassificationChangedEventArgs> IClassifier.ClassificationChanged
+    {
+        add { }
+        remove { }
+    }
 
     IList<ClassificationSpan> IClassifier.GetClassificationSpans(SnapshotSpan span)
         => Buffer

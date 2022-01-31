@@ -71,14 +71,6 @@
       <Name>Reni</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CSharp.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.VisualBasic.dll" />
-  </ItemGroup>
   <Import Project="sys.targets" />
   <Import Project="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\build\Microsoft.VisualStudio.Threading.Analyzers.targets" Condition="Exists('..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.0.64\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

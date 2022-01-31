@@ -36,6 +36,7 @@ public class LanguageClient : ILanguageClient
             : null;
     }
 
+
     IEnumerable<string> ILanguageClient.ConfigurationSections => null;
 
     IEnumerable<string> ILanguageClient.FilesToWatch => null;
@@ -47,8 +48,23 @@ public class LanguageClient : ILanguageClient
 
     Task ILanguageClient.OnServerInitializedAsync() => Task.CompletedTask;
 
-    Task ILanguageClient.OnServerInitializeFailedAsync(Exception e) => Task.CompletedTask;
+    Task<InitializationFailureContext> ILanguageClient.OnServerInitializeFailedAsync
+        (ILanguageClientInitializationInfo initializationState)
+        => Task.FromResult<InitializationFailureContext>(new());
 
-    public event AsyncEventHandler<EventArgs> StartAsync;
-    public event AsyncEventHandler<EventArgs> StopAsync;
+    bool ILanguageClient.ShowNotificationOnInitializeFailed => true;
+
+    event AsyncEventHandler<EventArgs> ILanguageClient.StartAsync
+    {
+        add => StartAsync += value;
+        remove => StartAsync -= value;
+    }
+
+    event AsyncEventHandler<EventArgs> ILanguageClient.StopAsync
+    {
+        add { }
+        remove { }
+    }
+
+    event AsyncEventHandler<EventArgs> StartAsync;
 }

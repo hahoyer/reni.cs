@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props" Condition="Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" />
   <PropertyGroup>
     <ProjectGuid>{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}</ProjectGuid>
     <AssemblyName>Reni</AssemblyName>
@@ -455,6 +454,9 @@
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="Code\CSharp_Generated.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
@@ -481,10 +483,4 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="sys.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props'))" />
-  </Target>
 </Project>

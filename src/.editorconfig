@@ -1,0 +1,22 @@
+﻿[*.cs]
+
+# RS0030: Do not used banned APIs
+dotnet_diagnostic.RS0030.severity = none
+
+# RS0031: The list of banned symbols contains a duplicate
+dotnet_diagnostic.RS0031.severity = none
+
+# RS0035: External access to internal symbols outside the restricted namespace(s) is prohibited
+dotnet_diagnostic.RS0035.severity = none
+
+# VSTHRD100: Avoid async void methods
+dotnet_diagnostic.VSTHRD100.severity = none
+
+# VSTHRD200: Use "Async" suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = none
+
+# VSTHRD111: Use ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD111.severity = none
+
+# VSTHRD010: Invoke single-threaded types on Main thread
+dotnet_diagnostic.VSTHRD010.severity = none
