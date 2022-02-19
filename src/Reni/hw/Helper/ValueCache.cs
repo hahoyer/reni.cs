@@ -43,7 +43,6 @@ public sealed class ValueCache<TValueType>
 
     void Ensure()
     {
-        Tracer.ConditionalBreak(IsBusy);
         (!IsBusy).Assert("Recursive attempt to get value.");
         if(ValidityState)
             return;

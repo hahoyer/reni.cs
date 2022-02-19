@@ -13,7 +13,7 @@
     <PropertyGroup>
         <LangVersion>default</LangVersion>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
         <Prefer32Bit>false</Prefer32Bit>
