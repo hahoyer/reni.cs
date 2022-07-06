@@ -113,7 +113,8 @@ sealed class Factory : DumpableObject
         if(issueId == IssueId.MissingLeftBracket)
         {
             target.Right.AssertIsNull();
-            return GetValueSyntax(target.Left, Anchor.Create(target).Combine(anchor, true));
+            anchor.IsEmpty.Assert();
+            return GetValueSyntax(target.Left, Anchor.Create(target));
         }
 
         NotImplementedMethod(issueId, target, anchor);
