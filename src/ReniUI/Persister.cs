@@ -14,9 +14,9 @@ namespace ReniUI
             readonly string Name;
             public readonly Action<T> Load;
             public readonly Func<T> Store;
-            readonly IPersitenceHandler<T> Handler;
+            readonly IPersistenceHandler<T> Handler;
 
-            public Member(string name, Action<T> load, Func<T> store, IPersitenceHandler<T> handler)
+            public Member(string name, Action<T> load, Func<T> store, IPersistenceHandler<T> handler)
             {
                 Name = name;
                 Load = load;
@@ -70,20 +70,20 @@ namespace ReniUI
         public void Store(string name) => Members[name].Store();
     }
 
-    interface IPersitenceHandler<T>
+    interface IPersistenceHandler<T>
     {
         T Get(string name);
         void Set(string name, T value);
     }
 
-    sealed class FilePersistenceHandler<T> : FilePersistenceHandler, IPersitenceHandler<T>
+    sealed class FilePersistenceHandler<T> : FilePersistenceHandler, IPersistenceHandler<T>
     {
         public FilePersistenceHandler(string fileName)
             : base(fileName) {}
 
-        T IPersitenceHandler<T>.Get(string name) => (T) Get(typeof(T), name);
+        T IPersistenceHandler<T>.Get(string name) => (T) Get(typeof(T), name);
 
-        void IPersitenceHandler<T>.Set(string name, T value) => Set(name, value);
+        void IPersistenceHandler<T>.Set(string name, T value) => Set(name, value);
     }
 
     abstract class FilePersistenceHandler : DumpableObject
@@ -91,7 +91,7 @@ namespace ReniUI
         [EnableDump]
         readonly string FileName;
 
-        protected FilePersistenceHandler(string fileName) { FileName = fileName; }
+        protected FilePersistenceHandler(string fileName) => FileName = fileName;
 
         protected object Get(Type type, string name)
         {
@@ -114,7 +114,7 @@ namespace ReniUI
             return null;
         }
 
-        SmbFile ToSmbFile(string name) => FileName.PathCombine(name).ToSmbFile();
+        SmbFile ToSmbFile(string name) => FileName.ToSmbFile()/name;
 
         protected void Set(string name, object value) => ToSmbFile(name).String = value.ToString();
     }
