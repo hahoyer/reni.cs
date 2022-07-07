@@ -28,7 +28,7 @@ sealed class Tagger : DumpableObject, ITagger<IErrorTag>, ITagger<TextMarkerTag>
 
     IEnumerable<ITagSpan<IErrorTag>> ITagger<IErrorTag>.GetTags(NormalizedSnapshotSpanCollection spans)
         => spans
-            .SelectMany(span => Buffer.Compiler.Locate(span.Start.Position, span.End.Position))
+            .SelectMany(Locate)
             .SelectMany(GetErrorTag)
             .ToArray();
 
@@ -38,6 +38,16 @@ sealed class Tagger : DumpableObject, ITagger<IErrorTag>, ITagger<TextMarkerTag>
         => spans
             .SelectMany(GetTextMarkerTag)
             .ToArray();
+
+    IEnumerable<Item> Locate(SnapshotSpan span)
+    {
+        var compiler = Buffer.Compiler;
+        var sourceLength = compiler.Source.Length;
+        // span may be beyond end of file for some reason only MS knows
+        var start = Math.Min(span.Start.Position, sourceLength);
+        var end = Math.Min(span.End.Position, sourceLength);
+        return compiler.Locate(start, end);
+    }
 
     void UpdateAtCaretPosition(CaretPosition caretPosition)
     {
@@ -81,7 +91,7 @@ sealed class Tagger : DumpableObject, ITagger<IErrorTag>, ITagger<TextMarkerTag>
         if(belongingItems == null)
             yield break;
 
-        yield return new TagSpan<TextMarkerTag>(Buffer.ToSpan(item.SourcePart), new("Brace"));
+        yield return new(Buffer.ToSpan(item.SourcePart), new("Brace"));
         foreach(var belongingItem in belongingItems)
             yield return new(Buffer.ToSpan(belongingItem.SourcePart), new("blue"));
     }

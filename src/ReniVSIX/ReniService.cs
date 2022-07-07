@@ -1,5 +1,4 @@
-﻿using hw.DebugFormatter;
-using hw.Helper;
+﻿using hw.Helper;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -19,14 +18,8 @@ public sealed class ReniService : LanguageService
     public override Microsoft.VisualStudio.Package.Source CreateSource(IVsTextLines buffer)
         => new SourceWrapper(this, buffer);
 
-    public override AuthoringScope ParseSource(ParseRequest request)
-    {
-        if(request.Reason == ParseReason.HighlightBraces)
-            return new HighlightBracesScope(request);
-
-        Dumpable.NotImplementedFunction(request);
-        return default;
-    }
+    public override Microsoft.VisualStudio.Package.AuthoringScope ParseSource(ParseRequest request)
+        => new AuthoringScope(request);
 
     public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 

@@ -64,7 +64,7 @@
     <Compile Include="DummyScanner.cs" />
     <Compile Include="Dumper.cs" />
     <Compile Include="Extension.cs" />
-    <Compile Include="HighlightBracesScope.cs" />
+    <Compile Include="AuthoringScope.cs" />
     <Compile Include="LanguageClient.cs" />
     <Compile Include="ConfigurationProperties.cs">
       <SubType>Component</SubType>
