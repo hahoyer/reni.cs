@@ -180,4 +180,10 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     static bool IsTooSmall(SourcePart fullToken, SourcePart targetPart)
         => fullToken.Contains(targetPart);
+
+    internal Declaration[] GetDeclarations(SourcePosition target)
+    {
+        NotImplementedMethod(target);
+        return default;
+    }
 }
