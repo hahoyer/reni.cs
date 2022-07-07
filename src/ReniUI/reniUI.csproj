@@ -19,6 +19,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Declaration.cs" />
     <Compile Include="Formatting\Formatter.cs" />
     <Compile Include="Formatting\FormatterByBinaryTree.cs" />
     <Compile Include="Formatting\IEditPieces.cs" />
