@@ -1,5 +1,5 @@
-reni.cpp
-========
+reni.cs
+=======
 
 hahoyers programming language  http://hahoyer-compiler.blogspot.com/
 
