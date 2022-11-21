@@ -5,46 +5,47 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.SyntaxTree;
 
-namespace Reni.TokenClasses
+namespace Reni.TokenClasses;
+
+[BelongsTo(typeof(MainTokenFactory))]
+sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandler
 {
-    [BelongsTo(typeof(MainTokenFactory))]
-    sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandler
+    public const string TokenId = "instance";
+
+    Result IPendingProvider.Result
+        (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
-        public const string TokenId = "instance";
-        public override string Id => TokenId;
+        if(category <= Category.Type.Replenished)
+            return Result(context, category, left, right);
 
-        protected override Result Result
-            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-        {
-            var leftType = left.Type(context);
-            (leftType != null).Assert();
-            return leftType
-                .InstanceResult(category, c => context.ResultAsReference(c, right));
-        }
+        NotImplementedMethod(context, category, left, right);
+        return null;
+    }
 
-        Result IPendingProvider.Result
-            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-        {
-            if(category <= Category.Type.Replenished)
-                return Result(context, category, left, right);
+    Result IRecursionHandler.Execute
+    (
+        ContextBase context,
+        Category category,
+        Category pendingCategory,
+        ValueSyntax syntax,
+        bool asReference
+    )
+    {
+        if(!asReference && (category | pendingCategory) <= Category.Type)
+            return syntax.ResultForCache(context, Category.Type);
 
-            NotImplementedMethod(context, category, left, right);
-            return null;
-        }
+        NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
+        return null;
+    }
 
-        Result IRecursionHandler.Execute
-        (
-            ContextBase context,
-            Category category,
-            Category pendingCategory,
-            ValueSyntax syntax,
-            bool asReference)
-        {
-            if(!asReference && (category | pendingCategory) <= Category.Type)
-                return syntax.ResultForCache(context, Category.Type);
+    public override string Id => TokenId;
 
-            NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
-            return null;
-        }
+    protected override Result Result
+        (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+    {
+        var leftType = left.Type(context);
+        (leftType != null).Assert();
+        return leftType
+            .InstanceResult(category, c => context.ResultAsReference(c, right));
     }
 }

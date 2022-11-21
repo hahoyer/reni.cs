@@ -8,172 +8,170 @@ using JetBrains.Annotations;
 using Reni.Runtime;
 using Reni.Validation;
 
-namespace Reni.FeatureTest.Helper
+namespace Reni.FeatureTest.Helper;
+
+/// <summary>
+///     Helper class for unit tests, that compile something
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+[PublicAPI]
+public abstract class CompilerTest : DependenceProvider, ITestFixture
 {
-    /// <summary>
-    ///     Helper class for unit tests, that compile something
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    [PublicAPI]
-    public abstract class CompilerTest : DependenceProvider, ITestFixture
+    sealed class RunException : Exception
     {
-        sealed class RunException : Exception
-        {
-            [Node]
-            internal readonly Exception Exception;
+        [Node]
+        internal readonly Exception Exception;
 
-            [Node]
-            [UsedImplicitly]
-            readonly Compiler Compiler;
-
-            public RunException(Exception exception, Compiler compiler)
-            {
-                Exception = exception;
-                Compiler = compiler;
-            }
-        }
-
-        internal readonly CompilerParameters Parameters;
-
+        [Node]
         [UsedImplicitly]
-        Compiler[] RunResults;
+        readonly Compiler Compiler;
 
-        protected CompilerTest()
+        public RunException(Exception exception, Compiler compiler)
         {
-            Parameters = new CompilerParameters();
-            if(TestRunner.Configuration.SkipSuccessfulMethods)
-                Parameters.TraceOptions.UseOnModeErrorFocus();
+            Exception = exception;
+            Compiler = compiler;
         }
+    }
 
-        TargetSetData[] TargetSet
+    internal readonly CompilerParameters Parameters;
+
+    [UsedImplicitly]
+    Compiler[] RunResults;
+
+    protected CompilerTest()
+    {
+        Parameters = new();
+        if(TestRunner.Configuration.SkipSuccessfulMethods)
+            Parameters.TraceOptions.UseOnModeErrorFocus();
+    }
+
+    public virtual void Run()
+    {
+        try
         {
-            get
+            RunResults = BaseRun().ToArray();
+        }
+        catch(RunException runException)
+        {
+            throw runException.Exception;
+        }
+    }
+
+    protected virtual string Output => GetStringAttribute<OutputAttribute>();
+    protected virtual string Target => GetStringAttribute<TargetAttribute>();
+
+    protected virtual void Verify(IEnumerable<Issue> issues)
+        => (!issues.Any()).Assert(() => issues.Select(issue => issue.LogDump).Stringify("\n"));
+
+    protected virtual void AssertValid(Compiler c) { }
+
+    TargetSetData[] TargetSet
+    {
+        get
+        {
+            var result = GetType()
+                .GetAttributes<TargetSetAttribute>(true)
+                .Select(tsa => tsa.TargetSet)
+                .ToArray();
+
+            if(Target == "")
+                return result;
+
+            return result
+                .Concat(new[] { new TargetSetData(Target, Output) })
+                .ToArray();
+        }
+    }
+
+    public string[] Targets => TargetSet.Select(item => item.Target).ToArray();
+
+    internal Compiler CreateFileAndRunCompiler
+    (
+        string name,
+        string text,
+        string expectedOutput = null,
+        Action<Compiler> expectedResult = null
+    )
+        =>
+            CreateFileAndRunCompiler
+                (name, new(text, expectedOutput), expectedResult);
+
+    Compiler CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
+    {
+        var fileName = name + ".reni";
+        var f = fileName.ToSmbFile();
+        f.String = targetSetData.Target;
+        return InternalRunCompiler(fileName, expectedResult, targetSetData);
+    }
+
+    Compiler InternalRunCompiler(string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
+        => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
+
+    Compiler InternalRunCompiler
+    (
+        CompilerParameters compilerParameters,
+        string fileName,
+        Action<Compiler> expectedResult,
+        TargetSetData targetSet
+    )
+    {
+        var outStream = new OutStream();
+        compilerParameters.OutStream = outStream;
+        var compiler = Compiler.FromFile(fileName, compilerParameters);
+
+        try
+        {
+            if(expectedResult != null)
             {
-                var result = GetType()
-                    .GetAttributes<TargetSetAttribute>(true)
-                    .Select(tsa => tsa.TargetSet)
-                    .ToArray();
-
-                if(Target == "")
-                    return result;
-
-                return result
-                    .Concat(new[] {new TargetSetData(Target, Output)})
-                    .ToArray();
+                compiler.Materialize();
+                expectedResult(compiler);
             }
-        }
 
-        protected virtual string Output => GetStringAttribute<OutputAttribute>();
-        protected virtual string Target => GetStringAttribute<TargetAttribute>();
+            compiler.Execute();
 
-        public string[] Targets => TargetSet.Select(item => item.Target).ToArray();
+            if(outStream.Data != targetSet.Output)
+            {
+                ("---------------------\n" + outStream.Data + "\n---------------------").Log
+                    ();
+                Tracer.ThrowAssertionFailed
+                (
+                    "outStream.Data != targetSet.Output",
+                    () =>
+                        "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);
+            }
 
-        public virtual void Run()
-        {
+            foreach(var issue in compiler.Issues)
+                issue.Dump().Log();
+
             try
             {
-                RunResults = BaseRun().ToArray();
+                Verify(compiler.Issues);
             }
-            catch(RunException runException)
+            catch(Exception)
             {
-                throw runException.Exception;
+                ("---------------------\n" + compiler.Issues + "\n---------------------").Log
+                    ();
+                throw;
             }
+
+            return compiler;
         }
-
-        internal Compiler CreateFileAndRunCompiler
-        (
-            string name,
-            string text,
-            string expectedOutput = null,
-            Action<Compiler> expectedResult = null
-        )
-            =>
-                CreateFileAndRunCompiler
-                    (name, new TargetSetData(text, expectedOutput), expectedResult);
-
-        Compiler CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
+        catch(Exception exception)
         {
-            var fileName = name + ".reni";
-            var f = fileName.ToSmbFile();
-            f.String = targetSetData.Target;
-            return InternalRunCompiler(fileName, expectedResult, targetSetData);
+            throw new RunException(exception, compiler);
         }
+    }
 
-        Compiler InternalRunCompiler(string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
-            => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
+    protected IEnumerable<Compiler> BaseRun() => TargetSet
+        .Select
+            (tuple => CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid));
 
-        Compiler InternalRunCompiler
-        (
-            CompilerParameters compilerParameters,
-            string fileName,
-            Action<Compiler> expectedResult,
-            TargetSetData targetSet
-        )
-        {
-            var outStream = new OutStream();
-            compilerParameters.OutStream = outStream;
-            var compiler = Compiler.FromFile(fileName, compilerParameters);
+    public IEnumerable<Compiler> Inspect() => BaseRun();
 
-            try
-            {
-                if(expectedResult != null)
-                {
-                    compiler.Materialize();
-                    expectedResult(compiler);
-                }
-
-                compiler.Execute();
-
-                if(outStream.Data != targetSet.Output)
-                {
-                    ("---------------------\n" + outStream.Data + "\n---------------------").Log
-                        ();
-                    Tracer.ThrowAssertionFailed
-                    (
-                        "outStream.Data != targetSet.Output",
-                        () =>
-                            "outStream.Data:" + outStream.Data + " expected: "
-                            + targetSet.Output);
-                }
-
-                foreach(var issue in compiler.Issues)
-                    issue.Dump().Log();
-
-                try
-                {
-                    Verify(compiler.Issues);
-                }
-                catch(Exception)
-                {
-                    ("---------------------\n" + compiler.Issues + "\n---------------------").Log
-                        ();
-                    throw;
-                }
-
-                return compiler;
-            }
-            catch(Exception exception)
-            {
-                throw new RunException(exception, compiler);
-            }
-        }
-
-        protected IEnumerable<Compiler> BaseRun() => TargetSet
-            .Select
-                (tuple => CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid));
-
-        public IEnumerable<Compiler> Inspect() => BaseRun();
-
-        protected virtual void Verify(IEnumerable<Issue> issues)
-            => (!issues.Any()).Assert(() => issues.Select(issue => issue.LogDump).Stringify("\n"));
-
-        internal string GetStringAttribute<T>()
-            where T : StringAttribute
-        {
-            var result = GetType().GetAttribute<T>(true);
-            return result == null? "" : result.Value;
-        }
-
-        protected virtual void AssertValid(Compiler c) { }
+    internal string GetStringAttribute<T>()
+        where T : StringAttribute
+    {
+        var result = GetType().GetAttribute<T>(true);
+        return result == null? "" : result.Value;
     }
 }

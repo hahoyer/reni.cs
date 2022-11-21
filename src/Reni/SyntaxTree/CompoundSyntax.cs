@@ -119,10 +119,10 @@ sealed class CompoundSyntax : ValueSyntax
     internal int[] MixInDeclarations => IndexList(item => item.IsMixInSyntax).ToArray();
 
     [DisableDump]
-    internal int EndPosition => PureStatements.Length;
+    internal int EndPosition => Statements.Length;
 
     [DisableDump]
-    internal Size IndexSize => Size.AutoSize(PureStatements.Length);
+    internal Size IndexSize => Size.AutoSize(Statements.Length);
 
     [DisableDump]
     internal string[] AllNames => Statements
