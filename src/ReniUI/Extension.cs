@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni.DeclarationOptions;
 using Reni.TokenClasses.Whitespace;
 
 namespace ReniUI;
@@ -75,4 +76,7 @@ static class Extension
         Dumpable.NotImplementedFunction(items);
         return default;
     }
+
+    internal static Declaration[] Filter(this Declaration[] declarations, string searchId)
+        => declarations.Where(declaration => declaration.IsMatch(searchId)).ToArray();
 }

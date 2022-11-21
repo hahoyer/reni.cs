@@ -5,6 +5,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.DeclarationOptions;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -80,8 +81,13 @@ class InfixHandler : DumpableObject, IValueProvider
 
     sealed class TerminalErrorTokenClass : InfixTypeErrorTokenClass, ITerminal
     {
+        static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
+
         public TerminalErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidTerminalExpression, tokenClass) { }
+
+        Declaration[] ITerminal.Declarations => PredefinedDeclarations;
+
 
         Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
             => new(category, GetIssue(token));

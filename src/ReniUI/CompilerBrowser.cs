@@ -7,8 +7,10 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
+using Reni.DeclarationOptions;
 using Reni.Helper;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
@@ -37,6 +39,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     internal Compiler Compiler => ParentCache.Value;
 
+    [DisableDump]
     public StringStream Result
     {
         get
@@ -170,7 +173,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
             return true;
 
         var start = Locate(targetPart.Start);
-        var end = Locate(targetPart.End + -1);
+        var end = Locate(targetPart.End - 1);
         if(start != null && end != null)
             return start.Anchor == end.Anchor && IsTooSmall(start.SourcePart, targetPart);
 
@@ -181,9 +184,38 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     static bool IsTooSmall(SourcePart fullToken, SourcePart targetPart)
         => fullToken.Contains(targetPart);
 
-    internal Declaration[] GetDeclarations(SourcePosition target)
+    bool IsCompletionMode(SourcePart target)
     {
-        NotImplementedMethod(target);
+        var startPosition = target.Start;
+        var beforeEndPosition = target.End - 1;
+        if(!startPosition.IsValid || !beforeEndPosition.IsValid)
+            return false;
+        var startItem = Locate(startPosition);
+        var beforeEndItem = Locate(beforeEndPosition);
+        return startItem != beforeEndItem && !beforeEndItem.IsWhiteSpace;
+    }
+
+    internal Declaration[] GetDeclarations(SourcePart target)
+    {
+        if(IsCompletionMode(target))
+        {
+            var location = (Classification.Syntax)Locate(target.Start - 1);
+            var syntax = location.Master;
+            if(syntax is ExpressionSyntax expressionSyntax)
+            {
+                var targetObject = expressionSyntax.Left;
+                if(targetObject is TerminalSyntax terminalSyntax)
+                    return terminalSyntax.Terminal.Declarations.Filter(expressionSyntax.Definable.Id);
+
+                NotImplementedFunction(target);
+                return default;
+            }
+
+            NotImplementedFunction(target);
+            return default;
+        }
+
+        NotImplementedFunction(target);
         return default;
     }
 }

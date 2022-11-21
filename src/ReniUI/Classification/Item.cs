@@ -72,6 +72,10 @@ public abstract class Item : DumpableObject
     public virtual bool IsPunctuation => false;
 
     [DisableDump]
+    public virtual bool IsWhiteSpace => false;
+
+
+    [DisableDump]
     public virtual string State => "";
 
     [DisableDump]

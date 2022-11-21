@@ -131,7 +131,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     internal BinaryTree LeftMost => Left?.LeftMost ?? this;
 
     [DisableDump]
-    BinaryTree RightMost => Right?.RightMost ?? this;
+    internal BinaryTree RightMost => Right?.RightMost ?? this;
 
     [DisableDump]
     internal IEnumerable<Issue> AllIssues
@@ -255,7 +255,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         if(position < WhiteSpaces.SourcePart.Start)
             return Left?.FindItemCache[position.Position];
 
-        if(position < Token.End || position == Token.End && TokenClass is EndOfText)
+        if(position < Token.End || (position == Token.End && TokenClass is EndOfText))
             return this;
 
         return Right?.FindItemCache[position.Position];

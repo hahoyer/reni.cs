@@ -104,17 +104,18 @@ sealed class Factory : DumpableObject
 
     ValueSyntax GetIssueSyntax(IssueId issueId, BinaryTree target, Anchor anchor)
     {
+        var resultingAnchor = Anchor.Create(target).Combine(anchor);
+
         if(issueId == IssueId.MissingRightBracket)
         {
             target.Left.AssertIsNull();
-            return GetValueSyntax(target.Right, Anchor.Create(target).Combine(anchor));
+            return GetValueSyntax(target.Right, resultingAnchor);
         }
 
         if(issueId == IssueId.MissingLeftBracket)
         {
             target.Right.AssertIsNull();
-            anchor.IsEmpty.Assert();
-            return GetValueSyntax(target.Left, Anchor.Create(target));
+            return GetValueSyntax(target.Left, resultingAnchor);
         }
 
         NotImplementedMethod(issueId, target, anchor);

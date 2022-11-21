@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -40,6 +41,12 @@ sealed class SourceWrapper : Microsoft.VisualStudio.Package.Source
     }
 
     public override TokenInfo GetTokenInfo(int line, int col) => Data.GetTokenInfo(line, col);
+
+    public override void Completion(IVsTextView textView, TokenInfo info, ParseReason reason)
+    {
+        Dumpable.NotImplementedFunction("textView", "info", reason);
+        base.Completion(textView, info, reason);
+    }
 
     string GetLineBreakString()
         => GetLineCount()
