@@ -1,32 +1,29 @@
 using hw.DebugFormatter;
-
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 
-namespace Reni.Type
+namespace Reni.Type;
+
+abstract class Child<TParent>
+    : TypeBase
+        , IProxyType
+        , IConversion
+        , IChild<TParent>
+    where TParent : TypeBase
 {
-    abstract class Child<TParent>
-        : TypeBase
-            , IProxyType
-            , IConversion
-            , IChild<TParent>
-        where TParent : TypeBase
-    {
-        protected Child(TParent parent) { Parent = parent; }
+    [Node]
+    [DisableDump]
+    internal readonly TParent Parent;
 
-        [Node]
-        [DisableDump]
-        internal readonly TParent Parent;
+    protected Child(TParent parent) => Parent = parent;
 
-        [DisableDump]
-        internal override Root Root => Parent.Root;
+    TParent IChild<TParent>.Parent => Parent;
+    Result IConversion.Execute(Category category) => ParentConversionResult(category);
+    TypeBase IConversion.Source => this;
+    IConversion IProxyType.Converter => this;
+    protected abstract Result ParentConversionResult(Category category);
 
-        TParent IChild<TParent>.Parent => Parent;
-        IConversion IProxyType.Converter => this;
-        TypeBase IConversion.Source => this;
-        Result IConversion.Execute(Category category) => ParentConversionResult(category);
-
-        protected abstract Result ParentConversionResult(Category category);
-    }
+    [DisableDump]
+    internal override Root Root => Parent.Root;
 }
