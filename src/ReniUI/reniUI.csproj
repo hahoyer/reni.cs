@@ -19,7 +19,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
-    <Compile Include="Declaration.cs" />
     <Compile Include="Formatting\Formatter.cs" />
     <Compile Include="Formatting\FormatterByBinaryTree.cs" />
     <Compile Include="Formatting\IEditPieces.cs" />
@@ -36,6 +35,7 @@
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
     <Compile Include="Test\UserInteraction\BigExample.cs" />
+    <Compile Include="Test\UserInteraction\DeclarationOptions.cs" />
     <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
     <Compile Include="Test\UserInteraction\UserInterAction.cs" />
     <Compile Include="Test\UserInteraction\UserInterAction2.cs" />
@@ -89,8 +89,8 @@
     <Content Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=2021.3.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2021.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2022.3.1\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="sys.targets" />

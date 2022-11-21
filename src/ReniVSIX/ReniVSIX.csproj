@@ -60,11 +60,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BufferContainer.cs" />
+    <Compile Include="CompletionSource.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DummyScanner.cs" />
     <Compile Include="Dumper.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="AuthoringScope.cs" />
+    <Compile Include="IntellisenseController.cs" />
     <Compile Include="LanguageClient.cs" />
     <Compile Include="ConfigurationProperties.cs">
       <SubType>Component</SubType>
@@ -114,13 +116,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations">
-      <Version>2021.3.0</Version>
+      <Version>2022.3.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK">
-      <Version>17.0.32112.339</Version>
+      <Version>17.4.33103.184</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
-      <Version>17.0.5234</Version>
+      <Version>17.4.2119</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
