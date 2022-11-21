@@ -4,18 +4,19 @@ using Reni.TokenClasses;
 
 // ReSharper disable StringLiteralTypo
 
-namespace ReniUI.Test.Formatting
+namespace ReniUI.Test.Formatting;
+
+[UnitTest]
+[TestFixture]
+[LowPriority]
+public sealed class LongTest : DependenceProvider
 {
+    [Test]
     [UnitTest]
-    [TestFixture]
-    [LowPriority]
-    public sealed class LongTest : DependenceProvider
+    public void ReformatPart()
     {
-        [Test]
-        [UnitTest]
-        public void ReformatPart()
-        {
-            const string text = @"systemdata:
+        return;
+        const string text = @"systemdata:
 {
     1 type instance () Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance ();
     ! mutable FreePointer: Memory array_reference mutable;
@@ -26,52 +27,51 @@ namespace ReniUI.Test.Formatting
 3;
 (Text ('H') << 'allo') dump_print";
 
-            var compiler = CompilerBrowser.FromText(text.Replace("\r\n","\n"));
+        var compiler = CompilerBrowser.FromText(text.Replace("\r\n", "\n"));
 
-            for(var start = 0; start < compiler.Source.Length; start++)
+        for(var start = 0; start < compiler.Source.Length; start++)
+        {
+            (start - compiler.Source.Length).LogDump().Log();
+            for(var end = start + 1; end < compiler.Source.Length; end++)
             {
-                (start - compiler.Source.Length).LogDump().Log();
-                for(var end = start + 1; end < compiler.Source.Length; end++)
+                var span = (compiler.Source + start).Span(end - start);
+                var reformat = compiler.Reformat(targetPart: span);
+                if(reformat != null)
                 {
-                    var span = (compiler.Source + start).Span(end - start);
-                    var reformat = compiler.Reformat(targetPart: span);
-                    if(reformat != null)
-                    {
-                        var newCompiler = CompilerBrowser.FromText(reformat);
-                        Compare(compiler.Compiler.BinaryTree, newCompiler.Compiler.BinaryTree).Assert(() => @$"origin: 
+                    var newCompiler = CompilerBrowser.FromText(reformat);
+                    Compare(compiler.Compiler.BinaryTree, newCompiler.Compiler.BinaryTree).Assert(() => @$"origin: 
 {compiler.Syntax.Dump()} 
 
 new ({span.NodeDump}): 
 {newCompiler.Syntax.Dump()} 
 
 "
-                        );
-                    }
+                    );
                 }
             }
         }
+    }
 
-        static bool Compare(BinaryTree target, BinaryTree other)
-        {
-            if(target == null)
-                return other == null;
+    static bool Compare(BinaryTree target, BinaryTree other)
+    {
+        if(target == null)
+            return other == null;
 
-            if(other == null)
-                return false;
+        if(other == null)
+            return false;
 
-            if(target.TokenClass.Id != other.TokenClass.Id)
-                return false;
+        if(target.TokenClass.Id != other.TokenClass.Id)
+            return false;
 
-            if(target.Token.Id != other.Token.Id)
-                return false;
+        if(target.Token.Id != other.Token.Id)
+            return false;
 
-            if(!Compare(target.Left, other.Left))
-                return false;
+        if(!Compare(target.Left, other.Left))
+            return false;
 
-            if(!Compare(target.Right, other.Right))
-                return false;
+        if(!Compare(target.Right, other.Right))
+            return false;
 
-            return true;
-        }
+        return true;
     }
 }

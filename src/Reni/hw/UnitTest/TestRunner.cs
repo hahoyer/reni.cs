@@ -79,14 +79,13 @@ public sealed class TestRunner : Dumpable
         => $@"//{HeaderText}
 
 // ReSharper disable once CheckNamespace
-namespace hw.UnitTest
+namespace hw.UnitTest;
+public static class PendingTests
 {{
-    public static class PendingTests
+    public static void Run()
     {{
-        public static void Run()
-        {{
-        {GeneratedTestCalls}
-}}}}}}
+    {GeneratedTestCalls}
+}}}}
 ";
 
     string GeneratedTestCalls
