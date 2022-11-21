@@ -31,6 +31,7 @@ sealed class ArrayType
         public Flag IsMutable { get; }
         public Flag IsTextItem { get; }
         Flags Data { get; }
+        public string DumpPrintText => Data.DumpPrintText;
 
         Options(string optionsId)
         {
@@ -42,7 +43,6 @@ sealed class ArrayType
         }
 
         protected override string GetNodeDump() => DumpPrintText;
-        public string DumpPrintText => Data.DumpPrintText;
 
         public static Options Create(string optionsId = null) => new(optionsId);
     }
@@ -61,6 +61,43 @@ sealed class ArrayType
     readonly ValueCache<NumberType> NumberCache;
 
     Options OptionsValue { get; }
+
+    [DisableDump]
+    RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
+
+    [DisableDump]
+    internal bool IsMutable => OptionsValue.IsMutable.Value;
+
+    [DisableDump]
+    internal bool IsTextItem => OptionsValue.IsTextItem.Value;
+
+    [DisableDump]
+    internal NumberType Number => NumberCache.Value;
+
+    [DisableDump]
+    ArrayType NoTextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(false));
+
+    [DisableDump]
+    internal ArrayType TextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(true));
+
+    [DisableDump]
+    internal ArrayType Mutable => ElementType.Array(Count, OptionsValue.IsMutable.SetTo(true));
+
+    IEnumerable<string> InternalDeclarationOptions
+    {
+        get
+        {
+            NotImplementedMethod();
+            return null;
+        }
+    }
+
+    TypeBase ElementAccessType => ElementType.TypeForArrayElement;
+
+    [DisableDump]
+    TypeBase IndexType => Root.BitType.Number(IndexSize.ToInt());
+
+    Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
     public ArrayType(TypeBase elementType, int count, string optionsId)
     {
@@ -191,43 +228,6 @@ sealed class ArrayType
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
     protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
-
-    [DisableDump]
-    RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
-
-    [DisableDump]
-    internal bool IsMutable => OptionsValue.IsMutable.Value;
-
-    [DisableDump]
-    internal bool IsTextItem => OptionsValue.IsTextItem.Value;
-
-    [DisableDump]
-    internal NumberType Number => NumberCache.Value;
-
-    [DisableDump]
-    ArrayType NoTextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(false));
-
-    [DisableDump]
-    internal ArrayType TextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(true));
-
-    [DisableDump]
-    internal ArrayType Mutable => ElementType.Array(Count, OptionsValue.IsMutable.SetTo(true));
-
-    IEnumerable<string> InternalDeclarationOptions
-    {
-        get
-        {
-            NotImplementedMethod();
-            return null;
-        }
-    }
-
-    TypeBase ElementAccessType => ElementType.TypeForArrayElement;
-
-    [DisableDump]
-    TypeBase IndexType => Root.BitType.Number(IndexSize.ToInt());
-
-    Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.ArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
