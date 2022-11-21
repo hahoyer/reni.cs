@@ -84,7 +84,7 @@ sealed class WhiteSpaces
     SourcePart ISourcePartEdit.SourcePart => SourcePart;
 
     protected override string GetNodeDump()
-        => SourcePart.GetDumpAroundCurrent(10).CSharpQuote() + " " + base.GetNodeDump();
+        => SourcePart.GetDumpAroundCurrent().CSharpQuote() + " " + base.GetNodeDump();
 
     static WhiteSpaceView CreateView(WhiteSpaceItem target, LineGroup.IConfiguration configuration)
     {
