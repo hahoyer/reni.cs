@@ -12,9 +12,11 @@ namespace ReniVSIX;
 
 [ContentType(Constants.LanguageName)]
 [Export(typeof(ILanguageClient))]
+[RunOnContext(RunningContext.RunOnHost)]
 public class LanguageClient : ILanguageClient
 {
-    public LanguageClient() => Debugger.Launch();
+    internal static LanguageClient Instance { get; set; }
+    public LanguageClient() => Instance = this;
 
     async Task<Connection> ILanguageClient.ActivateAsync(CancellationToken token)
     {

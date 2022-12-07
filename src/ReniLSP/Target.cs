@@ -10,25 +10,24 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
-namespace ReniLSP
+namespace ReniLSP;
+
+[UsedImplicitly]
+sealed class Target : DumpableObject, IDidOpenTextDocumentHandler
 {
-    [UsedImplicitly]
-    sealed class Target : DumpableObject, IDidOpenTextDocumentHandler
+    // ReSharper disable once CollectionNeverQueried.Local
+    readonly ConcurrentDictionary<string, TextDocumentItem> Buffers = new();
+
+    TextDocumentOpenRegistrationOptions
+        IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
+        (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+        => new();
+
+    Task<Unit> IRequestHandler<DidOpenTextDocumentParams, Unit>.Handle
+        (DidOpenTextDocumentParams request, CancellationToken cancellationToken)
     {
-        // ReSharper disable once CollectionNeverQueried.Local
-        readonly ConcurrentDictionary<string, TextDocumentItem> Buffers = new();
-
-        TextDocumentOpenRegistrationOptions
-            IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
-            (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
-            => new();
-
-        Task<Unit> IRequestHandler<DidOpenTextDocumentParams, Unit>.Handle
-            (DidOpenTextDocumentParams request, CancellationToken cancellationToken)
-        {
-            var item = request.TextDocument;
-            Buffers[item.Uri.GetFileSystemPath()] = item;
-            return Unit.Task;
-        }
+        var item = request.TextDocument;
+        Buffers[item.Uri.GetFileSystemPath()] = item;
+        return Unit.Task;
     }
 }

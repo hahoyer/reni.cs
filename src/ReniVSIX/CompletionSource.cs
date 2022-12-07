@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using hw.DebugFormatter;
-using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.Text;
 
 namespace ReniVSIX;

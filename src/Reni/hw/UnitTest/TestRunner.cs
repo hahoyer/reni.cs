@@ -39,7 +39,7 @@ public sealed class TestRunner : Dumpable
 
     TestRunner(IEnumerable<TestType> testTypes)
     {
-        TestLevels = new Func<Type, bool>[] { IsNormalPriority, IsLowPriority };
+        TestLevels = new[] { IsNormalPriority, IsLowPriority };
         TestTypes = testTypes.ToArray();
         TestTypes.IsCircuitFree(DependentTypes).Assert
             (() => Tracer.Dump(TestTypes.Circuits(DependentTypes).ToArray()));

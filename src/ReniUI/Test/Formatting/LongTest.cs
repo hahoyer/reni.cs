@@ -2,6 +2,8 @@ using hw.DebugFormatter;
 using hw.UnitTest;
 using Reni.TokenClasses;
 
+#pragma warning disable CS0162
+
 // ReSharper disable StringLiteralTypo
 
 namespace ReniUI.Test.Formatting;

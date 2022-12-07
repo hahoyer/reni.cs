@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace ReniVSIX;
 
-public static class ReniContent
+public class ReniContent
 {
     [UsedImplicitly]
     [Export]
