@@ -68,5 +68,25 @@ public class LanguageClient : ILanguageClient
         remove { }
     }
 
+    static async Task<Connection> Activate()
+    {
+        await Task.Yield();
+
+        var info = new ProcessStartInfo();
+        info.FileName = "a:/delvelop/Reni/dev/out/Debug/ReniLSP.exe";
+        info.Arguments = "bar";
+        info.RedirectStandardInput = true;
+        info.RedirectStandardOutput = true;
+        info.UseShellExecute = false;
+        info.CreateNoWindow = true;
+
+        var process = new Process();
+        process.StartInfo = info;
+
+        return process.Start()
+            ? new Connection(process.StandardOutput.BaseStream, process.StandardInput.BaseStream)
+            : null;
+    }
+
     event AsyncEventHandler<EventArgs> StartAsync;
 }

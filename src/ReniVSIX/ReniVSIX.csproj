@@ -35,6 +35,14 @@
 		<StartAction>Program</StartAction>
 		<StartProgram>$(DevenvDir)devenv.exe</StartProgram>
 		<StartArguments>/rootSuffix Exp</StartArguments>
+		<ApplicationIcon>reni.ico</ApplicationIcon>
+		<ApplicationManifest>source.extension.vsixmanifest</ApplicationManifest>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Title>reni Language Service</Title>
+		<Authors>hahoyer</Authors>
+		<Company>hw</Company>
+		<Copyright>c 2022</Copyright>
+		<PackageIcon>reni.ico</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -49,6 +57,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="reni.ico" />
 		<Content Include="reni.pkgdef">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		  <IncludeInVsix>true</IncludeInVsix>
@@ -68,6 +77,17 @@
 		<PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33103.184" />
 		<ProjectReference Include="..\ReniUI\ReniUI.csproj" />
 		<Reference Include="System.Design" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="reni.ico">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Properties\" />
 	</ItemGroup>
 
 	<Target Name="IncludeLanguageServers" BeforeTargets="GetVsixSourceItems">

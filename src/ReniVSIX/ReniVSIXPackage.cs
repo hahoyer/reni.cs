@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
@@ -18,7 +19,7 @@ namespace ReniVSIX;
 [ProvideLanguageEditorOptionPage(typeof(ConfigurationProperties), Constants.LanguageName, "Formatting", "", "100")]
 public sealed class ReniVSIXPackage : AsyncPackage
 {
-    protected override async System.Threading.Tasks.Task InitializeAsync
+    protected override async Task InitializeAsync
         (CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -53,3 +54,4 @@ public sealed class ReniVSIXPackage : AsyncPackage
             .Where(item => item.Name.Contains("BeforeList"))
             .ToArray();
 }
+

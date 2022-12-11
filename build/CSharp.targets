@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net5.0</TargetFramework>
+    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net7.0</TargetFramework>
     <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
     <NoWarn>649;660;661;1717</NoWarn>
     <RestorePackages>true</RestorePackages>
