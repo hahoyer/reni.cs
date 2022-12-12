@@ -23,7 +23,7 @@ public class LanguageClient : ILanguageClient
         await Task.Yield();
 
         var info = new ProcessStartInfo();
-        info.FileName = "a:/delvelop/Reni/dev/out/Debug/ReniLSP.exe";
+        info.FileName = "a:/develop/Reni/dev/out/Debug/ReniLSP.exe";
         info.Arguments = "bar";
         info.RedirectStandardInput = true;
         info.RedirectStandardOutput = true;

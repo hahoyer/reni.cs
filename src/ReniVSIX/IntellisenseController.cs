@@ -20,8 +20,8 @@ sealed class IntellisenseController : DumpableObject, IIntellisenseController
 
     void IIntellisenseController.ConnectSubjectBuffer(ITextBuffer subjectBuffer) => throw new NotImplementedException();
 
-    void IIntellisenseController.Detach(ITextView textView) => throw new NotImplementedException();
+    void IIntellisenseController.Detach(ITextView textView) { }
 
     void IIntellisenseController.DisconnectSubjectBuffer
-        (ITextBuffer subjectBuffer) => throw new NotImplementedException();
+        (ITextBuffer subjectBuffer) { }
 }

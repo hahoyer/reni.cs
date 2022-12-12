@@ -1,0 +1,115 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71905A24-D1C7-468D-8E25-553FA67DA2D9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\.travis.yml = ..\.travis.yml
+		Resources\Bool.ico = Resources\Bool.ico
+		Resources\Cache.bmp = Resources\Cache.bmp
+		Resources\Chip.ico = Resources\Chip.ico
+		Resources\Code.bmp = Resources\Code.bmp
+		Resources\Code.ico = Resources\Code.ico
+		Resources\CodeError.ico = Resources\CodeError.ico
+		Resources\Context.ico = Resources\Context.ico
+		Resources\Dictionary.ico = Resources\Dictionary.ico
+		Resources\empty.bmp = Resources\empty.bmp
+		Resources\empty_o.bmp = Resources\empty_o.bmp
+		Resources\Key.ico = Resources\Key.ico
+		..\LICENSE = ..\LICENSE
+		Resources\List.ico = Resources\List.ico
+		Resources\ListItem.ico = Resources\ListItem.ico
+		Resources\Number.ico = Resources\Number.ico
+		Resources\Ok.bmp = Resources\Ok.bmp
+		Resources\OnOff.ico = Resources\OnOff.ico
+		..\README = ..\README
+		Resources\reni.ico = Resources\reni.ico
+		Resources\Size.ico = Resources\Size.ico
+		Resources\Stack.Push.ico = Resources\Stack.Push.ico
+		Resources\String.ico = Resources\String.ico
+		Resources\Symbol.bmp = Resources\Symbol.bmp
+		Resources\Syntax.bmp = Resources\Syntax.bmp
+		..\sys.targets = ..\sys.targets
+		Resources\Type.ico = Resources\Type.ico
+		Resources\Unknown.bmp = Resources\Unknown.bmp
+		Resources\UnknownCache.bmp = Resources\UnknownCache.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{42AF6999-EE7E-46AC-BF8E-14F2F567ECF1}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A045FCB3-C25B-416E-87DD-CC932863375C}"
+	ProjectSection(SolutionItems) = preProject
+		..\.travis.yml = ..\.travis.yml
+		..\build\CSharp.Exe.Legacy.targets = ..\build\CSharp.Exe.Legacy.targets
+		..\build\CSharp.Exe.targets = ..\build\CSharp.Exe.targets
+		..\build\CSharp.Legacy.targets = ..\build\CSharp.Legacy.targets
+		..\build\CSharp.Library.Legacy.targets = ..\build\CSharp.Library.Legacy.targets
+		..\build\CSharp.Library.targets = ..\build\CSharp.Library.targets
+		..\build\CSharp.Library.UnitTest.targets = ..\build\CSharp.Library.UnitTest.targets
+		..\build\CSharp.targets = ..\build\CSharp.targets
+		..\build\CSharp.WinExe.Legacy.targets = ..\build\CSharp.WinExe.Legacy.targets
+		..\build\CSharp.WinExe.targets = ..\build\CSharp.WinExe.targets
+		..\build\HoyerWare.CSharp.targets = ..\build\HoyerWare.CSharp.targets
+		NuGet.Config = NuGet.Config
+		..\build\NuGetPackage.targets = ..\build\NuGetPackage.targets
+		..\build\sys.targets = ..\build\sys.targets
+		..\build\TypeScript.Exe.targets = ..\build\TypeScript.Exe.targets
+		..\build\TypeScript.Library.targets = ..\build\TypeScript.Library.targets
+		..\build\TypeScript.targets = ..\build\TypeScript.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniVSIX", "ReniVSIX\ReniVSIX.csproj", "{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HWBase", "HWBase\HWBase.csproj", "{EBB73C84-6622-4183-A28F-187178152322}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|arm64 = Debug|arm64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|arm64 = Release|arm64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|arm64.Build.0 = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|arm64.ActiveCfg = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|arm64.Build.0 = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|x86.Build.0 = Release|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Debug|arm64.Build.0 = Debug|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Debug|x86.Build.0 = Debug|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Release|arm64.ActiveCfg = Release|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Release|arm64.Build.0 = Release|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Release|x86.ActiveCfg = Release|Any CPU
+		{EBB73C84-6622-4183-A28F-187178152322}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using hw.DebugFormatter;
-using Microsoft.VisualStudio.Package;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 
 namespace ReniVSIX;
@@ -11,7 +12,6 @@ sealed class CompletionSource : DumpableObject, ICompletionSource
 
     public CompletionSource(ITextBuffer textBuffer) => TextBuffer = textBuffer;
 
-    public void AugmentCompletionSession
-        (ICompletionSession session, IList<CompletionSet> completionSets)
-        => NotImplementedMethod(session, completionSets);
+    void ICompletionSource.AugmentCompletionSession(ICompletionSession session, IList<CompletionSet> completionSets)
+        => throw new NotImplementedException();
 }
