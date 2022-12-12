@@ -37,16 +37,6 @@ public sealed class TestRunner : Dumpable
     string CurrentMethodName = "";
     string Status = "Start";
 
-    TestRunner(IEnumerable<TestType> testTypes)
-    {
-        TestLevels = new[] { IsNormalPriority, IsLowPriority };
-        TestTypes = testTypes.ToArray();
-        TestTypes.IsCircuitFree(DependentTypes).Assert
-            (() => Tracer.Dump(TestTypes.Circuits(DependentTypes).ToArray()));
-        if(Configuration.SkipSuccessfulMethods)
-            LoadConfiguration();
-    }
-
     bool AllIsFine => TestTypes.All(t => !t.IsStarted || t.IsSuccessful);
 
     string ConfigurationString
@@ -79,13 +69,14 @@ public sealed class TestRunner : Dumpable
         => $@"//{HeaderText}
 
 // ReSharper disable once CheckNamespace
-namespace hw.UnitTest;
-public static class PendingTests
+namespace hw.UnitTest
 {{
-    public static void Run()
+    public static class PendingTests
     {{
-    {GeneratedTestCalls}
-}}}}
+        public static void Run()
+        {{
+        {GeneratedTestCalls}
+}}}}}}
 ";
 
     string GeneratedTestCalls
@@ -107,6 +98,16 @@ public static class PendingTests
             Configuration.SaveResults = !value;
             Configuration.SkipSuccessfulMethods = value;
         }
+    }
+
+    TestRunner(IEnumerable<TestType> testTypes)
+    {
+        TestLevels = new[] { IsNormalPriority, IsLowPriority };
+        TestTypes = testTypes.ToArray();
+        TestTypes.IsCircuitFree(DependentTypes).Assert
+            (() => Tracer.Dump(TestTypes.Circuits(DependentTypes).ToArray()));
+        if(Configuration.SkipSuccessfulMethods)
+            LoadConfiguration();
     }
 
     string GeneratedTestCallsForMode(IGrouping<string, (TestType type, TestMethod method)> group)
