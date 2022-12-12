@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
 
-namespace hw.UnitTest
+// ReSharper disable CheckNamespace
+
+namespace hw.UnitTest;
+
+public static class TestExtender
 {
-    public static class TestExtender
-    {
-        public static bool RunTests(this Assembly rootAssembly) => TestRunner.RunTests(rootAssembly);
-    }
+    public static bool RunTests(this Assembly rootAssembly) => TestRunner.RunTests(rootAssembly);
 }

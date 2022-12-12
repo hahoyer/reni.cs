@@ -1,16 +1,9 @@
 using System;
 using JetBrains.Annotations;
 
-namespace hw.UnitTest
-{
-    [PublicAPI]
-    [Obsolete("Use DependenceProvider")]
-    // ReSharper disable once IdentifierTypo
-    public abstract class DependantAttribute : DependenceProvider 
-    {
-    }
+namespace hw.UnitTest;
 
-    [PublicAPI]
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class LowPriority : Attribute { }
-}
+[PublicAPI]
+[Obsolete("Use DependenceProvider")]
+// ReSharper disable once IdentifierTypo
+public abstract class DependantAttribute : DependenceProvider { }

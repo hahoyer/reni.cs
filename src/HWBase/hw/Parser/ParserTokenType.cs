@@ -1,26 +1,39 @@
 using hw.Helper;
+
 // ReSharper disable CheckNamespace
 
-namespace hw.Parser
+namespace hw.Parser;
+
+/// <summary>
+///     Used as base for all token types.
+/// </summary>
+/// <typeparam name="TSourcePart">Tree structure that is returned by the parser</typeparam>
+public abstract class ParserTokenType<TSourcePart>
+    : ScannerTokenType<TSourcePart>
+        , IUniqueIdProvider
+        , IParserTokenType<TSourcePart>
+    where TSourcePart : class
 {
-    public abstract class ParserTokenType<TTreeItem>
-        : ScannerTokenType<TTreeItem>
-            , IUniqueIdProvider
-            , IParserTokenType<TTreeItem>
-        where TTreeItem : class
+    TSourcePart IParserTokenType<TSourcePart>.Create(TSourcePart left, IToken token, TSourcePart right)
     {
-        public abstract string Id { get; }
-
-        TTreeItem IParserTokenType<TTreeItem>.Create(TTreeItem left, IToken token, TTreeItem right)
-            => Create(left, token, right);
-
-        string IParserTokenType<TTreeItem>.PrioTableId => Id;
-
-        string IUniqueIdProvider.Value => Id;
-
-        public override string ToString() => base.ToString() + " Id=" + Id.Quote();
-        protected abstract TTreeItem Create(TTreeItem left, IToken token, TTreeItem right);
-
-        protected override IParserTokenType<TTreeItem> GetParserTokenType(string id) => this;
+        var result = Create(left, token, right);
+        if(token is ILinked<TSourcePart> treeLinkedToken)
+            treeLinkedToken.Container = result;
+        return result;
     }
+
+    string IParserTokenType<TSourcePart>.PrioTableId => Id;
+
+    string IUniqueIdProvider.Value => Id;
+    public abstract string Id { get; }
+    protected abstract TSourcePart Create(TSourcePart left, IToken token, TSourcePart right);
+
+    public override string ToString() => base.ToString() + " Id=" + Id.Quote();
+
+    protected override IParserTokenType<TSourcePart> GetParserTokenType(string id) => this;
+}
+
+interface ILinked<TSourcePart>
+{
+    TSourcePart Container { get; set; }
 }

@@ -3,16 +3,27 @@ using System.Runtime.CompilerServices;
 using hw.Helper;
 using JetBrains.Annotations;
 
-namespace hw.UnitTest
-{
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    [MeansImplicitUse]
-    [PublicAPI]
-    public sealed class UnitTestAttribute : LocationProviderAttribute
-    {
-        public string DefaultMethod;
+// ReSharper disable CheckNamespace
 
-        public UnitTestAttribute([CallerFilePath] string fileName = "", [CallerLineNumber] int lineNumber = 0)
-            => Where = new SourceFilePosition {FileName = fileName, LineNumber = lineNumber};
-    }
+namespace hw.UnitTest;
+
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+[MeansImplicitUse]
+[PublicAPI]
+public sealed class UnitTestAttribute : LocationProviderAttribute
+{
+    public string DefaultMethod;
+
+    public UnitTestAttribute([CallerFilePath] string fileName = "", [CallerLineNumber] int lineNumber = 0)
+        => Where = new() { FileName = fileName, LineNumber = lineNumber };
 }
+
+[AttributeUsage(AttributeTargets.Class)]
+[MeansImplicitUse]
+[PublicAPI]
+public sealed class TestFixture : Attribute { }
+
+[AttributeUsage(AttributeTargets.Method)]
+[MeansImplicitUse]
+[PublicAPI]
+public sealed class TestAttribute : Attribute { }
