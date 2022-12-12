@@ -1,8 +1,9 @@
-namespace hw.DebugFormatter
+// ReSharper disable CheckNamespace
+
+namespace hw.DebugFormatter;
+
+public abstract class DumpEnabledAttribute : DumpAttributeBase
 {
-    public abstract class DumpEnabledAttribute : DumpAttributeBase
-    {
-        public bool IsEnabled { get; }
-        protected DumpEnabledAttribute(bool isEnabled) => IsEnabled = isEnabled;
-    }
+    public bool IsEnabled { get; }
+    protected DumpEnabledAttribute(bool isEnabled) => IsEnabled = isEnabled;
 }

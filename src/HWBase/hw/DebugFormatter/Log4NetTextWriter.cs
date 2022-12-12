@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using log4net;
 using log4net.Config;
 using log4net.Core;
+// ReSharper disable CheckNamespace
 
 namespace hw.DebugFormatter
 {
@@ -53,6 +54,7 @@ namespace hw.DebugFormatter
                 return stackTrace.GetFrame(1);
             }
 
+            [UsedImplicitly]
             static MethodInfo Method(Action<string> action) => action.Method;
         }
 
@@ -81,7 +83,7 @@ namespace hw.DebugFormatter
             if(Instance == null)
                 throw new MissingLog4NetXmlFileException();
 
-            Console.SetOut(exclusive? (TextWriter)Instance : new TextWriters(Instance, Console.Out));
+            Console.SetOut(exclusive? Instance : new TextWriters(Instance, Console.Out));
         }
 
         public static void WriteToLog(string value, bool isLine, Information logData, string indentedValue)
