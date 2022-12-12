@@ -13,7 +13,7 @@
       <Name>ReniUI</Name>
     </ProjectReference>
     <ProjectReference Include="..\Reni\Reni.csproj">
-      <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
+      <Project>{45d97de4-67c3-4f10-98b4-6618cf7c7bb1}</Project>
       <Name>Reni</Name>
     </ProjectReference>
   </ItemGroup>
