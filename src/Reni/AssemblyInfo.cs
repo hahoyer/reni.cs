@@ -1,11 +1,12 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyVersion("21.1")]
-[assembly: AssemblyFileVersion("21.1.1205.1752")]
+[assembly: AssemblyVersion("1.1")]
+[assembly: AssemblyFileVersion("1.1.221216.2112")]
 [assembly: AssemblyTitle("Reni Compiler: Library")]
 [assembly: AssemblyCompany("HoyerWare")]
 [assembly: AssemblyProduct("Reni Compiler")]
-[assembly: AssemblyCopyright("Copyright © Harald Hoyer 2021")]
+[assembly: AssemblyCopyright("Copyright © Harald Hoyer 2022")]
 [assembly: InternalsVisibleTo("ReniUI")]
+[assembly: InternalsVisibleTo("ReniLSP")]
 [assembly: InternalsVisibleTo("ReniVSIX")]

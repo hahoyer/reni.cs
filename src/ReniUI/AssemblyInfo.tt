@@ -4,9 +4,9 @@
     var title = "Library for user interfaces";
     var product = "Reni Compiler";
     var company = "HoyerWare";
-    var major = $"{DateTime.Today:yy}";
+    var major = 1;
     var minor = 1;
-    var build = $"{DateTime.Now:MMdd}";
+    var build = $"{DateTime.Now:yyMMdd}";
     var revision = $"{DateTime.Now:HHmm}";
     var versionString = $"{major}.{minor}";
     var fileVersionString = $"{major}.{minor}.{build}.{revision}";
@@ -21,3 +21,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyProduct("<#=product #>")]
 [assembly: AssemblyCopyright("Copyright © Harald Hoyer <#=DateTime.Today.ToString("yyyy") #>")]
 [assembly: InternalsVisibleTo("ReniVSIX")]
+[assembly: InternalsVisibleTo("ReniLSP")]
