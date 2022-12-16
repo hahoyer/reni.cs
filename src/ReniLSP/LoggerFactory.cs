@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Reactive.Disposables;
 using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.Extensions.Logging;
@@ -8,18 +9,13 @@ namespace ReniLSP;
 
 sealed class LoggerFactory : DumpableObject, ILoggerFactory
 {
-    class Dummy : IDisposable
-    {
-        public void Dispose() { }
-    }
-
     sealed class Logger : DumpableObject, ILogger
     {
         readonly string CategoryName;
         public Logger() => Debugger.Launch();
         public Logger(string categoryName) => CategoryName = categoryName;
 
-        IDisposable ILogger.BeginScope<TState>(TState state) => new Dummy();
+        IDisposable ILogger.BeginScope<TState>(TState state) => new CompositeDisposable();
 
         bool ILogger.IsEnabled(LogLevel logLevel) => true;
 
