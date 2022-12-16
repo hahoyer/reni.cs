@@ -391,18 +391,6 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
                 .ReferenceCode(Type.ForcedReference)
                 .ReferencePlus(CompoundViewSize);
 
-    internal Result ArrayInstanceResult(Category category, TypeBase elementType)
-    {
-        var elementResults = Compound
-            .Syntax
-            .Statements
-            .Length
-            .Select(i => CreateElement(category, i, elementType))
-            .ToArray();
-        NotImplementedMethod(category, elementType, "elementResults", elementResults);
-        return default;
-    }
-
     Result CreateElement(Category category, int index, TypeBase elementType)
         => AccessViaObjectPointer(category, index).Conversion(elementType);
 }

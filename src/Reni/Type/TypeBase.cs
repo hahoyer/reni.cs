@@ -107,6 +107,93 @@ abstract class TypeBase
     [SmartNode]
     readonly CacheContainer Cache;
 
+    [Node]
+    internal Size Size => Cache.Size.Value;
+
+    [DisableDump]
+    internal EnableCut EnableCut => Cache.EnableCut.Value;
+
+    [DisableDump]
+    internal TypeBase Pointer => ForcedReference.Type();
+
+    [DisableDump]
+    internal IReference ForcedReference => Cache.ForcedReference.Value;
+
+    [DisableDump]
+    internal CodeBase ArgCode => CodeBase.Arg(this);
+
+    [DisableDump]
+    internal TypeBase AutomaticDereferenceType
+        =>
+            IsWeakReference
+                ? CheckedReference.Converter.ResultType().AutomaticDereferenceType
+                : this;
+
+    [DisableDump]
+    internal TypeBase SmartPointer => IsHollow? this : Pointer;
+
+    [DisableDump]
+    internal TypeBase Align
+    {
+        get
+        {
+            var alignBits = Root.DefaultRefAlignParam.AlignBits;
+            return Size.Align(alignBits) == Size? this : Cache.Aligner[alignBits];
+        }
+    }
+
+    [DisableDump]
+    internal TypeType TypeType => Cache.TypeType.Value;
+
+    [DisableDump]
+    internal TypeBase FunctionInstance => Cache.FunctionInstanceType.Value;
+
+    [DisableDump]
+    internal PointerType ForcedPointer => Cache.Pointer.Value;
+
+    [DisableDump]
+    internal IReference CheckedReference => this as IReference;
+
+    [DisableDump]
+    internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
+
+    [DisableDump]
+    internal VoidType VoidType => Root.VoidType;
+
+    [DisableDump]
+    internal BitType BitType => Root.BitType;
+
+    [DisableDump]
+    internal TypeBase TypeForStructureElement => DeAlign(Category.Type).Type;
+
+    [DisableDump]
+    internal TypeBase TypeForArrayElement => DeAlign(Category.Type).Type;
+
+    [DisableDump]
+    IEnumerable<SearchResult> FunctionDeclarationsForType
+    {
+        get
+        {
+            var result = FunctionDeclarationForType;
+            if(result != null)
+                yield return SearchResult.Create(result, this);
+        }
+    }
+
+    [DisableDump]
+    [NotNull]
+    public IEnumerable<IConversion> SymmetricConversions => Cache.SymmetricConversions.Value;
+
+    [DisableDump]
+    internal IEnumerable<IConversion> NextConversionStepOptions
+        => SymmetricClosureConversions.Union(StripConversions);
+
+    [DisableDump]
+    internal IEnumerable<IConversion> SymmetricClosureConversions
+        => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
+
+    internal bool HasIssues => Issues?.Any() ?? false;
+
     protected TypeBase()
         : base(NextObjectId++) => Cache = new(this);
 
@@ -318,12 +405,6 @@ abstract class TypeBase
         return null;
     }
 
-    internal virtual Result ArrayInstanceResult(Category category, Func<Category, Result> getRightResult)
-    {
-        NotImplementedMethod(category, getRightResult(Category.All));
-        return null;
-    }
-
     /// <summary>
     ///     Override this function to provide declarations of a definable for this type.
     ///     Only declaration, that are made exactly for type <see cref="TDefinable" />
@@ -355,93 +436,6 @@ abstract class TypeBase
         NotImplementedMethod();
         return null;
     }
-
-    [Node]
-    internal Size Size => Cache.Size.Value;
-
-    [DisableDump]
-    internal EnableCut EnableCut => Cache.EnableCut.Value;
-
-    [DisableDump]
-    internal TypeBase Pointer => ForcedReference.Type();
-
-    [DisableDump]
-    internal IReference ForcedReference => Cache.ForcedReference.Value;
-
-    [DisableDump]
-    internal CodeBase ArgCode => CodeBase.Arg(this);
-
-    [DisableDump]
-    internal TypeBase AutomaticDereferenceType
-        =>
-            IsWeakReference
-                ? CheckedReference.Converter.ResultType().AutomaticDereferenceType
-                : this;
-
-    [DisableDump]
-    internal TypeBase SmartPointer => IsHollow? this : Pointer;
-
-    [DisableDump]
-    internal TypeBase Align
-    {
-        get
-        {
-            var alignBits = Root.DefaultRefAlignParam.AlignBits;
-            return Size.Align(alignBits) == Size? this : Cache.Aligner[alignBits];
-        }
-    }
-
-    [DisableDump]
-    internal TypeType TypeType => Cache.TypeType.Value;
-
-    [DisableDump]
-    internal TypeBase FunctionInstance => Cache.FunctionInstanceType.Value;
-
-    [DisableDump]
-    internal PointerType ForcedPointer => Cache.Pointer.Value;
-
-    [DisableDump]
-    internal IReference CheckedReference => this as IReference;
-
-    [DisableDump]
-    internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
-
-    [DisableDump]
-    internal VoidType VoidType => Root.VoidType;
-
-    [DisableDump]
-    internal BitType BitType => Root.BitType;
-
-    [DisableDump]
-    internal TypeBase TypeForStructureElement => DeAlign(Category.Type).Type;
-
-    [DisableDump]
-    internal TypeBase TypeForArrayElement => DeAlign(Category.Type).Type;
-
-    [DisableDump]
-    IEnumerable<SearchResult> FunctionDeclarationsForType
-    {
-        get
-        {
-            var result = FunctionDeclarationForType;
-            if(result != null)
-                yield return SearchResult.Create(result, this);
-        }
-    }
-
-    [DisableDump]
-    [NotNull]
-    public IEnumerable<IConversion> SymmetricConversions => Cache.SymmetricConversions.Value;
-
-    [DisableDump]
-    internal IEnumerable<IConversion> NextConversionStepOptions
-        => SymmetricClosureConversions.Union(StripConversions);
-
-    [DisableDump]
-    internal IEnumerable<IConversion> SymmetricClosureConversions
-        => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
-
-    internal bool HasIssues => Issues?.Any() ?? false;
 
     [NotNull]
     Size GetSizeForCache() => IsHollow? Size.Zero : GetSize();

@@ -46,7 +46,6 @@
     <Compile Include="Context\IRootProvider.cs" />
     <Compile Include="DeclarationOptions\Declaration.cs" />
     <Compile Include="DeclarationOptions\Typeoid.cs" />
-    <Compile Include="FeatureTest\Array\ArrayFromList.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
@@ -215,7 +214,6 @@
     <Compile Include="hw\UnitTest\TestExtender.cs" />
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
-    <Compile Include="TokenClasses\ArrayInstanceToken.cs" />
     <Compile Include="TokenClasses\LogicalOperation.cs" />
     <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
     <Compile Include="TokenClasses\Whitespace\LineGroup.cs" />

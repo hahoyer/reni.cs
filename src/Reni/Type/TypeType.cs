@@ -65,27 +65,12 @@ sealed class TypeType
         (Category category, Func<Category, Result> getRightResult)
         => RawInstanceResult(category.WithType, getRightResult).LocalReferenceResult;
 
-    internal override Result ArrayInstanceResult
-        (Category category, Func<Category, Result> getRightResult)
-        => RawArrayInstanceResult(category.WithType, getRightResult).LocalReferenceResult;
-
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
         if(category <= Category.Type.Replenished)
             return Value.Result(category.WithType);
         var constructorResult = Value
             .ConstructorResult(category, getRightResult(Category.Type).Type);
-        return constructorResult
-            .ReplaceArg(getRightResult);
-    }
-
-    Result RawArrayInstanceResult(Category category, Func<Category, Result> getRightResult)
-    {
-        var compoundView = getRightResult(Category.Type).Type.FindRecentCompoundView;
-        var arrayType = Value.Array(compoundView.Count);
-        if(category <= Category.Type.Replenished)
-            return arrayType.Result(category.WithType);
-        var constructorResult = compoundView.ArrayInstanceResult(category, Value);
         return constructorResult
             .ReplaceArg(getRightResult);
     }
