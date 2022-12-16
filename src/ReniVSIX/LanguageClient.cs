@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO.Pipelines;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using hw.DebugFormatter;
+using hw.Helper;
 using Microsoft.VisualStudio.LanguageServer.Client;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Utilities;
+using ReniLSP;
 
 namespace ReniVSIX;
 
@@ -15,27 +20,18 @@ namespace ReniVSIX;
 [RunOnContext(RunningContext.RunOnHost)]
 public class LanguageClient : ILanguageClient
 {
-    internal static LanguageClient Instance { get; set; }
-    public LanguageClient() => Instance = this;
+    Task Server;
 
     async Task<Connection> ILanguageClient.ActivateAsync(CancellationToken token)
     {
         await Task.Yield();
 
-        var info = new ProcessStartInfo();
-        info.FileName = "a:/develop/Reni/dev/out/Debug/ReniLSP.exe";
-        info.Arguments = "bar";
-        info.RedirectStandardInput = true;
-        info.RedirectStandardOutput = true;
-        info.UseShellExecute = false;
-        info.CreateNoWindow = true;
+        var reader = new Pipe();
+        var writer = new Pipe();
 
-        var process = new Process();
-        process.StartInfo = info;
-
-        return process.Start()
-            ? new Connection(process.StandardOutput.BaseStream, process.StandardInput.BaseStream)
-            : null;
+        Server = Task.Run(() => MainContainer.RunServer(writer.Reader, reader.Writer), token);
+        var connection = new Connection(reader.Reader.AsStream(), writer.Writer.AsStream());
+        return connection;
     }
 
 
@@ -68,24 +64,43 @@ public class LanguageClient : ILanguageClient
         remove { }
     }
 
-    static async Task<Connection> Activate()
+    static Process GetLSPProcess()
     {
-        await Task.Yield();
+        do
+        {
+            var process = Process
+                .GetProcesses()
+                .SingleOrDefault(p => p.ProcessName == "ReniLSP");
+            if(process != null)
+            {
+                "Connecting...".Log();
+                return process;
+            }
 
-        var info = new ProcessStartInfo();
-        info.FileName = "a:/delvelop/Reni/dev/out/Debug/ReniLSP.exe";
-        info.Arguments = "bar";
-        info.RedirectStandardInput = true;
-        info.RedirectStandardOutput = true;
-        info.UseShellExecute = false;
-        info.CreateNoWindow = true;
+            "Waiting...".Log();
+            1.Seconds().Sleep();
+        }
+        while(true);
+    }
 
-        var process = new Process();
-        process.StartInfo = info;
+    static Process CreateLSPProcess()
+    {
+        var process = new Process
+        {
+            StartInfo = new()
+            {
+                FileName = "a:/develop/Reni/dev/out/Debug/ReniLSP.exe"
+                , RedirectStandardInput = true
+                , RedirectStandardOutput = true
+                , UseShellExecute = false
+                , CreateNoWindow = true
+            }
+        };
 
-        return process.Start()
-            ? new Connection(process.StandardOutput.BaseStream, process.StandardInput.BaseStream)
-            : null;
+        if(process.Start())
+            return process;
+
+        throw new("Process could not be started.");
     }
 
     event AsyncEventHandler<EventArgs> StartAsync;

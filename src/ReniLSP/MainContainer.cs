@@ -1,17 +1,18 @@
 using System;
-using System.Diagnostics;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
 using Microsoft.Extensions.Logging;
+using Nerdbank.Streams;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace ReniLSP;
 
-static class MainContainer
+public static class MainContainer
 {
     public static async Task Main(string[] args)
     {
@@ -21,20 +22,31 @@ static class MainContainer
             return;
         }
 
-        Debugger.Launch();
+        await RunServer(Console.OpenStandardInput().UsePipeReader(), Console.OpenStandardOutput().UsePipeWriter());
+    }
 
-        var server = await LanguageServer.From(options
-            => options
-                .WithInput(Console.OpenStandardInput())
-                .WithOutput(Console.OpenStandardOutput())
-                .WithLoggerFactory(new LoggerFactory())
-                .AddDefaultLoggingProvider()
-                //.OnInitialize(Initialize)
-                //.OnInitialized(Initialized)
-                .WithHandler<Target>()
-                .WithHandler<TokenTarget>()
-        );
-        await server.WaitForExit;
+    public static async Task RunServer(PipeReader reader, PipeWriter writer)
+    {
+        try
+        {
+            var server = await LanguageServer.From(options
+                => options
+                    .WithInput(reader)
+                    .WithOutput(writer)
+                    .WithLoggerFactory(new LoggerFactory())
+                    .AddDefaultLoggingProvider()
+                    .OnInitialize(Initialize)
+                    .OnInitialized(Initialized)
+                    .WithHandler<Target>()
+                    .WithHandler<TokenTarget>()
+            );
+            Tracer.TraceBreak();
+            await server.WaitForExit;
+        }
+        catch(Exception)
+        {
+            Tracer.TraceBreak();
+        }
     }
 
     static Task Initialized
@@ -50,11 +62,9 @@ static class MainContainer
         return Task.CompletedTask;
     }
 
-    static Task Initialize(ILanguageServer server, InitializeParams request, CancellationToken cancellationToken)
-    {
-        Dumpable.NotImplementedFunction("server", request, cancellationToken);
-        return Task.CompletedTask;
-    }
+    static Task Initialize(ILanguageServer server, InitializeParams request, CancellationToken cancellationToken) =>
+        //  Dumpable.NotImplementedFunction("server", request, cancellationToken);
+        Task.CompletedTask;
 
 
     internal static FilePositionTag ToFilePositionTag(this LogLevel level)
@@ -64,29 +74,4 @@ static class MainContainer
             , LogLevel.Debug => FilePositionTag.Debug
             , _ => FilePositionTag.Output
         };
-}
-
-sealed class LoggerFactory : DumpableObject, ILoggerFactory
-{
-    sealed class Logger : DumpableObject, ILogger
-    {
-        readonly string CategoryName;
-        public Logger(string categoryName) => CategoryName = categoryName;
-
-        IDisposable ILogger.BeginScope<TState>(TState state) => null;
-
-        bool ILogger.IsEnabled(LogLevel logLevel) => true;
-
-        void ILogger.Log<TState>
-        (
-            LogLevel logLevel, EventId eventId, TState state, Exception exception
-            , Func<TState, Exception, string> formatter
-        ) => $"{CategoryName}: [{logLevel}] {formatter(state, exception)}".Log();
-    }
-
-    void IDisposable.Dispose() { }
-
-    void ILoggerFactory.AddProvider(ILoggerProvider provider) => NotImplementedMethod(provider);
-
-    ILogger ILoggerFactory.CreateLogger(string categoryName) => new Logger(categoryName);
 }
