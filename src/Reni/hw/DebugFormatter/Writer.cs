@@ -47,12 +47,10 @@ sealed class Writer
             {
                 var threadFlagString = Instance.ThreadFlagString;
                 if(!IsLineStart)
-                {
-                    threadFlagString = "\n" + threadFlagString;
-                    if(text.Length == 0 || text[0] != '\n')
-                        threadFlagString = "..." + threadFlagString;
-                }
-
+                    if(text.Length > 0 && text[0] == '\n')
+                        threadFlagString = "\n" + threadFlagString;
+                    else
+                        throw new NotImplementedException();
                 Debug.Write(threadFlagString);
             }
 

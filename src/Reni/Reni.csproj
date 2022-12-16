@@ -205,6 +205,8 @@
     <Compile Include="hw\Scanner\Match2TwoLayerScannerGuard.cs" />
     <Compile Include="hw\Scanner\MatchExtension.cs" />
     <Compile Include="hw\Scanner\Source.cs" />
+    <Compile Include="hw\Scanner\SourcePart.cs" />
+    <Compile Include="hw\Scanner\SourcePosition.cs" />
     <Compile Include="hw\Scanner\StringSourceProvider.cs" />
     <Compile Include="hw\Scanner\TwoLayerScanner.cs" />
     <Compile Include="hw\Scanner\WhiteSpaceTokenType.cs" />
@@ -212,6 +214,7 @@
     <Compile Include="hw\UnitTest\DependenceProvider.cs" />
     <Compile Include="hw\UnitTest\ITestFixture.cs" />
     <Compile Include="hw\UnitTest\TestExtender.cs" />
+    <Compile Include="hw\UnitTest\TestMethod.cs" />
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="TokenClasses\LogicalOperation.cs" />
@@ -222,9 +225,6 @@
     <Compile Include="Helper\PositionDictionary.cs" />
     <Compile Include="Helper\TreeWithParent.cs" />
     <Compile Include="Helper\TreeWithParentExtended.cs" />
-    <Compile Include="hw\Scanner\SourcePart.cs" />
-    <Compile Include="hw\Scanner\SourcePosition.cs" />
-    <Compile Include="hw\UnitTest\TestMethod.cs" />
     <Compile Include="IProxyType.cs" />
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
     <Compile Include="ParserTest\Comments.cs" />

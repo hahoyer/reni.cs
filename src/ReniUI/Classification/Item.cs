@@ -33,6 +33,56 @@ public abstract class Item : DumpableObject
 
     internal BinaryTree Anchor { get; }
 
+    internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
+
+    public char TypeCharacter
+    {
+        get
+        {
+            if(IsError)
+                return 'e';
+            if(IsComment)
+                return 'c';
+            if(IsSpace)
+                return 'w';
+            if(IsLineEnd)
+                return '$';
+            if(IsNumber)
+                return 'n';
+            if(IsText)
+                return 't';
+            if(IsKeyword)
+                return 'k';
+            if(IsIdentifier)
+                return 'i';
+            if(IsBrace)
+                return 'b';
+            NotImplementedMethod();
+            return '?';
+        }
+    }
+
+    string Types => GetTypes().Stringify(",");
+
+    public int StartPosition => SourcePart.Position;
+    public int EndPosition => SourcePart.EndPosition;
+
+    [DisableDump]
+    internal Reni.SyntaxTree.Syntax Master => Anchor.Syntax;
+
+    [DisableDump]
+    public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
+
+    public IEnumerable<Item> Belonging
+    {
+        get
+        {
+            if(IsBraceLike)
+                return Anchor.ParserLevelGroup.Select(item => new Syntax(item));
+            return new Item[0];
+        }
+    }
+
     protected Item(BinaryTree anchor) => Anchor = anchor;
 
     [DisableDump]
@@ -101,56 +151,6 @@ public abstract class Item : DumpableObject
 
     public override int GetHashCode() => SourcePart.GetHashCode();
 
-    internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
-
-    public char TypeCharacter
-    {
-        get
-        {
-            if(IsError)
-                return 'e';
-            if(IsComment)
-                return 'c';
-            if(IsSpace)
-                return 'w';
-            if(IsLineEnd)
-                return '$';
-            if(IsNumber)
-                return 'n';
-            if(IsText)
-                return 't';
-            if(IsKeyword)
-                return 'k';
-            if(IsIdentifier)
-                return 'i';
-            if(IsBrace)
-                return 'b';
-            NotImplementedMethod();
-            return '?';
-        }
-    }
-
-    string Types => GetTypes().Stringify(",");
-
-    public int StartPosition => SourcePart.Position;
-    public int EndPosition => SourcePart.EndPosition;
-
-    [DisableDump]
-    internal Reni.SyntaxTree.Syntax Master => Anchor.Syntax;
-
-    [DisableDump]
-    public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
-
-    public IEnumerable<Item> Belonging
-    {
-        get
-        {
-            if(IsBraceLike)
-                return Anchor.ParserLevelGroup.Select(item => new Syntax(item));
-            return new Item[0];
-        }
-    }
-
     IEnumerable<string> GetTypes()
     {
         if(IsError)
@@ -208,6 +208,6 @@ public abstract class Item : DumpableObject
     {
         var start = SourcePart.Start.TextPosition;
         return
-            $"{start.LineNumber}/{start.ColumnNumber}: {Types}: {SourcePart.Id.Quote()}";
+            $"{start.LineNumber}/{start.ColumnNumber1 - 1}: {Types}: {SourcePart.Id.Quote()}";
     }
 }
