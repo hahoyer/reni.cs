@@ -64,7 +64,7 @@ sealed class TokenTarget : SemanticTokensHandlerBase
     static Range GetRange(SourcePart token)
     {
         var r = token.TextPosition;
-        return new(r.start.LineNumber, r.start.ColumnNumber - 1, r.end.LineNumber, r.end.ColumnNumber - 1);
+        return new(r.start.LineNumber, r.start.ColumnNumber1 - 1, r.end.LineNumber, r.end.ColumnNumber1 - 1);
     }
 
     static SemanticTokensRegistrationOptions GetSemanticTokensRegistrationOptions()
