@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyVersion("1.1")]
-[assembly: AssemblyFileVersion("1.1.221216.2112")]
+[assembly: AssemblyVersion("22.0")]
+[assembly: AssemblyFileVersion("22.0.1217.0041")]
 [assembly: AssemblyTitle("Reni Compiler: Library")]
 [assembly: AssemblyCompany("HoyerWare")]
 [assembly: AssemblyProduct("Reni Compiler")]
