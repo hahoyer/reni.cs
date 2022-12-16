@@ -35,12 +35,10 @@ public static class MainContainer
                     .WithOutput(writer)
                     .WithLoggerFactory(new LoggerFactory())
                     .AddDefaultLoggingProvider()
-                    .OnInitialize(Initialize)
                     .OnInitialized(Initialized)
                     .WithHandler<Target>()
                     .WithHandler<TokenTarget>()
             );
-            Tracer.TraceBreak();
             await server.WaitForExit;
         }
         catch(Exception)
@@ -61,11 +59,6 @@ public static class MainContainer
         options.Range = true;
         return Task.CompletedTask;
     }
-
-    static Task Initialize(ILanguageServer server, InitializeParams request, CancellationToken cancellationToken) =>
-        //  Dumpable.NotImplementedFunction("server", request, cancellationToken);
-        Task.CompletedTask;
-
 
     internal static FilePositionTag ToFilePositionTag(this LogLevel level)
         => level switch
