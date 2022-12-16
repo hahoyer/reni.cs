@@ -27,14 +27,6 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     readonly ValueCache<Helper.Syntax> SyntaxCache;
 
-    CompilerBrowser(Func<Compiler> parent)
-    {
-        ParentCache = new(parent);
-        SyntaxCache = new(GetSyntax);
-    }
-
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
-
     public Source Source => Compiler.Source;
 
     internal Compiler Compiler => ParentCache.Value;
@@ -67,6 +59,14 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         }
     }
 
+    CompilerBrowser(Func<Compiler> parent)
+    {
+        ParentCache = new(parent);
+        SyntaxCache = new(GetSyntax);
+    }
+
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
     public static CompilerBrowser FromText
         (string text, CompilerParameters parameters, string sourceIdentifier = null)
         => new(() => Compiler.FromText(text, parameters, sourceIdentifier));
@@ -81,6 +81,14 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
         SyntaxCache.IsValid = true;
         return Item.LocateByPosition(Compiler.BinaryTree, offset);
+    }
+
+    public IEnumerable<Item> Locate(SourcePart target = null)
+    {
+        if(target == null)
+            target = Source.All;
+
+        return Locate(target.Position, target.EndPosition);
     }
 
     public IEnumerable<Item> Locate(int start, int end)
@@ -103,7 +111,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     public Item Locate(int offset) => Locate(Source + offset);
 
-    internal BinaryTree Locate(SourcePart span)
+    internal BinaryTree LocateTreeItem(SourcePart span)
         => Item.Locate(Compiler.BinaryTree, span);
 
     internal FunctionType Function(int index)
