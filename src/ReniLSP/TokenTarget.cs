@@ -1,16 +1,24 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using hw.DebugFormatter;
+using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
+using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using ReniUI;
+using ReniUI.Classification;
 
 namespace ReniLSP;
 
 [UsedImplicitly]
 sealed class TokenTarget : SemanticTokensHandlerBase
 {
+    static readonly Container<SemanticTokenType> TokenTypes = new("keyword", "comment", "string", "number", "variable"
+        , "decorator");
+
     protected override SemanticTokensRegistrationOptions CreateRegistrationOptions
         (SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
         => GetSemanticTokensRegistrationOptions();
@@ -22,35 +30,41 @@ sealed class TokenTarget : SemanticTokensHandlerBase
         , CancellationToken cancellationToken
     )
     {
-        Dumpable.NotImplementedFunction(builder, identifier, cancellationToken);
-        return Task.FromResult<SemanticTokens>(null);
+        var compiler = CompilerBrowser
+            .FromFile(DocumentUri.GetFileSystemPath(identifier).AssertNotNull());
+        var nodes = compiler
+            .Locate()
+            .Where(item => item.IsComment || !item.IsWhiteSpace);
+
+        foreach(var item in nodes)
+        foreach(var line in item.SourcePart.Split("\n"))
+            builder.Push(GetRange(line), GetTokenTypeIndex(item));
+        return Task.CompletedTask;
     }
 
     protected override Task<SemanticTokensDocument> GetSemanticTokensDocument
         (ITextDocumentIdentifierParams @params, CancellationToken cancellationToken)
-    {
-        Dumpable.NotImplementedFunction(@params, cancellationToken);
-        return Task.FromResult<SemanticTokensDocument>(null);
-    }
+        => Task.FromResult(new SemanticTokensDocument(RegistrationOptions.Legend));
 
-    public override Task<SemanticTokens> Handle(SemanticTokensParams request, CancellationToken cancellationToken)
-    {
-        Dumpable.NotImplementedFunction(request, cancellationToken);
-        return Task.FromResult<SemanticTokens>(null);
-    }
+    static SemanticTokenType? GetTokenTypeIndex(Item token)
+        => token.IsComment
+            ? SemanticTokenType.Comment
+            : token.IsBraceLike
+                ? SemanticTokenType.Keyword
+                : token.IsIdentifier
+                    ? SemanticTokenType.Variable
+                    : token.IsKeyword
+                        ? SemanticTokenType.Keyword
+                        : token.IsText
+                            ? SemanticTokenType.String
+                            : token.IsNumber
+                                ? SemanticTokenType.Number
+                                : SemanticTokenType.Namespace;
 
-    public override Task<SemanticTokensFullOrDelta> Handle
-        (SemanticTokensDeltaParams request, CancellationToken cancellationToken)
+    static Range GetRange(SourcePart token)
     {
-        Dumpable.NotImplementedFunction(request, cancellationToken);
-        return Task.FromResult<SemanticTokensFullOrDelta>(null);
-    }
-
-    public override Task<SemanticTokens> Handle
-        (SemanticTokensRangeParams request, CancellationToken cancellationToken)
-    {
-        Dumpable.NotImplementedFunction(request, cancellationToken);
-        return Task.FromResult<SemanticTokens>(null);
+        var r = token.TextPosition;
+        return new(r.start.LineNumber, r.start.ColumnNumber - 1, r.end.LineNumber, r.end.ColumnNumber - 1);
     }
 
     static SemanticTokensRegistrationOptions GetSemanticTokensRegistrationOptions()
@@ -59,7 +73,7 @@ sealed class TokenTarget : SemanticTokensHandlerBase
             Legend = new()
             {
                 TokenModifiers = new("readonly")
-                , TokenTypes = new("keyword", "comment", "string", "number", "variable", "decorator")
+                , TokenTypes = TokenTypes
             }
             , Full = true
             , Range = true
