@@ -25,6 +25,8 @@ sealed class LoggerFactory : DumpableObject, ILoggerFactory
             , Func<TState, Exception, string> formatter
         )
         {
+            if(logLevel.In(LogLevel.Debug, LogLevel.Trace))
+                return;
             $"{CategoryName}: [{logLevel}] {formatter(state, exception)}".LogLinePart();
             TraceException("Exception", exception).Log();
         }

@@ -16,7 +16,7 @@
     <Compile Include="MainContainer.cs" />
     <Compile Include="SemanticTokensHandlerWrapper.cs" />
     <Compile Include="TextDocumentSyncHandlerWrapper.cs" />
-    <Compile Include="TokenTarget.cs" />
+    <Compile Include="MainWrapper.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="sys.targets" />

@@ -12,7 +12,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 namespace ReniLSP;
 
 [UsedImplicitly]
-sealed class TokenTarget
+sealed class MainWrapper
     : DumpableObject
         , ISemanticTokensFullHandler
         , ISemanticTokensDeltaHandler
@@ -26,7 +26,7 @@ sealed class TokenTarget
     readonly TextDocumentSyncHandlerWrapper DocumentHandler;
     readonly SemanticTokensHandlerWrapper SemanticHandler;
 
-    public TokenTarget(ILogger<TokenTarget> logger)
+    public MainWrapper(ILogger<MainWrapper> logger)
     {
         Handler handler = new(logger);
         FormattingHandler = new(handler);

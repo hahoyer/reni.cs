@@ -20,7 +20,7 @@ sealed class Handler : DumpableObject
     );
 
     readonly ConcurrentDictionary<string, Buffer> Buffers = new();
-    readonly ILogger<TokenTarget> Logger;
+    readonly ILogger<MainWrapper> Logger;
 
     public static TextDocumentSyncRegistrationOptions DocumentOptions => new() { Change = TextDocumentSyncKind.Full };
 
@@ -42,7 +42,7 @@ sealed class Handler : DumpableObject
             WorkDoneProgress = true,
         };
 
-    public Handler(ILogger<TokenTarget> logger) => Logger = logger;
+    public Handler(ILogger<MainWrapper> logger) => Logger = logger;
 
     public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)
         => Buffers[identifier.TextDocument.GetKey()].Tokenize(builder, identifier);
