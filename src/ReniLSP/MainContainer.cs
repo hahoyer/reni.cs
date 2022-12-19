@@ -36,7 +36,6 @@ public static class MainContainer
                     .WithLoggerFactory(new LoggerFactory())
                     .AddDefaultLoggingProvider()
                     .OnInitialized(Initialized)
-                    .WithHandler<Target>()
                     .WithHandler<TokenTarget>()
             );
             await server.WaitForExit;

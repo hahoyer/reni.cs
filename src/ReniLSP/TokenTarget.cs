@@ -1,81 +1,86 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using hw.Helper;
-using hw.Scanner;
+using hw.DebugFormatter;
 using JetBrains.Annotations;
+using MediatR;
+using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using ReniUI;
-using ReniUI.Classification;
 
 namespace ReniLSP;
 
 [UsedImplicitly]
-sealed class TokenTarget : SemanticTokensHandlerBase
+sealed class TokenTarget
+    : DumpableObject
+        , ISemanticTokensFullHandler
+        , ISemanticTokensDeltaHandler
+        , ISemanticTokensRangeHandler
+        , IDidOpenTextDocumentHandler
+        , IDidChangeTextDocumentHandler
+        , IDidCloseTextDocumentHandler
 {
-    static readonly Container<SemanticTokenType> TokenTypes = new("keyword", "comment", "string", "number", "variable"
-        , "decorator");
+    readonly TextDocumentSyncHandlerWrapper DocumentHandler;
+    readonly SemanticTokensHandlerWrapper SemanticHandler;
 
-    protected override SemanticTokensRegistrationOptions CreateRegistrationOptions
+    public TokenTarget(ILogger<TokenTarget> logger)
+    {
+        Handler handler = new(logger);
+        SemanticHandler = new(handler);
+        DocumentHandler = new(handler);
+    }
+
+    SemanticTokensRegistrationOptions IRegistration<SemanticTokensRegistrationOptions, SemanticTokensCapability>.
+        GetRegistrationOptions
         (SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
-        => GetSemanticTokensRegistrationOptions();
+        => ((IRegistration<SemanticTokensRegistrationOptions, SemanticTokensCapability>)SemanticHandler)
+            .GetRegistrationOptions(capability, clientCapabilities);
 
-    protected override Task Tokenize
-    (
-        SemanticTokensBuilder builder
-        , ITextDocumentIdentifierParams identifier
-        , CancellationToken cancellationToken
-    )
-    {
-        var compiler = CompilerBrowser
-            .FromFile(DocumentUri.GetFileSystemPath(identifier).AssertNotNull());
-        var nodes = compiler
-            .Locate()
-            .Where(item => item.IsComment || !item.IsWhiteSpace);
+    TextDocumentChangeRegistrationOptions
+        IRegistration<TextDocumentChangeRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
+        (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+        => ((IRegistration<TextDocumentChangeRegistrationOptions, SynchronizationCapability>)DocumentHandler)
+            .GetRegistrationOptions(capability, clientCapabilities);
 
-        foreach(var item in nodes)
-        foreach(var line in item.SourcePart.Split("\n"))
-            builder.Push(GetRange(line), GetTokenTypeIndex(item));
-        return Task.CompletedTask;
-    }
+    TextDocumentCloseRegistrationOptions IRegistration<TextDocumentCloseRegistrationOptions, SynchronizationCapability>.
+        GetRegistrationOptions
+        (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+        => ((IRegistration<TextDocumentCloseRegistrationOptions, SynchronizationCapability>)DocumentHandler)
+            .GetRegistrationOptions(capability, clientCapabilities);
 
-    protected override Task<SemanticTokensDocument> GetSemanticTokensDocument
-        (ITextDocumentIdentifierParams @params, CancellationToken cancellationToken)
-        => Task.FromResult(new SemanticTokensDocument(RegistrationOptions.Legend));
+    TextDocumentOpenRegistrationOptions IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>.
+        GetRegistrationOptions
+        (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+        => ((IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>)DocumentHandler)
+            .GetRegistrationOptions(capability, clientCapabilities);
 
-    static SemanticTokenType? GetTokenTypeIndex(Item token)
-        => token.IsComment
-            ? SemanticTokenType.Comment
-            : token.IsBraceLike
-                ? SemanticTokenType.Keyword
-                : token.IsIdentifier
-                    ? SemanticTokenType.Variable
-                    : token.IsKeyword
-                        ? SemanticTokenType.Keyword
-                        : token.IsText
-                            ? SemanticTokenType.String
-                            : token.IsNumber
-                                ? SemanticTokenType.Number
-                                : SemanticTokenType.Namespace;
+    async Task<Unit> IRequestHandler<DidChangeTextDocumentParams, Unit>.Handle
+        (DidChangeTextDocumentParams request, CancellationToken cancellationToken)
+        => await DocumentHandler.Handle(request
+            , cancellationToken);
 
-    static Range GetRange(SourcePart token)
-    {
-        var r = token.TextPosition;
-        return new(r.start.LineNumber, r.start.ColumnNumber1 - 1, r.end.LineNumber, r.end.ColumnNumber1 - 1);
-    }
+    async Task<Unit> IRequestHandler<DidCloseTextDocumentParams, Unit>.Handle
+        (DidCloseTextDocumentParams request, CancellationToken cancellationToken)
+        => await DocumentHandler
+            .Handle(request, cancellationToken);
 
-    static SemanticTokensRegistrationOptions GetSemanticTokensRegistrationOptions()
-        => new()
-        {
-            Legend = new()
-            {
-                TokenModifiers = new("readonly")
-                , TokenTypes = TokenTypes
-            }
-            , Full = true
-            , Range = true
-        };
+    async Task<Unit> IRequestHandler<DidOpenTextDocumentParams, Unit>.Handle
+        (DidOpenTextDocumentParams request, CancellationToken cancellationToken)
+        => await DocumentHandler.Handle(request, cancellationToken);
+
+    async Task<SemanticTokensFullOrDelta> IRequestHandler<SemanticTokensDeltaParams, SemanticTokensFullOrDelta>.Handle
+        (SemanticTokensDeltaParams request, CancellationToken cancellationToken)
+        => await ((IRequestHandler<SemanticTokensDeltaParams, SemanticTokensFullOrDelta>)SemanticHandler).Handle(request
+            , cancellationToken);
+
+    async Task<SemanticTokens> IRequestHandler<SemanticTokensParams, SemanticTokens>.Handle
+        (SemanticTokensParams request, CancellationToken cancellationToken)
+        => await ((IRequestHandler<SemanticTokensParams, SemanticTokens>)SemanticHandler).Handle(request
+            , cancellationToken);
+
+    async Task<SemanticTokens> IRequestHandler<SemanticTokensRangeParams, SemanticTokens>.Handle
+        (SemanticTokensRangeParams request, CancellationToken cancellationToken)
+        => await ((IRequestHandler<SemanticTokensRangeParams, SemanticTokens>)SemanticHandler).Handle(request
+            , cancellationToken);
 }

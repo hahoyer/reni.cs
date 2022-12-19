@@ -8,9 +8,11 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Handler.cs" />
     <Compile Include="LoggerFactory.cs" />
-    <Compile Include="Target.cs" />
     <Compile Include="MainContainer.cs" />
+    <Compile Include="SemanticTokensHandlerWrapper.cs" />
+    <Compile Include="TextDocumentSyncHandlerWrapper.cs" />
     <Compile Include="TokenTarget.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
