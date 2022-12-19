@@ -8,6 +8,9 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Buffer.cs" />
+    <Compile Include="DocumentFormattingHandlerWrapper.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="LoggerFactory.cs" />
     <Compile Include="MainContainer.cs" />

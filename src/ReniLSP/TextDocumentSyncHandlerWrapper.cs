@@ -41,5 +41,5 @@ sealed class TextDocumentSyncHandlerWrapper : TextDocumentSyncHandlerBase
 
     protected override TextDocumentSyncRegistrationOptions CreateRegistrationOptions
         (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
-        => Handler.GetDocumentRegistrationOptions();
+        => Handler.DocumentOptions;
 }

@@ -62,7 +62,8 @@ public abstract class Item : DumpableObject
         }
     }
 
-    string Types => GetTypes().Stringify(",");
+    internal string[] Types => GetTypes().ToArray();
+    string TypeList => GetTypes().Stringify(",");
 
     public int StartPosition => SourcePart.Position;
     public int EndPosition => SourcePart.EndPosition;
@@ -208,6 +209,6 @@ public abstract class Item : DumpableObject
     {
         var start = SourcePart.Start.TextPosition;
         return
-            $"{start.LineNumber}/{start.ColumnNumber1 - 1}: {Types}: {SourcePart.Id.Quote()}";
+            $"{start.LineNumber}/{start.ColumnNumber1 - 1}: {TypeList}: {SourcePart.Id.Quote()}";
     }
 }

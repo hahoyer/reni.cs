@@ -14,7 +14,7 @@ sealed class SemanticTokensHandlerWrapper : SemanticTokensHandlerBase
 
     protected override SemanticTokensRegistrationOptions CreateRegistrationOptions
         (SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
-        => Handler.GetSemanticTokensRegistrationOptions();
+        => Handler.SemanticTokensOptions;
 
     protected override Task Tokenize
     (
