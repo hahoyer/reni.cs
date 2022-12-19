@@ -195,7 +195,7 @@
     <Resource Include="Resources\visualStudio15.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Reni\Reni2.csproj">
+    <ProjectReference Include="..\Reni\Reni.csproj">
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
       <Name>Reni2</Name>
     </ProjectReference>
