@@ -95,6 +95,6 @@ sealed class Handler : DumpableObject
         Buffers[target] = text;
     }
 
-    public void DidClose
-        (DidCloseTextDocumentParams request) => Buffers.TryRemove(GetBufferKey(request.TextDocument), out var _);
+    public void DidClose(DidCloseTextDocumentParams request)
+        => Buffers.TryRemove(GetBufferKey(request.TextDocument), out var _);
 }
