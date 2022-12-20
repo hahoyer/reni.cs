@@ -8,7 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.LanguageServer.Client;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Utilities;
 using ReniLSP;
@@ -18,8 +20,10 @@ namespace ReniVSIX;
 [ContentType(Constants.LanguageName)]
 [Export(typeof(ILanguageClient))]
 [RunOnContext(RunningContext.RunOnHost)]
+[ProvideLanguageEditorOptionPage(typeof(ConfigurationProperties), Constants.LanguageName, "Formatting", "", "100")]
 public class LanguageClient : ILanguageClient
 {
+    [UsedImplicitly]
     Task Server;
 
     async Task<Connection> ILanguageClient.ActivateAsync(CancellationToken token)
@@ -30,17 +34,23 @@ public class LanguageClient : ILanguageClient
         var writer = new Pipe();
 
         Server = Task.Run(() => MainContainer.RunServer(writer.Reader, reader.Writer), token);
-        var connection = new Connection(reader.Reader.AsStream(), writer.Writer.AsStream());
-        return connection;
+        return new(reader.Reader.AsStream(), writer.Writer.AsStream());
     }
 
+    IEnumerable<string> ILanguageClient.ConfigurationSections
+    {
+        get
+        {
+            yield return "formatting";
+            yield return "Formatting";
+        }
+    }
 
-    IEnumerable<string> ILanguageClient.ConfigurationSections => null;
 
     IEnumerable<string> ILanguageClient.FilesToWatch => null;
 
     object ILanguageClient.InitializationOptions => null;
-    string ILanguageClient.Name => "Bar Language Extension";
+    string ILanguageClient.Name => "Reni Language Extension";
 
     async Task ILanguageClient.OnLoadedAsync() => await StartAsync.InvokeAsync(this, EventArgs.Empty);
 

@@ -38,6 +38,7 @@ public static class MainContainer
                     .OnInitialized(Initialized)
                     .WithHandler<MainWrapper>()
             );
+
             await server.WaitForExit;
         }
         catch(Exception)

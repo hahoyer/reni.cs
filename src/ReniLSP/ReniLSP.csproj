@@ -7,6 +7,9 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Buffer.cs" />
     <Compile Include="DocumentFormattingHandlerWrapper.cs" />
@@ -17,9 +20,20 @@
     <Compile Include="SemanticTokensHandlerWrapper.cs" />
     <Compile Include="TextDocumentSyncHandlerWrapper.cs" />
     <Compile Include="MainWrapper.cs" />
-    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="sys.targets" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReniUI\ReniUI.csproj">
+      <Project>{c339a515-d066-4c12-a4c5-07da91c19a2c}</Project>
+      <Name>ReniUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Reni\Reni.csproj">
+      <Project>{45d97de4-67c3-4f10-98b4-6618cf7c7bb1}</Project>
+      <Name>Reni</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\JetBrains.Annotations.2022.3.1\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
@@ -81,6 +95,9 @@
     <Reference Include="OmniSharp.Extensions.JsonRpc.Generators, Version=0.19.0.0, Culture=neutral, PublicKeyToken=6d868dff454e6022, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\OmniSharp.Extensions.JsonRpc.Generators.0.19.7\lib\netstandard2.0\OmniSharp.Extensions.JsonRpc.Generators.dll</HintPath>
     </Reference>
+    <Reference Include="OmniSharp.Extensions.LanguageClient, Version=0.19.0.0, Culture=neutral, PublicKeyToken=6d868dff454e6022, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\OmniSharp.Extensions.LanguageClient.0.19.7\lib\netstandard2.0\OmniSharp.Extensions.LanguageClient.dll</HintPath>
+    </Reference>
     <Reference Include="OmniSharp.Extensions.LanguageProtocol, Version=0.19.0.0, Culture=neutral, PublicKeyToken=6d868dff454e6022, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\OmniSharp.Extensions.LanguageProtocol.0.19.7\lib\netstandard2.0\OmniSharp.Extensions.LanguageProtocol.dll</HintPath>
     </Reference>
@@ -90,6 +107,7 @@
     <Reference Include="OmniSharp.Extensions.LanguageServer.Shared, Version=0.19.0.0, Culture=neutral, PublicKeyToken=6d868dff454e6022, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\OmniSharp.Extensions.LanguageServer.Shared.0.19.7\lib\netstandard2.0\OmniSharp.Extensions.LanguageServer.Shared.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
@@ -136,33 +154,21 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReniUI\ReniUI.csproj">
-      <Project>{c339a515-d066-4c12-a4c5-07da91c19a2c}</Project>
-      <Name>ReniUI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Reni\Reni.csproj">
-      <Project>{45d97de4-67c3-4f10-98b4-6618cf7c7bb1}</Project>
-      <Name>Reni</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CSharp.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.dll" />
-    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.VisualBasic.dll" />
+    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CSharp.dll" />
+    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
+    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.dll" />
+    <Analyzer Include="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\analyzers\vb\Microsoft.VisualStudio.Threading.Analyzers.VisualBasic.dll" />
   </ItemGroup>
   <Import Project="sys.targets" />
-  <Import Project="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\build\Microsoft.VisualStudio.Threading.Analyzers.targets" Condition="Exists('..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" />
+  <Import Project="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\build\Microsoft.VisualStudio.Threading.Analyzers.targets" Condition="Exists('..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.17.4.27\build\Microsoft.VisualStudio.Threading.Analyzers.targets'))" />
     <Error Condition="!Exists('..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\build\Microsoft.VisualStudio.Threading.Analyzers.targets'))" />
     <Error Condition="!Exists('..\..\bin\Packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets'))" />
   </Target>
-  <Import Project="..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\build\Microsoft.VisualStudio.Threading.Analyzers.targets" Condition="Exists('..\..\bin\Packages\Microsoft.VisualStudio.Threading.Analyzers.16.10.56\build\Microsoft.VisualStudio.Threading.Analyzers.targets')" />
   <Import Project="..\..\bin\Packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\..\bin\Packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />
 </Project>

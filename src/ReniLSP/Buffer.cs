@@ -47,22 +47,9 @@ sealed class Buffer : DumpableObject
         }
     }
 
-    public TextEditContainer Format(FormattingOptions options)
+    public TextEditContainer Format(ReniUI.Formatting.Configuration options)
     {
-        var configuration = new ReniUI.Formatting.Configuration
-            {
-                LineBreakAtEndOfText = options.InsertFinalNewline
-                , IndentCount = options.TabSize
-                , AdditionalLineBreaksForMultilineItems
-                    = options.ToBoolean("AdditionalLineBreaksForMultilineItems") ?? false
-                , EmptyLineLimit = options.ToInteger("EmptyLineLimit")
-                , LineBreaksAtComplexDeclaration = options.ToBoolean("LineBreaksAtComplexDeclaration") ?? false
-                , LineBreaksBeforeDeclarationToken = options.ToBoolean("LineBreaksBeforeDeclarationToken") ?? false
-                , LineBreaksBeforeListToken = options.ToBoolean("LineBreaksBeforeListToken") ?? false
-                , MaxLineLength = options.ToInteger("MaxLineLength")
-            }
-            ;
-        var edits = configuration.Create()
+        var edits = options.Create()
             .GetEditPieces(CompilerCache.Value, CompilerCache.Value.Source.All)
             .Select(edit => new TextEdit { NewText = edit.Insert, Range = edit.Remove.GetRange() });
         return TextEditContainer.From(edits);

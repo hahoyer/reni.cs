@@ -9,9 +9,9 @@ using Microsoft.VisualStudio.Text.Editor;
 
 namespace ReniVSIX;
 
-//[ProvideService(typeof(ReniService), ServiceName = "Reni Language Service")]
-//[ProvideLanguageService(typeof(ReniService), Constants.LanguageName, 106)]
-//[ProvideLanguageExtension(typeof(ReniService), ".reni")]
+[ProvideService(typeof(ReniService), ServiceName = "Reni Language Service")]
+[ProvideLanguageService(typeof(ReniService), Constants.LanguageName, 106)]
+[ProvideLanguageExtension(typeof(ReniService), ".reni")]
 [UsedImplicitly]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(Constants.PackageGuidString)]

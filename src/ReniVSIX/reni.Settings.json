@@ -1,0 +1,8 @@
+{
+    "formatting.AdditionalLineBreaksForMultilineItems": true,
+    "formatting.EmptyLineLimit": 1,
+    "formatting.LineBreaksAtComplexDeclaration": true,
+    "formatting.LineBreaksBeforeDeclarationToken": false,
+    "formatting.LineBreaksBeforeListToken": false,
+    "formatting.MaxLineLength": 150,
+}

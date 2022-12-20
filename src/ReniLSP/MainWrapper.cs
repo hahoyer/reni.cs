@@ -4,10 +4,12 @@ using hw.DebugFormatter;
 using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
 
 namespace ReniLSP;
 
@@ -21,18 +23,24 @@ sealed class MainWrapper
         , IDidChangeTextDocumentHandler
         , IDidCloseTextDocumentHandler
         , IDocumentFormattingHandler
+        , IConfigurationHandler
+        , IDidChangeConfigurationHandler
 {
     readonly DocumentFormattingHandlerWrapper FormattingHandler;
     readonly TextDocumentSyncHandlerWrapper DocumentHandler;
     readonly SemanticTokensHandlerWrapper SemanticHandler;
+    readonly Handler Handler;
 
     public MainWrapper(ILogger<MainWrapper> logger)
     {
-        Handler handler = new(logger);
-        FormattingHandler = new(handler);
-        SemanticHandler = new(handler);
-        DocumentHandler = new(handler);
+        Handler = new(logger);
+        FormattingHandler = new(Handler);
+        SemanticHandler = new(Handler);
+        DocumentHandler = new(Handler);
     }
+
+    void ICapability<DidChangeConfigurationCapability>.SetCapability
+        (DidChangeConfigurationCapability capability, ClientCapabilities clientCapabilities) { }
 
     DocumentFormattingRegistrationOptions
         IRegistration<DocumentFormattingRegistrationOptions, DocumentFormattingCapability>
@@ -60,6 +68,14 @@ sealed class MainWrapper
         .GetRegistrationOptions(SynchronizationCapability capability, ClientCapabilities clientCapabilities)
         => ((IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>)DocumentHandler)
             .GetRegistrationOptions(capability, clientCapabilities);
+
+    async Task<Container<JToken>> IRequestHandler<ConfigurationParams, Container<JToken>>
+        .Handle(ConfigurationParams request, CancellationToken cancellationToken)
+        => await Handler.Configuration(request);
+
+    async Task<Unit> IRequestHandler<DidChangeConfigurationParams, Unit>.Handle
+        (DidChangeConfigurationParams request, CancellationToken cancellationToken)
+        => await Handler.DidChangeConfigurationHandlerImplementation(request);
 
     async Task<Unit> IRequestHandler<DidChangeTextDocumentParams, Unit>
         .Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)

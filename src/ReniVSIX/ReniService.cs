@@ -8,24 +8,22 @@ public sealed class ReniService : LanguageService
 {
     readonly ValueCache<LanguagePreferences> PreferencesCache;
 
+    internal ReniVSIXPackage Package => (ReniVSIXPackage)Site;
+
     public ReniService() => PreferencesCache = new(CreateLanguagePreferences);
 
     public override LanguagePreferences GetLanguagePreferences()
         => PreferencesCache.Value;
 
-    public override IScanner GetScanner(IVsTextLines buffer) => DummyScanner.Instance;
+    public override IScanner GetScanner(IVsTextLines buffer) => null;
 
-    public override Microsoft.VisualStudio.Package.Source CreateSource(IVsTextLines buffer)
-        => new SourceWrapper(this, buffer);
+    public override Source CreateSource(IVsTextLines buffer) => null;
 
-    public override Microsoft.VisualStudio.Package.AuthoringScope ParseSource(ParseRequest request)
-        => new AuthoringScope(request);
+    public override AuthoringScope ParseSource(ParseRequest request) => null;
 
     public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 
     public override string Name => Constants.LanguageName;
-
-    internal ReniVSIXPackage Package => (ReniVSIXPackage)Site;
 
     LanguagePreferences CreateLanguagePreferences()
         => new(Site, typeof(ReniService).GUID, Name)
