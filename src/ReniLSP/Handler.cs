@@ -1,8 +1,6 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
-using hw.Helper;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol;
@@ -88,19 +86,23 @@ sealed class Handler : DumpableObject
         return default;
     }
 
-    public Task<Unit> DidChangeConfigurationHandlerImplementation(DidChangeConfigurationParams request)
+    public void DidChangeConfigurationHandlerImplementation(DidChangeConfigurationParams request)
     {
-        var settingsValues = request.Settings.AssertNotNull()["formatting"];
+        var settingsValues = request.Settings?["reni"]?["formatting"];
+        if(settingsValues?["list"] == null)
+            return;
+
         FormatOptions = new()
         {
             EmptyLineLimit = settingsValues["EmptyLineLimit"].Value<int?>()
             , MaxLineLength = settingsValues["MaxLineLength"].Value<int?>()
             , AdditionalLineBreaksForMultilineItems
-                = settingsValues["AdditionalLineBreaksForMultilineItems"].Value<bool>()
-            , LineBreaksBeforeListToken = settingsValues["LineBreaksBeforeListToken"].Value<bool>()
-            , LineBreaksBeforeDeclarationToken = settingsValues["LineBreaksBeforeDeclarationToken"].Value<bool>()
-            , LineBreaksAtComplexDeclaration = settingsValues["LineBreaksAtComplexDeclaration"].Value<bool>()
+                = settingsValues["list"]["AdditionalLineBreaksForMultilineItems"].Value<bool>()
+            , LineBreaksBeforeListToken = settingsValues["list"]["LineBreaksBeforeListToken"].Value<bool>()
+            , LineBreaksBeforeDeclarationToken
+                = settingsValues["list"]["LineBreaksBeforeDeclarationToken"].Value<bool>()
+            , LineBreaksAtComplexDeclaration = settingsValues["list"]["LineBreaksAtComplexDeclaration"].Value<bool>()
         };
-        return Unit.Task;
+        return;
     }
 }

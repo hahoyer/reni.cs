@@ -75,7 +75,10 @@ sealed class MainWrapper
 
     async Task<Unit> IRequestHandler<DidChangeConfigurationParams, Unit>.Handle
         (DidChangeConfigurationParams request, CancellationToken cancellationToken)
-        => await Handler.DidChangeConfigurationHandlerImplementation(request);
+    {
+        Handler.DidChangeConfigurationHandlerImplementation(request);
+        return await Unit.Task;
+    }
 
     async Task<Unit> IRequestHandler<DidChangeTextDocumentParams, Unit>
         .Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)

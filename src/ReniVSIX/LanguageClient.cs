@@ -39,11 +39,7 @@ public class LanguageClient : ILanguageClient
 
     IEnumerable<string> ILanguageClient.ConfigurationSections
     {
-        get
-        {
-            yield return "formatting";
-            yield return "Formatting";
-        }
+        get { yield return "reni"; }
     }
 
 
