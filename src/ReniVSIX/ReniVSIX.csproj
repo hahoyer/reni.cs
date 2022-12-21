@@ -130,7 +130,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="reni.pkgdef">
+    <Content Include="ReniVS22.pkgdef">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

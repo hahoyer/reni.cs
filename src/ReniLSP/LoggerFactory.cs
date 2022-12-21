@@ -38,7 +38,7 @@ sealed class LoggerFactory : DumpableObject, ILoggerFactory
 {title}: {exception.Message}
     {exception.Source}
     {exception.StackTrace}
-{TraceException("Inner Exception", exception.InnerException).Indent()}";
+    {TraceException("Inner Exception", exception.InnerException).Indent()}";
     }
 
     void IDisposable.Dispose() { }

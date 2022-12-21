@@ -5,6 +5,7 @@
         <DisplayName>Reni.VS22</DisplayName>
         <Description xml:space="preserve">Reni language support for Visual Studio 2022</Description>
         <Icon>reni.ico</Icon>
+        <PreviewImage>reni.ico</PreviewImage>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0, )" />
