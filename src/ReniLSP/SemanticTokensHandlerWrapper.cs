@@ -16,7 +16,7 @@ sealed class SemanticTokensHandlerWrapper : SemanticTokensHandlerBase
         (SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
         => Handler.SemanticTokensOptions;
 
-    protected override Task Tokenize
+    protected override async Task Tokenize
     (
         SemanticTokensBuilder builder,
         ITextDocumentIdentifierParams identifier,
@@ -24,7 +24,7 @@ sealed class SemanticTokensHandlerWrapper : SemanticTokensHandlerBase
     )
     {
         Handler.Tokenize(builder, identifier);
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     protected override Task<SemanticTokensDocument> GetSemanticTokensDocument

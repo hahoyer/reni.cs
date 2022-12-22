@@ -21,6 +21,7 @@
     <Compile Include="Formatting\IndentedSourcePartEdit.cs" />
     <Compile Include="Formatting\BinaryTreeProxy.cs" />
     <Compile Include="Formatting\Position.cs" />
+    <Compile Include="Test\Classification\Comments.cs" />
     <Compile Include="Test\Formatting\Comments.cs" />
     <Compile Include="Test\Formatting\CommentsOfLists.cs" />
     <Compile Include="Test\Formatting\Exclamation.cs" />
