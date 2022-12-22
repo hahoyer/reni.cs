@@ -36,8 +36,7 @@ sealed class LineCommentType : DumpableObject, IItemsType, ILine
         var head = sourcePart.Start.Span(headLength.Value);
 
         var tailLength = sourcePart.End.Match(Lexer.Instance.LineEnd, false);
-        tailLength.AssertIsNotNull();
-        var tail = sourcePart.End.Span(tailLength.Value);
+        var tail = sourcePart.End.Span(tailLength ?? 0);
 
         yield return new(HeadType.Instance, head, parent);
         yield return new(TextLineType.Instance, head.End.Span(tail.Start), parent);

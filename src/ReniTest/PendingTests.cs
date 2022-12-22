@@ -1,11 +1,10 @@
-//23:08:32.793 15.12.2022 ran 186 of 186 
+//02:38:25.080 22.12.2022 ran 187 of 187 
 
 // ReSharper disable once CheckNamespace
-namespace hw.UnitTest
+namespace hw.UnitTest;
+public static class PendingTests
 {
-    public static class PendingTests
+    public static void Run()
     {
-        public static void Run()
-        {
-        
-}}}
+    
+}}
