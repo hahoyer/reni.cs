@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
-using Microsoft.Extensions.Logging;
 using Nerdbank.Streams;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
@@ -59,12 +58,4 @@ public static class MainContainer
         options.Range = true;
         return Task.CompletedTask;
     }
-
-    internal static FilePositionTag ToFilePositionTag(this LogLevel level)
-        => level switch
-        {
-            LogLevel.Trace => FilePositionTag.Debug
-            , LogLevel.Debug => FilePositionTag.Debug
-            , _ => FilePositionTag.Output
-        };
 }
