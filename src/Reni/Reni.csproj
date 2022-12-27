@@ -217,6 +217,7 @@
     <Compile Include="hw\UnitTest\TestMethod.cs" />
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
+    <Compile Include="ResultData.cs" />
     <Compile Include="TokenClasses\LogicalOperation.cs" />
     <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
     <Compile Include="TokenClasses\Whitespace\LineGroup.cs" />
