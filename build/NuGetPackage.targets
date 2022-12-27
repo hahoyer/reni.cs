@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="">
+
+<!--EXTERNAL_PROPERTIES: NuGetCommand-->
+<!--EXTERNAL_PROPERTIES: NonInteractiveSwitch-->
+<!--EXTERNAL_PROPERTIES: PackageOutputDir-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <Import Project="CSharp.Library.targets" />
 
@@ -25,7 +29,6 @@
 
     <Target
         Name="BuildPackages"
-        DependsOnTargets="CheckPrerequisites;FilterNuSpecs"
         Inputs="%(PackageSpecs.Identity)"
         Outputs="$(PackageSpecsIntermediate)\%(Identity)"
         >
