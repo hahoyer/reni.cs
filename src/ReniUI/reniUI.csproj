@@ -28,6 +28,7 @@
     <Compile Include="Test\Formatting\FlatStrings.cs" />
     <Compile Include="Test\Formatting\TrainWreck.cs" />
     <Compile Include="Test\StrangeExpressions.cs" />
+    <Compile Include="Test\Examples\Enum.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
     <Compile Include="Test\UserInteraction\BigExample.cs" />
     <Compile Include="Test\UserInteraction\DeclarationOptions.cs" />
@@ -94,5 +95,6 @@
       <Name>Reni</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="sys.targets" />
 </Project>

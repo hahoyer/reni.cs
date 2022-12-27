@@ -72,7 +72,10 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         => new(() => Compiler.FromText(text, parameters, sourceIdentifier));
 
     public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
-        => new(() => Compiler.FromText(text, null, sourceIdentifier));
+    {
+        text.AssertNotNull();
+        return new(() => Compiler.FromText(text, null, sourceIdentifier));
+    }
 
     public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
         => new(() => Compiler.FromFile(fileName, parameters));

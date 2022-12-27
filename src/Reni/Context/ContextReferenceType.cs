@@ -13,6 +13,8 @@ sealed class ContextReferenceType
     : TypeBase
         , ISymbolProviderForPointer<DumpPrintToken>
 {
+    readonly CompoundView Parent;
+
     IEnumerable<string> InternalDeclarationOptions
     {
         get
@@ -22,24 +24,24 @@ sealed class ContextReferenceType
         }
     }
 
-    internal ContextReferenceType(CompoundView parent) => FindRecentCompoundView = parent;
+    internal ContextReferenceType(CompoundView parent) => Parent = parent;
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
         => Feature.Extension.Value(DumpPrintTokenResult, this);
 
     [DisableDump]
-    internal override Root Root => FindRecentCompoundView.Root;
+    internal override Root Root => Parent.Root;
 
     [DisableDump]
-    internal override CompoundView FindRecentCompoundView { get; }
+    internal override CompoundView FindRecentCompoundView => Parent;
 
     [DisableDump]
-    internal override bool IsHollow => false;
+    internal override bool IsHollow => Parent.IsHollow;
 
     [DisableDump]
-    internal override bool IsPointerPossible => true;
+    internal override bool IsPointerPossible => !IsHollow;
 
-    protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+    protected override Size GetSize() => IsHollow? Size.Zero : Root.DefaultRefAlignParam.RefSize;
 
     protected override CodeBase DumpPrintCode()
         => CodeBase.DumpPrintText(ContextOperator.TokenId);
@@ -57,9 +59,9 @@ sealed class ContextReferenceType
             .Result(category, DumpPrintCode);
 
     Result PointerConversion(Category category)
-        => FindRecentCompoundView
+        => Parent
             .Type
             .Pointer
             .Result
-                (category, c => ArgResult(c).AddToReference(() => FindRecentCompoundView.CompoundViewSize * -1));
+                (category, c => ArgResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
 }
