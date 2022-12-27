@@ -7,59 +7,59 @@ using Reni.Feature;
 using Reni.Struct;
 using Reni.Type;
 
-namespace Reni.Context
+namespace Reni.Context;
+
+sealed class ContextReferenceType
+    : TypeBase
+        , ISymbolProviderForPointer<DumpPrintToken>
 {
-    sealed class ContextReferenceType
-        : TypeBase
-            , ISymbolProviderForPointer<DumpPrintToken>
+    IEnumerable<string> InternalDeclarationOptions
     {
-        readonly CompoundView Parent;
-
-        internal ContextReferenceType(CompoundView parent) { Parent = parent; }
-
-        [DisableDump]
-        internal override Root Root => Parent.Root;
-        [DisableDump]
-        internal override CompoundView FindRecentCompoundView => Parent;
-        [DisableDump]
-        internal override bool IsHollow => false;
-        [DisableDump]
-        internal override bool IsPointerPossible => true;
-
-        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-
-        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-            => Feature.Extension.Value(DumpPrintTokenResult, this);
-
-        protected override CodeBase DumpPrintCode()
-            => CodeBase.DumpPrintText(ContextOperator.TokenId);
-
-        new Result DumpPrintTokenResult(Category category)
-            => VoidType
-                .Result(category, DumpPrintCode);
-
-        internal override IEnumerable<string> DeclarationOptions
-            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
-
-        IEnumerable<string> InternalDeclarationOptions
+        get
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            NotImplementedMethod();
+            return null;
         }
-
-
-        protected override IEnumerable<IConversion> StripConversions
-            => base.StripConversions
-                .Concat(new[] {Feature.Extension.Conversion(PointerConversion)});
-
-        Result PointerConversion(Category category)
-            => Parent
-                .Type
-                .Pointer
-                .Result
-                (category, c => ArgResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
     }
-}                                                               
+
+    internal ContextReferenceType(CompoundView parent) => FindRecentCompoundView = parent;
+
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+        => Feature.Extension.Value(DumpPrintTokenResult, this);
+
+    [DisableDump]
+    internal override Root Root => FindRecentCompoundView.Root;
+
+    [DisableDump]
+    internal override CompoundView FindRecentCompoundView { get; }
+
+    [DisableDump]
+    internal override bool IsHollow => false;
+
+    [DisableDump]
+    internal override bool IsPointerPossible => true;
+
+    protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+
+    protected override CodeBase DumpPrintCode()
+        => CodeBase.DumpPrintText(ContextOperator.TokenId);
+
+    internal override IEnumerable<string> DeclarationOptions
+        => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+
+    protected override IEnumerable<IConversion> StripConversions
+        => base.StripConversions
+            .Concat(new[] { Feature.Extension.Conversion(PointerConversion) });
+
+    new Result DumpPrintTokenResult(Category category)
+        => VoidType
+            .Result(category, DumpPrintCode);
+
+    Result PointerConversion(Category category)
+        => FindRecentCompoundView
+            .Type
+            .Pointer
+            .Result
+                (category, c => ArgResult(c).AddToReference(() => FindRecentCompoundView.CompoundViewSize * -1));
+}
