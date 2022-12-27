@@ -29,13 +29,13 @@ sealed class Category : DumpableObject, IEquatable<Category>
     public static Category Closures => CreateCategory(closures: true);
 
     [DebuggerHidden]
-        public static Category IsHollow => CreateCategory(isHollow: true);
+    public static Category IsHollow => CreateCategory(true);
 
     [DebuggerHidden]
     public static Category None => CreateCategory();
 
     [DebuggerHidden]
-        public static Category All => CreateCategory(isHollow: true, size: true, type: true, code: true, closures: true);
+    public static Category All => CreateCategory(true, true, true, true, true);
 
     public bool IsNone => !HasAny;
 
@@ -71,9 +71,6 @@ sealed class Category : DumpableObject, IEquatable<Category>
                 result |= Size;
                 result |= Closures;
             }
-
-            if(result.HasType)
-                result |= Size;
 
             if(result.HasSize)
                 result |= IsHollow;

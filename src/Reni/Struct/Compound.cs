@@ -275,6 +275,6 @@ sealed class Compound
     }
 
     internal Issue[] GetIssues(int? viewPosition = null)
-        => ResultsOfStatements(Category.Code, 0, viewPosition)
+        => ResultsOfStatements(Category.Type, 0, viewPosition)
             .Issues;
 }

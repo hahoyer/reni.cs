@@ -38,6 +38,9 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     [UsedImplicitly]
     internal readonly FunctionCache<ContextBase, ResultCache> ResultCache = new();
 
+    [DisableDump]
+    internal Issue[] AllIssues => this.CachedValue(GetAllIssues);
+
     protected ValueSyntax(Anchor anchor, Issue issue = null)
         : base(anchor, issue)
         => anchor.AssertIsNotNull();
@@ -82,9 +85,6 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
         NotImplementedMethod(visitor);
         return null;
     }
-
-    [DisableDump]
-    internal Issue[] AllIssues => this.CachedValue(GetAllIssues);
 
     Issue[] GetAllIssues() => this
         .GetNodesFromLeftToRight()
