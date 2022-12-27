@@ -94,7 +94,9 @@ sealed class Handler : DumpableObject
     public Task<Container<JToken>> Configuration(ConfigurationParams request)
     {
         NotImplementedMethod(request);
+#pragma warning disable VSTHRD114 // Avoid returning a null Task
         return default;
+#pragma warning restore VSTHRD114 // Avoid returning a null Task
     }
 
     public void DidChangeConfigurationHandlerImplementation(DidChangeConfigurationParams request)
