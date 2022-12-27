@@ -13,8 +13,18 @@ sealed class Buffer : DumpableObject
 {
     public string FileName;
     public string Text;
+
+    readonly Handler Parent;
     readonly ValueCache<CompilerBrowser> CompilerCache;
-    public Buffer() => CompilerCache = new(() => CompilerBrowser.FromText(Text, FileName));
+
+    public Buffer(Handler parent)
+    {
+        Parent = parent;
+        CompilerCache = new(() => CompilerBrowser.FromText(Text
+            , new() { ProcessErrors = true }
+            , FileName));
+    }
+
 
     public void ApplyChanges(IEnumerable<TextDocumentContentChangeEvent> changes)
     {
@@ -26,6 +36,15 @@ sealed class Buffer : DumpableObject
 
             Text = change.Text;
         }
+
+        Validate();
+    }
+
+    internal void Validate()
+    {
+        var issues = CompilerCache.Value.Issues.ToArray();
+        if(issues.Any())
+            Parent.PublishDiagnostics(FileName, issues);
     }
 
     public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)

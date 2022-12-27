@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
 using Microsoft.Extensions.Logging;
@@ -6,7 +8,9 @@ using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
+using Reni.Validation;
 
 namespace ReniLSP;
 
@@ -19,6 +23,8 @@ sealed class Handler : DumpableObject
         , "string"
         , "variable"
     );
+
+    internal readonly ITextDocumentLanguageServer Server;
 
     readonly ConcurrentDictionary<string, Buffer> Buffers = new();
     readonly ILogger<MainWrapper> Logger;
@@ -44,7 +50,11 @@ sealed class Handler : DumpableObject
             WorkDoneProgress = true,
         };
 
-    public Handler(ILogger<MainWrapper> logger) => Logger = logger;
+    public Handler(ILogger<MainWrapper> logger, ITextDocumentLanguageServer server)
+    {
+        Logger = logger;
+        Server = server;
+    }
 
     public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)
         => Buffers[identifier.TextDocument.GetKey()].Tokenize(builder, identifier);
@@ -54,7 +64,8 @@ sealed class Handler : DumpableObject
     public void DidOpen(DidOpenTextDocumentParams request)
     {
         var fileName = request.TextDocument.GetKey();
-        Buffers[fileName] = new() { FileName = fileName, Text = request.TextDocument.Text };
+        Buffers[fileName] = new(this) { FileName = fileName, Text = request.TextDocument.Text };
+        Buffers[fileName].Validate();
     }
 
     public void DidChange(DidChangeTextDocumentParams request)
@@ -105,4 +116,23 @@ sealed class Handler : DumpableObject
         };
         return;
     }
+
+    public void PublishDiagnostics(string fileName, IEnumerable<Issue> issues)
+    {
+        var result = new PublishDiagnosticsParams
+        {
+            Diagnostics = issues.Select(ToDiagnostic).ToArray()
+            , Uri = DocumentUri.File(fileName)
+        };
+
+        Server.PublishDiagnostics(result);
+    }
+
+    static Diagnostic ToDiagnostic(Issue issue) => new()
+    {
+        Code = issue.Tag
+        , Message = issue.Message
+        , Range = issue.Position.GetRange()
+        , Severity = DiagnosticSeverity.Error
+    };
 }

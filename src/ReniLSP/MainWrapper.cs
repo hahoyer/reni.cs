@@ -9,6 +9,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
 
 namespace ReniLSP;
@@ -31,9 +32,9 @@ sealed class MainWrapper
     readonly SemanticTokensHandlerWrapper SemanticHandler;
     readonly Handler Handler;
 
-    public MainWrapper(ILogger<MainWrapper> logger)
+    public MainWrapper(ILogger<MainWrapper> logger, ITextDocumentLanguageServer server)
     {
-        Handler = new(logger);
+        Handler = new(logger, server);
         FormattingHandler = new(Handler);
         SemanticHandler = new(Handler);
         DocumentHandler = new(Handler);
