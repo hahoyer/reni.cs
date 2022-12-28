@@ -2,7 +2,7 @@
 
 <!--EXTERNAL_PROPERTIES: NuGetCommand-->
 <!--EXTERNAL_PROPERTIES: NonInteractiveSwitch-->
-<!--EXTERNAL_PROPERTIES: PackageOutputDir-->
+<!--EXTERNAL_PROPERTIES: PackageOutputDir;NuGetCommand-->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <Import Project="CSharp.Library.targets" />
@@ -94,5 +94,6 @@
         <Error Condition="$(ExitCode) != 0" Text="$(ConsoleOutput)" File="%(PackageSpecs.Identity)"/>
 
     </Target>
+    <Target Name="DeployPackage"></Target>
 
 </Project>
