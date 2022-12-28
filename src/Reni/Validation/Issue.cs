@@ -4,98 +4,96 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 
-namespace Reni.Validation
+namespace Reni.Validation;
+
+public sealed class Issue : DumpableObject, IEquatable<Issue>
 {
-    public sealed class Issue : DumpableObject, IEquatable<Issue>
+    internal static readonly IEnumerable<Issue> Empty = new Issue[0];
+    static int NextObjectId;
+
+    [EnableDump]
+    internal readonly SourcePart Position;
+
+    [DisableDump]
+    internal readonly IssueId IssueId;
+
+    [EnableDump]
+    internal readonly string AdditionalMessage;
+
+    [DisableDump]
+    internal string Tag => IssueId.Tag;
+
+    internal string LogDump
     {
-        static int NextObjectId;
-
-        internal static readonly IEnumerable<Issue> Empty = new Issue[0];
-
-        [EnableDump]
-        internal readonly SourcePart Position;
-
-        internal Issue(IssueId issueId, SourcePart position, string additionalMessage = null)
-            : base(NextObjectId++)
+        get
         {
-            IssueId = issueId;
-            AdditionalMessage = additionalMessage ?? "";
-            Position = position;
-            AssertValid();
-            StopByObjectIds();
+            var result = Position.Id == "("
+                ? Position.Start.FilePosition(Tag) + " Functional"
+                : Position.FileErrorPosition(Tag);
+            if(string.IsNullOrWhiteSpace(AdditionalMessage))
+                return result;
+            return result + " " + AdditionalMessage;
         }
-
-        bool IEquatable<Issue>.Equals(Issue other)
-        {
-            if(ReferenceEquals(objA: null, objB: other))
-                return false;
-            if(ReferenceEquals(this, other))
-                return true;
-            return
-                Equals(Position, other.Position) &&
-                Equals(IssueId, other.IssueId) &&
-                string.Equals(AdditionalMessage, other.AdditionalMessage);
-        }
-
-        [DisableDump]
-        internal IssueId IssueId { get; }
-
-        [EnableDump]
-        internal string AdditionalMessage { get; }
-
-        [DisableDump]
-        internal string Tag => IssueId.Tag;
-
-        internal string LogDump
-        {
-            get
-            {
-                var result = Position.Id == "("
-                    ? Position.Start.FilePosition(Tag) + " Functional"
-                    : Position.FileErrorPosition(Tag);
-                if(string.IsNullOrWhiteSpace(AdditionalMessage))
-                    return result;
-                return result + " " + AdditionalMessage;
-            }
-        }
-
-        public string Message
-        {
-            get {                 
-                var result = IssueId.Tag;
-                if(string.IsNullOrWhiteSpace(AdditionalMessage))
-                    return result;
-                return result + " " + AdditionalMessage;
-            }
-        }
-
-        void AssertValid() => (Position != null).Assert();
-
-        protected override string GetNodeDump()
-            => base.GetNodeDump() +
-               IssueId.NodeDump().Surround(left: "{", right: "}");
-
-        public override bool Equals(object obj)
-        {
-            if(ReferenceEquals(objA: null, objB: obj))
-                return false;
-            if(ReferenceEquals(this, obj))
-                return true;
-            return obj is Issue issue && Equals(issue);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Position.GetHashCode();
-                hashCode = (hashCode * 397) ^ IssueId.GetHashCode();
-                hashCode = (hashCode * 397) ^ AdditionalMessage.GetHashCode();
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(Issue left, Issue right) => Equals(left, right);
-        public static bool operator !=(Issue left, Issue right) => !Equals(left, right);
     }
+
+    public string Message
+    {
+        get
+        {
+            var result = IssueId.Tag;
+            if(string.IsNullOrWhiteSpace(AdditionalMessage))
+                return result;
+            return result + " " + AdditionalMessage;
+        }
+    }
+
+    internal Issue(IssueId issueId, SourcePart position, string additionalMessage = null)
+        : base(NextObjectId++)
+    {
+        IssueId = issueId;
+        AdditionalMessage = additionalMessage ?? "";
+        Position = position;
+        AssertValid();
+        StopByObjectIds();
+    }
+
+    bool IEquatable<Issue>.Equals(Issue other)
+    {
+        if(ReferenceEquals(null, other))
+            return false;
+        if(ReferenceEquals(this, other))
+            return true;
+        return
+            Equals(Position, other.Position)
+            && Equals(IssueId, other.IssueId)
+            && string.Equals(AdditionalMessage, other.AdditionalMessage);
+    }
+
+    protected override string GetNodeDump()
+        => base.GetNodeDump() + IssueId.NodeDump().Surround("{", "}");
+
+    public override bool Equals(object obj)
+    {
+        if(ReferenceEquals(null, obj))
+            return false;
+        if(ReferenceEquals(this, obj))
+            return true;
+        return obj is Issue issue && Equals(issue);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = Position.GetHashCode();
+            hashCode = (hashCode * 397) ^ IssueId.GetHashCode();
+            hashCode = (hashCode * 397) ^ AdditionalMessage.GetHashCode();
+            return hashCode;
+        }
+    }
+
+    void AssertValid() => (Position != null).Assert();
+
+    public static bool operator ==(Issue left, Issue right) => Equals(left, right);
+    public static bool operator !=(Issue left, Issue right) => !Equals(left, right);
 }
