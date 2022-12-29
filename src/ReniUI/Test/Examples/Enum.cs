@@ -1,6 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
+using Reni.Validation;
 
 namespace ReniUI.Test.Examples;
 
@@ -23,5 +24,7 @@ x = Auswahl Nein then ""No match"" dumpprint
         var compiler = CompilerBrowser.FromText(text);
         var issues = compiler.Issues.ToArray();
         (issues.Length == 2).Assert();
+        (issues[0].IssueId == IssueId.MissingDeclarationForType).Assert();
+        false.Assert();
     }
 }
