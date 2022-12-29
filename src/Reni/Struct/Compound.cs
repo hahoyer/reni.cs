@@ -46,7 +46,7 @@ sealed class Compound
     int EndPosition => Syntax.EndPosition;
 
     [DisableDump]
-    public bool HasIssue => Issues.Any();
+    public bool HasIssue => Issues?.Any() ?? false;
 
     [DisableDump]
     public Issue[] Issues => GetIssues();
@@ -159,7 +159,7 @@ sealed class Compound
                     .ReplaceRelative(this, CodeBase.TopRef, Closures.Void)
                 & category;
 
-            if(result.HasIssue)
+            if(result.HasIssue == true)
                 return ReturnMethodDump(result);
 
             if(category.HasType())

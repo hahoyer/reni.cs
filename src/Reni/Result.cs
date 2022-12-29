@@ -17,7 +17,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 {
     static int NextObjectId = 1;
 
-    public Issue[] Issues = new Issue[0];
+    public Issue[] Issues;
 
     readonly ResultData Data;
 
@@ -235,7 +235,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         get
         {
-            if(HasIssue)
+            if(HasIssue == true)
                 return this;
 
             var size = FindSize;
@@ -259,7 +259,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
     }
 
-    public bool HasIssue => Issues.Any();
+    public bool? HasIssue => Issues?.Any();
 
     [DisableDump]
     internal Result Weaken
@@ -281,13 +281,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         get
         {
-            if(HasIssue)
+            if(HasIssue == true)
                 return this;
 
             HasType.Assert(() => "Dereference requires type category:\n " + Dump());
 
             var result = this;
-            while(!result.HasIssue && result.Type.IsWeakReference)
+            while(result.HasIssue != true && result.Type.IsWeakReference)
                 result = result.DereferenceResult;
             return result;
         }
@@ -325,7 +325,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         get
         {
-            if(HasIssue)
+            if(HasIssue == true)
                 return this;
             if(!HasCode && !HasType && !HasSize)
                 return this;
@@ -391,7 +391,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     )
         : base(NextObjectId++)
     {
-        Issues = issues ?? new Issue[0];
+        Issues = issues;
         Data = new(category, getIsHollow, getSize, getType, getCode, getClosures, rootContext, ToString);
 
         AssertValid();
@@ -406,7 +406,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             result += "\nPendingCategory=" + Data.PendingCategory.Dump();
         if(CompleteCategory != Category.None)
             result += "\nCompleteCategory=" + CompleteCategory.Dump();
-        if(HasIssue)
+        if(HasIssue == true)
             result += "\nIssues=" + Tracer.Dump(Issues);
         if(HasIsHollow)
             result += "\nIsHollow=" + Tracer.Dump(Data.IsHollow);
@@ -425,9 +425,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     internal void Update(Result result)
     {
-        Issues = Issues.Union(result.Issues).ToArray();
+        Issues = T(Issues, result.Issues).ConcatMany().ToArray();
 
-        if(HasIssue)
+        if(HasIssue == true)
             Reset(Category.All.Without(Category.Closures));
         else
         {
@@ -474,7 +474,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
         ((CompleteCategory & PendingCategory) == Category.None).Assert();
 
-        if(HasIssue)
+        if(HasIssue == true)
         {
             (!HasIsHollow).Assert();
             (!HasSize).Assert();
@@ -509,11 +509,11 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         IsDirty = true;
 
-        Issues = Issues.Union(other.Issues).ToArray();
+        Issues = T(Issues, other.Issues).ConcatMany().ToArray();
 
         var hasIssue = HasIssue;
 
-        if(hasIssue)
+        if(hasIssue == true)
         {
             IsHollow = null;
             Size = null;
@@ -607,7 +607,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         var resultForArg = getResultForArg & categoryForArg;
         if(resultForArg != null)
         {
-            result.Issues = result.Issues.Union(resultForArg.Issues).ToArray();
+            result.Issues = T(result.Issues, resultForArg.Issues).ConcatMany().ToArray();
 
             if(HasCode)
                 result.Code = Code.ReplaceArg(resultForArg);
@@ -703,7 +703,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     Result InternalLocalBlock(Category category)
     {
-        if(HasIssue)
+        if(HasIssue == true)
             return this;
 
         if(!category.HasCode() && !category.HasClosures())
@@ -827,7 +827,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [PublicAPI]
     internal Result DereferencedAlignedResult(Size size)
-        => HasIssue? this :
+        => HasIssue == true? this :
             HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code.DePointer(size)) : this;
 
     internal Result ConvertToConverter(TypeBase source)
@@ -870,5 +870,5 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Closures);
 
     internal bool IsValidOrIssue(Category category)
-        => HasIssue || CompleteCategory.Contains(category);
+        => HasIssue == true || CompleteCategory.Contains(category);
 }

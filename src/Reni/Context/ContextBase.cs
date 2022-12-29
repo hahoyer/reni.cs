@@ -309,7 +309,7 @@ abstract class ContextBase
 
         var result = searchResult.Result(category, CacheObject.AsObject, token, this, right);
 
-        (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
+        (result.HasIssue == true || result.CompleteCategory.Contains(category)).Assert();
         return result;
     }
 

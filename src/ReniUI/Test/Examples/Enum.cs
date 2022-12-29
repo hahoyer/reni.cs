@@ -23,8 +23,17 @@ x = Auswahl Nein then ""No match"" dumpprint
 ";
         var compiler = CompilerBrowser.FromText(text);
         var issues = compiler.Issues.ToArray();
-        (issues.Length == 2).Assert();
-        (issues[0].IssueId == IssueId.MissingDeclarationForType).Assert();
+
+        var i = 0;
+
+        var issue = issues[i++];
+        (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
+
+        issue = issues[i];
+        (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
+
+        (i == issues.Length).Assert();
+
         false.Assert();
     }
 }

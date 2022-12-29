@@ -146,7 +146,7 @@ sealed class ResultCache : DumpableObject
     //[DebuggerHidden]
     void Update(Category category)
     {
-        if(Data.HasIssue)
+        if(Data.HasIssue == true)
             return;
 
         var localCategory = category.Without(Data.CompleteCategory | Data.PendingCategory);

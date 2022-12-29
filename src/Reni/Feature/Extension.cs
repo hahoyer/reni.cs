@@ -75,7 +75,7 @@ static class Extension
         var result = conversion.Execute(category);
         (result != null).Assert();
 
-        if(!result.HasIssue && category.HasCode() && result.Code.ArgType != null)
+        if(result.HasIssue != true && category.HasCode() && result.Code.ArgType != null)
             (result.Code.ArgType == conversion.Source).Assert
                 (() => result.DebuggerDump());
 

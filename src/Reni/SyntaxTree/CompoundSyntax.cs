@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -111,7 +112,7 @@ sealed class CompoundSyntax : ValueSyntax
     internal override Result ResultForCache(ContextBase context, Category category)
     {
         var compound = context.Compound(this);
-        return compound.HasIssue? Feature.Extension.Result(compound.Issues, category) : compound.Result(category);
+        return compound.HasIssue? compound.Issues.Result(category) : compound.Result(category);
     }
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor)

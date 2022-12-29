@@ -164,7 +164,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     }
 
     internal Issue[] Issues => Compound.GetIssues(ViewPosition);
-    internal bool HasIssues => Issues.Any();
+    internal bool HasIssues => Issues?.Any() ?? false;
 
     [DisableDump]
     internal int Count => Compound.Syntax.Statements.Length;
