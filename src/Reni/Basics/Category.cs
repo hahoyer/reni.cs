@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
@@ -7,7 +6,7 @@ using JetBrains.Annotations;
 namespace Reni.Basics;
 
 [Dump("Dump")]
-sealed class Category : DumpableObject, IEquatable<Category>
+sealed class Category : DumpableObject
 {
     static readonly Category[] Cache = new Category[32];
     public readonly bool HasCode;
@@ -110,34 +109,6 @@ sealed class Category : DumpableObject, IEquatable<Category>
         HasSize = size;
     }
 
-    public bool Equals(Category obj)
-    {
-        if(ReferenceEquals(null, obj))
-            return false;
-        if(ReferenceEquals(this, obj))
-            return true;
-        return
-            obj.HasCode.Equals(HasCode) &&
-            obj.HasType.Equals(HasType) &&
-            obj.HasClosures.Equals(HasClosures) &&
-            obj.HasSize.Equals(HasSize) &&
-            obj.HasIsHollow.Equals(HasIsHollow)
-            ;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            var result = HasCode.GetHashCode();
-            result = (result * 397) ^ HasType.GetHashCode();
-            result = (result * 397) ^ HasClosures.GetHashCode();
-            result = (result * 397) ^ HasSize.GetHashCode();
-            result = (result * 397) ^ HasIsHollow.GetHashCode();
-            return result;
-        }
-    }
-
     protected override string Dump(bool isRecursion) => NodeDump;
 
     protected override string GetNodeDump()
@@ -157,17 +128,6 @@ sealed class Category : DumpableObject, IEquatable<Category>
         if(result == "")
             return "none";
         return result;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if(ReferenceEquals(null, obj))
-            return false;
-        if(ReferenceEquals(this, obj))
-            return true;
-        if(obj.GetType() != typeof(Category))
-            return false;
-        return Equals((Category)obj);
     }
 
     [DebuggerHidden]
@@ -202,19 +162,19 @@ sealed class Category : DumpableObject, IEquatable<Category>
         x.HasClosures && y.HasClosures);
 
     public bool IsEqual(Category x) =>
-        HasCode == x.HasCode &&
-        HasClosures == x.HasClosures &&
-        HasSize == x.HasSize &&
-        HasType == x.HasType &&
-        HasIsHollow == x.HasIsHollow;
+        HasCode == x.HasCode
+        && HasClosures == x.HasClosures
+        && HasSize == x.HasSize
+        && HasType == x.HasType
+        && HasIsHollow == x.HasIsHollow;
 
     [PublicAPI]
     bool IsLessThan(Category x) =>
-        (!HasCode && x.HasCode) ||
-        (!HasClosures && x.HasClosures) ||
-        (!HasSize && x.HasSize) ||
-        (!HasType && x.HasType) ||
-        (!HasIsHollow && x.HasIsHollow);
+        (!HasCode && x.HasCode)
+        || (!HasClosures && x.HasClosures)
+        || (!HasSize && x.HasSize)
+        || (!HasType && x.HasType)
+        || (!HasIsHollow && x.HasIsHollow);
 
     bool IsLessThanOrEqual(Category x)
     {
@@ -246,6 +206,4 @@ sealed class Category : DumpableObject, IEquatable<Category>
 
     public static bool operator >=(Category left, Category right) => right <= left;
     public static bool operator >(Category left, Category right) => right < left;
-    public static bool operator ==(Category left, Category right) => Equals(left, right);
-    public static bool operator !=(Category left, Category right) => !Equals(left, right);
 }
