@@ -78,7 +78,7 @@ sealed class ConversionPath
 
     Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
     {
-        pendingCategory.IsNone.Assert();
+        (pendingCategory == Category.None).Assert();
         return Source.ArgResult(category);
     }
 

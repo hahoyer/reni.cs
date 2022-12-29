@@ -50,7 +50,7 @@ abstract class ContextBase
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
-            if(pendingCategory.IsNone)
+            if(pendingCategory == Category.None)
                 return AsReference
                     ? Context.ResultAsReference(category, Syntax)
                     : Context.ResultForCache(category, Syntax);

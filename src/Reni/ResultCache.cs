@@ -36,7 +36,7 @@ sealed class ResultCache : DumpableObject
 
         Result IResultProvider.Execute(Category category, Category pendingCategory)
         {
-            pendingCategory.IsNone.Assert();
+            (pendingCategory == Category.None).Assert();
             return ObtainResult(category);
         }
     }
@@ -169,7 +169,7 @@ sealed class ResultCache : DumpableObject
             localCategory = localCategory.Without(Category.Closures);
         }
 
-        if(!localCategory.HasAny && !(category & Data.PendingCategory).HasAny)
+        if(localCategory == Category.None && (category & Data.PendingCategory) == Category.None)
             return;
 
         var oldPendingCategory = Data.PendingCategory;

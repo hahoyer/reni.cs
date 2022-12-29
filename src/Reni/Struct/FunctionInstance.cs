@@ -89,11 +89,11 @@ abstract class FunctionInstance
 
     Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
     {
-        if(category.IsNone && pendingCategory == Category.Closures)
+        if(category == Category.None && pendingCategory == Category.Closures)
             return new(Category.Closures, getClosures: Closures.Void);
 
 
-        pendingCategory.IsNone.Assert();
+        (pendingCategory == Category.None).Assert();
         return GetResult(category);
     }
 

@@ -33,19 +33,19 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         get
         {
-            var value = CategoryValue.None;
+            var result = Category.None;
 
             if(HasCode)
-                value |= CategoryValue.Code;
+                result |= Category.Code;
             if(HasClosures)
-                value |= CategoryValue.Closures;
+                result |= Category.Closures;
             if(HasIsHollow)
-                value |= CategoryValue.IsHollow;
+                result |= Category.IsHollow;
             if(HasType)
-                value |= CategoryValue.Type;
+                result |= Category.Type;
             if(HasSize)
-                value |= CategoryValue.Size;
-            return Category.CreateCategory(value);
+                result |= Category.Size;
+            return result;
         }
     }
 
@@ -737,7 +737,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [DebuggerHidden]
     public static Result operator |(Result aResult, Result bResult)
     {
-        (aResult.CompleteCategory & bResult.CompleteCategory).IsNone.Assert();
+        ((aResult.CompleteCategory & bResult.CompleteCategory) == Category.None).Assert();
         var result = aResult.Clone;
         result.Update(bResult);
         return result;

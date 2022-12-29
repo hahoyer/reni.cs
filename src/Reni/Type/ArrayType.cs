@@ -208,7 +208,7 @@ sealed class ArrayType
 
     internal override Result ConstructorResult(Category category, TypeBase argsType)
     {
-        if(category.IsNone)
+        if(category == Category.None)
             return null;
 
         if(argsType == VoidType)
