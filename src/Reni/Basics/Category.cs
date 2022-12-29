@@ -20,7 +20,7 @@ public enum Category
 public static class CategoryExtension
 {
     [UnitTest]
-    public sealed class Test : DependenceProvider
+    public sealed class Test
     {
         [UnitTest]
         public void Without()
