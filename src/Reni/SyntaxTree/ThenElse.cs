@@ -40,7 +40,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
     {
         (syntax == this).Assert();
 
-        if(!asReference && (category | pendingCategory) <= Category.Type.Replenished && Else == null)
+        if(!asReference && Category.Type.Replenished().Contains(category | pendingCategory) && Else == null)
             return context.RootContext.VoidType.Result(Category.Type);
 
         NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
@@ -61,9 +61,9 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         => InternalResult(context, category);
 
     Result CondResult(ContextBase context, Category category)
-        => context.Result(category.WithType, Cond)
+        => context.Result(category | Category.Type, Cond)
             .Conversion(context.RootContext.BitType.Align)
-            .LocalBlock(category.WithType)
+            .LocalBlock(category | Category.Type)
             .Conversion(context.RootContext.BitType);
 
     Result ElseResult(ContextBase context, Category category)
@@ -80,7 +80,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
 
     Result BranchResult(ContextBase context, Category category, ValueSyntax syntax)
     {
-        var result = context.Result(category.WithType, syntax);
+        var result = context.Result(category | Category.Type, syntax);
         if(result == null)
             return null;
 
@@ -90,18 +90,18 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
 
         var commonType = CommonType(context);
         return branchResult.Type
-                .Conversion(category.WithType, commonType)
-                .ReplaceArg(branchResult) &
-            category;
+                .Conversion(category | Category.Type, commonType)
+                .ReplaceArg(branchResult)
+            & category;
     }
 
     Result InternalResult(ContextBase context, Category category)
     {
         var commonType = CommonType(context);
-        if(category <= Category.Type.Replenished)
+        if(Category.Type.Replenished().Contains(category))
             return commonType.Result(category);
 
-        var branchCategory = category & Category.Code.Replenished;
+        var branchCategory = category & Category.Code.Replenished();
         var condResult = CondResult(context, category);
         var thenResult = ThenResult(context, branchCategory);
         var elseResult = ElseResult(context, branchCategory);

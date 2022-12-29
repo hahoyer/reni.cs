@@ -4,64 +4,62 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
 
-namespace Reni.Context
+namespace Reni.Context;
+
+sealed class Function : Child, IFunctionContext
 {
-    sealed class Function : Child, IFunctionContext
+    [Node]
+    internal TypeBase ArgsType { get; }
+
+    readonly int Order;
+
+    [Node]
+    TypeBase ValueType { get; }
+
+    internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
+        : base(parent)
     {
-        readonly int Order;
+        Order = Closures.NextOrder++;
+        ArgsType = argsType;
+        ValueType = valueType;
+        StopByObjectIds();
+    }
 
-        internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
-            : base(parent)
-        {
-            Order = Closures.NextOrder++;
-            ArgsType = argsType;
-            ValueType = valueType;
-            StopByObjectIds();
-        }
+    int IContextReference.Order => Order;
 
-        [Node]
-        internal TypeBase ArgsType { get; }
-        [Node]
-        TypeBase ValueType { get; }
+    TypeBase IFunctionContext.ArgsType => ArgsType;
 
-        int IContextReference.Order => Order;
+    Result IFunctionContext.CreateArgReferenceResult(Category category) => ArgsType
+            .ContextAccessResult(category | Category.Type, this, () => ArgsType.Size * -1)
+        & category;
 
-        protected override string GetContextChildIdentificationDump()
-            => "@(." + ArgsType.ObjectId + "i)";
-
-        internal override IFunctionContext ObtainRecentFunctionContext() => this;
-        [DisableDump]
-        protected override string LevelFormat => "function";
-
-        TypeBase IFunctionContext.ArgsType => ArgsType;
-
-        Result IFunctionContext.CreateArgReferenceResult(Category category)
-        {
-            return ArgsType
-                .ContextAccessResult(category.WithType, this, () => ArgsType.Size * -1)
-                & category;
-        }
-
-        Result IFunctionContext.CreateValueReferenceResult(Category category)
-        {
-            if(ValueType == null)
-                throw new ValueCannotBeUsedHereException();
-            return ValueType.Pointer
+    Result IFunctionContext.CreateValueReferenceResult(Category category)
+    {
+        if(ValueType == null)
+            throw new ValueCannotBeUsedHereException();
+        return ValueType.Pointer
                 .ContextAccessResult
                 (
-                    category.WithType,
+                    category | Category.Type,
                     this,
                     () => (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
-                & category;
-        }
+            & category;
     }
 
-    sealed class ValueCannotBeUsedHereException : Exception {}
+    protected override string GetContextChildIdentificationDump()
+        => "@(." + ArgsType.ObjectId + "i)";
 
-    interface IFunctionContext : IContextReference
-    {
-        Result CreateArgReferenceResult(Category category);
-        Result CreateValueReferenceResult(Category category);
-        TypeBase ArgsType { get; }
-    }
+    internal override IFunctionContext ObtainRecentFunctionContext() => this;
+
+    [DisableDump]
+    protected override string LevelFormat => "function";
+}
+
+sealed class ValueCannotBeUsedHereException : Exception { }
+
+interface IFunctionContext : IContextReference
+{
+    Result CreateArgReferenceResult(Category category);
+    Result CreateValueReferenceResult(Category category);
+    TypeBase ArgsType { get; }
 }

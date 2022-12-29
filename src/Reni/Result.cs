@@ -30,7 +30,24 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [Node]
     [EnableDumpWithExceptionPredicate]
     public Category CompleteCategory
-        => Category.CreateCategory(HasIsHollow, HasSize, HasType, HasCode, HasClosures);
+    {
+        get
+        {
+            var value = CategoryValue.None;
+
+            if(HasCode)
+                value |= CategoryValue.Code;
+            if(HasClosures)
+                value |= CategoryValue.Closures;
+            if(HasIsHollow)
+                value |= CategoryValue.IsHollow;
+            if(HasType)
+                value |= CategoryValue.Type;
+            if(HasSize)
+                value |= CategoryValue.Size;
+            return Category.CreateCategory(value);
+        }
+    }
 
     /// <summary>
     ///     Is this an hollow object? With no data?
@@ -118,13 +135,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     internal Size FindSize
-        => HasSize
-            ? Size
-            : HasCode
-                ? Code.Size
-                : HasType
-                    ? Type.Size
-                    : null;
+        => HasSize? Size :
+            HasCode? Code.Size :
+            HasType? Type.Size : null;
 
     Size QuickFindSize
     {
@@ -157,11 +170,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     internal Closures FindClosures
-        => HasClosures
-            ? Closures
-            : HasCode
-                ? Code.Closures
-                : null;
+        => HasClosures? Closures :
+            HasCode? Code.Closures : null;
 
     [DisableDump]
     internal Closures SmartClosures
@@ -418,7 +428,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         Issues = Issues.Union(result.Issues).ToArray();
 
         if(HasIssue)
-            Reset(Category.All - Category.Closures);
+            Reset(Category.All.Without(Category.Closures));
         else
         {
             if(result.HasIsHollow)
@@ -437,7 +447,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(result.HasClosures)
             Data.Closure = result.Closures;
 
-        Data.PendingCategory = Data.PendingCategory - result.CompleteCategory;
+        Data.PendingCategory = Data.PendingCategory.Without(result.CompleteCategory);
 
         AssertValid();
     }
@@ -512,36 +522,36 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
         else
         {
-            (category <= other.CompleteCategory).Assert
+            other.CompleteCategory.Contains(category).Assert
             (() => nameof(other).DumpValue(other) + ", " + nameof(category).DumpValue(category)
             );
 
-            (category <= CompleteCategory).Assert
+            CompleteCategory.Contains(category).Assert
             (() => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
             );
 
-            if(category.HasIsHollow)
+            if(category.HasIsHollow())
                 IsHollow = SmartIsHollow && other.SmartIsHollow;
             else if(HasIsHollow)
                 IsHollow = null;
 
-            if(category.HasSize)
+            if(category.HasSize())
                 Size += other.Size;
             else if(HasSize)
                 Size = null;
 
-            if(category.HasType)
+            if(category.HasType())
                 Type = Type.Pair(other.Type);
             else if(HasType)
                 Type = null;
 
-            if(category.HasCode)
+            if(category.HasCode())
                 Code = Code + other.Code;
             else if(HasCode)
                 Code = null;
         }
 
-        if(category.HasClosures)
+        if(category.HasClosures())
             Closures = Closures.Sequence(other.Closures);
         else if(HasClosures)
             Closures = null;
@@ -552,15 +562,15 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     void Reset(Category category)
     {
         IsDirty = true;
-        if(category.HasIsHollow)
+        if(category.HasIsHollow())
             IsHollow = null;
-        if(category.HasSize)
+        if(category.HasSize())
             Size = null;
-        if(category.HasType)
+        if(category.HasType())
             Type = null;
-        if(category.HasCode)
+        if(category.HasCode())
             Code = null;
-        if(category.HasClosures)
+        if(category.HasClosures())
             Closures = null;
         IsDirty = false;
     }
@@ -590,7 +600,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             , IsDirty = true
         };
 
-        var categoryForArg = CompleteCategory & Category.Code.WithClosures;
+        var categoryForArg = CompleteCategory & (Category.Code | Category.Closures);
         if(HasCode)
             categoryForArg |= Category.Type;
 
@@ -640,7 +650,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode && !HasClosures)
             return this;
 
-        var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
+        var replacement = getReplacement(CompleteCategory.Without(Category.Size | Category.Type));
         var result = new Result
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
@@ -689,21 +699,21 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     internal Result LocalBlock(Category category)
-        => AutomaticDereferenceResult.InternalLocalBlock(category.WithType);
+        => AutomaticDereferenceResult.InternalLocalBlock(category | Category.Type);
 
     Result InternalLocalBlock(Category category)
     {
         if(HasIssue)
             return this;
 
-        if(!category.HasCode && !category.HasClosures)
+        if(!category.HasCode() && !category.HasClosures())
             return this;
 
         var result = this & category;
         var copier = Type.Copier(category);
-        if(category.HasCode)
+        if(category.HasCode())
             result.Code = Code.LocalBlock(copier.Code);
-        if(category.HasClosures)
+        if(category.HasClosures())
             result.Closures = Closures.Sequence(copier.Closures);
         return result;
     }
@@ -817,11 +827,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [PublicAPI]
     internal Result DereferencedAlignedResult(Size size)
-        => HasIssue
-            ? this
-            : HasCode
-                ? new(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
-                : this;
+        => HasIssue? this :
+            HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code.DePointer(size)) : this;
 
     internal Result ConvertToConverter(TypeBase source)
         => source.IsHollow || (!HasClosures && !HasCode)
@@ -863,5 +870,5 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Closures);
 
     internal bool IsValidOrIssue(Category category)
-        => HasIssue || category <= CompleteCategory;
+        => HasIssue || CompleteCategory.Contains(category);
 }

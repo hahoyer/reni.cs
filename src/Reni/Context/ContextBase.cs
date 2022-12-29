@@ -32,6 +32,12 @@ abstract class ContextBase
         [EnableDumpExcept(false)]
         readonly bool AsReference;
 
+        [EnableDump]
+        string ContextId => Context.NodeDump;
+
+        [EnableDump]
+        int SyntaxObjectId => Syntax.ObjectId;
+
         internal ResultProvider
             (ContextBase context, ValueSyntax syntax, bool asReference = false)
             : base(NextObjectId++)
@@ -57,12 +63,6 @@ abstract class ContextBase
             NotImplementedMethod(category, pendingCategory);
             return null;
         }
-
-        [EnableDump]
-        string ContextId => Context.NodeDump;
-
-        [EnableDump]
-        int SyntaxObjectId => Syntax.ObjectId;
     }
 
     internal sealed class Cache : DumpableObject, IIconKeyProvider
@@ -111,6 +111,16 @@ abstract class ContextBase
     [DisableDump]
     [Node]
     internal readonly Cache CacheObject;
+
+    [DisableDump]
+    internal CompoundView FindRecentCompoundView => CacheObject.RecentStructure.Value;
+
+    [DisableDump]
+    internal IFunctionContext FindRecentFunctionContextObject
+        => CacheObject.RecentFunctionContextObject.Value;
+
+    [DisableDump]
+    public string Format => ParentChain.Select(item => item.LevelFormat).Stringify(" in ");
 
     protected ContextBase()
         : base(NextId++) => CacheObject = new(this);
@@ -183,16 +193,6 @@ abstract class ContextBase
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
-    [DisableDump]
-    internal CompoundView FindRecentCompoundView => CacheObject.RecentStructure.Value;
-
-    [DisableDump]
-    internal IFunctionContext FindRecentFunctionContextObject
-        => CacheObject.RecentFunctionContextObject.Value;
-
-    [DisableDump]
-    public string Format => ParentChain.Select(item => item.LevelFormat).Stringify(" in ");
-
     [UsedImplicitly]
     internal int SizeToPacketCount(Size size)
         => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
@@ -221,12 +221,12 @@ abstract class ContextBase
     //[DebuggerHidden]
     Result ResultForCache(Category category, ValueSyntax syntax)
     {
-        var trace = syntax.ObjectId.In() && ObjectId.In(7) && category.HasType;
+        var trace = syntax.ObjectId.In() && ObjectId.In(7) && category.HasType();
         StartMethodDump(trace, category, syntax);
         try
         {
             BreakExecution();
-            var result = syntax.ResultForCache(this, category.Replenished);
+            var result = syntax.ResultForCache(this, category.Replenished());
             (result == null || result.IsValidOrIssue(category)).Assert();
             return ReturnMethodDump(result);
         }
@@ -248,7 +248,7 @@ abstract class ContextBase
         (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true));
 
     internal Result ResultAsReference(Category category, ValueSyntax syntax)
-        => Result(category.WithType, syntax)
+        => Result(category | Category.Type, syntax)
             .LocalReferenceResult;
 
     internal Result ArgReferenceResult(Category category)
@@ -309,19 +309,19 @@ abstract class ContextBase
 
         var result = searchResult.Result(category, CacheObject.AsObject, token, this, right);
 
-        (result.HasIssue || category <= result.CompleteCategory).Assert();
+        (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
         return result;
     }
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
     {
-        var target = Result(category.WithType, argsType).SmartUn<PointerType>().Align;
+        var target = Result(category | Category.Type, argsType).SmartUn<PointerType>().Align;
         return target
                 .Type
                 .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
-                .Result(category.WithType, target)
-                .LocalReferenceResult &
-            category;
+                .Result(category | Category.Type, target)
+                .LocalReferenceResult
+            & category;
     }
 }
 

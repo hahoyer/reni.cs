@@ -95,7 +95,7 @@ sealed class Compound
     {
         if(category.IsNone)
             return new(category);
-        var trace = Syntax.ObjectId.In() && category.HasCode;
+        var trace = Syntax.ObjectId.In() && category.HasCode();
         StartMethodDump(trace, category, fromPosition, fromNotPosition);
         try
         {
@@ -119,7 +119,7 @@ sealed class Compound
             var result = results
                 .Aggregate
                 (
-                    Parent.RootContext.VoidType.Result(category.WithType),
+                    Parent.RootContext.VoidType.Result(category | Category.Type),
                     (current, next) => current.Sequence(next)
                 );
             return ReturnMethodDump(result);
@@ -132,13 +132,13 @@ sealed class Compound
 
     internal Result Result(Category category)
     {
-        var trace = Syntax.ObjectId.In() && category.HasType;
+        var trace = Syntax.ObjectId.In() && category.HasType();
         StartMethodDump(trace, category);
         try
         {
             BreakExecution();
             var resultsOfStatements = ResultsOfStatements
-                (category - Category.Type, 0, Syntax.EndPosition);
+                (category.Without(Category.Type), 0, Syntax.EndPosition);
 
             Dump("resultsOfStatements", resultsOfStatements);
             BreakExecution();
@@ -156,13 +156,13 @@ sealed class Compound
             BreakExecution();
 
             var result = resultWithCleanup
-                    .ReplaceRelative(this, CodeBase.TopRef, Closures.Void) &
-                category;
+                    .ReplaceRelative(this, CodeBase.TopRef, Closures.Void)
+                & category;
 
             if(result.HasIssue)
                 return ReturnMethodDump(result);
 
-            if(category.HasType)
+            if(category.HasType())
                 result.Type = CompoundView.Type;
 
             return ReturnMethodDump(result);
@@ -184,9 +184,12 @@ sealed class Compound
 
     Result AccessResult(Category category, int accessPosition, int position)
     {
-        var trace = ObjectId == -10 && //
-                Syntax.ObjectId.In(4) && //
-                accessPosition == 2 && //
+        var trace = ObjectId == -10
+                && //
+                Syntax.ObjectId.In(4)
+                && //
+                accessPosition == 2
+                && //
                 position == 2 //
             //&& category.HasType
             ;
@@ -197,7 +200,7 @@ sealed class Compound
             Dump(nameof(Syntax.PureStatements), Syntax.PureStatements[position]);
             BreakExecution();
             var rawResult = uniqueChildContext.Result
-                (category.WithType, Syntax.PureStatements[position]);
+                (category | Category.Type, Syntax.PureStatements[position]);
             Dump(nameof(rawResult), rawResult);
             BreakExecution();
             var unFunction = rawResult.SmartUn<FunctionType>();

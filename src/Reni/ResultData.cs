@@ -38,19 +38,19 @@ sealed class ResultData
         var code = getCode == null? null : new ValueCache<CodeBase>(getCode);
         var closures = getClosures == null? null : new ValueCache<Closures>(getClosures);
 
-        if(category.HasType)
+        if(category.HasType())
             Type = ObtainType(isHollow, size, type, code, rootContext, getObjectDump);
 
-        if(category.HasCode)
+        if(category.HasCode())
             Code = ObtainCode(isHollow, size, type, code, getObjectDump);
 
-        if(category.HasSize)
+        if(category.HasSize())
             Size = ObtainSize(isHollow, size, type, code, getObjectDump);
 
-        if(category.HasClosures)
+        if(category.HasClosures())
             Closure = ObtainClosures(isHollow, size, type, code, closures, getObjectDump);
 
-        if(category.HasIsHollow)
+        if(category.HasIsHollow())
             IsHollow = ObtainIsHollow(isHollow, size, type, code, getObjectDump);
     }
 

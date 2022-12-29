@@ -37,11 +37,8 @@ sealed class TypeType
 
     IImplementation ISymbolProvider<Mutable>.Feature
         (Mutable tokenClass)
-        => Value is ArrayType
-            ? Feature.Extension.Value(MutableArrayResult)
-            : Value is ArrayReferenceType
-                ? Feature.Extension.Value(MutableReferenceResult)
-                : null;
+        => Value is ArrayType? Feature.Extension.Value(MutableArrayResult) :
+            Value is ArrayReferenceType? Feature.Extension.Value(MutableReferenceResult) : null;
 
     IImplementation ISymbolProvider<Slash>.Feature
         (Slash tokenClass)
@@ -63,12 +60,12 @@ sealed class TypeType
 
     internal override Result InstanceResult
         (Category category, Func<Category, Result> getRightResult)
-        => RawInstanceResult(category.WithType, getRightResult).LocalReferenceResult;
+        => RawInstanceResult(category | Category.Type, getRightResult).LocalReferenceResult;
 
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
-        if(category <= Category.Type.Replenished)
-            return Value.Result(category.WithType);
+        if(Category.Type.Replenished().Contains(category))
+            return Value.Result(category | Category.Type);
         var constructorResult = Value
             .ConstructorResult(category, getRightResult(Category.Type).Type);
         return constructorResult

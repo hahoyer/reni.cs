@@ -244,11 +244,11 @@ sealed class ArrayType
         var indexType = BitType
             .Number(BitsConst.Convert(Count).Size.ToInt())
             .Align;
-        var constructorResult = function.Result(category.WithType, indexType);
+        var constructorResult = function.Result(category | Category.Type, indexType);
         var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
-                .Aggregate((c, n) => n + c) ??
-            VoidType.Result(category);
+                .Aggregate((c, n) => n + c)
+            ?? VoidType.Result(category);
         return Result(category, elements);
     }
 
@@ -257,12 +257,12 @@ sealed class ArrayType
     {
         var resultForArg = indexType
             .Result
-                (category.WithType, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
+                (category | Category.Type, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
         return elementConstructorResult
                 .ReplaceArg(resultForArg)
                 .Conversion(ElementAccessType)
-                .Conversion(ElementType) &
-            category;
+                .Conversion(ElementType)
+            & category;
     }
 
     Result ConcatArraysResult
@@ -274,14 +274,14 @@ sealed class ArrayType
     )
     {
         var oldElementsResult = Pointer
-            .Result(category.WithType, objectReference).DereferenceResult;
+            .Result(category | Category.Type, objectReference).DereferenceResult;
 
         var isElementArg = argsType.IsConvertible(ElementAccessType);
         var newCount = isElementArg? 1 : argsType.ArrayLength(ElementAccessType);
         var newElementsResultRaw
             = isElementArg
-                ? argsType.Conversion(category.WithType, ElementAccessType)
-                : argsType.Conversion(category.WithType, ElementType.Array(newCount, argsOptions));
+                ? argsType.Conversion(category | Category.Type, ElementAccessType)
+                : argsType.Conversion(category | Category.Type, ElementType.Array(newCount, argsOptions));
 
         var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult();
         var result = ElementType
@@ -293,10 +293,10 @@ sealed class ArrayType
     Result DumpPrintTokenArrayResult(Category category)
     {
         var result = Root.ConcatPrintResult(category, Count, DumpPrintResult);
-        if(category.HasCode)
+        if(category.HasCode())
             result.Code = CodeBase.DumpPrintText
-                    ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")) +
-                result.Code;
+                    ("<<" + (OptionsValue.IsMutable.Value? ":=" : ""))
+                + result.Code;
         return result;
     }
 

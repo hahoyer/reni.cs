@@ -599,13 +599,13 @@ abstract class TypeBase
 
     internal Result Conversion(Category category, TypeBase destination)
     {
-        if(category <= Category.Type.Replenished)
+        if(Category.Type.Replenished().Contains(category))
             return destination.SmartPointer.Result(category);
 
         var path = ConversionService.FindPath(this, destination);
         return path == null
             ? ArgResult(category).InvalidConversion(destination)
-            : path.Execute(category.WithType);
+            : path.Execute(category | Category.Type);
     }
 
     Result Mutation(Category category, TypeBase destination)
@@ -700,10 +700,10 @@ abstract class TypeBase
         =>
             IsHollow
                 ? Result(category)
-                : Pointer.Result(category.WithType, ForcedReference).DereferenceResult;
+                : Pointer.Result(category | Category.Type, ForcedReference).DereferenceResult;
 
     internal Result ObjectResult(Category category)
-        => IsHollow? Result(category) : Pointer.Result(category.WithType, ForcedReference);
+        => IsHollow? Result(category) : Pointer.Result(category | Category.Type, ForcedReference);
 
     Result IssueResult(Category category, IssueId issueId, SourcePart token)
         => issueId

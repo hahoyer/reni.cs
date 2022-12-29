@@ -15,7 +15,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
     Result IPendingProvider.Result
         (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
-        if(category <= Category.Type.Replenished)
+        if(Category.Type.Replenished().Contains(category))
             return Result(context, category, left, right);
 
         NotImplementedMethod(context, category, left, right);
@@ -31,7 +31,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
         bool asReference
     )
     {
-        if(!asReference && (category | pendingCategory) <= Category.Type)
+        if(!asReference && Category.Type.Contains(category | pendingCategory))
             return syntax.ResultForCache(context, Category.Type);
 
         NotImplementedMethod(context, category, pendingCategory, syntax, asReference);

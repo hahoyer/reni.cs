@@ -149,24 +149,24 @@ sealed class ResultCache : DumpableObject
         if(Data.HasIssue)
             return;
 
-        var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
+        var localCategory = category.Without(Data.CompleteCategory | Data.PendingCategory);
 
-        if(localCategory.HasIsHollow && Data.FindIsHollow != null)
+        if(localCategory.HasIsHollow() && Data.FindIsHollow != null)
         {
             Data.IsHollow = Data.FindIsHollow;
-            localCategory -= Category.IsHollow;
+            localCategory = localCategory.Without(Category.IsHollow);
         }
 
-        if(localCategory.HasSize && Data.FindSize != null)
+        if(localCategory.HasSize() && Data.FindSize != null)
         {
             Data.Size = Data.FindSize;
-            localCategory -= Category.Size;
+            localCategory = localCategory.Without(Category.Size);
         }
 
-        if(localCategory.HasClosures && Data.FindClosures != null)
+        if(localCategory.HasClosures() && Data.FindClosures != null)
         {
             Data.Closures = Data.FindClosures;
-            localCategory -= Category.Closures;
+            localCategory = localCategory.Without(Category.Closures);
         }
 
         if(!localCategory.HasAny && !(category & Data.PendingCategory).HasAny)
@@ -184,7 +184,7 @@ sealed class ResultCache : DumpableObject
         }
         finally
         {
-            Data.PendingCategory = oldPendingCategory - Data.CompleteCategory;
+            Data.PendingCategory = oldPendingCategory.Without(Data.CompleteCategory);
         }
     }
 

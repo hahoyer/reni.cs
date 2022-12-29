@@ -10,224 +10,227 @@ using Reni.Feature;
 using Reni.Numeric;
 using Reni.TokenClasses;
 
-namespace Reni.Type
+namespace Reni.Type;
+
+sealed class ArrayReferenceType
+    : TypeBase
+        , ISymbolProviderForPointer<DumpPrintToken>
+        , ISymbolProviderForPointer<Mutable>
+        , ISymbolProviderForPointer<EnableReinterpretation>
+        , ISymbolProviderForPointer<Plus>
+        , ISymbolProviderForPointer<Minus>
+        , IForcedConversionProvider<ArrayReferenceType>
+        , IRepeaterType
+        , IChild<TypeBase>
 {
-    sealed class ArrayReferenceType
-        : TypeBase
-            , ISymbolProviderForPointer<DumpPrintToken>
-            , ISymbolProviderForPointer<Mutable>
-            , ISymbolProviderForPointer<EnableReinterpretation>
-            , ISymbolProviderForPointer<Plus>
-            , ISymbolProviderForPointer<Minus>
-            , IForcedConversionProvider<ArrayReferenceType>
-            , IRepeaterType
-            , IChild<TypeBase>
+    internal sealed class Options : DumpableObject
     {
-        internal sealed class Options : DumpableObject
+        internal Flag IsMutable { get; }
+        internal Flag IsForceMutable { get; }
+        internal Flag IsEnableReinterpretation { get; }
+        Flags Data { get; }
+        public string DumpPrintText => Data.DumpPrintText;
+
+        Options(string optionsId)
         {
-            Flags Data { get; }
-
-            Options(string optionsId)
-            {
-                Data = new Flags(optionsId);
-                IsForceMutable = Data.Register("force_mutable");
-                IsMutable = Data.Register("mutable");
-                IsEnableReinterpretation = Data.Register("enable_reinterpretation");
-                Data.Align();
-                Data.IsValid.Assert();
-            }
-
-            internal Flag IsMutable { get; }
-            internal Flag IsForceMutable { get; }
-            internal Flag IsEnableReinterpretation { get; }
-
-            internal static Options Create(string optionsId) => new Options(optionsId);
-
-            internal static string ForceMutable(bool value)
-                => Create(null).IsForceMutable.SetTo(value);
-
-            protected override string GetNodeDump() => DumpPrintText;
-            public string DumpPrintText => Data.DumpPrintText;
+            Data = new(optionsId);
+            IsForceMutable = Data.Register("force_mutable");
+            IsMutable = Data.Register("mutable");
+            IsEnableReinterpretation = Data.Register("enable_reinterpretation");
+            Data.Align();
+            Data.IsValid.Assert();
         }
 
-        [UsedImplicitly]
-        readonly int Order;
-        readonly ValueCache<RepeaterAccessType> RepeaterAccessTypeCache;
+        protected override string GetNodeDump() => DumpPrintText;
 
-        internal ArrayReferenceType(TypeBase valueType, string optionsId)
+        internal static Options Create(string optionsId) => new(optionsId);
+
+        internal static string ForceMutable(bool value)
+            => Create(null).IsForceMutable.SetTo(value);
+    }
+
+    [DisableDump]
+    internal TypeBase ValueType { get; }
+
+    [UsedImplicitly]
+    readonly int Order;
+
+    readonly ValueCache<RepeaterAccessType> RepeaterAccessTypeCache;
+    Options OptionsValue { get; }
+
+    internal string DumpOptions => OptionsValue.DumpPrintText;
+
+    [DisableDump]
+    RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
+
+    static IEnumerable<string> InternalDeclarationOptions
+    {
+        get
         {
-            Order = Closures.NextOrder++;
-            OptionsValue = Options.Create(optionsId);
-            RepeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
-                (() => new RepeaterAccessType(this));
-            ValueType = valueType;
-            (!valueType.IsHollow).Assert(valueType.Dump);
-            (!(valueType.CoreType is PointerType)).Assert(valueType.Dump);
-
-            StopByObjectIds(-10);
+            yield return DumpPrintToken.TokenId;
+            yield return TokenClasses.Mutable.TokenId;
+            yield return TokenClasses.EnableReinterpretation.TokenId;
+            yield return Plus.TokenId;
+            yield return Minus.TokenId;
         }
+    }
 
-        [DisableDump]
-        internal TypeBase ValueType { get; }
-        Options OptionsValue { get; }
+    [DisableDump]
+    internal bool IsMutable => OptionsValue.IsMutable.Value;
 
-        [DisableDump]
-        internal override Root Root => ValueType.Root;
-        internal override string DumpPrintText
-            => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
+    [DisableDump]
+    internal ArrayReferenceType Mutable
+        => ValueType.ArrayReference(OptionsValue.IsMutable.SetTo(true));
 
-        internal string DumpOptions => OptionsValue.DumpPrintText;
+    [DisableDump]
+    internal ArrayReferenceType EnableReinterpretation
+        => ValueType.ArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
 
-        [DisableDump]
-        RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
-        [DisableDump]
-        internal override bool IsHollow => false;
-        [DisableDump]
-        internal override bool IsAligningPossible => false;
+    internal ArrayReferenceType(TypeBase valueType, string optionsId)
+    {
+        Order = Closures.NextOrder++;
+        OptionsValue = Options.Create(optionsId);
+        RepeaterAccessTypeCache = new(() => new(this));
+        ValueType = valueType;
+        (!valueType.IsHollow).Assert(valueType.Dump);
+        (!(valueType.CoreType is PointerType)).Assert(valueType.Dump);
 
-        internal override IEnumerable<string> DeclarationOptions
-            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+        StopByObjectIds(-10);
+    }
 
-        static IEnumerable<string> InternalDeclarationOptions
+    TypeBase IChild<TypeBase>.Parent => ValueType;
+
+    IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
+        (ArrayReferenceType destination)
+        => ForcedConversion(destination).NullableToArray();
+
+    TypeBase IRepeaterType.ElementType => ValueType;
+    TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
+    bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
+
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+        => Feature.Extension.Value(DumpPrintTokenResult);
+
+    IImplementation ISymbolProviderForPointer<EnableReinterpretation>.
+        Feature
+        (EnableReinterpretation tokenClass)
+        => Feature.Extension.Value(EnableReinterpretationResult);
+
+    IImplementation ISymbolProviderForPointer<Minus>.Feature
+        (Minus tokenClass)
+        => Feature.Extension.FunctionFeature(MinusResult);
+
+    IImplementation ISymbolProviderForPointer<Mutable>.Feature
+        (Mutable tokenClass)
+        => Feature.Extension.Value(MutableResult);
+
+    IImplementation ISymbolProviderForPointer<Plus>.Feature
+        (Plus tokenClass)
+        => Feature.Extension.FunctionFeature(PlusResult);
+
+    [DisableDump]
+    internal override Root Root => ValueType.Root;
+
+    internal override string DumpPrintText
+        => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
+
+    [DisableDump]
+    internal override bool IsHollow => false;
+
+    [DisableDump]
+    internal override bool IsAligningPossible => false;
+
+    internal override IEnumerable<string> DeclarationOptions
+        => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+    [DisableDump]
+    protected override IEnumerable<IGenericProviderForType> GenericList
+        => this.GenericListFromType(base.GenericList);
+
+    [DisableDump]
+    protected override IEnumerable<IConversion> RawSymmetricConversions
+        => base.RawSymmetricConversions;
+
+    internal override Size SimpleItemSize => ValueType.Size;
+
+    protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
+
+    protected override string GetNodeDump()
+        => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
+
+    protected override Size GetSize() => ValueType.Pointer.Size;
+
+    [DisableDump]
+    internal override IImplementation FunctionDeclarationForPointerType
+        => Feature.Extension.FunctionFeature(AccessResult);
+
+
+    Result MutableResult(Category category)
+    {
+        OptionsValue.IsForceMutable.Value.Assert();
+        return ResultFromPointer(category, Mutable);
+    }
+
+    Result EnableReinterpretationResult(Category category)
+        => ResultFromPointer(category, EnableReinterpretation);
+
+    IConversion ForcedConversion(ArrayReferenceType destination)
+        =>
+            HasForcedConversion(destination)
+                ? Feature.Extension.Conversion
+                    (category => destination.ConversionResult(category, this), this)
+                : null;
+
+    bool HasForcedConversion(ArrayReferenceType destination)
+    {
+        if(this == destination)
+            return true;
+
+        if(destination.IsMutable && !IsMutable)
+            return false;
+
+        if(ValueType == destination.ValueType)
+            return true;
+
+        if(ValueType == destination.ValueType)
+            NotImplementedMethod(destination);
+
+        return OptionsValue.IsEnableReinterpretation.Value;
+    }
+
+    Result ConversionResult(Category category, ArrayReferenceType source)
+        => source.Mutation(this) & category;
+
+    internal Result ConversionResult(Category category, ArrayType source)
+    {
+        var trace = ObjectId == -1 && category.HasCode();
+        StartMethodDump(trace, category, source);
+        try
         {
-            get
-            {
-                yield return DumpPrintToken.TokenId;
-                yield return TokenClasses.Mutable.TokenId;
-                yield return TokenClasses.EnableReinterpretation.TokenId;
-                yield return Plus.TokenId;
-                yield return Minus.TokenId;
-            }
+            return ReturnMethodDump(source.Pointer.Mutation(this) & category);
         }
-
-        [DisableDump]
-        protected override IEnumerable<IGenericProviderForType> GenericList
-            => this.GenericListFromType(base.GenericList);
-        [DisableDump]
-        protected override IEnumerable<IConversion> RawSymmetricConversions
-            => base.RawSymmetricConversions;
-
-        internal override Size SimpleItemSize => ValueType.Size;
-
-        protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
-
-        protected override string GetNodeDump()
-            => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
-
-        protected override Size GetSize() => ValueType.Pointer.Size;
-
-        [DisableDump]
-        internal bool IsMutable => OptionsValue.IsMutable.Value;
-        [DisableDump]
-        internal ArrayReferenceType Mutable
-            => ValueType.ArrayReference(OptionsValue.IsMutable.SetTo(true));
-        [DisableDump]
-        internal ArrayReferenceType EnableReinterpretation
-            => ValueType.ArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
-
-        TypeBase IRepeaterType.ElementType => ValueType;
-        TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
-        bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
-
-        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-            => Feature.Extension.Value(DumpPrintTokenResult);
-
-        IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
-            (ArrayReferenceType destination)
-            => ForcedConversion(destination).NullableToArray();
-
-        IImplementation ISymbolProviderForPointer<Mutable>.Feature
-            (Mutable tokenClass)
-            => Feature.Extension.Value(MutableResult);
-
-        IImplementation ISymbolProviderForPointer<EnableReinterpretation>.
-            Feature
-            (EnableReinterpretation tokenClass)
-            => Feature.Extension.Value(EnableReinterpretationResult);
-
-        [DisableDump]
-        internal override IImplementation FunctionDeclarationForPointerType
-            => Feature.Extension.FunctionFeature(AccessResult);
-
-        IImplementation ISymbolProviderForPointer<Minus>.Feature
-            (Minus tokenClass)
-            => Feature.Extension.FunctionFeature(MinusResult);
-
-        IImplementation ISymbolProviderForPointer<Plus>.Feature
-            (Plus tokenClass)
-            => Feature.Extension.FunctionFeature(PlusResult);
-
-
-        Result MutableResult(Category category)
+        finally
         {
-            OptionsValue.IsForceMutable.Value.Assert();
-            return ResultFromPointer(category, Mutable);
+            EndMethodDump();
         }
+    }
 
-        Result EnableReinterpretationResult(Category category)
-            => ResultFromPointer(category, EnableReinterpretation);
+    Result AccessResult(Category category, TypeBase right)
+    {
+        var leftResult = ObjectResult(category).DereferenceResult;
+        return AccessType
+            .Result(category, leftResult, right);
+    }
 
-        IConversion ForcedConversion(ArrayReferenceType destination)
-            =>
-                HasForcedConversion(destination)
-                    ? Feature.Extension.Conversion
-                        (category => destination.ConversionResult(category, this), this)
-                    : null;
+    Result PlusResult(Category category, TypeBase right)
+    {
+        var codeAndClosures = AccessResult(category, right).DereferenceResult;
+        return Result(category, codeAndClosures);
+    }
 
-        bool HasForcedConversion(ArrayReferenceType destination)
-        {
-            if(this == destination)
-                return true;
-
-            if(destination.IsMutable && !IsMutable)
-                return false;
-
-            if(ValueType == destination.ValueType)
-                return true;
-
-            if(ValueType == destination.ValueType)
-                NotImplementedMethod(destination);
-
-            return OptionsValue.IsEnableReinterpretation.Value;
-        }
-
-        Result ConversionResult(Category category, ArrayReferenceType source)
-            => source.Mutation(this) & category;
-
-        internal Result ConversionResult(Category category, ArrayType source)
-        {
-            var trace = ObjectId == -1 && category.HasCode;
-            StartMethodDump(trace, category, source);
-            try
-            {
-                return ReturnMethodDump(source.Pointer.Mutation(this) & category);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        Result AccessResult(Category category, TypeBase right)
-        {
-            var leftResult = ObjectResult(category).DereferenceResult;
-            return AccessType
-                .Result(category, leftResult, right);
-        }
-
-        Result PlusResult(Category category, TypeBase right)
-        {
-            var codeAndClosures = AccessResult(category, right).DereferenceResult;
-            return Result(category, codeAndClosures);
-        }
-
-        Result MinusResult(Category category, TypeBase right)
-        {
-            NotImplementedMethod(category, right);
-            return null;
-        }
-
-        TypeBase IChild<TypeBase>.Parent => ValueType;
-
+    Result MinusResult(Category category, TypeBase right)
+    {
+        NotImplementedMethod(category, right);
+        return null;
     }
 }

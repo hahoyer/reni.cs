@@ -29,6 +29,49 @@ sealed class CompoundSyntax : ValueSyntax
     [EnableDump(Order = 1)]
     internal readonly IStatementSyntax[] Statements;
 
+    [DisableDump]
+    public IEnumerable<FunctionSyntax> ConverterFunctions
+        => Statements
+            .Where(data => data.Declarer?.IsConverterSyntax ?? false)
+            .Select(data => (FunctionSyntax)data.Value);
+
+    [DisableDump]
+    internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
+
+    [EnableDump(Order = 100)]
+    internal IDictionary<string, int> NameIndex
+        => Statements
+            .Select((statement, index) => (Key: statement.Declarer?.Name?.Value, Value: index))
+            .Where(pair => pair.Key != null)
+            .ToDictionary(item => item.Key, item => item.Value);
+
+    [EnableDump(Order = 100)]
+    internal int[] MutableDeclarations => IndexList(item => item.IsMutableSyntax).ToArray();
+
+    [EnableDump(Order = 100)]
+    internal int[] Converters => IndexList(item => item.IsConverterSyntax).ToArray();
+
+    [EnableDump(Order = 100)]
+    internal int[] MixInDeclarations => IndexList(item => item.IsMixInSyntax).ToArray();
+
+    [DisableDump]
+    internal int EndPosition => Statements.Length;
+
+    [DisableDump]
+    internal Size IndexSize => Size.AutoSize(Statements.Length);
+
+    [DisableDump]
+    internal string[] AllNames => Statements
+        .Select(s => s.Declarer?.Name?.Value)
+        .Where(name => name != null)
+        .ToArray();
+
+    [DisableDump]
+    internal int[] ConverterStatementPositions
+        => Statements
+            .SelectMany((s, i) => s.Declarer.IsConverterSyntax? new[] { i } : new int[0])
+            .ToArray();
+
     CompoundSyntax(IStatementSyntax[] statements, CleanupSyntax cleanupSection, Anchor anchor)
         : base(NextObjectId++, anchor)
     {
@@ -93,49 +136,6 @@ sealed class CompoundSyntax : ValueSyntax
 
     internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
 
-    [DisableDump]
-    public IEnumerable<FunctionSyntax> ConverterFunctions
-        => Statements
-            .Where(data => data.Declarer?.IsConverterSyntax ?? false)
-            .Select(data => (FunctionSyntax)data.Value);
-
-    [DisableDump]
-    internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
-
-    [EnableDump(Order = 100)]
-    internal IDictionary<string, int> NameIndex
-        => Statements
-            .Select((statement, index) => (Key: statement.Declarer?.Name?.Value, Value: index))
-            .Where(pair => pair.Key != null)
-            .ToDictionary(item => item.Key, item => item.Value);
-
-    [EnableDump(Order = 100)]
-    internal int[] MutableDeclarations => IndexList(item => item.IsMutableSyntax).ToArray();
-
-    [EnableDump(Order = 100)]
-    internal int[] Converters => IndexList(item => item.IsConverterSyntax).ToArray();
-
-    [EnableDump(Order = 100)]
-    internal int[] MixInDeclarations => IndexList(item => item.IsMixInSyntax).ToArray();
-
-    [DisableDump]
-    internal int EndPosition => Statements.Length;
-
-    [DisableDump]
-    internal Size IndexSize => Size.AutoSize(Statements.Length);
-
-    [DisableDump]
-    internal string[] AllNames => Statements
-        .Select(s => s.Declarer?.Name?.Value)
-        .Where(name => name != null)
-        .ToArray();
-
-    [DisableDump]
-    internal int[] ConverterStatementPositions
-        => Statements
-            .SelectMany((s, i) => s.Declarer.IsConverterSyntax? new[] { i } : new int[0])
-            .ToArray();
-
     public static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax cleanupSection, Anchor anchor)
         => new(statements, cleanupSection, anchor);
 
@@ -155,12 +155,12 @@ sealed class CompoundSyntax : ValueSyntax
 
     internal Result Cleanup(ContextBase context, Category category)
     {
-        if(CleanupSection != null && (category.HasCode || category.HasClosures))
+        if(CleanupSection != null && (category.HasCode() || category.HasClosures()))
             return context
-                    .Result(category.WithType, CleanupSection.Value)
+                    .Result(category | Category.Type, CleanupSection.Value)
                     .Conversion(context.RootContext.VoidType)
-                    .LocalBlock(category) &
-                category;
+                    .LocalBlock(category)
+                & category;
 
         return context.RootContext.VoidType.Result(category);
     }

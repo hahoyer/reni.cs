@@ -111,13 +111,13 @@ sealed class Root
     internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
     {
         var result = VoidType.Result(category);
-        if(!(category.HasCode || category.HasClosures))
+        if(!(category.HasCode() || category.HasClosures()))
             return result;
 
         StartMethodDump(false, category, count, "elemResults");
         try
         {
-            if(category.HasCode)
+            if(category.HasCode())
                 result.Code = CodeBase.DumpPrintText("(");
 
             for(var i = 0; i < count; i++)
@@ -130,14 +130,14 @@ sealed class Root
                 BreakExecution();
 
                 result.IsDirty = true;
-                if(category.HasCode)
+                if(category.HasCode())
                 {
                     if(i > 0)
                         result.Code = result.Code + CodeBase.DumpPrintText(", ");
                     result.Code = result.Code + elemResult.Code;
                 }
 
-                if(category.HasClosures)
+                if(category.HasClosures())
                     result.Closures = result.Closures.Sequence(elemResult.Closures);
                 result.IsDirty = false;
 
@@ -145,7 +145,7 @@ sealed class Root
                 BreakExecution();
             }
 
-            if(category.HasCode)
+            if(category.HasCode())
                 result.Code = result.Code + CodeBase.DumpPrintText(")");
             return ReturnMethodDump(result);
         }
