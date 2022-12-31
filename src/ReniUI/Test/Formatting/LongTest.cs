@@ -10,7 +10,6 @@ namespace ReniUI.Test.Formatting;
 
 [UnitTest]
 [TestFixture]
-[LowPriority]
 public sealed class LongTest : DependenceProvider
 {
     [Test]
