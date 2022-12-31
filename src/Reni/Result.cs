@@ -615,24 +615,23 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     Result InternalReplaceArg(ResultCache getResultForArg)
     {
-        var result = Clone;
-        result.IsDirty = true;
-
         var categoryForArg = CompleteCategory & (Category.Code | Category.Closures);
         if(HasCode)
             categoryForArg |= Category.Type;
 
         var resultForArg = getResultForArg & categoryForArg;
-        if(resultForArg != null)
-        {
-            result.Issues = T(result.Issues, resultForArg.Issues).ConcatMany().ToArray();
+        if(resultForArg == null)
+            return this;
 
-            if(HasCode)
-                result.Code = Code.ReplaceArg(resultForArg);
-            if(HasClosures)
-                result.Closures = Closures.WithoutArg() + resultForArg.Closures;
-        }
+        var result = Clone;
+        result.IsDirty = true;
 
+        result.Issues = T(result.Issues, resultForArg.Issues).ConcatMany().ToArray();
+
+        if(HasCode)
+            result.Code = Code.ReplaceArg(resultForArg);
+        if(HasClosures)
+            result.Closures = Closures.WithoutArg() + resultForArg.Closures;
         result.IsDirty = false;
         return result;
     }
@@ -690,11 +689,12 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             return this;
 
         var result = Clone;
-
+        result.IsDirty = true;
         if(HasCode)
             result.Code = Code.ReplaceRelative(refInCode, replacementCode);
         if(HasClosures)
             result.Closures = Closures.Without(refInCode).Sequence(replacementRefs());
+        result.IsDirty = false;
         return result;
     }
 
