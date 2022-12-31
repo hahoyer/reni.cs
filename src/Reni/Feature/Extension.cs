@@ -129,7 +129,7 @@ static class Extension
 
             return IssueId
                 .MissingRightExpression
-                .IssueResult(category, currentTarget);
+                .IssueResult(category, currentTarget, context.RootContext);
         }
 
         if(valueResult == null)
@@ -203,5 +203,5 @@ static class Extension
             .Distinct()
             .SingleOrDefault();
 
-    internal static Result Result(this Issue[] issues, Category category) => new(category, issues);
+    internal static Result Result(this Issue[] issues, Category category, Root root) => new(category, issues, root);
 }

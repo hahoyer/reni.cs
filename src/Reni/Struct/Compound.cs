@@ -94,7 +94,7 @@ sealed class Compound
     Result ResultsOfStatements(Category category, int fromPosition, int? fromNotPosition)
     {
         if(category == Category.None)
-            return new(category);
+            return new(category, () => Root);
         var trace = Syntax.ObjectId.In() && category.HasCode();
         StartMethodDump(trace, category, fromPosition, fromNotPosition);
         try

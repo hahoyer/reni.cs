@@ -4,6 +4,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
+using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -42,8 +43,8 @@ sealed class IssueId : EnumEx, Match.IError
         return new(this, anchors.Select(anchor => anchor.SourcePart).Aggregate(), message);
     }
 
-    internal Result IssueResult(Category category, SourcePart token, string message = null)
-        => new(category, Issue(token, message));
+    internal Result IssueResult(Category category, SourcePart token, Root root, string message = null)
+        => new(category, Issue(token, message), root);
 
     internal Result<BinaryTree> Syntax(BinaryTree binaryTree) => new(binaryTree, Issue(binaryTree.SourcePart));
 }

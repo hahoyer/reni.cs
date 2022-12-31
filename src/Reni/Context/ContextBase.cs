@@ -99,7 +99,7 @@ abstract class ContextBase
             RecentFunctionContextObject = new(target.ObtainRecentFunctionContext);
             Compounds = new(container => new(container, target));
 
-            AsObject = new(target);
+            AsObject = new(target, () => target.RootContext);
         }
 
         [DisableDump]
@@ -239,13 +239,13 @@ abstract class ContextBase
     [DebuggerHidden]
     ResultCache ResultCacheForCache(ValueSyntax syntax)
     {
-        var result = new ResultCache(new ResultProvider(this, syntax));
+        var result = new ResultCache(new ResultProvider(this, syntax), RootContext);
         syntax.AddToCacheForDebug(this, result);
         return result;
     }
 
     ResultCache GetResultAsReferenceCacheForCache
-        (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true));
+        (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true), RootContext);
 
     internal Result ResultAsReference(Category category, ValueSyntax syntax)
         => Result(category | Category.Type, syntax)
@@ -270,7 +270,7 @@ abstract class ContextBase
             .Execute
             (
                 category,
-                new(FunctionalArgObjectResult),
+                new(FunctionalArgObjectResult, RootContext),
                 token,
                 null,
                 this,
@@ -305,7 +305,7 @@ abstract class ContextBase
         if(searchResult == null)
             return IssueId
                 .MissingDeclarationInContext
-                .IssueResult(category, token, "Context: " + RootContext.Format);
+                .IssueResult(category, token, RootContext, "Context: " + RootContext.Format);
 
         var result = searchResult.Result(category, CacheObject.AsObject, token, this, right);
 

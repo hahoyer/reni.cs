@@ -5,168 +5,168 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class RemoveLocalReferences : Base
 {
-    sealed class RemoveLocalReferences : Base
+    sealed class Counter : Base
     {
-        sealed class Counter : Base
+        readonly Dictionary<LocalReference, int> ReferencesCounts = new();
+
+        internal LocalReference[] SingleReferences
+            => ReferencesCounts
+                .Where(r => r.Value == 1)
+                .Select(r => r.Key)
+                .ToArray();
+
+        internal LocalReference[] References => ReferencesCounts.Keys.ToArray();
+
+        public Counter(CodeBase body) => body.Visit(this);
+
+        internal override CodeBase LocalReference(LocalReference visitedObject)
         {
-            readonly Dictionary<LocalReference, int> ReferencesCounts = new();
+            if(ReferencesCounts.ContainsKey(visitedObject))
+                ReferencesCounts[visitedObject]++;
+            else
+                ReferencesCounts.Add(visitedObject, 1);
+            visitedObject.ValueCode.Visit(this);
+            return null;
+        }
+    }
 
-            public Counter(CodeBase body) => body.Visit(this);
+    sealed class Reducer : Base
+    {
+        public CodeBase NewBody { get; }
+        readonly FunctionCache<LocalReference, LocalReference> Map;
+        readonly LocalReference[] References;
 
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-            {
-                if(ReferencesCounts.ContainsKey(visitedObject))
-                    ReferencesCounts[visitedObject]++;
-                else
-                    ReferencesCounts.Add(visitedObject, 1);
-                visitedObject.ValueCode.Visit(this);
-                return null;
-            }
-
-            internal LocalReference[] SingleReferences
-                => ReferencesCounts
-                    .Where(r => r.Value == 1)
-                    .Select(r => r.Key)
-                    .ToArray();
-
-            internal LocalReference[] References => ReferencesCounts.Keys.ToArray();
+        public Reducer(LocalReference[] references, CodeBase body)
+        {
+            References = references;
+            Map = new(GetReplacementsForCache);
+            NewBody = GetNewBody(body);
         }
 
-        sealed class Reducer : Base
+        internal override CodeBase LocalReference(LocalReference visitedObject)
+            => References.Contains(visitedObject)? Map[visitedObject] : null;
+
+        CodeBase GetNewBody(CodeBase body)
+            => References.Any()? body.Visit(this) ?? body : body;
+
+        LocalReference GetReplacementsForCache(LocalReference reference)
         {
-            public CodeBase NewBody { get; }
-            readonly FunctionCache<LocalReference, LocalReference> Map;
-            readonly LocalReference[] References;
+            var valueCode = reference.ValueCode;
+            return (valueCode.Visit(this) ?? valueCode)
+                .LocalReference(reference.ValueType, true);
+        }
+    }
 
-            public Reducer(LocalReference[] references, CodeBase body)
-            {
-                References = references;
-                Map = new(GetReplacementsForCache);
-                NewBody = GetNewBody(body);
-            }
+    sealed class FinalReplacer : Base
+    {
+        readonly Size Offset;
+        readonly LocalReference Target;
 
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-                => References.Contains(visitedObject)? Map[visitedObject] : null;
+        public FinalReplacer(LocalReference target)
+            : this(Size.Zero, target) { }
 
-            CodeBase GetNewBody(CodeBase body)
-                => References.Any()? body.Visit(this) ?? body : body;
-
-            LocalReference GetReplacementsForCache(LocalReference reference)
-            {
-                var valueCode = reference.ValueCode;
-                return (valueCode.Visit(this) ?? valueCode)
-                    .LocalReference(reference.ValueType, true);
-            }
+        FinalReplacer(Size offset, LocalReference target)
+        {
+            Offset = offset;
+            Target = target;
         }
 
-        sealed class FinalReplacer : Base
+        internal override CodeBase LocalReference(LocalReference visitedObject)
+            => visitedObject != Target
+                ? null
+                : CodeBase
+                    .TopRef()
+                    .ReferencePlus(Offset);
+
+
+        protected override Visitor<CodeBase, FiberItem> After(Size size)
+            => new FinalReplacer(Offset + size, Target);
+    }
+
+    static int NextObjectId;
+    readonly ValueCache<CodeBase> ReducedBodyCache;
+    readonly ValueCache<LocalReference[]> ReferencesCache;
+
+    CodeBase Body { get; }
+    CodeBase Copier { get; }
+
+    [DisableDump]
+    internal CodeBase NewBody
+    {
+        get
         {
-            readonly Size Offset;
-            readonly LocalReference Target;
+            if(!References.Any())
+                return ReducedBody;
 
-            public FinalReplacer(LocalReference target)
-                : this(Size.Zero, target) { }
-
-            FinalReplacer(Size offset, LocalReference target)
+            var trace = ObjectId == -10;
+            StartMethodDump(trace);
+            try
             {
-                Offset = offset;
-                Target = target;
-            }
+                BreakExecution();
 
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-                => visitedObject != Target
-                    ? null
-                    : CodeBase
-                        .TopRef()
-                        .ReferencePlus(Offset);
+                (!ReducedBody.HasArg).Assert(ReducedBody.Dump);
 
+                Dump(nameof(ReducedBody), ReducedBody);
+                Dump(nameof(References), References);
 
-            protected override Visitor<CodeBase, FiberItem> After(Size size)
-                => new FinalReplacer(Offset + size, Target);
-        }
+                var body = ReducedBody;
+                var initialSize = Size.Zero;
 
-        static int NextObjectId;
-        readonly ValueCache<CodeBase> ReducedBodyCache;
-        readonly ValueCache<LocalReference[]> ReferencesCache;
+                var cleanup = new Result(Category.Code | Category.Closures, () => Body.ArgType.Root
+                    , getIsHollow: () => true);
 
-        CodeBase Body { get; }
-        CodeBase Copier { get; }
-
-        public RemoveLocalReferences(CodeBase body, CodeBase copier)
-            : base(NextObjectId++)
-        {
-            Body = body;
-            Copier = copier;
-            ReferencesCache = new(GetReferencesForCache);
-            ReducedBodyCache = new(GetReducedBodyForCache);
-        }
-
-        [DisableDump]
-        internal CodeBase NewBody
-        {
-            get
-            {
-                if(!References.Any())
-                    return ReducedBody;
-
-                var trace = ObjectId == -10;
-                StartMethodDump(trace);
-                try
+                foreach(var reference in References)
                 {
+                    Dump(nameof(reference), reference);
+                    var initialCode = reference.AlignedValueCode;
+                    initialSize += initialCode.Size;
+                    Dump(nameof(initialCode), initialCode);
+
+                    var replacedBody = body.Visit(new FinalReplacer(reference)) ?? body;
+                    Dump(nameof(replacedBody), replacedBody);
+                    body = initialCode + replacedBody;
+                    Dump(nameof(body), body);
                     BreakExecution();
 
-                    (!ReducedBody.HasArg).Assert(ReducedBody.Dump);
-
-                    Dump(nameof(ReducedBody), ReducedBody);
-                    Dump(nameof(References), References);
-
-                    var body = ReducedBody;
-                    var initialSize = Size.Zero;
-
-                    var cleanup = new Result(Category.Code | Category.Closures, () => true);
-
-                    foreach(var reference in References)
-                    {
-                        Dump(nameof(reference), reference);
-                        var initialCode = reference.AlignedValueCode;
-                        initialSize += initialCode.Size;
-                        Dump(nameof(initialCode), initialCode);
-
-                        var replacedBody = body.Visit(new FinalReplacer(reference)) ?? body;
-                        Dump(nameof(replacedBody), replacedBody);
-                        body = initialCode + replacedBody;
-                        Dump(nameof(body), body);
-                        BreakExecution();
-
-                        var cleanup1 = reference
-                            .ValueType
-                            .Cleanup(Category.Code | Category.Closures)
-                            .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, Closures.Void);
-                        cleanup = cleanup1 + cleanup;
-                        Dump(nameof(cleanup), cleanup);
-                        BreakExecution();
-                    }
-
-                    var result = (body + cleanup.Code).LocalBlockEnd(Copier, initialSize);
-                    return ReturnMethodDump(result);
+                    var cleanup1 = reference
+                        .ValueType
+                        .Cleanup(Category.Code | Category.Closures)
+                        .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, Closures.Void);
+                    cleanup = cleanup1 + cleanup;
+                    Dump(nameof(cleanup), cleanup);
+                    BreakExecution();
                 }
-                finally
-                {
-                    EndMethodDump();
-                }
+
+                var result = (body + cleanup.Code).LocalBlockEnd(Copier, initialSize);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
             }
         }
-
-        LocalReference[] References => ReferencesCache.Value;
-        CodeBase ReducedBody => ReducedBodyCache.Value;
-
-        CodeBase GetReducedBodyForCache()
-            => new Reducer(new Counter(Body).SingleReferences, Body).NewBody;
-
-        LocalReference[] GetReferencesForCache()
-            => new Counter(ReducedBody)
-                .References;
     }
+
+    LocalReference[] References => ReferencesCache.Value;
+    CodeBase ReducedBody => ReducedBodyCache.Value;
+
+    public RemoveLocalReferences(CodeBase body, CodeBase copier)
+        : base(NextObjectId++)
+    {
+        Body = body;
+        Copier = copier;
+        ReferencesCache = new(GetReferencesForCache);
+        ReducedBodyCache = new(GetReducedBodyForCache);
+    }
+
+    CodeBase GetReducedBodyForCache()
+        => new Reducer(new Counter(Body).SingleReferences, Body).NewBody;
+
+    LocalReference[] GetReferencesForCache()
+        => new Counter(ReducedBody)
+            .References;
 }

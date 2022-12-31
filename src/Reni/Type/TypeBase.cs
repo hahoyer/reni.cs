@@ -77,7 +77,7 @@ abstract class TypeBase
             EnableCut = new(() => new(parent));
             Mutation = new(
                 destination =>
-                    new(category => parent.Mutation(category, destination))
+                    new(category => parent.Mutation(category, destination), parent.Root)
             );
             ForcedReference = new(parent.GetForcedReferenceForCache);
             Pointer = new(parent.GetPointerForCache);
@@ -500,9 +500,8 @@ abstract class TypeBase
     internal Result Result(Category category, Func<CodeBase> getCode = null, Func<Closures> getClosures = null)
         => new(
             category,
-            getType: () => this,
-            getCode: getCode,
-            getClosures: getClosures);
+            () => Root,
+            getClosures, getCode, () => this);
 
     internal TypeBase CommonType(TypeBase elseType)
     {
@@ -707,7 +706,7 @@ abstract class TypeBase
 
     Result IssueResult(Category category, IssueId issueId, SourcePart token)
         => issueId
-            .IssueResult(category, token, "Type: " + DumpPrintText);
+            .IssueResult(category, token, Root, "Type: " + DumpPrintText);
 
     internal Result Execute
     (

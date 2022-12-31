@@ -59,6 +59,8 @@ sealed class Root
     [DisableDump]
     internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
 
+    public TypeBase IssueType => this.CachedValue(() => new IssueData.IssueType(this));
+
     internal Root(IParent parent) => Parent = parent;
 
     IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature(ConcatArrays tokenClass)

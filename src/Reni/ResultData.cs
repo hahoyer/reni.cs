@@ -26,7 +26,7 @@ sealed class ResultData
         Func<Closures> getClosures = null,
         Func<Size> getSize = null,
         Func<bool> getIsHollow = null,
-        Root rootContext = null,
+        Func<Root> rootContext = null,
         Func<string> getObjectDump = null
     )
     {
@@ -37,7 +37,7 @@ sealed class ResultData
         var closures = getClosures == null? null : new ValueCache<Closures>(getClosures);
 
         if(category.HasType())
-            Type = ObtainType(isHollow, size, type, code, rootContext, getObjectDump);
+            Type = ObtainType(isHollow, size, type, code, rootContext?.Invoke(), getObjectDump);
 
         if(category.HasCode())
             Code = ObtainCode(isHollow, size, type, code, getObjectDump);

@@ -173,7 +173,7 @@ sealed class ConversionPath
             ;
         //Tracer.FlaggedLine("\n"+Tracer.Dump(results));
         var result = results
-                .Aggregate(new ResultCache(this), (c, n) => n.ReplaceArg(c))
+                .Aggregate(new ResultCache(this, Destination.Root), (c, n) => n.ReplaceArg(c))
             & category;
         //Tracer.FlaggedLine("\n"+Tracer.Dump(results));
         return result;

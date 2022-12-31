@@ -4,52 +4,52 @@ using hw.Helper;
 using Reni.Struct;
 using Reni.Validation;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class Container : DumpableObject
 {
-    sealed class Container : DumpableObject
+    static int NextObjectId;
+
+    [Node]
+    [DisableDump]
+    public static Container UnexpectedVisitOfPending { get; }
+        = new("UnexpectedVisitOfPending");
+
+    [Node]
+    internal readonly FunctionId FunctionId;
+
+    [Node]
+    internal readonly Issue[] Issues;
+
+    [Node]
+    [EnableDump]
+    internal CodeBase Data { get; }
+
+    [Node]
+    [EnableDump]
+    internal string Description { get; }
+
+    bool HasIssues => Issues?.Any() ?? false;
+    bool HasCode => Data != null;
+
+    internal Container(CodeBase data, Issue[] issues, string description, FunctionId functionId = null)
+        : base(NextObjectId++)
     {
-        static int NextObjectId;
-
-        [Node]
-        internal readonly FunctionId FunctionId;
-
-        [Node]
-        internal readonly Issue[] Issues;
-
-        Container(string errorText) => Description = errorText;
-
-        internal Container(CodeBase data, Issue[] issues, string description, FunctionId functionId = null)
-            : base(NextObjectId++)
-        {
-            Description = description;
+        Description = description;
+        Issues = issues;
+        if(!HasIssues)
             Data = data;
-            Issues = issues;
-            FunctionId = functionId;
+        FunctionId = functionId;
 
-            (HasCode != HasIssues).Assert();
-        }
+        (HasCode != HasIssues).Assert();
+    }
 
-        bool HasIssues => Issues?.Any() ?? false;
-        bool HasCode => Data != null;
+    Container(string errorText) => Description = errorText;
 
-        [Node]
-        [EnableDump]
-        internal CodeBase Data { get; }
-
-        [Node]
-        [EnableDump]
-        internal string Description { get; }
-
-        [Node]
-        [DisableDump]
-        public static Container UnexpectedVisitOfPending { get; }
-            = new Container(errorText: "UnexpectedVisitOfPending");
-
-        public string GetCSharpStatements(int indent)
-        {
-            var generator = new CSharpGenerator(Data?.TemporarySize.SaveByteCount ?? 0);
-            Data?.Visit(generator);
-            return generator.Data.Indent(indent);
-        }
+    public string GetCSharpStatements(int indent)
+    {
+        var generator = new CSharpGenerator(Data?.TemporarySize.SaveByteCount ?? 0);
+        Data?.Visit(generator);
+        return generator.Data.Indent(indent);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
@@ -10,45 +11,44 @@ namespace Reni;
 
 sealed class IssueData : DumpableObject
 {
-    internal sealed class Default : Singleton<Default, DumpableObject>
+    internal sealed class IssueType : TypeBase, IContextReference
     {
-        internal sealed class IssueType : TypeBase, IContextReference
-        {
-            int IContextReference.Order => default;
-            internal override Root Root => default;
-            protected override Size GetSize() => Size.Zero;
-            internal override bool IsHollow => true;
-        }
+        [DisableDump]
+        internal override Root Root { get; }
 
-        internal sealed class IssueCode : CodeBase
-        {
-            public IssueCode()
-                : base(0) { }
+        public IssueType(Root root) => Root = root;
+        int IContextReference.Order => default;
 
-            protected override Size GetSize() => Size.Zero;
-            internal override CodeBase Add(FiberItem subsequentElement) => this;
-        }
+        [DisableDump]
+        internal override bool IsHollow => true;
 
-        internal readonly ResultData Value;
+        protected override Size GetSize() => Size.Zero;
+    }
 
-        public Default()
-        {
-            var type = new IssueType();
-            var code = new IssueCode();
-            Value = new(Category.All, () => type, () => code);
-        }
+    internal sealed class IssueCode : CodeBase
+    {
+        internal static readonly IssueCode Instance = new();
+
+        IssueCode()
+            : base(0) { }
+
+        protected override Size GetSize() => Size.Zero;
+        internal override CodeBase Add(FiberItem subsequentElement) => this;
     }
 
     public Issue[] Issues;
     public Category Category;
 
-    public bool? IsHollow => HasIssue && Category.HasIsHollow()? Default.Instance.Value.IsHollow : null;
-    public CodeBase Code => HasIssue && Category.HasCode()? Default.Instance.Value.Code : null;
-    public Size Size => HasIssue && Category.HasSize()? Default.Instance.Value.Size : null;
-    public TypeBase Type => HasIssue && Category.HasType()? Default.Instance.Value.Type : null;
-    public Closures Closure => HasIssue && Category.HasClosures()? Default.Instance.Value.Closures : null;
+    internal readonly Func<Root> Root;
+
+    public bool? IsHollow => HasIssue && Category.HasIsHollow()? IssueCode.Instance.IsHollow : null;
+    public CodeBase Code => HasIssue && Category.HasCode()? IssueCode.Instance : null;
+    public Size Size => HasIssue && Category.HasSize()? IssueCode.Instance.Size : null;
+    public TypeBase Type => HasIssue && Category.HasType()? Root().IssueType : null;
+    public Closures Closure => HasIssue && Category.HasClosures()? IssueCode.Instance.Closures : null;
 
     public bool HasIssue => Issues?.Any() ?? false;
+    public IssueData(Func<Root> root) => Root = root;
 
     public void Set(Category category, bool value = true)
     {

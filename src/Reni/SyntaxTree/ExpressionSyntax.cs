@@ -25,14 +25,14 @@ sealed class ExpressionSyntax : ValueSyntax
         }
 
         public override string Message
-            => "Depth of " +
-                Depth +
-                " exhausted when evaluation expression.\n" +
-                "Expression: " +
-                SourcePart.GetDumpAroundCurrent() +
-                "\n" +
-                "Context: " +
-                Context.NodeDump;
+            => "Depth of "
+                + Depth
+                + " exhausted when evaluation expression.\n"
+                + "Expression: "
+                + SourcePart.GetDumpAroundCurrent()
+                + "\n"
+                + "Context: "
+                + Context.NodeDump;
     }
 
     [Node]
@@ -86,10 +86,10 @@ sealed class ExpressionSyntax : ValueSyntax
 
             var leftType = left.Type;
             if(leftType == null)
-                return left.Issues.Result(category);
+                return left.Issues.Result(category, context.RootContext);
 
             if(leftType.HasIssues)
-                return leftType.Issues.Result(category);
+                return leftType.Issues.Result(category, context.RootContext);
 
             return leftType
                 .Execute(category, left, Token, Definable, context, Right);

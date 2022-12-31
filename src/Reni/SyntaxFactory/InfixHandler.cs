@@ -20,15 +20,6 @@ class InfixHandler : DumpableObject, IValueProvider
         readonly IssueId IssueId;
         readonly ITokenClass ActualTokenClass;
 
-        protected InfixTypeErrorTokenClass(IssueId issueId, ITokenClass actualTokenClass)
-        {
-            IssueId = issueId;
-            ActualTokenClass = actualTokenClass;
-        }
-
-        IssueId IIssueTokenClass.IssueId => IssueId;
-        string ITokenClass.Id => $"<error:{IssueId}/{ActualTokenClass}>";
-
 
         string Message
         {
@@ -49,6 +40,15 @@ class InfixHandler : DumpableObject, IValueProvider
             }
         }
 
+        protected InfixTypeErrorTokenClass(IssueId issueId, ITokenClass actualTokenClass)
+        {
+            IssueId = issueId;
+            ActualTokenClass = actualTokenClass;
+        }
+
+        IssueId IIssueTokenClass.IssueId => IssueId;
+        string ITokenClass.Id => $"<error:{IssueId}/{ActualTokenClass}>";
+
         protected Issue GetIssue(SourcePart sourcePart) => IssueId.Issue(sourcePart, Message);
     }
 
@@ -58,7 +58,7 @@ class InfixHandler : DumpableObject, IValueProvider
             : base(IssueId.InvalidInfixExpression, tokenClass) { }
 
         Result IInfix.Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-            => new(category, GetIssue(left.Anchor.SourcePart + right.Anchor.SourcePart));
+            => new(category, GetIssue(left.Anchor.SourcePart + right.Anchor.SourcePart), context.RootContext);
     }
 
     sealed class SuffixErrorTokenClass : InfixTypeErrorTokenClass, ISuffix
@@ -67,7 +67,7 @@ class InfixHandler : DumpableObject, IValueProvider
             : base(IssueId.InvalidSuffixExpression, tokenClass) { }
 
         Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
-            => new(category, GetIssue(left.Anchor.SourcePart));
+            => new(category, GetIssue(left.Anchor.SourcePart), context.RootContext);
     }
 
     sealed class PrefixErrorTokenClass : InfixTypeErrorTokenClass, IPrefix
@@ -76,7 +76,7 @@ class InfixHandler : DumpableObject, IValueProvider
             : base(IssueId.InvalidPrefixExpression, tokenClass) { }
 
         Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
-            => new(category, GetIssue(right.Anchor.SourcePart));
+            => new(category, GetIssue(right.Anchor.SourcePart), context.RootContext);
     }
 
     sealed class TerminalErrorTokenClass : InfixTypeErrorTokenClass, ITerminal
@@ -90,7 +90,7 @@ class InfixHandler : DumpableObject, IValueProvider
 
 
         Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
-            => new(category, GetIssue(token));
+            => new(category, GetIssue(token), context.RootContext);
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor)
         {
@@ -116,13 +116,10 @@ class InfixHandler : DumpableObject, IValueProvider
     }
 
     static ITokenClass GetTokenClass(bool left, ITokenClass tokenClass, bool right)
-        => left
-            ? right
+        => left? right
                 ? GetTokenClass<IInfix>(tokenClass)
-                : GetTokenClass<ISuffix>(tokenClass)
-            : right
-                ? GetTokenClass<IPrefix>(tokenClass)
-                : GetTokenClass<ITerminal>(tokenClass);
+                : GetTokenClass<ISuffix>(tokenClass) :
+            right? GetTokenClass<IPrefix>(tokenClass) : GetTokenClass<ITerminal>(tokenClass);
 
     static ITokenClass GetTokenClass<TInfixType>(ITokenClass tokenClass)
         => tokenClass is TInfixType? tokenClass : GetErrorTokenClass<TInfixType>(tokenClass);

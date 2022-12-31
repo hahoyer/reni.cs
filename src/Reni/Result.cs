@@ -257,12 +257,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             var result = new Result
             (
-                CompleteCategory,
-                () => IsHollow.AssertValue(),
-                () => alignedSize,
-                () => Type.Align,
-                () => Code.BitCast(alignedSize),
-                () => Closures);
+                CompleteCategory
+                , IssueData.Root
+                , () => Closures
+                , () => Code.BitCast(alignedSize)
+                , () => Type.Align
+                , () => alignedSize
+                , () => IsHollow.AssertValue());
             return result;
         }
     }
@@ -353,7 +354,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         private set => IssueData.Issues = value;
     }
 
-    internal Result(Category category, Issue[] issues)
+    internal Result(Category category, Issue[] issues, Root root)
         : this
         (
             category,
@@ -362,20 +363,21 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             null,
             null,
             null,
-            null) { }
+            null,
+            () => root) { }
 
-    internal Result(Category category, Issue recentIssue)
-        : this(category, new[] { recentIssue }) { }
+    internal Result(Category category, Issue recentIssue, Root root)
+        : this(category, new[] { recentIssue }, root) { }
 
     internal Result
     (
         Category category,
-        Func<bool> getIsHollow = null,
-        Func<Size> getSize = null,
-        Func<TypeBase> getType = null,
-        Func<CodeBase> getCode = null,
+        Func<Root> rootContext,
         Func<Closures> getClosures = null,
-        Root rootContext = null
+        Func<CodeBase> getCode = null,
+        Func<TypeBase> getType = null,
+        Func<Size> getSize = null,
+        Func<bool> getIsHollow = null
     )
         : this
         (
@@ -388,10 +390,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             getClosures,
             rootContext) { }
 
-    Result()
+    Result(Func<Root> root)
         : base(NextObjectId++)
     {
-        IssueData = new();
+        IssueData = new(root);
         Data = new();
     }
 
@@ -404,11 +406,11 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         Func<TypeBase> getType,
         Func<CodeBase> getCode,
         Func<Closures> getClosures,
-        Root rootContext = null
+        Func<Root> rootContext
     )
         : base(NextObjectId++)
     {
-        IssueData = new() { Category = category, Issues = issues };
+        IssueData = new(rootContext) { Category = category, Issues = issues };
         Data = new
         (
             issues?.Any() == true? Category.None : category
@@ -498,7 +500,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             () => Size,
             () => Type,
             () => Code,
-            () => Closures);
+            () => Closures,
+            IssueData.Root);
         result.PendingCategory &= category;
         return result;
     }
@@ -511,10 +514,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         ((CompleteCategory & PendingCategory) == Category.None).Assert();
 
         if(HasType)
-            (Data.Type is not IssueData.Default.IssueType).Assert();
+            (Data.Type is not IssueData.IssueType).Assert();
 
         if(HasCode)
-            (Data.Code is not IssueData.Default.IssueCode).Assert();
+            (Data.Code is not IssueData.IssueCode).Assert();
 
         if(HasIsHollow && HasSize)
             (Size.IsZero == IsHollow).Assert
@@ -605,14 +608,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [PublicAPI]
     internal Result ReplaceArg(ResultCache.IResultProvider provider)
-        => HasArg? InternalReplaceArg(new(provider)) : this;
+        => HasArg? InternalReplaceArg(new(provider, IssueData.Root)) : this;
 
     internal Result ReplaceArg(Func<Category, Result> getArgs)
-        => HasArg? InternalReplaceArg(new(getArgs)) : this;
+        => HasArg? InternalReplaceArg(new(getArgs, IssueData.Root)) : this;
 
     Result InternalReplaceArg(ResultCache getResultForArg)
     {
-        var result = new Result
+        var result = new Result(IssueData.Root)
         {
             Issues = Issues
             , IsHollow = IsHollow
@@ -652,7 +655,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode && !HasClosures)
             return this;
 
-        var result = new Result
+        var result = new Result(IssueData.Root)
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
         };
@@ -674,7 +677,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             return this;
 
         var replacement = getReplacement(CompleteCategory.Without(Category.Size | Category.Type));
-        var result = new Result
+        var result = new Result(IssueData.Root)
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
         };
@@ -696,7 +699,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode && !HasClosures)
             return this;
 
-        var result = new Result
+        var result = new Result(IssueData.Root)
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type
         };
@@ -851,7 +854,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [PublicAPI]
     internal Result DereferencedAlignedResult(Size size)
         => HasIssue? this :
-            HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code.DePointer(size)) : this;
+            HasCode? new(CompleteCategory.Without(Category.Type), IssueData.Root, getCode: () => Code.DePointer(size)) :
+            this;
 
     internal Result ConvertToConverter(TypeBase source)
         => source.IsHollow || (!HasClosures && !HasCode)
