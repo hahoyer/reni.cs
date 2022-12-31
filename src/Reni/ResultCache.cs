@@ -154,9 +154,6 @@ sealed class ResultCache : DumpableObject
     //[DebuggerHidden]
     void Update(Category category)
     {
-        if(Data.HasIssue)
-            return;
-
         var localCategory = category.Without(Data.CompleteCategory | Data.PendingCategory);
 
         if(localCategory.HasIsHollow() && Data.FindIsHollow != null)
@@ -183,6 +180,8 @@ sealed class ResultCache : DumpableObject
         var oldPendingCategory = Data.PendingCategory;
         try
         {
+            Data.HasIssue.ConditionalBreak();
+
             Data.PendingCategory |= localCategory;
             var result = Provider.Execute(localCategory, oldPendingCategory & category);
 
@@ -209,7 +208,7 @@ sealed class ResultCache : DumpableObject
             BreakExecution();
             GuardedUpdate(category);
             Dump(nameof(Provider), Provider);
-            Data.CompleteCategory.Contains(category).Assert();
+            Data.CompleteCategory.Contains(category).Assert(Data.Dump);
             return ReturnMethodDump(Data & category);
         }
         finally
