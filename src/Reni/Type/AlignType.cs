@@ -13,6 +13,8 @@ sealed class AlignType
     [DisableDump]
     readonly int AlignBits;
 
+    IEnumerable<string> InternalDeclarationOptions => Parent.DeclarationOptions;
+
     public AlignType(TypeBase target, int alignBits)
         : base(target)
     {
@@ -33,6 +35,7 @@ sealed class AlignType
     protected override Result DeAlign(Category category) => Mutation(Parent) & category;
     protected override PointerType GetPointerForCache() => Parent.ForcedPointer;
 
+    [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
@@ -62,8 +65,6 @@ sealed class AlignType
 
     protected override Result ParentConversionResult(Category category)
         => UnalignedResult(category);
-
-    IEnumerable<string> InternalDeclarationOptions => Parent.DeclarationOptions;
 
     public Result UnalignedResult(Category category)
         => Parent.Result(category, () => ArgCode.BitCast(Parent.Size));
