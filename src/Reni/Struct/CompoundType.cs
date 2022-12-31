@@ -27,11 +27,7 @@ sealed class CompoundType
     [DisableDump]
     IEnumerable<string> InternalDeclarationOptions => View.DeclarationOptions;
 
-    internal CompoundType(CompoundView view)
-    {
-        View = view;
-        (!View.HasIssues).Assert(() => Tracer.Dump(View.Issues));
-    }
+    internal CompoundType(CompoundView view) => View = view;
 
     ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 

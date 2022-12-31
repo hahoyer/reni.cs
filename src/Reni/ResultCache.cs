@@ -209,6 +209,7 @@ sealed class ResultCache : DumpableObject
             BreakExecution();
             GuardedUpdate(category);
             Dump(nameof(Provider), Provider);
+            Data.CompleteCategory.Contains(category).Assert();
             return ReturnMethodDump(Data & category);
         }
         finally
