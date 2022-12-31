@@ -362,14 +362,10 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         => CodeBase.ReferenceCode(Compound).ReferencePlus(CompoundViewSize * -1);
 
     internal TypeBase ValueType(int position)
-    {
-        var accessType = Compound
-            .AccessType(ViewPosition, position);
-
-        return accessType
+        => Compound
+            .AccessType(ViewPosition, position)
             .AssertNotNull()
             .TypeForStructureElement;
-    }
 
     internal IImplementation Find(Definable definable, bool publicOnly)
     {

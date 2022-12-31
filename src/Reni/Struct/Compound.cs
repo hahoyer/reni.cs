@@ -159,7 +159,7 @@ sealed class Compound
                     .ReplaceRelative(this, CodeBase.TopRef, Closures.Void)
                 & category;
 
-            if(result.HasIssue == true)
+            if(result.HasIssue)
                 return ReturnMethodDump(result);
 
             if(category.HasType())
@@ -185,13 +185,10 @@ sealed class Compound
     Result AccessResult(Category category, int accessPosition, int position)
     {
         var trace = ObjectId == -10
-                && //
-                Syntax.ObjectId.In(4)
-                && //
-                accessPosition == 2
-                && //
-                position == 2 //
-            //&& category.HasType
+                && Syntax.ObjectId.In(1)
+                && accessPosition == 1
+                && position == 1
+                && category.HasClosures()
             ;
         StartMethodDump(trace, category, accessPosition, position);
         try
@@ -202,6 +199,7 @@ sealed class Compound
             var rawResult = uniqueChildContext.Result
                 (category | Category.Type, Syntax.PureStatements[position]);
             Dump(nameof(rawResult), rawResult);
+            rawResult.CompleteCategory.Contains(category | Category.Type).Assert();
             BreakExecution();
             var unFunction = rawResult.SmartUn<FunctionType>();
             Dump(nameof(unFunction), unFunction);
@@ -216,7 +214,7 @@ sealed class Compound
     }
 
     internal TypeBase AccessType(int accessPosition, int position)
-        => AccessResult(Category.Type, accessPosition, position).Type;
+        => AccessResult(Category.Type, accessPosition, position).Type.AssertNotNull();
 
     bool ObtainIsHollow(int? accessPosition)
     {

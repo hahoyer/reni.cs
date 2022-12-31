@@ -85,7 +85,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
             return null;
 
         var branchResult = result;
-        if(branchResult.HasIssue == true)
+        if(branchResult.HasIssue)
             return branchResult;
 
         var commonType = CommonType(context);
@@ -105,7 +105,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         var condResult = CondResult(context, category);
         var thenResult = ThenResult(context, branchCategory);
         var elseResult = ElseResult(context, branchCategory);
-        if(condResult.HasIssue == true || thenResult.HasIssue == true || elseResult.HasIssue == true)
+        if(!condResult.HasIssue && thenResult.HasIssue != true && elseResult.HasIssue != true)
             return condResult + thenResult + elseResult;
 
         return commonType

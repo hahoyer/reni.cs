@@ -10,11 +10,9 @@ namespace Reni;
 
 sealed class ResultData
 {
-    internal Closures Closure;
+    internal Closures Closures;
     internal CodeBase Code;
-    internal bool IsDirty;
     internal bool? IsHollow;
-    internal Category PendingCategory = Category.None;
     internal Size Size;
     internal TypeBase Type;
 
@@ -23,13 +21,13 @@ sealed class ResultData
     internal ResultData
     (
         Category category,
-        Func<bool> getIsHollow,
-        Func<Size> getSize,
         Func<TypeBase> getType,
         Func<CodeBase> getCode,
-        Func<Closures> getClosures,
-        Root rootContext,
-        Func<string> getObjectDump
+        Func<Closures> getClosures = null,
+        Func<Size> getSize = null,
+        Func<bool> getIsHollow = null,
+        Root rootContext = null,
+        Func<string> getObjectDump = null
     )
     {
         var isHollow = getIsHollow == null? null : new ValueCache<bool>(getIsHollow);
@@ -48,7 +46,7 @@ sealed class ResultData
             Size = ObtainSize(isHollow, size, type, code, getObjectDump);
 
         if(category.HasClosures())
-            Closure = ObtainClosures(isHollow, size, type, code, closures, getObjectDump);
+            Closures = ObtainClosures(isHollow, size, type, code, closures, getObjectDump);
 
         if(category.HasIsHollow())
             IsHollow = ObtainIsHollow(isHollow, size, type, code, getObjectDump);
@@ -167,12 +165,42 @@ sealed class ResultData
             return getArgs.Value;
         if(getCode != null)
             return getCode.Value.Closures;
-// ReSharper disable ExpressionIsAlwaysNull
         if(TryObtainIsHollow(getIsHollow, getSize, getType, getCode) == true)
-// ReSharper restore ExpressionIsAlwaysNull
             return Closures.Void();
 
-        Tracer.AssertionFailed($"Closures cannot be determined for {getObjectDump()}");
         return null;
+    }
+
+    public void Reset(Category category)
+    {
+        if(category.HasIsHollow())
+            IsHollow = null;
+        if(category.HasSize())
+            Size = null;
+        if(category.HasType())
+            Type = null;
+        if(category.HasCode())
+            Code = null;
+        if(category.HasClosures())
+            Closures = null;
+    }
+
+    public void Set(Category category, object value)
+    {
+        if(Equals(value, default))
+            Reset(category);
+        else
+        {
+            if(category.HasIsHollow())
+                IsHollow = (bool?)value;
+            if(category.HasSize())
+                Size = (Size)value;
+            if(category.HasType())
+                Type = (TypeBase)value;
+            if(category.HasCode())
+                Code = (CodeBase)value;
+            if(category.HasClosures())
+                Closures = (Closures)value;
+        }
     }
 }

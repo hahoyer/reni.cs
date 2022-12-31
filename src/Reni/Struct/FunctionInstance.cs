@@ -133,7 +133,7 @@ abstract class FunctionInstance
             BreakExecution();
             var rawResult = Context.Result(category | Category.Type, Body);
 
-            (rawResult.HasIssue == true || rawResult.CompleteCategory == (category | Category.Type)).Assert();
+            (rawResult.HasIssue || rawResult.CompleteCategory == (category | Category.Type)).Assert();
             if(rawResult.FindClosures != null)
                 (!rawResult.SmartClosures.Contains(Closures.Arg())).Assert(rawResult.Dump);
 
