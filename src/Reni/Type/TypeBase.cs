@@ -77,7 +77,7 @@ abstract class TypeBase
             EnableCut = new(() => new(parent));
             Mutation = new(
                 destination =>
-                    new(category => parent.Mutation(category, destination), parent.Root)
+                    new(category => parent.Mutation(category, destination))
             );
             ForcedReference = new(parent.GetForcedReferenceForCache);
             Pointer = new(parent.GetPointerForCache);
@@ -440,7 +440,7 @@ abstract class TypeBase
     [NotNull]
     Size GetSizeForCache() => IsHollow? Size.Zero : GetSize();
 
-    Result VoidCodeAndRefs(Category category)
+    static Result VoidCodeAndRefs(Category category)
         => Root.VoidType.Result(category & (Category.Code | Category.Closures));
 
     internal ArrayType Array(int count, string options = null)
@@ -500,7 +500,6 @@ abstract class TypeBase
     internal Result Result(Category category, Func<CodeBase> getCode = null, Func<Closures> getClosures = null)
         => new(
             category,
-            () => Root,
             getClosures, getCode, () => this);
 
     internal TypeBase CommonType(TypeBase elseType)

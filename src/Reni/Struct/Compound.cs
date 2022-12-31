@@ -94,7 +94,7 @@ sealed class Compound
     Result ResultsOfStatements(Category category, int fromPosition, int? fromNotPosition)
     {
         if(category == Category.None)
-            return new(category, () => Root);
+            return new(category);
         var trace = Syntax.ObjectId.In() && category.HasCode();
         StartMethodDump(trace, category, fromPosition, fromNotPosition);
         try
@@ -119,7 +119,7 @@ sealed class Compound
             var result = results
                 .Aggregate
                 (
-                    Parent.RootContext.VoidType.Result(category | Category.Type),
+                    Root.VoidType.Result(category | Category.Type),
                     (current, next) => current.Sequence(next)
                 );
             return ReturnMethodDump(result);

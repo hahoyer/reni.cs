@@ -26,7 +26,6 @@ sealed class ResultData
         Func<Closures> getClosures = null,
         Func<Size> getSize = null,
         Func<bool> getIsHollow = null,
-        Func<Root> rootContext = null,
         Func<string> getObjectDump = null
     )
     {
@@ -37,7 +36,7 @@ sealed class ResultData
         var closures = getClosures == null? null : new ValueCache<Closures>(getClosures);
 
         if(category.HasType())
-            Type = ObtainType(isHollow, size, type, code, rootContext?.Invoke(), getObjectDump);
+            Type = ObtainType(isHollow, size, type, code, getObjectDump);
 
         if(category.HasCode())
             Code = ObtainCode(isHollow, size, type, code, getObjectDump);
@@ -46,7 +45,7 @@ sealed class ResultData
             Size = ObtainSize(isHollow, size, type, code, getObjectDump);
 
         if(category.HasClosures())
-            Closures = ObtainClosures(isHollow, size, type, code, closures, getObjectDump);
+            Closures = ObtainClosures(isHollow, size, type, code, closures);
 
         if(category.HasIsHollow())
             IsHollow = ObtainIsHollow(isHollow, size, type, code, getObjectDump);
@@ -58,7 +57,6 @@ sealed class ResultData
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode,
-        Root rootContext,
         Func<string> getObjectDump
     )
     {
@@ -68,7 +66,7 @@ sealed class ResultData
         var isHollow = TryObtainIsHollow(getIsHollow, getSize, getType, getCode);
 // ReSharper restore ExpressionIsAlwaysNull
         if(isHollow == true)
-            return rootContext.VoidType;
+            return Root.VoidType;
         Tracer.AssertionFailed($"Type cannot be determined for {getObjectDump()}");
         return null;
     }
@@ -157,8 +155,7 @@ sealed class ResultData
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode,
-        ValueCache<Closures> getArgs,
-        Func<string> getObjectDump
+        ValueCache<Closures> getArgs
     )
     {
         if(getArgs != null)

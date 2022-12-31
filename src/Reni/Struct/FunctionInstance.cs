@@ -82,7 +82,7 @@ abstract class FunctionInstance
     {
         Body = body;
         Parent = parent;
-        ResultCache = new(this, parent.Root);
+        ResultCache = new(this);
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -90,7 +90,7 @@ abstract class FunctionInstance
     Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
     {
         if(category == Category.None && pendingCategory == Category.Closures)
-            return new(Category.Closures, () => Context.RootContext, Closures.Void);
+            return new(Category.Closures, Closures.Void);
 
         (pendingCategory == Category.None).Assert();
         return GetResult(category);

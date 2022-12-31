@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
@@ -13,11 +12,12 @@ sealed class IssueData : DumpableObject
 {
     internal sealed class IssueType : TypeBase, IContextReference
     {
-        [DisableDump]
-        internal override Root Root { get; }
+        internal static readonly IssueType Instance = new();
 
-        public IssueType(Root root) => Root = root;
         int IContextReference.Order => default;
+
+        [DisableDump]
+        internal override Root Root => null;
 
         [DisableDump]
         internal override bool IsHollow => true;
@@ -39,16 +39,13 @@ sealed class IssueData : DumpableObject
     public Issue[] Issues;
     public Category Category;
 
-    internal readonly Func<Root> Root;
-
     public bool? IsHollow => HasIssue && Category.HasIsHollow()? IssueCode.Instance.IsHollow : null;
     public CodeBase Code => HasIssue && Category.HasCode()? IssueCode.Instance : null;
     public Size Size => HasIssue && Category.HasSize()? IssueCode.Instance.Size : null;
-    public TypeBase Type => HasIssue && Category.HasType()? Root().IssueType : null;
+    public TypeBase Type => HasIssue && Category.HasType()? IssueType.Instance : null;
     public Closures Closure => HasIssue && Category.HasClosures()? IssueCode.Instance.Closures : null;
 
     public bool HasIssue => Issues?.Any() ?? false;
-    public IssueData(Func<Root> root) => Root = root;
 
     public void Set(Category category, bool value = true)
     {

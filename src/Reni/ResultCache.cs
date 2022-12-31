@@ -7,7 +7,6 @@ using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Type;
 using Reni.Validation;
 
@@ -77,6 +76,9 @@ sealed class ResultCache : DumpableObject
     }
 
     [DisableDump]
+    const string FunctionDump = "";
+
+    [DisableDump]
     static CallStack Current;
 
     [DisableDump]
@@ -90,9 +92,6 @@ sealed class ResultCache : DumpableObject
 
     [DisableDump]
     internal IResultProvider Provider { get; }
-
-    [DisableDump]
-    internal string FunctionDump = "";
 
     [DisableDump]
     [PublicAPI]
@@ -116,31 +115,17 @@ sealed class ResultCache : DumpableObject
     [DisableDump]
     internal Issue[] Issues => GetCategories(Category.IsHollow).Issues;
 
-    internal ResultCache(IResultProvider obtainResult, Root root)
+    internal ResultCache(IResultProvider obtainResult)
         : this()
     {
-        Data = new(Category.None, () => root);
+        Data = new(Category.None);
         Provider = obtainResult ?? NotSupported;
     }
 
-    internal ResultCache(IResultProvider obtainResult, Func<Root> getRoot)
+    internal ResultCache(Func<Category, Result> obtainResult)
         : this()
     {
-        Data = new(Category.None, getRoot);
-        Provider = obtainResult ?? NotSupported;
-    }
-
-    internal ResultCache(Func<Category, Result> obtainResult, Root root)
-        : this()
-    {
-        Data = new(Category.None, () => root);
-        Provider = new SimpleProvider(obtainResult);
-    }
-
-    internal ResultCache(Func<Category, Result> obtainResult, Func<Root> getRoot)
-        : this()
-    {
-        Data = new(Category.None, getRoot);
+        Data = new(Category.None);
         Provider = new SimpleProvider(obtainResult);
     }
 

@@ -99,7 +99,7 @@ abstract class ContextBase
             RecentFunctionContextObject = new(target.ObtainRecentFunctionContext);
             Compounds = new(container => new(container, target));
 
-            AsObject = new(target, () => target.RootContext);
+            AsObject = new(target);
         }
 
         [DisableDump]
@@ -239,13 +239,13 @@ abstract class ContextBase
     [DebuggerHidden]
     ResultCache ResultCacheForCache(ValueSyntax syntax)
     {
-        var result = new ResultCache(new ResultProvider(this, syntax), RootContext);
+        var result = new ResultCache(new ResultProvider(this, syntax));
         syntax.AddToCacheForDebug(this, result);
         return result;
     }
 
     ResultCache GetResultAsReferenceCacheForCache
-        (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true), RootContext);
+        (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true));
 
     internal Result ResultAsReference(Category category, ValueSyntax syntax)
         => Result(category | Category.Type, syntax)
@@ -270,7 +270,7 @@ abstract class ContextBase
             .Execute
             (
                 category,
-                new(FunctionalArgObjectResult, RootContext),
+                new(FunctionalArgObjectResult),
                 token,
                 null,
                 this,

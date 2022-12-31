@@ -24,6 +24,9 @@ sealed class CompoundType
 
     bool IsDumpPrintTextActive;
 
+    [DisableDump]
+    IEnumerable<string> InternalDeclarationOptions => View.DeclarationOptions;
+
     internal CompoundType(CompoundView view)
     {
         View = view;
@@ -99,9 +102,6 @@ sealed class CompoundType
         => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
     internal override Result Cleanup(Category category) => View.Compound.Cleanup(category);
-
-    [DisableDump]
-    IEnumerable<string> InternalDeclarationOptions => View.DeclarationOptions;
 
     Result VoidConversion(Category category) => Mutation(Root.VoidType) & category;
 

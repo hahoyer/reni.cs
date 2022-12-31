@@ -116,8 +116,7 @@ sealed class RemoveLocalReferences : Base
                 var body = ReducedBody;
                 var initialSize = Size.Zero;
 
-                var cleanup = new Result(Category.Code | Category.Closures, () => Body.ArgType.Root
-                    , getIsHollow: () => true);
+                var cleanup = new Result(Category.Code | Category.Closures, getIsHollow: () => true);
 
                 foreach(var reference in References)
                 {

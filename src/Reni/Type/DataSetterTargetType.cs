@@ -1,20 +1,19 @@
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 
-namespace Reni.Type
+namespace Reni.Type;
+
+abstract class DataSetterTargetType : SetterTargetType
 {
-    abstract class DataSetterTargetType : SetterTargetType
-    {
-        protected override Result SetterResult(Category category)
-            => Root.VoidType.Result(category, SetterCode);
+    protected abstract CodeBase SetterCode();
+    protected abstract CodeBase GetterCode();
 
-        protected override Result GetterResult(Category category)
-            => ValueType
-                .ForcedPointer
-                .Result(category, GetterCode);
+    protected override Result SetterResult(Category category)
+        => Root.VoidType.Result(category, SetterCode);
 
-        protected abstract CodeBase SetterCode();
-        protected abstract CodeBase GetterCode();
-
-    }
+    protected override Result GetterResult(Category category)
+        => ValueType
+            .ForcedPointer
+            .Result(category, GetterCode);
 }

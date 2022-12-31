@@ -165,10 +165,10 @@ static class Extension
         {
             var result = feature
                 .Function
-                .Result(valueCategory, context.RootContext.VoidType);
+                .Result(valueCategory, Root.VoidType);
 
             return result
-                .ReplaceArg(context.RootContext.VoidType.Result(Category.All));
+                .ReplaceArg(Root.VoidType.Result(Category.All));
         }
 
         if(right != null && feature.Function != null)
@@ -203,5 +203,5 @@ static class Extension
             .Distinct()
             .SingleOrDefault();
 
-    internal static Result Result(this Issue[] issues, Category category, Root root) => new(category, issues, root);
+    internal static Result Result(this Issue[] issues, Category category, Root root) => new(category, issues);
 }

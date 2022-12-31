@@ -257,9 +257,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             var result = new Result
             (
-                CompleteCategory
-                , IssueData.Root
-                , () => Closures
+                CompleteCategory, () => Closures
                 , () => Code.BitCast(alignedSize)
                 , () => Type.Align
                 , () => alignedSize
@@ -354,7 +352,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         private set => IssueData.Issues = value;
     }
 
-    internal Result(Category category, Issue[] issues, Root root)
+    internal Result(Category category, Issue[] issues)
         : this
         (
             category,
@@ -363,16 +361,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             null,
             null,
             null,
-            null,
-            () => root) { }
+            null) { }
 
-    internal Result(Category category, Issue recentIssue, Root root)
-        : this(category, new[] { recentIssue }, root) { }
+    internal Result(Category category, Issue recentIssue)
+        : this(category, new[] { recentIssue }) { }
 
     internal Result
     (
         Category category,
-        Func<Root> rootContext,
         Func<Closures> getClosures = null,
         Func<CodeBase> getCode = null,
         Func<TypeBase> getType = null,
@@ -387,13 +383,12 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             getSize,
             getType,
             getCode,
-            getClosures,
-            rootContext) { }
+            getClosures) { }
 
-    Result(Func<Root> root)
+    Result()
         : base(NextObjectId++)
     {
-        IssueData = new(root);
+        IssueData = new();
         Data = new();
     }
 
@@ -405,12 +400,11 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         Func<Size> getSize,
         Func<TypeBase> getType,
         Func<CodeBase> getCode,
-        Func<Closures> getClosures,
-        Func<Root> rootContext
+        Func<Closures> getClosures
     )
         : base(NextObjectId++)
     {
-        IssueData = new(rootContext) { Category = category, Issues = issues };
+        IssueData = new() { Category = category, Issues = issues };
         Data = new
         (
             issues?.Any() == true? Category.None : category
@@ -418,9 +412,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             , getCode
             , getClosures
             , getSize
-            , getIsHollow
-            , rootContext
-            , ToString
+            , getIsHollow, ToString
         );
 
         AssertValid();
@@ -500,8 +492,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             () => Size,
             () => Type,
             () => Code,
-            () => Closures,
-            IssueData.Root);
+            () => Closures);
         result.PendingCategory &= category;
         return result;
     }
@@ -608,14 +599,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [PublicAPI]
     internal Result ReplaceArg(ResultCache.IResultProvider provider)
-        => HasArg? InternalReplaceArg(new(provider, IssueData.Root)) : this;
+        => HasArg? InternalReplaceArg(new(provider)) : this;
 
     internal Result ReplaceArg(Func<Category, Result> getArgs)
-        => HasArg? InternalReplaceArg(new(getArgs, IssueData.Root)) : this;
+        => HasArg? InternalReplaceArg(new(getArgs)) : this;
 
     Result InternalReplaceArg(ResultCache getResultForArg)
     {
-        var result = new Result(IssueData.Root)
+        var result = new Result
         {
             Issues = Issues
             , IsHollow = IsHollow
@@ -655,7 +646,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode && !HasClosures)
             return this;
 
-        var result = new Result(IssueData.Root)
+        var result = new Result
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
         };
@@ -677,7 +668,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             return this;
 
         var replacement = getReplacement(CompleteCategory.Without(Category.Size | Category.Type));
-        var result = new Result(IssueData.Root)
+        var result = new Result
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
         };
@@ -699,7 +690,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode && !HasClosures)
             return this;
 
-        var result = new Result(IssueData.Root)
+        var result = new Result
         {
             Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type
         };
@@ -854,7 +845,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [PublicAPI]
     internal Result DereferencedAlignedResult(Size size)
         => HasIssue? this :
-            HasCode? new(CompleteCategory.Without(Category.Type), IssueData.Root, getCode: () => Code.DePointer(size)) :
+            HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code.DePointer(size)) :
             this;
 
     internal Result ConvertToConverter(TypeBase source)

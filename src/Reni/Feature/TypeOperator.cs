@@ -19,7 +19,7 @@ sealed class TypeOperator : SuffixSyntaxToken
         {
             var leftType = left.Type(context);
             if(leftType.HasIssues)
-                return new(category, leftType.Issues, context.RootContext);
+                return new(category, leftType.Issues);
 
             return leftType
                 .TypeForTypeOperator
@@ -27,7 +27,6 @@ sealed class TypeOperator : SuffixSyntaxToken
                 .Result(category);
         }
 
-        return context
-            .RootContext.VoidType.Result(category);
+        return Root.VoidType.Result(category);
     }
 }

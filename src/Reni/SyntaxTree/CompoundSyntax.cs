@@ -155,11 +155,11 @@ sealed class CompoundSyntax : ValueSyntax
         if(CleanupSection != null && (category.HasCode() || category.HasClosures()))
             return context
                     .Result(category | Category.Type, CleanupSection.Value)
-                    .Conversion(context.RootContext.VoidType)
+                    .Conversion(Root.VoidType)
                     .LocalBlock(category)
                 & category;
 
-        return context.RootContext.VoidType.Result(category);
+        return Root.VoidType.Result(category);
     }
 
     IEnumerable<int> IndexList(Func<DeclarerSyntax, bool> selector)

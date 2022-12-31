@@ -26,6 +26,8 @@ sealed class Root
         Result<ValueSyntax> ParsePredefinedItem(string source);
     }
 
+    internal static readonly VoidType VoidType = new();
+
     [DisableDump]
     [Node]
     readonly FunctionList Functions = new();
@@ -45,10 +47,6 @@ sealed class Root
     internal RecursionType RecursionType => this.CachedValue(() => new RecursionType(this));
 
     [DisableDump]
-    [Node]
-    internal VoidType VoidType => this.CachedValue(() => new VoidType(this));
-
-    [DisableDump]
     internal int FunctionCount => Functions.Count;
 
     internal static RefAlignParam DefaultRefAlignParam => new(BitsConst.SegmentAlignBits, Size.Create(64));
@@ -58,8 +56,6 @@ sealed class Root
 
     [DisableDump]
     internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
-
-    public TypeBase IssueType => this.CachedValue(() => new IssueData.IssueType(this));
 
     internal Root(IParent parent) => Parent = parent;
 
