@@ -211,7 +211,7 @@ sealed class ArrayType
         if(category == Category.None)
             return null;
 
-        if(argsType == VoidType)
+        if(argsType == Root.VoidType)
             return Result(category, () => CodeBase.BitsConst(Size, BitsConst.Convert(0)));
 
         var function = argsType as IFunction;
@@ -248,7 +248,7 @@ sealed class ArrayType
         var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
                 .Aggregate((c, n) => n + c)
-            ?? VoidType.Result(category);
+            ?? Root.VoidType.Result(category);
         return Result(category, elements);
     }
 

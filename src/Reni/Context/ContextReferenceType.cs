@@ -55,7 +55,7 @@ sealed class ContextReferenceType
             .Concat(new[] { Feature.Extension.Conversion(PointerConversion) });
 
     new Result DumpPrintTokenResult(Category category)
-        => VoidType
+        => Root.VoidType
             .Result(category, DumpPrintCode);
 
     Result PointerConversion(Category category)

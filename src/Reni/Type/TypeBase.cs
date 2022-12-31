@@ -158,9 +158,6 @@ abstract class TypeBase
     internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
 
     [DisableDump]
-    internal VoidType VoidType => Root.VoidType;
-
-    [DisableDump]
     internal BitType BitType => Root.BitType;
 
     [DisableDump]
@@ -612,7 +609,7 @@ abstract class TypeBase
     internal ResultCache Mutation(TypeBase destination)
         => Cache.Mutation[destination];
 
-    internal Result DumpPrintTypeNameResult(Category category) => VoidType
+    internal Result DumpPrintTypeNameResult(Category category) => Root.VoidType
         .Result
         (
             category,
@@ -691,7 +688,7 @@ abstract class TypeBase
     }
 
     protected Result DumpPrintTokenResult(Category category)
-        => VoidType.Result(category, DumpPrintCode)
+        => Root.VoidType.Result(category, DumpPrintCode)
             .ReplaceArg(DereferencesObjectResult(category));
 
     Result DereferencesObjectResult(Category category)

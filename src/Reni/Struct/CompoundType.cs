@@ -90,6 +90,7 @@ sealed class CompoundType
     [DisableDump]
     internal override ContextBase ToContext => View.Context;
 
+    [DisableDump]
     internal override Issue[] Issues => View.Issues;
 
     protected override Size GetSize() => View.CompoundViewSize;

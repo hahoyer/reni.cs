@@ -120,7 +120,7 @@ sealed class FunctionBodyType
         => CodeBase.DumpPrintText(Syntax.Tag);
 
     new Result DumpPrintTokenResult(Category category)
-        => VoidType
+        => Root.VoidType
             .Result(category, DumpPrintCode);
 
     FunctionType Function(TypeBase argsType) => FindRecentCompoundView.Function(Syntax, argsType.AssertNotNull());
