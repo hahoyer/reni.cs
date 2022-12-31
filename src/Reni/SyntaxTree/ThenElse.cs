@@ -105,8 +105,10 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         var condResult = CondResult(context, category);
         var thenResult = ThenResult(context, branchCategory);
         var elseResult = ElseResult(context, branchCategory);
-        if(!condResult.HasIssue && thenResult.HasIssue != true && elseResult.HasIssue != true)
+        if(condResult.HasIssue || thenResult.HasIssue)
             return condResult + thenResult + elseResult;
+        if(elseResult.HasIssue)
+            return condResult + (thenResult + elseResult);
 
         return commonType
             .Result
