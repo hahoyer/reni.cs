@@ -75,6 +75,10 @@ public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
         var i = 0;
         (issueArray[i].IssueId == IssueId.MissingDeclarationInContext).Assert(issueArray[i].Dump);
         i++;
+        (issueArray[i].IssueId == IssueId.MissingDeclarationForType).Assert(issueArray[i].Dump);
+        i++;
+        (issueArray[i].IssueId == IssueId.MissingDeclarationForType).Assert(issueArray[i].Dump);
+        i++;
         (i == issueArray.Length).Assert();
     }
 }
