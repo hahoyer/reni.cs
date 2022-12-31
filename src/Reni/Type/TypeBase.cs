@@ -704,9 +704,9 @@ abstract class TypeBase
     internal Result ObjectResult(Category category)
         => IsHollow? Result(category) : Pointer.Result(category | Category.Type, ForcedReference);
 
-    Result IssueResult(Category category, IssueId issueId, SourcePart token)
+    Result IssueResult(Category category, IssueId issueId, SourcePart token, Issue[] leftIssues)
         => issueId
-            .IssueResult(category, token, Root, "Type: " + DumpPrintText);
+            .Result(category, token, Root, "Type: " + DumpPrintText, leftIssues);
 
     internal Result Execute
     (
@@ -721,7 +721,7 @@ abstract class TypeBase
         (
             definable,
             result => result.Execute(category, left, currentTarget, context, right),
-            issueId => IssueResult(category, issueId, currentTarget)
+            issueId => IssueResult(category, issueId, currentTarget, left.Issues)
         );
 
     TResult ExecuteDeclaration<TResult>

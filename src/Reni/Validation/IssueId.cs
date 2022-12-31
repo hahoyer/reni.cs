@@ -43,8 +43,9 @@ sealed class IssueId : EnumEx, Match.IError
         return new(this, anchors.Select(anchor => anchor.SourcePart).Aggregate(), message);
     }
 
-    internal Result IssueResult(Category category, SourcePart token, Root root, string message = null)
-        => new(category, Issue(token, message), root);
+    internal Result Result
+        (Category category, SourcePart token, Root root, string message = null, Issue[] foundIssues = null)
+        => new(category, T(foundIssues, T(Issue(token, message))).ConcatMany().ToArray(), root);
 
     internal Result<BinaryTree> Syntax(BinaryTree binaryTree) => new(binaryTree, Issue(binaryTree.SourcePart));
 }

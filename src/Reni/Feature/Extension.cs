@@ -129,7 +129,7 @@ static class Extension
 
             return IssueId
                 .MissingRightExpression
-                .IssueResult(category, currentTarget, context.RootContext);
+                .Result(category, currentTarget, context.RootContext);
         }
 
         if(valueResult == null)
