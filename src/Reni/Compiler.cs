@@ -52,54 +52,6 @@ public sealed class Compiler
 
     bool IsInExecutionPhase;
 
-    Compiler(Source source, string moduleName, CompilerParameters parameters)
-    {
-        (source != null).Assert();
-        Source = source;
-        Parameters = parameters ?? new CompilerParameters();
-        ModuleName = moduleName;
-
-        var main = this["Main"];
-        var declaration = this["Declaration"];
-
-        MainTokenFactory = new(declaration, "Main");
-
-        main.PrioTable = MainPriorityTable;
-        main.TokenFactory = new ScannerTokenFactory();
-        main.Add<ScannerTokenType<BinaryTree>>(MainTokenFactory);
-
-        declaration.PrioTable = DeclarationPriorityTable;
-        declaration.TokenFactory = new ScannerTokenFactory(true);
-        declaration.BoxFunction = target => new ExclamationBoxToken(target);
-        declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory("Declaration"));
-
-        main.Parser.Trace = Parameters.TraceOptions.Parser;
-        declaration.Parser.Trace = Parameters.TraceOptions.Parser;
-
-        //Tracer.FlaggedLine(PrettyDump);
-
-        Root = new(this);
-        CodeContainerCache = new(GetCodeContainer);
-        BinaryTreeCache = new(() => Parse(Source));
-        ValueSyntaxCache = new(GetSyntax);
-    }
-
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
-
-    CodeBase IExecutionContext.Function(FunctionId functionId)
-        => CodeContainer.Function(functionId);
-
-    IOutStream IExecutionContext.OutStream => Parameters.OutStream;
-
-    IEnumerable<Definable> Root.IParent.DefinedNames
-        => MainTokenFactory.AllTokenClasses.OfType<Definable>();
-
-    IExecutionContext Root.IParent.ExecutionContext => this;
-
-    Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
-
-    bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
-
     [Node]
     [DisableDump]
     internal BinaryTree BinaryTree => BinaryTreeCache.Value;
@@ -200,7 +152,12 @@ public sealed class Compiler
                 CompareOperation.TokenId(false, true)
             );
             result += PrioTable.Left
-                (EqualityOperation.TokenId(false), EqualityOperation.TokenId());
+            (
+                EqualityOperation.TokenId(false, false)
+                , EqualityOperation.TokenId(false, true)
+                , EqualityOperation.TokenId(true, false)
+                , EqualityOperation.TokenId(true, true)
+            );
 
             result += PrioTable.Left(NotOperation.TokenId);
             result += PrioTable.Left("&");
@@ -276,6 +233,54 @@ public sealed class Compiler
 
     [DisableDump]
     internal TypeBase MainType => this.CachedValue(() => Syntax.Type(Root));
+
+    Compiler(Source source, string moduleName, CompilerParameters parameters)
+    {
+        (source != null).Assert();
+        Source = source;
+        Parameters = parameters ?? new CompilerParameters();
+        ModuleName = moduleName;
+
+        var main = this["Main"];
+        var declaration = this["Declaration"];
+
+        MainTokenFactory = new(declaration, "Main");
+
+        main.PrioTable = MainPriorityTable;
+        main.TokenFactory = new ScannerTokenFactory();
+        main.Add<ScannerTokenType<BinaryTree>>(MainTokenFactory);
+
+        declaration.PrioTable = DeclarationPriorityTable;
+        declaration.TokenFactory = new ScannerTokenFactory(true);
+        declaration.BoxFunction = target => new ExclamationBoxToken(target);
+        declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory("Declaration"));
+
+        main.Parser.Trace = Parameters.TraceOptions.Parser;
+        declaration.Parser.Trace = Parameters.TraceOptions.Parser;
+
+        //Tracer.FlaggedLine(PrettyDump);
+
+        Root = new(this);
+        CodeContainerCache = new(GetCodeContainer);
+        BinaryTreeCache = new(() => Parse(Source));
+        ValueSyntaxCache = new(GetSyntax);
+    }
+
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+    CodeBase IExecutionContext.Function(FunctionId functionId)
+        => CodeContainer.Function(functionId);
+
+    IOutStream IExecutionContext.OutStream => Parameters.OutStream;
+
+    IEnumerable<Definable> Root.IParent.DefinedNames
+        => MainTokenFactory.AllTokenClasses.OfType<Definable>();
+
+    IExecutionContext Root.IParent.ExecutionContext => this;
+
+    Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
+
+    bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
 
     public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
     {
