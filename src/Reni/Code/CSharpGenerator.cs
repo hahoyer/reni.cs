@@ -7,225 +7,176 @@ using Reni.Basics;
 using Reni.Runtime;
 using Reni.Struct;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class CSharpGenerator : DumpableObject, IVisitor
 {
-    sealed class CSharpGenerator : DumpableObject, IVisitor
+    readonly int TemporaryByteCount;
+    readonly List<string> DataCache = new();
+    int IndentLevel;
+
+    public string Data
     {
-        readonly int TemporaryByteCount;
-        readonly List<string> DataCache = new();
-        int IndentLevel;
-
-        public CSharpGenerator(int temporaryByteCount) => TemporaryByteCount = temporaryByteCount;
-
-        public string Data
+        get
         {
-            get
-            {
-                var start = $"\nvar data = Data.Create({TemporaryByteCount})";
-                return DataCache
+            var start = $"\nvar data = Data.Create({TemporaryByteCount})";
+            return DataCache
                     .Aggregate(start, (x, y) => x + ";\n" + y)
-                    + ";\n";
-            }
+                + ";\n";
         }
+    }
 
-        [StringFormatMethod("pattern")]
-        void AddCode(string pattern, params object[] data)
+    static int RefBytes => DataHandler.RefBytes;
+
+    public CSharpGenerator(int temporaryByteCount) => TemporaryByteCount = temporaryByteCount;
+
+    void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
+        => AddCode($"data.ArrayGetter({elementSize.SaveByteCount},{indexSize.SaveByteCount})");
+
+    void IVisitor.ArraySetter(Size elementSize, Size indexSize)
+        => AddCode($"data.ArraySetter({elementSize.SaveByteCount},{indexSize.SaveByteCount})");
+
+    void IVisitor.Assign(Size targetSize)
+        => AddCode($"data.Assign({targetSize.SaveByteCount})");
+
+    void IVisitor.BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
+    {
+        var sizeBytes = size.SaveByteCount;
+        var leftBytes = leftSize.SaveByteCount;
+        var rightBytes = rightSize.SaveByteCount;
+        AddCode($"data.{opToken}(sizeBytes:{sizeBytes}, leftBytes:{leftBytes}, rightBytes:{rightBytes})");
+    }
+
+    void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize)
+    {
+        var sizeBytes = size.SaveByteCount;
+        var argBytes = argSize.SaveByteCount;
+        AddCode(sizeBytes == argBytes
+            ? $"data.{operation}Prefix(bytes:{sizeBytes})"
+            : $"data.{operation}Prefix(sizeBytes:{sizeBytes}, argBytes:{argBytes})");
+    }
+
+    void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
+        => AddCode(
+            $"data.Push(data.Pull({targetSize.SaveByteCount}).BitCast({significantSize.ToInt()}).BitCast({size.ToInt()}))"
+        );
+
+    void IVisitor.BitsArray(Size size, BitsConst data)
+        => AddCode($"data.SizedPush({size.ByteCount}{data.ByteSequence()})");
+
+    void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
+        => AddCode($"data.Push({Generator.FunctionName(functionId)}(data.Pull({argsAndRefsSize.SaveByteCount})))");
+
+    void IVisitor.DePointer(Size size, Size dataSize)
+        => AddCode
+        (
+            $"data.Push(data.Pull({RefBytes}).DePointer({dataSize.ByteCount}){BitCast(size, dataSize)})"
+        );
+
+
+    void IVisitor.Drop(Size beforeSize, Size afterSize)
+        => AddCode(afterSize.IsZero
+            ? $"data.Drop({beforeSize.ByteCount})"
+            : $"data.Drop({beforeSize.ByteCount}, {afterSize.ByteCount})");
+
+    void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
+    {
+        fiberHead.Visit(this);
+        foreach(var fiberItem in fiberItems)
+            fiberItem.Visit(this);
+    }
+
+    void IVisitor.List(CodeBase[] data)
+    {
+        foreach(var codeBase in data)
+            codeBase.Visit(this);
+    }
+
+    void IVisitor.PrintNumber(Size leftSize, Size rightSize)
+        => AddCode($"data.Pull({leftSize.SaveByteCount}).PrintNumber()");
+
+    void IVisitor.PrintText(string dumpPrintText)
+        => AddCode($"Data.PrintText({dumpPrintText.Quote()})");
+
+    void IVisitor.PrintText(Size leftSize, Size itemSize)
+        => AddCode
+        (
+            $"data.Pull({leftSize.SaveByteCount}).PrintText({itemSize.SaveByteCount})"
+        );
+
+    void IVisitor.RecursiveCall() => AddCode("goto Start");
+    void IVisitor.RecursiveCallCandidate() => throw new UnexpectedRecursiveCallCandidate();
+
+    void IVisitor.ReferencePlus(Size size)
+        => AddCode("data.PointerPlus({0})", size.SaveByteCount);
+
+    void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
+    {
+        AddCode($"if({PullBool(condSize.ByteCount)})\n{{");
+        Indent();
+        thenCode.Visit(this);
+        BackIndent();
+        AddCode("}}\nelse\n{{");
+        Indent();
+        elseCode.Visit(this);
+        BackIndent();
+        AddCode("}}");
+    }
+
+    void IVisitor.TopData(Size offset, Size size, Size dataSize)
+        => AddCode
+        (
+            $"data.Push(data.Get({dataSize.ByteCount}, {offset.SaveByteCount}){BitCast(size, dataSize)})"
+        );
+
+    void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
+        => AddCode
+        (
+            $"data.Push(frame.Get({dataSize.ByteCount}, {offset.SaveByteCount}){BitCast(size, dataSize)})"
+        );
+
+    void IVisitor.TopFrameRef(Size offset)
+        => AddCode($"data.Push(frame.Pointer({offset.SaveByteCount}))");
+
+    void IVisitor.TopRef(Size offset)
+        => AddCode($"data.Push(data.Pointer({offset.SaveByteCount}))");
+
+    [StringFormatMethod("pattern")]
+    void AddCode(string pattern, params object[] data)
+    {
+        var c = string.Format(pattern, data);
+        DataCache.Add("    ".Repeat(IndentLevel) + c);
+    }
+
+    static string BitCast(Size size, Size dataSize)
+    {
+        if(size == dataSize)
+            return "";
+        return $".BitCast({dataSize.ToInt()}).BitCast({size.ToInt()})";
+    }
+
+    static string PullBool(int byteCount)
+    {
+        if(byteCount == 1)
+            return "data.Pull(1).GetBytes()[0] != 0";
+        return $"data.Pull({byteCount}).IsNotNull()";
+    }
+
+    void BackIndent() => IndentLevel--;
+    void Indent() => IndentLevel++;
+
+    internal static string GenerateCSharpStatements(CodeBase codeBase)
+    {
+        var generator = new CSharpGenerator(codeBase.TemporarySize.SaveByteCount);
+        try
         {
-            var c = string.Format(pattern, data);
-            DataCache.Add("    ".Repeat(IndentLevel) + c);
+            codeBase.Visit(generator);
         }
-
-        static string BitCast(Size size, Size dataSize)
+        catch(UnexpectedContextReference e)
         {
-            if(size == dataSize)
-                return "";
-            return $".BitCast({dataSize.ToInt()}).BitCast({size.ToInt()})";
+            Tracer.AssertionFailed("", () => e.Message);
         }
 
-        static int RefBytes => DataHandler.RefBytes;
-
-
-        void IVisitor.Drop(Size beforeSize, Size afterSize)
-        {
-            if(afterSize.IsZero)
-                AddCode("data.Drop({0})", beforeSize.ByteCount);
-            else
-                AddCode("data.Drop({0}, {1})", beforeSize.ByteCount, afterSize.ByteCount);
-        }
-
-        void IVisitor.BitsArray(Size size, BitsConst data)
-            => AddCode("data.SizedPush({0}{1})", size.ByteCount, data.ByteSequence());
-
-        void IVisitor.ReferencePlus(Size size)
-            => AddCode("data.PointerPlus({0})", size.SaveByteCount);
-
-        void IVisitor.PrintNumber(Size leftSize, Size rightSize)
-            => AddCode("data.Pull({0}).PrintNumber()", leftSize.SaveByteCount);
-
-        void IVisitor.PrintText(string dumpPrintText)
-            => AddCode("Data.PrintText({0})", dumpPrintText.Quote());
-
-        void IVisitor.TopRef(Size offset)
-            => AddCode("data.Push(data.Pointer({0}))", offset.SaveByteCount);
-
-        void IVisitor.TopFrameRef(Size offset)
-            => AddCode("data.Push(frame.Pointer({0}))", offset.SaveByteCount);
-
-        void IVisitor.Assign(Size targetSize)
-            => AddCode("data.Assign({0})", targetSize.SaveByteCount);
-
-        void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
-            => AddCode
-                (
-                    "data.Push(data.Pull({0}).BitCast({1}).BitCast({2}))",
-                    targetSize.SaveByteCount,
-                    significantSize.ToInt(),
-                    size.ToInt()
-                );
-
-        void IVisitor.PrintText(Size leftSize, Size itemSize)
-            => AddCode
-                (
-                    "data.Pull({0}).PrintText({1})",
-                    leftSize.SaveByteCount,
-                    itemSize.SaveByteCount
-                );
-
-        void IVisitor.RecursiveCall() => AddCode("goto Start");
-        void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
-
-        void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
-            =>
-                AddCode
-                    (
-                        "data.ArrayGetter({0},{1})",
-                        elementSize.SaveByteCount,
-                        indexSize.SaveByteCount
-                    );
-
-        void IVisitor.ArraySetter(Size elementSize, Size indexSize)
-            =>
-                AddCode
-                    (
-                        "data.ArraySetter({0},{1})",
-                        elementSize.SaveByteCount,
-                        indexSize.SaveByteCount
-                    );
-
-        void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
-            => AddCode
-                (
-                    "data.Push({0}(data.Pull({1})))",
-                    Generator.FunctionName(functionId),
-                    argsAndRefsSize.SaveByteCount
-                );
-
-        void IVisitor.TopData(Size offset, Size size, Size dataSize)
-            => AddCode
-                (
-                    "data.Push(data.Get({0}, {1}){2})",
-                    dataSize.ByteCount,
-                    offset.SaveByteCount,
-                    BitCast(size, dataSize)
-                );
-
-        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
-            => AddCode
-                (
-                    "data.Push(frame.Get({0}, {1}){2})",
-                    dataSize.ByteCount,
-                    offset.SaveByteCount,
-                    BitCast(size, dataSize)
-                );
-
-        void IVisitor.DePointer(Size size, Size dataSize)
-            => AddCode
-                (
-                    "data.Push(data.Pull({0}).DePointer({1}){2})",
-                    RefBytes,
-                    dataSize.ByteCount,
-                    BitCast(size, dataSize)
-                );
-
-        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize)
-        {
-            var sizeBytes = size.SaveByteCount;
-            var argBytes = argSize.SaveByteCount;
-            if(sizeBytes == argBytes)
-                AddCode("data.{0}Prefix(bytes:{1})", operation, sizeBytes);
-            else
-                AddCode
-                    (
-                        "data.{0}Prefix(sizeBytes:{1}, argBytes:{2})",
-                        operation,
-                        sizeBytes,
-                        argBytes
-                    );
-        }
-
-        void IVisitor.BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
-        {
-            var sizeBytes = size.SaveByteCount;
-            var leftBytes = leftSize.SaveByteCount;
-            var rightBytes = rightSize.SaveByteCount;
-            AddCode
-                (
-                    "data.{0}(sizeBytes:{1}, leftBytes:{2}, rightBytes:{3})",
-                    opToken,
-                    sizeBytes,
-                    leftBytes,
-                    rightBytes
-                );
-        }
-
-        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
-        {
-            AddCode("if({0})\n{{", PullBool(condSize.ByteCount));
-            Indent();
-            thenCode.Visit(this);
-            BackIndent();
-            AddCode("}}\nelse\n{{");
-            Indent();
-            elseCode.Visit(this);
-            BackIndent();
-            AddCode("}}");
-        }
-
-        static string PullBool(int byteCount)
-        {
-            if(byteCount == 1)
-                return "data.Pull(1).GetBytes()[0] != 0";
-            return "data.Pull(" + byteCount + ").IsNotNull()";
-        }
-
-        void BackIndent() => IndentLevel--;
-        void Indent() => IndentLevel++;
-
-        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
-        {
-            fiberHead.Visit(this);
-            foreach(var fiberItem in fiberItems)
-                fiberItem.Visit(this);
-        }
-
-        void IVisitor.List(CodeBase[] data)
-        {
-            foreach(var codeBase in data)
-                codeBase.Visit(this);
-        }
-
-        internal static string GenerateCSharpStatements(CodeBase codeBase)
-        {
-            var generator = new CSharpGenerator(codeBase.TemporarySize.SaveByteCount);
-            try
-            {
-                codeBase.Visit(generator);
-            }
-            catch(UnexpectedContextReference e)
-            {
-                Tracer.AssertionFailed("", () => e.Message);
-            }
-            return generator.Data;
-        }
+        return generator.Data;
     }
 }
