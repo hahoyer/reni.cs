@@ -1,31 +1,36 @@
 ﻿using hw.DebugFormatter;
 using Reni.Basics;
+using Reni.Parser;
+using Reni.TokenClasses;
 
 namespace Reni.Code;
 
 sealed class IdentityTestCode : FiberItem
 {
     [EnableDump]
-    readonly bool IsEqual;
+    internal readonly bool IsEqual;
 
     [EnableDump]
-    readonly Size Size;
+    internal readonly Size ArgumentSize;
 
-    internal IdentityTestCode(bool isEqual, Size size)
+    [DisableDump]
+    internal override Size OutputSize { get; }
+
+    string DataFunctionName => EqualityOperation.TokenId(IsEqual).Symbolize();
+
+    internal IdentityTestCode(bool isEqual, Size outputSize, Size size)
     {
+        OutputSize = outputSize;
         IsEqual = isEqual;
-        Size = size;
+        ArgumentSize = size;
     }
 
     [DisableDump]
-    internal override Size InputSize => Size * 2;
-
-    [DisableDump]
-    internal override Size OutputSize => Size.Bit;
+    internal override Size InputSize => ArgumentSize * 2;
 
     internal override void Visit(IVisitor visitor)
-    {
-        NotImplementedMethod(visitor);
-        return;
-    }
+        => visitor.BitArrayBinaryOp(DataFunctionName, OutputSize, ArgumentSize, ArgumentSize);
+
+    protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+        => subsequentElement.TryToCombineBack(this);
 }

@@ -33,20 +33,6 @@ public sealed class NotEqual : ApplyCompareOperator
 }
 
 [UnitTest]
-public sealed class Identical : ApplyCompareOperator
-{
-    protected override string Operator => "==";
-    protected override bool Result => false;
-}
-
-[UnitTest]
-public sealed class NotIdentical : ApplyCompareOperator
-{
-    protected override string Operator => "~==";
-    protected override bool Result => true;
-}
-
-[UnitTest]
 public sealed class GreaterThan : ApplyCompareOperator
 {
     protected override string Operator => ">";

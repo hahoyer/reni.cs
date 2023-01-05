@@ -153,10 +153,10 @@ public sealed class Compiler
             );
             result += PrioTable.Left
             (
-                EqualityOperation.TokenId(false, false)
-                , EqualityOperation.TokenId(false, true)
-                , EqualityOperation.TokenId(true, false)
-                , EqualityOperation.TokenId(true, true)
+                EqualityOperation.TokenId(false)
+                , EqualityOperation.TokenId(true)
+                , IdentityOperation.TokenId(false)
+                , IdentityOperation.TokenId(true)
             );
 
             result += PrioTable.Left(NotOperation.TokenId);

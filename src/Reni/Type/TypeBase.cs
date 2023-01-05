@@ -23,6 +23,8 @@ abstract class TypeBase
         , ISearchTarget
         , ValueCache.IContainer
         , IRootProvider
+        , ISymbolProviderForPointer<IdentityOperation>
+
 {
     sealed class CacheContainer
     {
@@ -205,6 +207,10 @@ abstract class TypeBase
     string IIconKeyProvider.IconKey => "Type";
 
     Root IRootProvider.Value => Root;
+
+    IImplementation ISymbolProviderForPointer<IdentityOperation>.Feature(IdentityOperation tokenClass)
+        => Feature.Extension.FunctionFeature(
+            (category, right, operation) => IdentityOperationResult(category, right, operation.IsEqual), tokenClass);
 
     [DisableDump]
     [Node]
@@ -742,6 +748,39 @@ abstract class TypeBase
                 return onError(IssueId.AmbiguousSymbol);
         }
     }
+
+    Result IdentityOperationResult(Category category, TypeBase right, bool isEqual)
+    {
+        if(AutomaticDereferenceType == right.AutomaticDereferenceType)
+            return IdentityOperationResult(category, isEqual)
+                .ReplaceArg(c => right.Conversion(c, AutomaticDereferenceType.Pointer));
+
+        return Root.BitType.Result
+        (
+            category,
+            () => CodeBase.BitsConst(BitsConst.Convert(isEqual))
+        );
+    }
+
+    Result IdentityOperationResult(Category category, bool isEqual)
+    {
+        var result = Root.BitType.Result
+        (
+            category,
+            () => IdentityOperationCode(isEqual),
+            Closures.Arg
+        );
+
+        var leftResult = ObjectResult(category | Category.Type).Conversion(Align);
+        var rightResult = ObjectResult(category | Category.Type).Conversion(Align);
+        var pair = leftResult + rightResult;
+        return result.ReplaceArg(pair);
+    }
+
+    CodeBase IdentityOperationCode(bool isEqual) => Align
+        .Pair(Align)
+        .ArgCode
+        .Add(new IdentityTestCode(isEqual, Size.Bit, Align.Size));
 }
 
 // ReSharper disable CommentTypo

@@ -1,12 +1,13 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
 namespace ReniUI.Test.Examples;
 
 [UnitTest]
-public sealed class Enum : DependenceProvider
+public sealed class EnumDevelop : DependenceProvider
 {
     [UnitTest]
     public void Start()
@@ -66,7 +67,7 @@ x = Auswahl Nein then ""No match"" dump_print
     }
 
     [UnitTest]
-    public void FirstCallCorrected()
+    public void Corrected()
     {
         const string text = @"Auswahl: @!
   {
@@ -76,20 +77,30 @@ x = Auswahl Nein then ""No match"" dump_print
 };
 
 x: Auswahl Ja;
-x = Auswahl Nein then ""No match"" dump_print
+x == Auswahl Ja then ""Match"" dump_print;
+x == Auswahl Nein then ""No match"" dump_print
 ";
         var compiler = CompilerBrowser.FromText(text);
         var issues = compiler.Issues.ToArray();
 
         var i = 0;
 
-        var issue = issues[i++];
-        (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
-
-        issue = issues[i++];
-        (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
-
         (i == issues.Length).Assert();
-        false.Assert();
     }
 }
+
+[UnitTest]
+[TargetSet(@"Auswahl: @!
+  {
+!public Ja: (Type: ^^, Value: ""Ja""),
+!public  Nein: (Type: ^^, Value: ""Nein""),
+!public  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
+};
+
+z: 2;
+z = 3 then ""???"" dump_print;
+x: Auswahl Ja;
+x == Auswahl Ja then ""Match"" dump_print;
+x == Auswahl Nein then ""No match"" dump_print",
+    "MatchNo match")]
+public sealed class EnumExample : CompilerTest { }

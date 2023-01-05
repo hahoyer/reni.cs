@@ -35,6 +35,7 @@
     <Compile Include="Code\FunctionContainer.cs" />
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\Holder.cs" />
+    <Compile Include="Code\IdentityTestCode.cs" />
     <Compile Include="Code\InvalidConversionCode.cs" />
     <Compile Include="Code\ItemCollector.cs" />
     <Compile Include="Code\IVisitor.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="IssueData.cs" />
     <Compile Include="ResultData.cs" />
+    <Compile Include="TokenClasses\IdentityOperation.cs" />
     <Compile Include="TokenClasses\LogicalOperation.cs" />
     <Compile Include="TokenClasses\Whitespace\ContactType.cs" />
     <Compile Include="TokenClasses\Whitespace\LineGroup.cs" />

@@ -112,7 +112,7 @@ sealed class CSharpGenerator : DumpableObject, IVisitor
 
     void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
     {
-        AddCode($"if({PullBool(condSize.ByteCount)})\n{{");
+        AddCode($"if({PullBool(condSize.ByteCount)})\n{{{{");
         Indent();
         thenCode.Visit(this);
         BackIndent();
@@ -149,18 +149,12 @@ sealed class CSharpGenerator : DumpableObject, IVisitor
     }
 
     static string BitCast(Size size, Size dataSize)
-    {
-        if(size == dataSize)
-            return "";
-        return $".BitCast({dataSize.ToInt()}).BitCast({size.ToInt()})";
-    }
+        => size == dataSize? "" : $".BitCast({dataSize.ToInt()}).BitCast({size.ToInt()})";
 
     static string PullBool(int byteCount)
-    {
-        if(byteCount == 1)
-            return "data.Pull(1).GetBytes()[0] != 0";
-        return $"data.Pull({byteCount}).IsNotNull()";
-    }
+        => byteCount == 1
+            ? "data.Pull(1).GetBytes()[0] != 0"
+            : $"data.Pull({byteCount}).IsNotNull()";
 
     void BackIndent() => IndentLevel--;
     void Indent() => IndentLevel++;
