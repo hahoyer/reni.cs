@@ -97,8 +97,6 @@ x == Auswahl Nein then ""No match"" dump_print
 !public  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
 };
 
-z: 2;
-z = 3 then ""???"" dump_print;
 x: Auswahl Ja;
 x == Auswahl Ja then ""Match"" dump_print;
 x == Auswahl Nein then ""No match"" dump_print",
