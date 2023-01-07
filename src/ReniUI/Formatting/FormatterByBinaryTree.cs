@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 
@@ -38,8 +35,8 @@ sealed class FormatterByBinaryTree : DumpableObject, IFormatter
         if(targetPart == null)
             return true;
         var sourcePart = editPiece.Remove;
-        return targetPart.Source == sourcePart.Source &&
-            targetPart.Position <= sourcePart.EndPosition &&
-            sourcePart.Position <= targetPart.EndPosition;
+        return targetPart.Source == sourcePart.Source
+            && targetPart.Position <= sourcePart.EndPosition
+            && sourcePart.Position <= targetPart.EndPosition;
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
@@ -8,216 +6,213 @@ using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 
-namespace Reni.Feature
+namespace Reni.Feature;
+
+interface IEvalImplementation
 {
-    interface IEvalImplementation
-    {
-        IFunction Function { get; }
-        IValue Value { get; }
-    }
+    IFunction Function { get; }
+    IValue Value { get; }
+}
 
-    interface IMetaImplementation
-    {
-        IMeta Function { get; }
-    }
+interface IMetaImplementation
+{
+    IMeta Function { get; }
+}
 
-    interface IImplementation : IEvalImplementation, IMetaImplementation {}
+interface IImplementation : IEvalImplementation, IMetaImplementation { }
 
-    abstract class FunctionFeatureImplementation
-        : DumpableObject, IImplementation, IFunction
-    {
-        protected FunctionFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) {}
+abstract class FunctionFeatureImplementation
+    : DumpableObject, IImplementation, IFunction
+{
+    protected FunctionFeatureImplementation(int? nextObjectId)
+        : base(nextObjectId) { }
 
-        protected FunctionFeatureImplementation() { }
+    protected FunctionFeatureImplementation() { }
+    IFunction IEvalImplementation.Function => this;
+    IValue IEvalImplementation.Value => null;
 
-        IMeta IMetaImplementation.Function => null;
-        IFunction IEvalImplementation.Function => this;
-        IValue IEvalImplementation.Value => null;
+    bool IFunction.IsImplicit => IsImplicit;
 
-        Result IFunction.Result(Category category, TypeBase argsType)
-            => Result(category, argsType);
+    Result IFunction.Result(Category category, TypeBase argsType)
+        => Result(category, argsType);
 
-        bool IFunction.IsImplicit => IsImplicit;
+    IMeta IMetaImplementation.Function => null;
 
-        protected abstract Result Result(Category category, TypeBase argsType);
-        protected abstract bool IsImplicit { get; }
-    }
+    protected abstract Result Result(Category category, TypeBase argsType);
+    protected abstract bool IsImplicit { get; }
+}
 
-    abstract class ContextMetaFeatureImplementation
-        : DumpableObject
-            , IImplementation
-            , IMeta
-    {
-        IMeta IMetaImplementation.Function => this;
-        IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => null;
+abstract class ContextMetaFeatureImplementation
+    : DumpableObject
+        , IImplementation
+        , IMeta
+{
+    IFunction IEvalImplementation.Function => null;
+    IValue IEvalImplementation.Value => null;
 
-        Result IMeta.Result
-            (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
-            => Result(contextBase, category, right);
+    Result IMeta.Result
+        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
+        => Result(contextBase, category, right);
 
-        protected abstract Result Result
-            (ContextBase contextBase, Category category, ValueSyntax right);
-    }
+    IMeta IMetaImplementation.Function => this;
+
+    protected abstract Result Result
+        (ContextBase contextBase, Category category, ValueSyntax right);
+}
+
+/// <summary>
+///     Provide the result as a transformation from arg of type Source
+/// </summary>
+interface IConversion
+{
+    Result Execute(Category category);
+    TypeBase Source { get; }
+}
+
+interface IValue
+{
+    Result Execute(Category category);
+}
+
+interface IFunction
+{
+    /// <summary>
+    ///     Result code contains CodeBase.Arg for argsType and ObjectReference for function object, if appropriate
+    /// </summary>
+    /// <param name="category"> </param>
+    /// <param name="argsType"> </param>
+    /// <returns> </returns>
+    Result Result(Category category, TypeBase argsType);
 
     /// <summary>
-    ///     Provide the result as a transformation from arg of type Source
+    ///     Gets a value indicating whether this function requires implicit call (i. e. call without argument list).
     /// </summary>
-    interface IConversion
-    {
-        Result Execute(Category category);
-        TypeBase Source { get; }
-    }
+    /// <value>
+    ///     <c>true</c> if this instance is implicit; otherwise, <c>false</c>.
+    /// </value>
+    [DisableDump]
+    bool IsImplicit { get; }
+}
 
-    interface IValue
-    {
-        Result Execute(Category category);
-    }
+interface IMeta
+{
+    Result Result
+        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
+}
 
-    interface IFunction
-    {
-        /// <summary>
-        ///     Result code contains CodeBase.Arg for argsType and ObjectReference for function object, if appropriate
-        /// </summary>
-        /// <param name="category"> </param>
-        /// <param name="argsType"> </param>
-        /// <returns> </returns>
-        Result Result(Category category, TypeBase argsType);
+interface ISearchTarget { }
 
-        /// <summary>
-        ///     Gets a value indicating whether this function requires implicit call (i. e. call without argument list).
-        /// </summary>
-        /// <value>
-        ///     <c>true</c> if this instance is implicit; otherwise, <c>false</c>.
-        /// </value>
-        [DisableDump]
-        bool IsImplicit { get; }
-    }
+// ReSharper disable once TypeParameterCanBeVariant
+// Exact match for TDefinable is required here.
+interface ISymbolProviderForPointer<TDefinable>
+    where TDefinable : Definable
+{
+    IImplementation Feature(TDefinable tokenClass);
+}
 
-    interface IMeta
-    {
-        Result Result
-            (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
-    }
+// ReSharper disable once TypeParameterCanBeVariant
+// Exact match for TDefinable is required here.
+interface ISymbolProvider<TDefinable>
+    where TDefinable : Definable
+{
+    IImplementation Feature(TDefinable tokenClass);
+}
 
-    interface ISearchTarget {}
+interface IGenericProviderForType
+{
+    IEnumerable<IConversion> GetForcedConversions(TypeBase typeBase);
+}
 
-    // ReSharper disable once TypeParameterCanBeVariant
-    // Exact match for TDefinable is required here.
-    interface ISymbolProviderForPointer<TDefinable>
-        where TDefinable : Definable
-    {
-        IImplementation Feature(TDefinable tokenClass);
-    }
+interface IDeclarationProvider
+{
+    IEnumerable<SearchResult> Declarations(TypeBase source);
+    IEnumerable<IImplementation> Declarations(ContextBase source);
+}
 
-    // ReSharper disable once TypeParameterCanBeVariant
-    // Exact match for TDefinable is required here.
-    interface ISymbolProvider<TDefinable>
-        where TDefinable : Definable
-    {
-        IImplementation Feature(TDefinable tokenClass);
-    }
+sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
+{
+    readonly T Target;
+    public GenericProviderForType(T target) => Target = target;
 
-    interface IGenericProviderForType
-    {
-        IEnumerable<IConversion> GetForcedConversions(TypeBase typeBase);
-    }
+    IEnumerable<IConversion> IGenericProviderForType.GetForcedConversions(TypeBase source)
+        => source.GetForcedConversions(Target);
+}
 
-    interface IDeclarationProvider
-    {
-        IEnumerable<SearchResult> Declarations(TypeBase source);
-        IEnumerable<IImplementation> Declarations(ContextBase source);
-    }
+sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvider
+    where T : Definable
+{
+    readonly T Target;
+    public GenericProviderForDefinable(T target) => Target = target;
 
-    sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
-    {
-        readonly T Target;
-        public GenericProviderForType(T target) { Target = target; }
+    IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
+        => source.Declarations(Target);
 
-        IEnumerable<IConversion> IGenericProviderForType.GetForcedConversions(TypeBase source)
-            => source.GetForcedConversions(Target);
-    }
+    IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
+        => source.Declarations(Target);
+}
 
-    sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvider
-        where T : Definable
-    {
-        readonly T Target;
-        public GenericProviderForDefinable(T target) { Target = target; }
+sealed class MetaFunction : DumpableObject, IImplementation, IMeta
+{
+    readonly Func<Category, ResultCache, ContextBase, ValueSyntax, Result> Function;
 
-        IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
-            => source.Declarations(Target);
+    public MetaFunction
+        (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
+        => Function = function;
 
-        IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
-            => source.Declarations(Target);
-    }
+    IFunction IEvalImplementation.Function => null;
+    IValue IEvalImplementation.Value => null;
 
-    sealed class MetaFunction : DumpableObject, IImplementation, IMeta
-    {
-        readonly Func<Category, ResultCache, ContextBase, ValueSyntax, Result> Function;
+    Result IMeta.Result
+        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
+        => Function(category, left, contextBase, right);
 
-        public MetaFunction
-            (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
-        {
-            Function = function;
-        }
+    IMeta IMetaImplementation.Function => this;
+}
 
-        IMeta IMetaImplementation.Function => this;
-        IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => null;
+sealed class ContextMetaFunction : ContextMetaFeatureImplementation
+{
+    readonly Func<ContextBase, Category, ValueSyntax, Result> Function;
 
-        Result IMeta.Result
-            (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
-            => Function(category, left, contextBase, right);
-    }
+    public ContextMetaFunction(Func<ContextBase, Category, ValueSyntax, Result> function) => Function = function;
 
-    sealed class ContextMetaFunction : ContextMetaFeatureImplementation
-    {
-        readonly Func<ContextBase, Category, ValueSyntax, Result> Function;
+    protected override Result Result
+        (ContextBase contextBase, Category category, ValueSyntax right)
+        => Function(contextBase, category, right);
+}
 
-        public ContextMetaFunction(Func<ContextBase, Category, ValueSyntax, Result> function)
-        {
-            Function = function;
-        }
+sealed class ContextMetaFunctionFromSyntax
+    : DumpableObject, IImplementation, IMeta
+{
+    [EnableDump]
+    readonly ValueSyntax Definition;
 
-        protected override Result Result
-            (ContextBase contextBase, Category category, ValueSyntax right)
-            => Function(contextBase, category, right);
-    }
+    public ContextMetaFunctionFromSyntax(ValueSyntax definition) => Definition = definition;
+    IFunction IEvalImplementation.Function => null;
+    IValue IEvalImplementation.Value => null;
 
-    sealed class ContextMetaFunctionFromSyntax
-        : DumpableObject, IImplementation, IMeta
-    {
-        [EnableDump]
-        readonly ValueSyntax Definition;
-        public ContextMetaFunctionFromSyntax(ValueSyntax definition) { Definition = definition; }
+    Result IMeta.Result
+        (Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
+        => callContext.Result(category, Definition.ReplaceArg(right));
 
-        IMeta IMetaImplementation.Function => this;
-        IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => null;
+    IMeta IMetaImplementation.Function => this;
+}
 
-        Result IMeta.Result
-            (Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
-            => callContext.Result(category, Definition.ReplaceArg(right));
-    }
+interface IForcedConversionProvider<in TDestination>
+{
+    IEnumerable<IConversion> Result(TDestination destination);
+}
 
-    interface IForcedConversionProvider<in TDestination>
-    {
-        IEnumerable<IConversion> Result(TDestination destination);
-    }
+interface IForcedConversionProviderForPointer<in TDestination>
+{
+    IEnumerable<IConversion> Result(TDestination destination);
+}
 
-    interface IForcedConversionProviderForPointer<in TDestination>
-    {
-        IEnumerable<IConversion> Result(TDestination destination);
-    }
+interface IChild<out TParent>
+{
+    TParent Parent { get; }
+}
 
-    interface IChild<out TParent>
-    {
-        TParent Parent { get; }
-    }
-
-    interface ISourceProvider
-    {
-        SourcePart Value { get; }
-    }
+interface ISourceProvider
+{
+    SourcePart Value { get; }
 }

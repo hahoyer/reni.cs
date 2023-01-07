@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -23,6 +22,17 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
 
     WhiteSpaceItem[] ItemsCache;
 
+    [EnableDump]
+    internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
+
+    [DisableDump]
+    internal bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
+
+    bool HasVolatileLineBreak => Type is IVolatileLineBreak || Items.Any(item => item.HasVolatileLineBreak);
+
+    internal bool HasLineBreak
+        => HasStableLineBreak || HasVolatileLineBreak;
+
     internal WhiteSpaceItem(SourcePart sourcePart)
         : this(RootType.Instance, sourcePart, null) { }
 
@@ -45,19 +55,8 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
 
     protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
-    [EnableDump]
-    internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
-
-    [DisableDump]
-    internal bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
-
-    bool HasVolatileLineBreak => Type is IVolatileLineBreak || Items.Any(item => item.HasVolatileLineBreak);
-
-    internal bool HasLineBreak
-        => HasStableLineBreak || HasVolatileLineBreak;
-
     public bool IsNotEmpty(bool areEmptyLinesPossible)
-        => Items.Any(item => item.Type is IComment || areEmptyLinesPossible && item.Type is IVolatileLineBreak);
+        => Items.Any(item => item.Type is IComment || (areEmptyLinesPossible && item.Type is IVolatileLineBreak));
 
     WhiteSpaceItem[] GetItems()
         => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhiteSpaceItem[0];
@@ -79,7 +78,7 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
 
     internal string FlatFormat(bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
     {
-        if(HasStableLineBreak || areEmptyLinesPossible && HasVolatileLineBreak)
+        if(HasStableLineBreak || (areEmptyLinesPossible && HasVolatileLineBreak))
             return null;
 
         var result = Items

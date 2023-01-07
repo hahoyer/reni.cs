@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using hw.Scanner;
 
-namespace ReniUI.Formatting
+namespace ReniUI.Formatting;
+
+interface IFormatter
 {
-    interface IFormatter
-    {
-        IEnumerable<Edit> GetEditPieces(CompilerBrowser compiler, SourcePart targetPart);
-    }
+    IEnumerable<Edit> GetEditPieces(CompilerBrowser compiler, SourcePart targetPart);
 }

@@ -1,4 +1,3 @@
-using System;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;

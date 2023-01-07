@@ -1,12 +1,4 @@
-using System;
+namespace ReniUI.Formatting;
 
-namespace ReniUI.Formatting
-{
-    [Obsolete("", true)]
-    enum IndentDirection
-    {
-        ToLeft
-        , ToRight
-        , NoIndent
-    }
-}
+[Obsolete("", true)]
+enum IndentDirection { ToLeft, ToRight, NoIndent }

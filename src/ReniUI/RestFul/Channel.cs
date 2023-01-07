@@ -1,61 +1,58 @@
-﻿using System;
-using System.Linq;
-using hw.Helper;
+﻿using hw.Helper;
 using JetBrains.Annotations;
 using Reni;
 
-namespace ReniUI.RestFul
+namespace ReniUI.RestFul;
+
+public sealed class Channel
 {
-    public sealed class Channel
+    sealed class ExecutionProhibitedException : Exception { }
+
+    readonly ValueCache<CompilerBrowser> CompilerCache;
+    readonly ValueCache<StringStream> ResultCache;
+    string TextValue;
+
+    public string Text
     {
-        sealed class ExecutionProhibitedException : Exception { }
-
-        readonly ValueCache<CompilerBrowser> CompilerCache;
-        readonly ValueCache<StringStream> ResultCache;
-        string TextValue;
-
-        public Channel()
+        get => TextValue;
+        set
         {
-            ResultCache = new(GetResult);
-            CompilerCache = new(CreateCompiler);
+            if(value == TextValue)
+                return;
+
+            TextValue = value;
+            CompilerCache.IsValid = false;
+            ResultCache.IsValid = false;
         }
+    }
 
-        public string Text
-        {
-            get => TextValue;
-            set
-            {
-                if(value == TextValue)
-                    return;
+    public Channel()
+    {
+        ResultCache = new(GetResult);
+        CompilerCache = new(CreateCompiler);
+    }
 
-                TextValue = value;
-                CompilerCache.IsValid = false;
-                ResultCache.IsValid = false;
-            }
-        }
+    CompilerBrowser CreateCompiler()
+        => CompilerBrowser.FromText(TextValue);
 
-        CompilerBrowser CreateCompiler()
-            => CompilerBrowser.FromText(TextValue);
+    StringStream GetResult() => CompilerCache.Value.Result;
 
-        StringStream GetResult() => CompilerCache.Value.Result;
+    [PublicAPI]
+    public Issue[] GetIssues() => CompilerCache.Value.Issues.Select(Issue.Create).ToArray();
 
-        [PublicAPI]
-        public Issue[] GetIssues() => CompilerCache.Value.Issues.Select(Issue.Create).ToArray();
+    public void ResetResult() => ResultCache.IsValid = false;
 
-        public void ResetResult() => ResultCache.IsValid = false;
+    public string GetOutput()
+    {
+        if(GetIssues().Any())
+            throw new ExecutionProhibitedException();
+        return ResultCache.Value.Data;
+    }
 
-        public string GetOutput()
-        {
-            if(GetIssues().Any())
-                throw new ExecutionProhibitedException();
-            return ResultCache.Value.Data;
-        }
-
-        public string GetUnexpectedErrors()
-        {
-            if(GetIssues().Any())
-                return "";
-            return ResultCache.Value.Log;
-        }
+    public string GetUnexpectedErrors()
+    {
+        if(GetIssues().Any())
+            return "";
+        return ResultCache.Value.Log;
     }
 }

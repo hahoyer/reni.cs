@@ -1,40 +1,33 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 
-namespace ReniUI.Test.UserInteraction
+namespace ReniUI.Test.UserInteraction;
+
+[TestFixture]
+[UnitTest]
+[UserInterAction]
+public sealed class UserInterAction2 : DependenceProvider
 {
-    [TestFixture]
+    const string Text = @"#(aa comment aa)# !mutable name: 3";
+    const string Type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
+
+    [Test]
     [UnitTest]
-    [UserInterAction]
-    public sealed class UserInterAction2 : DependenceProvider
+    public void GetTokenForPosition()
     {
-        const string Text = @"#(aa comment aa)# !mutable name: 3";
-        const string Type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
+        var compiler = CompilerBrowser.FromText(Text);
 
-        [Test]
-        [UnitTest]
-        public void GetTokenForPosition()
-        {
-            var compiler = CompilerBrowser.FromText(Text);
-
-            var typeCharacters = new string
-            (
-                Text
-                    .Length
-                    .Select(item => compiler.Locate(item).TypeCharacter)
-                    .ToArray()
-            );
-            (Type == typeCharacters).Assert
-            (() =>
-                "\nXpctd: " +
-                Type +
-                "\nFound: " +
-                typeCharacters +
-                "\nText : " +
-                Text
-            );
-        }
+        var typeCharacters = new string
+        (
+            Text
+                .Length
+                .Select(item => compiler.Locate(item).TypeCharacter)
+                .ToArray()
+        );
+        (Type == typeCharacters).Assert
+        (() =>
+            "\nXpctd: " + Type + "\nFound: " + typeCharacters + "\nText : " + Text
+        );
     }
 }

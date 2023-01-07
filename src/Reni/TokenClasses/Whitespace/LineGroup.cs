@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -24,24 +22,6 @@ sealed class LineGroup : DumpableObject
     readonly int Lines;
     readonly bool IsLast;
     readonly IConfiguration Configuration;
-
-    internal LineGroup
-    (
-        SourcePart sourcePart
-        , IItemType predecessor
-        , int lines
-        , bool isLast
-        , IConfiguration configuration
-    )
-    {
-        SourcePart = sourcePart;
-        Predecessor = predecessor;
-        Lines = lines;
-        IsLast = isLast;
-        Configuration = configuration;
-    }
-
-    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
     int PredecessorLine => Predecessor is ILine? 1 : 0;
 
@@ -90,11 +70,26 @@ sealed class LineGroup : DumpableObject
     ///     Otherwise it will be zero or one spaces<br />
     ///     depending of separator request of the current position (head/inner/tail/flat).
     /// </summary>
-    int? TargetSpacesCount => LineBreakMode
-        ? null
-        : Configuration.SeparatorRequests.Get(Predecessor == null, IsLast)
-            ? 1
-            : 0;
+    int? TargetSpacesCount => LineBreakMode? null :
+        Configuration.SeparatorRequests.Get(Predecessor == null, IsLast)? 1 : 0;
+
+    internal LineGroup
+    (
+        SourcePart sourcePart
+        , IItemType predecessor
+        , int lines
+        , bool isLast
+        , IConfiguration configuration
+    )
+    {
+        SourcePart = sourcePart;
+        Predecessor = predecessor;
+        Lines = lines;
+        IsLast = isLast;
+        Configuration = configuration;
+    }
+
+    protected override string GetNodeDump() => SourcePart.NodeDump + " " + base.GetNodeDump();
 
     internal IEnumerable<Edit> GetEdits(int indent)
     {

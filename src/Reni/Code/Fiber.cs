@@ -1,135 +1,132 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.Type;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class Fiber : CodeBase
 {
-    sealed class Fiber : CodeBase
+    static int NextObjectId;
+
+    [Node]
+    internal readonly FiberHead FiberHead;
+
+    [Node]
+    internal readonly FiberItem[] FiberItems;
+
+    [DisableDump]
+    internal new bool HasArg => FiberHead.HasArg || FiberItems.Any(x => x.HasArg);
+
+    internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
+        : this(fiberHead, null, fiberItem) { }
+
+    Fiber(FiberHead fiberHead, IEnumerable<FiberItem> fiberItems, FiberItem fiberItem)
+        : base(NextObjectId++)
     {
-        static int NextObjectId;
+        FiberHead = fiberHead;
+        var l = new List<FiberItem>();
+        if(fiberItems != null)
+            l.AddRange(fiberItems);
+        if(fiberItem != null)
+            l.Add(fiberItem);
+        FiberItems = l.ToArray();
+        AssertValid();
 
-        [Node]
-        internal readonly FiberHead FiberHead;
+        StopByObjectIds();
+    }
 
-        [Node]
-        internal readonly FiberItem[] FiberItems;
+    internal override bool IsRelativeReference => FiberHead.IsRelativeReference;
 
-        internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
-            : this(fiberHead, null, fiberItem) { }
-
-        Fiber(FiberHead fiberHead, IEnumerable<FiberItem> fiberItems, FiberItem fiberItem)
-            : base(NextObjectId++)
+    protected override Size GetTemporarySize()
+    {
+        var result = FiberHead.TemporarySize;
+        var sizeSoFar = FiberHead.Size;
+        foreach(var codeBase in FiberItems)
         {
-            FiberHead = fiberHead;
-            var l = new List<FiberItem>();
-            if(fiberItems != null)
-                l.AddRange(fiberItems);
-            if(fiberItem != null)
-                l.Add(fiberItem);
-            FiberItems = l.ToArray();
-            AssertValid();
-
-            StopByObjectIds();
+            sizeSoFar -= codeBase.InputSize;
+            var newResult = sizeSoFar + codeBase.TemporarySize;
+            sizeSoFar += codeBase.OutputSize;
+            result = result.Max(newResult).Max(sizeSoFar);
         }
 
-        internal override bool IsRelativeReference => FiberHead.IsRelativeReference;
+        return result;
+    }
 
-        protected override Size GetTemporarySize()
+    protected override Size GetSize() => FiberItems.Last().OutputSize;
+
+    protected override Closures GetRefsImplementation()
+        => FiberItems
+            .Aggregate
+                (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));
+
+    internal override CodeBase Add(FiberItem subsequentElement)
+    {
+        var lastFiberItems = new List<FiberItem>
         {
-            var result = FiberHead.TemporarySize;
-            var sizeSoFar = FiberHead.Size;
-            foreach(var codeBase in FiberItems)
+            subsequentElement
+        };
+        var fiberItems = new List<FiberItem>(FiberItems);
+        while(lastFiberItems.Count > 0)
+            if(fiberItems.Count > 0)
             {
-                sizeSoFar -= codeBase.InputSize;
-                var newResult = sizeSoFar + codeBase.TemporarySize;
-                sizeSoFar += codeBase.OutputSize;
-                result = result.Max(newResult).Max(sizeSoFar);
-            }
-
-            return result;
-        }
-
-        protected override Size GetSize() => FiberItems.Last().OutputSize;
-
-        protected override Closures GetRefsImplementation()
-            => FiberItems
-                .Aggregate
-                    (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));
-
-        internal override CodeBase Add(FiberItem subsequentElement)
-        {
-            var lastFiberItems = new List<FiberItem>
-            {
-                subsequentElement
-            };
-            var fiberItems = new List<FiberItem>(FiberItems);
-            while(lastFiberItems.Count > 0)
-                if(fiberItems.Count > 0)
-                {
-                    var newLastFiberItems = fiberItems.Last().TryToCombine(lastFiberItems[0]);
-                    if(newLastFiberItems == null)
-                    {
-                        fiberItems.AddRange(lastFiberItems);
-                        lastFiberItems.RemoveAll(x => true);
-                    }
-                    else
-                    {
-                        fiberItems.Remove(fiberItems.Last());
-                        fiberItems.AddRange(newLastFiberItems);
-                        lastFiberItems.RemoveAt(0);
-                    }
-                }
-                else
+                var newLastFiberItems = fiberItems.Last().TryToCombine(lastFiberItems[0]);
+                if(newLastFiberItems == null)
                 {
                     fiberItems.AddRange(lastFiberItems);
                     lastFiberItems.RemoveAll(x => true);
                 }
-
-            if(fiberItems.Count <= 0)
-                return FiberHead;
-            return new Fiber(FiberHead, fiberItems, null);
-        }
-
-        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
-            => actual.Fiber(this);
-
-        internal override void Visit(IVisitor visitor)
-            => visitor.Fiber(FiberHead, FiberItems);
-
-        public override string DumpData()
-        {
-            var result = "";
-            result += "[*] " + FiberHead.Dump() + "\n";
-            result += FiberItems.DumpLines();
-            return result.Substring(0, result.Length - 1);
-        }
-
-        [DisableDump]
-        internal new bool HasArg => FiberHead.HasArg || FiberItems.Any(x => x.HasArg);
-
-        void AssertValid()
-        {
-            (!FiberHead.IsNonFiberHeadList).Assert(Dump);
-            FiberItems.Any().Assert(Dump);
-            var lastSize = FiberHead.Size;
-            foreach(var t in FiberItems)
-            {
-                (lastSize == t.InputSize).Assert(Dump);
-                lastSize = t.OutputSize;
+                else
+                {
+                    fiberItems.Remove(fiberItems.Last());
+                    fiberItems.AddRange(newLastFiberItems);
+                    lastFiberItems.RemoveAt(0);
+                }
             }
-        }
+            else
+            {
+                fiberItems.AddRange(lastFiberItems);
+                lastFiberItems.RemoveAll(x => true);
+            }
 
-        internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
-            => (newHead ?? FiberHead)
-                .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
-
-        internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
-            => new[] { FiberHead.Visit(argTypeVisitor) }
-                .Concat(FiberItems.Select(x => x.Visit(argTypeVisitor)))
-                .DistinctNotNull();
+        if(fiberItems.Count <= 0)
+            return FiberHead;
+        return new Fiber(FiberHead, fiberItems, null);
     }
+
+    protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        => actual.Fiber(this);
+
+    internal override void Visit(IVisitor visitor)
+        => visitor.Fiber(FiberHead, FiberItems);
+
+    public override string DumpData()
+    {
+        var result = "";
+        result += "[*] " + FiberHead.Dump() + "\n";
+        result += FiberItems.DumpLines();
+        return result.Substring(0, result.Length - 1);
+    }
+
+    void AssertValid()
+    {
+        (!FiberHead.IsNonFiberHeadList).Assert(Dump);
+        FiberItems.Any().Assert(Dump);
+        var lastSize = FiberHead.Size;
+        foreach(var t in FiberItems)
+        {
+            (lastSize == t.InputSize).Assert(Dump);
+            lastSize = t.OutputSize;
+        }
+    }
+
+    internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
+        => (newHead ?? FiberHead)
+            .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
+
+    internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
+        => new[] { FiberHead.Visit(argTypeVisitor) }
+            .Concat(FiberItems.Select(x => x.Visit(argTypeVisitor)))
+            .DistinctNotNull();
 }

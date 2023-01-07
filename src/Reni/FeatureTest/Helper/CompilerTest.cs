@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
@@ -38,6 +35,26 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     [UsedImplicitly]
     Compiler[] RunResults;
 
+    TargetSetData[] TargetSet
+    {
+        get
+        {
+            var result = GetType()
+                .GetAttributes<TargetSetAttribute>(true)
+                .Select(tsa => tsa.TargetSet)
+                .ToArray();
+
+            if(Target == "")
+                return result;
+
+            return result
+                .Concat(new[] { new TargetSetData(Target, Output) })
+                .ToArray();
+        }
+    }
+
+    public string[] Targets => TargetSet.Select(item => item.Target).ToArray();
+
     protected CompilerTest()
     {
         Parameters = new();
@@ -64,26 +81,6 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
         => (!issues.Any()).Assert(() => issues.Select(issue => issue.LogDump).Stringify("\n"));
 
     protected virtual void AssertValid(Compiler c) { }
-
-    TargetSetData[] TargetSet
-    {
-        get
-        {
-            var result = GetType()
-                .GetAttributes<TargetSetAttribute>(true)
-                .Select(tsa => tsa.TargetSet)
-                .ToArray();
-
-            if(Target == "")
-                return result;
-
-            return result
-                .Concat(new[] { new TargetSetData(Target, Output) })
-                .ToArray();
-        }
-    }
-
-    public string[] Targets => TargetSet.Select(item => item.Target).ToArray();
 
     internal Compiler CreateFileAndRunCompiler
     (

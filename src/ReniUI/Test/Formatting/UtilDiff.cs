@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
+
 
 // ReSharper disable InconsistentNaming
-// ReSharper disable CheckNamespace
 
 // Copyright (c) 2006, 2008 Tony Garnock-Jones <tonyg@lshift.net>
 // Copyright (c) 2006, 2008 LShift Ltd. <query@lshift.net>
@@ -44,7 +42,7 @@ using System.Collections.Generic;
 //
 
 
-namespace hw.Helper;
+namespace ReniUI.Test.Formatting;
 
 public class UtilDiff
 {
@@ -203,9 +201,7 @@ public class UtilDiff
                 var j = file2indices[jX];
 
                 for(s = r; s < candidates.Count; s++)
-                    if(candidates[s].file2index < j &&
-                       (s == candidates.Count - 1 ||
-                           candidates[s + 1].file2index > j))
+                    if(candidates[s].file2index < j && (s == candidates.Count - 1 || candidates[s + 1].file2index > j))
                         break;
 
                 if(s < candidates.Count)

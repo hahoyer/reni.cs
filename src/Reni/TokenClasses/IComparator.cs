@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using hw.Scanner;
 
-namespace Reni.TokenClasses {
-    public interface IComparator
-    {
-        IEqualityComparer<IItem> WhiteSpaceComparer {get;}
-    }
+namespace Reni.TokenClasses;
+
+public interface IComparator
+{
+    IEqualityComparer<IItem> WhiteSpaceComparer { get; }
 }

@@ -1,30 +1,30 @@
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Feature;
 
-namespace Reni.Type
+namespace Reni.Type;
+
+sealed class StableReferenceType
+    : TagChild<PointerType>
 {
-    sealed class StableReferenceType
-        : TagChild<PointerType>
-    {
-        internal StableReferenceType(PointerType parent)
-            : base(parent) { }
+    internal StableReferenceType(PointerType parent)
+        : base(parent) { }
 
-        [DisableDump]
-        internal override bool IsAligningPossible => false;
-        [DisableDump]
-        internal override bool IsPointerPossible => false;
-        [DisableDump]
-        protected override IEnumerable<IConversion> StripConversions
-            => base.StripConversions
-                .Concat(new[] {Feature.Extension.Conversion(ConvertToPointer)});
-        [DisableDump]
-        internal override TypeBase Weaken => Parent;
+    [DisableDump]
+    internal override bool IsAligningPossible => false;
 
-        Result ConvertToPointer(Category category) => Mutation(Parent) & category;
+    [DisableDump]
+    internal override bool IsPointerPossible => false;
 
-        protected override string TagTitle => "stable";
-    }
+    [DisableDump]
+    protected override IEnumerable<IConversion> StripConversions
+        => base.StripConversions
+            .Concat(new[] { Feature.Extension.Conversion(ConvertToPointer) });
+
+    [DisableDump]
+    internal override TypeBase Weaken => Parent;
+
+    protected override string TagTitle => "stable";
+
+    Result ConvertToPointer(Category category) => Mutation(Parent) & category;
 }

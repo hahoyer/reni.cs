@@ -1,9 +1,6 @@
-using System.Collections.Generic;
+namespace ReniUI.Formatting;
 
-namespace ReniUI.Formatting
+interface IEditPieces
 {
-    interface IEditPieces
-    {
-        IEnumerable<Edit> Get(IEditPiecesConfiguration parameter);
-    }
+    IEnumerable<Edit> Get(IEditPiecesConfiguration parameter);
 }

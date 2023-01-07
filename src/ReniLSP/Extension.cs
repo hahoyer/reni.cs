@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.Scanner;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using ReniUI.Classification;
@@ -23,7 +22,7 @@ static class Extension
             yield return "variable";
     }
 
-    public static Range GetRange(this SourcePart token)
+    public static OmniSharp.Extensions.LanguageServer.Protocol.Models.Range GetRange(this SourcePart token)
     {
         var range = token.TextPosition;
         return new(range.start.LineNumber, range.start.ColumnNumber1 - 1, range.end.LineNumber

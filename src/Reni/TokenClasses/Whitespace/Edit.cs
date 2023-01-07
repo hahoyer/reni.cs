@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using JetBrains.Annotations;
@@ -15,6 +14,13 @@ public sealed class Edit : DumpableObject
 
     internal readonly string Flag;
 
+    [EnableDump(Order = 1)]
+    string Position => Remove.NodeDump;
+
+    [DisableDump]
+    [PublicAPI]
+    internal bool IsEmpty => Insert == "" && Remove.Length == 0;
+
     internal Edit(SourcePart remove, string insert, string flag)
     {
         Remove = remove;
@@ -23,13 +29,6 @@ public sealed class Edit : DumpableObject
     }
 
     protected override string GetNodeDump() => Flag ?? base.GetNodeDump();
-
-    [EnableDump(Order = 1)]
-    string Position => Remove.NodeDump;
-
-    [DisableDump]
-    [PublicAPI]
-    internal bool IsEmpty => Insert == "" && Remove.Length == 0;
 
     static Edit Create1(SourcePart sourcePart, string insert)
     {

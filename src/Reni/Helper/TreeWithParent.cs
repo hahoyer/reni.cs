@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 
@@ -14,6 +13,17 @@ abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.ICo
     [DisableDump]
     internal readonly TResult Parent;
 
+    internal TResult[] DirectChildren
+    {
+        get
+        {
+            var cachedItem = this.CachedItem(() => FlatItem.DirectChildCount.Select(CreateDirectChild).ToArray());
+            return
+                //IsInDump && !cachedItem.IsValid? null : 
+                cachedItem.Value;
+        }
+    }
+
     protected TreeWithParent(TTarget flatItem, TResult parent)
     {
         FlatItem = flatItem;
@@ -23,17 +33,6 @@ abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.ICo
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
     protected abstract TResult Create(TTarget flatItem);
-
-    internal TResult[] DirectChildren
-    {
-        get
-        {
-            var cachedItem = this.CachedItem(() => FlatItem.DirectChildCount.Select(CreateDirectChild).ToArray());
-            return 
-                //IsInDump && !cachedItem.IsValid? null : 
-                    cachedItem.Value;
-        }
-    }
 
     TResult CreateDirectChild(int index)
     {

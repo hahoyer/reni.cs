@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -22,31 +21,12 @@ sealed class BinaryTreeProxy
     [EnableDumpExcept(null)]
     internal Position LineBreakBehaviour;
 
-    BinaryTreeProxy(BinaryTree target, Configuration configuration, BinaryTreeProxy parent)
-        : base(target, parent)
-    {
-        Configuration = configuration;
-        Formatter.SetFormatters(target);
-        StopByObjectIds();
-    }
-
-    BinaryTreeProxy()
-        : base(null, null) { }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
-
-    protected override string Dump(bool isRecursion) => FlatItem == null? "?" : base.Dump(isRecursion);
-
-    protected override BinaryTreeProxy Create(BinaryTree child)
-        => child == null? null : new(child, Configuration, this);
-
     [EnableDump(Order = -3)]
     string MainPosition
-        => FlatItem.SourcePart.GetDumpAroundCurrent() +
-            " " +
-            FlatItem.TokenClass.GetType().PrettyName() +
-            (FlatItem.Formatter == default? "" : " " + FlatItem.Formatter.GetType().Name);
+        => FlatItem.SourcePart.GetDumpAroundCurrent()
+            + " "
+            + FlatItem.TokenClass.GetType().PrettyName()
+            + (FlatItem.Formatter == default? "" : " " + FlatItem.Formatter.GetType().Name);
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(false)]
@@ -127,9 +107,28 @@ sealed class BinaryTreeProxy
     int? FlatLength => FlatItem.GetFlatLength(Configuration.EmptyLineLimit != 0);
 
     bool HasLineBreaksBySyntax
-        => GetHasLineBreaksBySyntax() ||
-            Left != null && Left.HasLineBreaksBySyntax ||
-            Right != null && Right.HasLineBreaksBySyntax;
+        => GetHasLineBreaksBySyntax()
+            || (Left != null && Left.HasLineBreaksBySyntax)
+            || (Right != null && Right.HasLineBreaksBySyntax);
+
+    BinaryTreeProxy(BinaryTree target, Configuration configuration, BinaryTreeProxy parent)
+        : base(target, parent)
+    {
+        Configuration = configuration;
+        Formatter.SetFormatters(target);
+        StopByObjectIds();
+    }
+
+    BinaryTreeProxy()
+        : base(null, null) { }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+    protected override string Dump(bool isRecursion) => FlatItem == null? "?" : base.Dump(isRecursion);
+
+    protected override BinaryTreeProxy Create(BinaryTree child)
+        => child == null? null : new(child, Configuration, this);
 
     bool GetIsLineSplit()
     {
@@ -163,11 +162,8 @@ sealed class BinaryTreeProxy
     }
 
     internal BinaryTreeProxy Convert(BinaryTree target)
-        => FlatItem == target
-            ? this
-            : target.FullToken.End <= FlatItem.FullToken.Start
-                ? Left?.Convert(target)
-                : Right?.Convert(target);
+        => FlatItem == target? this :
+            target.FullToken.End <= FlatItem.FullToken.Start? Left?.Convert(target) : Right?.Convert(target);
 
     void SetupMainPositions() => FlatItem.Formatter?.SetupPositions(this);
 
