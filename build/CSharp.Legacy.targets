@@ -12,7 +12,7 @@
     <!-- CSharp specific settings -->
 
     <PropertyGroup>
-        <LangVersion>default</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <AppDesignerFolder>Properties</AppDesignerFolder>
