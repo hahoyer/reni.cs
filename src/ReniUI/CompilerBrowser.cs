@@ -24,6 +24,8 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     readonly ValueCache<Helper.Syntax> SyntaxCache;
 
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
     public Source Source => Compiler.Source;
 
     internal Compiler Compiler => ParentCache.Value;
@@ -43,7 +45,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     internal IExecutionContext ExecutionContext => Compiler;
     public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
-    internal IEnumerable<Issue> Issues => Compiler.Issues;
+    internal IEnumerable<Issue> Issues => ExceptionGuard(() => Compiler.Issues);
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Helper.Syntax Syntax
@@ -62,7 +64,43 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         SyntaxCache = new(GetSyntax);
     }
 
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
+    TResult ExceptionGuard<TResult>(Func<TResult> getResult)
+    {
+        try
+        {
+            return getResult();
+        }
+        catch(Exception e)
+        {
+            SaveException(e);
+            throw;
+        }
+    }
+
+    void SaveException(Exception exception)
+    {
+        if(!SmbFile.SourceFolder.Exists)
+            return;
+        var folderName = $"At{DateTime.Now:yyMMdd_hhmmss}";
+        var issueFolder = SmbFile.SourceFolder / "Generated" / folderName;
+        (issueFolder / "Exception.txt").String = exception.LogDump();
+        (issueFolder / "Text.reni").String = @$"#( Source: {Compiler.Source.Identifier} )#
+{Compiler.Source.Data}";
+        (issueFolder / "Test.cs").String = @$"
+using hw.Helper;
+using hw.UnitTest;
+
+namespace ReniUI.Generated.{folderName};
+
+[UnitTest]
+public class Test : CompilerTest
+{{
+    protected override string Target => ""Text.reni"".ToSmbFile().String;
+}}
+";
+
+
+    }
 
     public static CompilerBrowser FromText
         (string text, CompilerParameters parameters, string sourceIdentifier = null)
