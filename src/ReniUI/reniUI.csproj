@@ -1,100 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <ProjectGuid>{C339A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
-    <AssemblyName>ReniUI</AssemblyName>
-    <TargetTypeEx>CSharp.Library.Legacy</TargetTypeEx>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetTypeEx>CSharp.Library</TargetTypeEx>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyInfo.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Formatting\Formatter.cs" />
-    <Compile Include="Formatting\FormatterByBinaryTree.cs" />
-    <Compile Include="Formatting\IEditPieces.cs" />
-    <Compile Include="Formatting\IEditPiecesConfiguration.cs" />
-    <Compile Include="Formatting\IndentDirection.cs" />
-    <Compile Include="Formatting\IndentedSourcePartEdit.cs" />
-    <Compile Include="Formatting\BinaryTreeProxy.cs" />
-    <Compile Include="Formatting\Position.cs" />
-    <Compile Include="Test\Classification\Comments.cs" />
-    <Compile Include="Test\Formatting\Comments.cs" />
-    <Compile Include="Test\Formatting\CommentsOfLists.cs" />
-    <Compile Include="Test\Formatting\Exclamation.cs" />
-    <Compile Include="Test\Formatting\FlatStrings.cs" />
-    <Compile Include="Test\Formatting\TrainWreck.cs" />
-    <Compile Include="Test\StrangeExpressions.cs" />
-    <Compile Include="Test\Examples\Enum.cs" />
-    <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
-    <Compile Include="Test\UserInteraction\BigExample.cs" />
-    <Compile Include="Test\UserInteraction\DeclarationOptions.cs" />
-    <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
-    <Compile Include="Test\UserInteraction\UserInterAction.cs" />
-    <Compile Include="Test\UserInteraction\UserInterAction2.cs" />
-    <Content Include="AssemblyInfo.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-    </Content>
-    <Compile Include="Classification\Item.cs" />
-    <Compile Include="Classification\WhiteSpaceItem.cs" />
-    <Compile Include="Formatting\Edit.cs" />
-    <Compile Include="Formatting\EditPieceParameter.cs" />
-    <Compile Include="Formatting\Extension.cs" />
-    <Compile Include="Formatting\ISourcePosition.cs" />
-    <Compile Include="Formatting\WhiteSpaces.cs" />
-    <Compile Include="Formatting\SourcePartEditExtension.cs" />
-    <Compile Include="Formatting\ISourcePartEdit.cs" />
-    <Compile Include="Helper\Syntax.cs" />
-    <Compile Include="CompilerBrowser.cs" />
-    <Compile Include="Extension.cs" />
-    <Compile Include="Persister.cs" />
-    <Compile Include="Formatting\Configuration.cs" />
-    <Compile Include="Formatting\ContactType.cs" />
-    <Compile Include="Formatting\IChainLink.cs" />
-    <Compile Include="Formatting\IFormatter.cs" />
-    <Compile Include="RestFul\Channel.cs" />
-    <Compile Include="RestFul\ChannelRepo.cs" />
-    <Compile Include="RestFul\IChannelRepo.cs" />
-    <Compile Include="RestFul\Issue.cs" />
-    <Compile Include="Test\BracketMatching.cs" />
-    <Compile Include="Test\Classification\All.cs" />
-    <Compile Include="Test\Classification\Basics.cs" />
-    <Compile Include="Test\Classification\Extension.cs" />
-    <Compile Include="Test\Formatting\All.cs" />
-    <Compile Include="Test\Formatting\BadThings.cs" />
-    <Compile Include="Test\Formatting\Basics.cs" />
-    <Compile Include="Test\Formatting\Complex.cs" />
-    <Compile Include="Test\Formatting\Declaration.cs" />
-    <Compile Include="Test\Formatting\Extension.cs" />
-    <Compile Include="Test\Formatting\Lists.cs" />
-    <Compile Include="Test\Formatting\LongTest.cs" />
-    <Compile Include="Test\Formatting\ThenElse.cs" />
-    <Compile Include="Test\Formatting\WithComments.cs" />
-    <Compile Include="Test\ListMatching.cs" />
-    <Compile Include="Test\PairedSyntaxTree.cs" />
-    <Compile Include="Test\ThenElseMatching.cs" />
-    <Compile Include="Test\TokenLocating.cs" />
-    <Compile Include="Classification\Syntax.cs" />
-    <None Include="packages.config" />
-    <None Include="sys.targets" />
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-    <Content Include=".gitignore" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2022.3.1\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Reni\Reni.csproj">
-      <Project>{45d97de4-67c3-4f10-98b4-6618cf7c7bb1}</Project>
-      <Name>Reni</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="sys.targets" />
+    <Import Project="sys.targets" />
+    <ItemGroup>
+      <None Update="AssemblyInfo.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="AssemblyInfo.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>AssemblyInfo.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Reni\Reni.csproj" />
+    </ItemGroup>
 </Project>
+
+

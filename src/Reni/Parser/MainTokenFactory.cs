@@ -1,39 +1,34 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.Parser
+namespace Reni.Parser;
+
+sealed class MainTokenFactory : GenericTokenFactory<BinaryTree>
 {
-    sealed class MainTokenFactory : GenericTokenFactory<BinaryTree>
+    readonly Compiler<BinaryTree>.Component Declaration;
+    readonly List<UserSymbol> UserSymbols = new();
+
+    [DisableDump]
+    internal IEnumerable<IParserTokenType<BinaryTree>> AllTokenClasses
+        => PredefinedTokenClasses.Concat(UserSymbols);
+
+    public MainTokenFactory(Compiler<BinaryTree>.Component declaration, string title)
+        : base(title)
+        => Declaration = declaration;
+
+    protected override IParserTokenType<BinaryTree> SpecialTokenClass(System.Type type)
     {
-        readonly Compiler<BinaryTree>.Component Declaration;
-        readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
+        if(type == typeof(Exclamation))
+            return new Exclamation(Declaration.SubParser);
 
-        public MainTokenFactory(Compiler<BinaryTree>.Component declaration, string title)
-            : base(title)
-        {
-            Declaration = declaration;
-        }
+        return base.SpecialTokenClass(type);
+    }
 
-        protected override IParserTokenType<BinaryTree> SpecialTokenClass(System.Type type)
-        {
-            if(type == typeof(Exclamation))
-                return new Exclamation(Declaration.SubParser);
-
-            return base.SpecialTokenClass(type);
-        }
-
-        protected override IParserTokenType<BinaryTree> GetTokenClass(string name)
-        {
-            var result = new UserSymbol(name);
-            UserSymbols.Add(result);
-            return result;
-        }
-
-        [DisableDump]
-        internal IEnumerable<IParserTokenType<BinaryTree>> AllTokenClasses
-            => PredefinedTokenClasses.Concat(UserSymbols);
+    protected override IParserTokenType<BinaryTree> GetTokenClass(string name)
+    {
+        var result = new UserSymbol(name);
+        UserSymbols.Add(result);
+        return result;
     }
 }

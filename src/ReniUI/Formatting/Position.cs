@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
@@ -23,11 +22,8 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == LeftBracketOuter
-                    ? this
-                    : other == IndentAll
-                        ? LineBreakAndIndent
-                        : base.Combine(other);
+                => other == LeftBracketOuter? this :
+                    other == IndentAll? LineBreakAndIndent : base.Combine(other);
         }
 
         internal sealed class IndentAll : Position
@@ -36,13 +32,9 @@ abstract class Position : DumpableObject
                 : base(indent: Flag.Indent.True) { }
 
             protected override Position Combine(Position other)
-                => other == BeforeToken
-                    ? LineBreakAndIndent
-                    : other == RightBracketInner
-                        ? other
-                        : other == LeftCoupling
-                            ? LeftCouplingWithIndent
-                            : base.Combine(other);
+                => other == BeforeToken? LineBreakAndIndent :
+                    other == RightBracketInner? other :
+                    other == LeftCoupling? LeftCouplingWithIndent : base.Combine(other);
         }
 
         internal sealed class IndentAllAndForceLineSplit : Position
@@ -51,11 +43,8 @@ abstract class Position : DumpableObject
                 : base(indent: Flag.Indent.True, forceLineBreak: Flag.ForceLineBreak.True) { }
 
             protected override Position Combine(Position other)
-                => other == BeforeToken
-                    ? LineBreakAndIndentAndForceLineBreak
-                    : other == RightBracketInner
-                        ? other
-                        : base.Combine(other);
+                => other == BeforeToken? LineBreakAndIndentAndForceLineBreak :
+                    other == RightBracketInner? other : base.Combine(other);
         }
 
         internal sealed class BeforeToken : Position
@@ -91,13 +80,9 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == LeftBracketOuter
-                    ? LeftAfterColonToken
-                    : other == Function
-                        ? null
-                        : other == IndentAll
-                            ? AfterColonTokenWithIndentAll
-                            : base.Combine(other);
+                => other == LeftBracketOuter? LeftAfterColonToken :
+                    other == Function? null :
+                    other == IndentAll? AfterColonTokenWithIndentAll : base.Combine(other);
         }
 
         internal sealed class LeftBracketOuter : Position
@@ -112,13 +97,9 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == LeftBracketOuter
-                    ? null
-                    : other == IndentAllAndForceLineSplit
-                        ? InnerLeftWithIndentAllAndForceLineSplit
-                        : other == IndentAll
-                            ? InnerLeftWithIndentAll
-                            : base.Combine(other);
+                => other == LeftBracketOuter? null :
+                    other == IndentAllAndForceLineSplit? InnerLeftWithIndentAllAndForceLineSplit :
+                    other == IndentAll? InnerLeftWithIndentAll : base.Combine(other);
         }
 
         internal sealed class RightBracketInner : Position
@@ -127,9 +108,9 @@ abstract class Position : DumpableObject
                 : base(lineBreaks: Flag.LineBreaks.Simple) { }
 
             protected override Position Combine(Position other)
-                => other == RightBracketOuter ||
-                    other == AfterListToken ||
-                    other == AfterListTokenWithAdditionalLineBreak
+                => other == RightBracketOuter
+                    || other == AfterListToken
+                    || other == AfterListTokenWithAdditionalLineBreak
                         ? this
                         : base.Combine(other);
         }
@@ -282,14 +263,9 @@ abstract class Position : DumpableObject
     }
 
     protected override string GetNodeDump()
-        => $"{Tag}({LineBreaks:d}" +
-            $"{(ForceLineBreak == default? "" : "!")}" +
-            $"{(Indent == default? "" : ">")}";
+        => $"{Tag}({LineBreaks:d}" + $"{(ForceLineBreak == default? "" : "!")}" + $"{(Indent == default? "" : ">")}";
 
     public static Position operator +(Position first, Position other)
-        => first == null
-            ? other
-            : other == null
-                ? first
-                : first.Combine(other);
+        => first == null? other :
+            other == null? first : first.Combine(other);
 }

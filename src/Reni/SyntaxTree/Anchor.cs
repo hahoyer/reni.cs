@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -15,6 +13,21 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
 {
     internal readonly BinaryTree[] Items;
     readonly string ReasonForEmptiness;
+
+    [DisableDump]
+    internal SourcePart[] SourceParts => Items.SourceParts();
+
+    [DisableDump]
+    internal SourcePart SourcePart => SourceParts.Combine();
+
+    [DisableDump]
+    public IEnumerable<Issue> Issues => Items.SelectMany(node => node.AllIssues);
+
+    [DisableDump]
+    public bool IsEmpty => !Items.Any();
+
+    [DisableDump]
+    internal BinaryTree Main => this.CachedValue(GetMain);
 
     Anchor(params BinaryTree[] items)
     {
@@ -41,21 +54,6 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         var itemDump = ReasonForEmptiness ?? $"[{Items.Length}]";
         return base.GetNodeDump() + itemDump;
     }
-
-    [DisableDump]
-    internal SourcePart[] SourceParts => Items.SourceParts();
-
-    [DisableDump]
-    internal SourcePart SourcePart => SourceParts.Combine();
-
-    [DisableDump]
-    public IEnumerable<Issue> Issues => Items.SelectMany(node => node.AllIssues);
-
-    [DisableDump]
-    public bool IsEmpty => !Items.Any();
-
-    [DisableDump]
-    internal BinaryTree Main => this.CachedValue(GetMain);
 
     internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.Start);
     internal Anchor GetRightOf(BinaryTree target) => GetRightOf(target.Token.End);
@@ -111,9 +109,6 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         => Create(target.GetNodesFromLeftToRight().ToArray());
 
     public static Anchor operator +(Anchor left, Anchor right)
-        => left == null
-            ? right
-            : right == null
-                ? left
-                : left.Combine(right, true);
+        => left == null? right :
+            right == null? left : left.Combine(right, true);
 }

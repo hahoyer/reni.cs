@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;
@@ -51,6 +49,31 @@ sealed class DataStack : DumpableObject, IVisitor
     [EnableDump]
     LocalDataClass LocalData;
 
+    internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
+
+    [DisableDump]
+    internal BitsConst Value => Data.GetBitsConst();
+
+    StackData Data
+    {
+        get => LocalData.Data;
+        set => LocalData.Data = value;
+    }
+
+    internal Size Size
+    {
+        get => Data.Size;
+        set
+        {
+            if(Size == value)
+                return;
+            if(Size < value)
+                Push(new UnknownStackData(value - Size, Data.OutStream));
+            else
+                Data = Data.ForcedPull(Size - value);
+        }
+    }
+
     public DataStack(IExecutionContext context)
     {
         Context = context;
@@ -99,17 +122,17 @@ sealed class DataStack : DumpableObject, IVisitor
         (
             size == targetSize,
             () =>
-                nameof(size) +
-                " == " +
-                nameof(targetSize) +
-                " " +
-                nameof(size) +
-                "=" +
-                size +
-                " " +
-                nameof(targetSize) +
-                "=" +
-                targetSize);
+                nameof(size)
+                + " == "
+                + nameof(targetSize)
+                + " "
+                + nameof(size)
+                + "="
+                + size
+                + " "
+                + nameof(targetSize)
+                + "="
+                + targetSize);
         Push(Pull(targetSize).BitCast(significantSize).BitCast(size));
     }
 
@@ -207,31 +230,6 @@ sealed class DataStack : DumpableObject, IVisitor
     void IVisitor.TopFrameRef(Size offset) => Push(LocalData.FrameAddress(offset));
 
     void IVisitor.TopRef(Size offset) => Push(LocalData.Address(offset));
-
-    internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
-
-    [DisableDump]
-    internal BitsConst Value => Data.GetBitsConst();
-
-    StackData Data
-    {
-        get => LocalData.Data;
-        set => LocalData.Data = value;
-    }
-
-    internal Size Size
-    {
-        get => Data.Size;
-        set
-        {
-            if(Size == value)
-                return;
-            if(Size < value)
-                Push(new UnknownStackData(value - Size, Data.OutStream));
-            else
-                Data = Data.ForcedPull(Size - value);
-        }
-    }
 
     internal IEnumerable<DataMemento> GetLocalItemMementos() => Data.GetItemMementos();
 

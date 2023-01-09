@@ -1,60 +1,58 @@
-using System;
-using hw.Helper;
 using hw.DebugFormatter;
+using hw.Helper;
 using JetBrains.Annotations;
 
-namespace Reni.Code.ReplaceVisitor
+namespace Reni.Code.ReplaceVisitor;
+
+/// <summary>
+///     Handle argument replaces
+/// </summary>
+abstract class ReplaceArg : Base
 {
-    /// <summary>
-    ///     Handle argument replaces
-    /// </summary>
-    abstract class ReplaceArg : Base
+    [Dump("Dump")]
+    internal sealed class TypeException : Exception
     {
-        static int NextObjectId;
+        readonly CodeBase Actual;
+        readonly Arg VisitedObject;
 
-        internal ReplaceArg(ResultCache actualArg)
-            : base(NextObjectId++)
+        public TypeException(CodeBase actual, Arg visitedObject)
         {
-            (actualArg != null).Assert(() => "actualArg != null");
-            ActualArg = actualArg;
+            Actual = actual;
+            VisitedObject = visitedObject;
         }
 
-        [DisableDump]
-        protected ResultCache ActualArg { get; }
-
-        protected abstract CodeBase ActualCode { get; }
-
-        internal override CodeBase Arg(Arg visitedObject)
+        [UsedImplicitly]
+        public string Dump()
         {
-            if(ActualArg.Type == visitedObject.Type)
-                return ActualCode;
-            throw new TypeException(ActualCode, visitedObject);
+            var data = "\nVisitedObject="
+                + Tracer.Dump(VisitedObject)
+                + "\nActual="
+                + Tracer.Dump(Actual);
+
+            return "TypeException\n{"
+                + data.Indent()
+                + "\n}";
         }
+    }
 
-        [Dump("Dump")]
-        internal sealed class TypeException : Exception
-        {
-            readonly CodeBase Actual;
-            readonly Arg VisitedObject;
+    static int NextObjectId;
 
-            public TypeException(CodeBase actual, Arg visitedObject)
-            {
-                Actual = actual;
-                VisitedObject = visitedObject;
-            }
+    [DisableDump]
+    protected ResultCache ActualArg { get; }
 
-            [UsedImplicitly]
-            public string Dump()
-            {
-                var data = "\nVisitedObject="
-                    + Tracer.Dump(VisitedObject)
-                    + "\nActual="
-                    + Tracer.Dump(Actual);
+    internal ReplaceArg(ResultCache actualArg)
+        : base(NextObjectId++)
+    {
+        (actualArg != null).Assert(() => "actualArg != null");
+        ActualArg = actualArg;
+    }
 
-                return "TypeException\n{"
-                    + data.Indent()
-                    + "\n}";
-            }
-        }
+    protected abstract CodeBase ActualCode { get; }
+
+    internal override CodeBase Arg(Arg visitedObject)
+    {
+        if(ActualArg.Type == visitedObject.Type)
+            return ActualCode;
+        throw new TypeException(ActualCode, visitedObject);
     }
 }

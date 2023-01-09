@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;

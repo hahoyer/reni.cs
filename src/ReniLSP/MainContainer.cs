@@ -1,8 +1,4 @@
-using System;
 using System.IO.Pipelines;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using hw.DebugFormatter;
 using Nerdbank.Streams;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;

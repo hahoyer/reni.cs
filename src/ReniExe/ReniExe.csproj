@@ -1,30 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}</ProjectGuid>
-    <AssemblyName>ReniExe</AssemblyName>
-    <TargetTypeEx>CSharp.Exe.Legacy</TargetTypeEx>
+    <TargetTypeEx>CSharp.Exe</TargetTypeEx>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="MainContainer.cs" />
-    <None Include="packages.config" />
-    <None Include="sys.targets" />
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2022.3.1\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ReniUI\ReniUI.csproj">
-      <Project>{c339a515-d066-4c12-a4c5-07da91c19a2c}</Project>
-      <Name>ReniUI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Reni\Reni.csproj">
-      <Project>{45d97de4-67c3-4f10-98b4-6618cf7c7bb1}</Project>
-      <Name>Reni</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="sys.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Reni\Reni.csproj" />
+  </ItemGroup>
 </Project>

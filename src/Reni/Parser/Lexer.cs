@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.Scanner;
 using Reni.Validation;
 
@@ -47,12 +46,12 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
         LineEndOrEnd = LineEnd.Else(Match.End);
 
         LineCommentHead = "#".Box();
-        LineComment = LineCommentHead +
-            LineEndOrEnd
+        LineComment = LineCommentHead
+            + LineEndOrEnd
                 .Else
                 (
-                    "(".AnyChar().Not +
-                    LineEnd.Find
+                    "(".AnyChar().Not
+                    + LineEnd.Find
                         .Else(Match.End.Find)
                 );
 
@@ -60,8 +59,8 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
         InlineCommentHead = "#(".Box();
         InlineCommentTail = ")#".Box();
 
-        InlineComment = InlineCommentHead +
-            InlineCommentTail
+        InlineComment = InlineCommentHead
+            + InlineCommentTail
                 .Else(Match.WhiteSpace + InlineCommentTail.Else((Match.WhiteSpace + InlineCommentTail).Find))
                 .Else(identifier.Value(id => (Match.WhiteSpace + id + InlineCommentTail).Box().Find))
                 .Else(Match.End.Find + InvalidComment)
@@ -69,8 +68,8 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
 
         Number = Match.Digit.Repeat(1);
 
-        var verbatimText = "@(" +
-                (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
+        var verbatimText = "@("
+                + (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
                 .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
                 .Else(Match.End.Find + InvalidTextEnd)
             ;

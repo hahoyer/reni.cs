@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
@@ -104,8 +103,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                     {
                         var neighbor = list[index - 1].RightNeighbor;
                         (neighbor.LineBreakBehaviour == Position.AfterListToken //
-                                ||
-                                neighbor.LineBreakBehaviour == Position.AfterListTokenWithAdditionalLineBreak)
+                                || neighbor.LineBreakBehaviour == Position.AfterListTokenWithAdditionalLineBreak)
                             .Assert();
                         neighbor.LineBreakBehaviour = Position.AfterListTokenWithAdditionalLineBreak;
                     }
@@ -317,11 +315,9 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         => flatItem?.Anchor?.Items?.FirstOrDefault()?.TokenClass is LeftParenthesis;
 
     static Formatter CreateCompound(CompoundSyntax compound)
-        => compound.CleanupSection == null
-            ? FlatCompound.Instance
-            : compound.Anchor.Items.FirstOrDefault()?.TokenClass is BeginOfText
-                ? RootCompoundWithCleanup.Instance
-                : ChildCompoundWithCleanup.Instance;
+        => compound.CleanupSection == null? FlatCompound.Instance :
+            compound.Anchor.Items.FirstOrDefault()?.TokenClass is BeginOfText? RootCompoundWithCleanup.Instance :
+            ChildCompoundWithCleanup.Instance;
 
     internal static void SetFormatters(BinaryTree target)
     {

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using hw.Scanner;
 
-namespace Reni.TokenClasses.Whitespace
+namespace Reni.TokenClasses.Whitespace;
+
+interface IItemsType
 {
-    interface IItemsType
-    {
-        IEnumerable<WhiteSpaceItem> GetItems(SourcePart sourcePart, IParent parent);
-    }
+    IEnumerable<WhiteSpaceItem> GetItems(SourcePart sourcePart, IParent parent);
 }

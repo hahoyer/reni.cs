@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Reni.Context;
 
-namespace Reni.Context
-{
-    class UndefinedSymbolIssue
-    {}
-}
+class UndefinedSymbolIssue { }

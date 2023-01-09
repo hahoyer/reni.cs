@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -62,11 +60,11 @@ sealed class WhiteSpaces
     IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
     {
         StopByObjectIds();
-        if(!SeparatorRequests.Head &&
-           !SeparatorRequests.Tail &&
-           !SeparatorRequests.Inner &&
-           MinimalLineBreakCount == 0 &&
-           SourcePart.Length == 0)
+        if(!SeparatorRequests.Head
+           && !SeparatorRequests.Tail
+           && !SeparatorRequests.Inner
+           && MinimalLineBreakCount == 0
+           && SourcePart.Length == 0)
             return new Edit[0];
 
         var indent = Configuration.IndentCount * parameter.Indent;

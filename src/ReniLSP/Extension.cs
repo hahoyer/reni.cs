@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.Scanner;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using ReniUI.Classification;

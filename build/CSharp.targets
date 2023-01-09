@@ -1,24 +1,31 @@
 <!--EXTERNAL_PROPERTIES: PackagesDir;LevelDir-->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <ProductDir>$(MSBuildProjectDirectory)\$(LevelDir)</ProductDir>
-    <BinDir>$(ProductDir)bin\</BinDir>
-    <OutputPath>$(ProductDir)out\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>$(ProductDir)intermediate\$(AssemblyName)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <ProductDir>$(MSBuildProjectDirectory)\$(LevelDir)</ProductDir>
+        <BinDir>$(ProductDir)bin\</BinDir>
+        <OutputPath>$(ProductDir)out\$(Configuration)\</OutputPath>
+        <IntermediateOutputPath>$(ProductDir)intermediate\$(AssemblyName)\$(Configuration)\</IntermediateOutputPath>
+    </PropertyGroup>
 
-  <!-- CSharp specific settings -->
+    <!-- CSharp specific settings -->
 
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net7.0</TargetFramework>
-    <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
-    <NoWarn>649;660;661;1717</NoWarn>
-    <RestorePackages>true</RestorePackages>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-
+    <PropertyGroup>
+        <EnableNETAnalyzers>False</EnableNETAnalyzers>
+        <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+        <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <LangVersion>latest</LangVersion>
+        <TargetFramework>net472</TargetFramework>
+        <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
+        <NoWarn>649;660;661;1717</NoWarn>
+        <RestorePackages>true</RestorePackages>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Using Remove="System.Net.Http" />
+    </ItemGroup>
 </Project>

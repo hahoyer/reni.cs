@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
@@ -16,6 +15,11 @@ public sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax
 
     [DisableDump]
     readonly PositionDictionary<Syntax> Context;
+
+    int DirectChildCount => FlatItem.DirectChildren.Length;
+
+    [DisableDump]
+    Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
     internal Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context)
         : this(flatItem, context, null) { }
@@ -37,11 +41,6 @@ public sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax
 
     Syntax ITree<Syntax>.GetDirectChild(int index) => DirectChildren[index];
     int ITree<Syntax>.LeftDirectChildCount => 0;
-
-    int DirectChildCount => FlatItem.DirectChildren.Length;
-
-    [DisableDump]
-    Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
     Syntax GetDirectChild(int index)
     {

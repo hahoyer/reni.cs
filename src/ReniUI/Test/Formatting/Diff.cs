@@ -1,9 +1,7 @@
-using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 
-// ReSharper disable CheckNamespace
-namespace hw.Helper;
+namespace ReniUI.Test.Formatting;
 
 /// <summary>
 ///     This Class implements the Difference Algorithm published in
@@ -60,7 +58,7 @@ namespace hw.Helper;
 ///     2006.03.10 using the standard Debug class for self-test now.
 ///     compile with: csc /target:exe /out:diffTest.exe /d:DEBUG /d:TRACE /d:SELFTEST Diff.cs
 /// </summary>
-public class Diff
+public abstract class Diff
 {
     /// <summary>details of one difference.</summary>
     public struct Item

@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Validation;
@@ -12,6 +11,15 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
 
     [EnableDumpExcept(null)]
     internal readonly ValueSyntax Value;
+
+    [DisableDump]
+    internal string NameOrNull => Declarer.Name?.Value;
+
+    [DisableDump]
+    internal bool IsConverterSyntax => Declarer.IsConverterSyntax;
+
+    [DisableDump]
+    internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
     DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor, Issue issue = null)
         : base(anchor, issue)
@@ -49,15 +57,6 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
             , { } when index == Declarer.DirectChildCount => Value
             , _ => null
         };
-
-    [DisableDump]
-    internal string NameOrNull => Declarer.Name?.Value;
-
-    [DisableDump]
-    internal bool IsConverterSyntax => Declarer.IsConverterSyntax;
-
-    [DisableDump]
-    internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
     internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
         => new DeclarationSyntax

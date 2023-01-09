@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
@@ -24,6 +22,9 @@ sealed class PointerType
     internal TypeBase ValueType { get; }
 
     readonly int Order;
+
+    StableReferenceType StableReferenceType
+        => this.CachedValue(() => new StableReferenceType(this));
 
     internal PointerType(TypeBase valueType)
     {
@@ -126,9 +127,6 @@ sealed class PointerType
 
     internal override Result ConvertToStableReference(Category category)
         => Mutation(StableReferenceType) & category;
-
-    StableReferenceType StableReferenceType
-        => this.CachedValue(() => new StableReferenceType(this));
 
     Result DereferenceResult(Category category)
         => ValueType

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.ConversionService;
