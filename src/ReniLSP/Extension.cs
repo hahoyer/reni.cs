@@ -22,7 +22,7 @@ static class Extension
             yield return "variable";
     }
 
-    public static OmniSharp.Extensions.LanguageServer.Protocol.Models.Range GetRange(this SourcePart token)
+    public static Range GetRange(this SourcePart token)
     {
         var range = token.TextPosition;
         return new(range.start.LineNumber, range.start.ColumnNumber1 - 1, range.end.LineNumber

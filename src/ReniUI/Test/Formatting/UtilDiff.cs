@@ -1,5 +1,3 @@
-
-
 // ReSharper disable InconsistentNaming
 
 // Copyright (c) 2006, 2008 Tony Garnock-Jones <tonyg@lshift.net>

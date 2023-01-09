@@ -2,9 +2,6 @@
 
   <PropertyGroup>
     <TargetTypeEx>CSharp.Library</TargetTypeEx>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
-    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
-    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>
