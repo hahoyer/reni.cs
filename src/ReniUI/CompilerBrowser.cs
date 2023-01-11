@@ -24,8 +24,6 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     readonly ValueCache<Helper.Syntax> SyntaxCache;
 
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
-
     public Source Source => Compiler.Source;
 
     internal Compiler Compiler => ParentCache.Value;
@@ -64,31 +62,46 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         SyntaxCache = new(GetSyntax);
     }
 
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
     TResult ExceptionGuard<TResult>(Func<TResult> getResult)
     {
         try
         {
             return getResult();
         }
-        catch(Exception e)
+        catch(Exception exception)
         {
-            SaveException(e);
-            throw;
+            SaveException(exception);
+            return default;
         }
+    }
+
+    static string Dump(Exception exception)
+    {
+        if(exception == null)
+            return "";
+        var innerExceptionDump = Dump(exception.InnerException);
+        if(innerExceptionDump.Length > 0)
+            innerExceptionDump = $@"
+InnerException: {innerExceptionDump}".Indent();
+
+        return @$"{exception.GetType().PrettyName()}: {exception.Message}
+{exception.StackTrace}{innerExceptionDump}";
     }
 
     void SaveException(Exception exception)
     {
-        if(!SmbFile.SourceFolder.Exists)
-            return;
-        var folderName = $"At{DateTime.Now:yyMMdd_hhmmss}";
-        var issueFolder = SmbFile.SourceFolder / "Generated" / folderName;
-        (issueFolder / "Exception.txt").String = exception.LogDump();
+        var sourceFolder = SmbFile.SourceFolder ?? ".".ToSmbFile();
+        var folderName = $"At{DateTime.Now:yyMMdd_HHmmss}";
+        var issueFolder = sourceFolder / "Generated" / folderName;
+        (issueFolder / "Exception.txt").String = Dump(exception);
         (issueFolder / "Text.reni").String = @$"#( Source: {Compiler.Source.Identifier} )#
 {Compiler.Source.Data}";
         (issueFolder / "Test.cs").String = @$"
 using hw.Helper;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 
 namespace ReniUI.Generated.{folderName};
 
@@ -98,8 +111,7 @@ public class Test : CompilerTest
     protected override string Target => ""Text.reni"".ToSmbFile().String;
 }}
 ";
-
-
+        $"Exception data saved to :\n{Tracer.FilePosition((issueFolder / "Test.cs").FullName, 1, 1, FilePositionTag.Output)}".Log();
     }
 
     public static CompilerBrowser FromText
