@@ -13,45 +13,44 @@ using Reni.FeatureTest.ThenElse;
 using Reni.FeatureTest.TypeType;
 using Reni.FeatureTest.Validation;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest;
+
+public abstract class TextStruct : CompilerTest
 {
-    public abstract class TextStruct : CompilerTest
-    {
-        static string Definition() => "FeatureTest\\Text.reni".ToSmbFile().String;
-        protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";
-        protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
-    }
-
-    [UnitTest]
-    [Output("abcdef")]
-    [InstanceCode("Text ('abcdef')")]
-    [Integer1]
-    [TwoFunctions]
-    [FromTypeAndFunction]
-    [HalloWelt]
-    [ElementAccess]
-    [ElementAccessVariableSetter]
-    [TypeOperator]
-    [DefaultInitialized]
-    [FunctionVariable]
-    [WikiExamples]
-    [Repeater]
-    [FunctionArgument]
-    [PrimitiveRecursiveFunctionHuge]
-    [ArrayElementType]
-    [ArrayReferenceAll]
-    [Simple]
-    [MixIn.Function]
-    public sealed class Text1 : TextStruct {}
-
-    [UnitTest]
-    [Output("Hallo")]
-    [InstanceCode("Text ('H') << 'allo'")]
-    [Text1]
-    [UserObjects]
-    [UnMatchedBrackets]
-    [AutomaticDereferencing]
-    [ContextOperator]
-    [ComplexContext]
-    public sealed class TextConcat : TextStruct {}
+    protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
+    protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";
+    static string Definition() => (SmbFile.SourceFolder / "Text.reni").String;
 }
+
+[UnitTest]
+[Output("abcdef")]
+[InstanceCode("Text ('abcdef')")]
+[Integer1]
+[TwoFunctions]
+[FromTypeAndFunction]
+[HalloWelt]
+[ElementAccess]
+[ElementAccessVariableSetter]
+[TypeOperator]
+[DefaultInitialized]
+[FunctionVariable]
+[WikiExamples]
+[Repeater]
+[FunctionArgument]
+[PrimitiveRecursiveFunctionHuge]
+[ArrayElementType]
+[ArrayReferenceAll]
+[Simple]
+[MixIn.Function]
+public sealed class Text1 : TextStruct { }
+
+[UnitTest]
+[Output("Hallo")]
+[InstanceCode("Text ('H') << 'allo'")]
+[Text1]
+[UserObjects]
+[UnMatchedBrackets]
+[AutomaticDereferencing]
+[ContextOperator]
+[ComplexContext]
+public sealed class TextConcat : TextStruct { }

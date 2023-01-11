@@ -4,18 +4,17 @@ using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.Validation;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest;
+
+[UnitTest]
+[SimpleAssignment]
+[UndefinedContextSymbol]
+[UndefinedSymbol]
+[UseOfUndefinedContextSymbol]
+[IndirectUseOfUndefinedContextSymbol]
+[AllScopeHandling]
+[Output("Ha")]
+public sealed class ComplexContext : CompilerTest
 {
-    [UnitTest]
-    [SimpleAssignment]
-    [UndefinedContextSymbol]
-    [UndefinedSymbol]
-    [UseOfUndefinedContextSymbol]
-    [IndirectUseOfUndefinedContextSymbol]
-    [AllScopeHandling]
-    [Output("Ha")]
-    public sealed class ComplexContext : CompilerTest
-    {
-        protected override string Target => "FeatureTest\\ComplexContext.reni".ToSmbFile().String;
-    }
+    protected override string Target => (SmbFile.SourceFolder / "ComplexContext.reni").String;
 }
