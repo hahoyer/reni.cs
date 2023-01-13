@@ -21,6 +21,7 @@ sealed class CompoundSyntax : ValueSyntax
     static int NextObjectId;
 
     [EnableDump(Order = 2)]
+    [EnableDumpExcept(null)]
     internal readonly CleanupSyntax CleanupSection;
 
     [EnableDump(Order = 1)]

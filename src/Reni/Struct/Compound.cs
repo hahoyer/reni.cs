@@ -102,7 +102,7 @@ sealed class Compound
 
             var positions = ((fromNotPosition ?? EndPosition) - fromPosition)
                 .Select(i => fromPosition + i)
-                .Where(position => !Syntax.PureStatements[position].IsLambda)
+                .Where(position => Syntax.PureStatements[position]?.IsLambda == false)
                 .ToArray();
 
             var rawResults = positions
@@ -252,7 +252,12 @@ sealed class Compound
             .IsHollowStructureElement(uniqueChildContext);
     }
 
-    bool? InnerIsHollowStatic(int position) => Syntax.PureStatements[position].IsHollow;
+    bool? InnerIsHollowStatic(int position)
+    {
+        var statement = Syntax.PureStatements[position];
+        // if there is no statement (f.i. because of errors) it is granted to be hollow.
+        return statement == null? true : statement.IsHollow;
+    }
 
     internal Result Cleanup(Category category)
     {

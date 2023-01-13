@@ -58,7 +58,7 @@ static class Extension
         GetDifferenceReport(LocalCanonize(newText.Canonize(spaceReplacement))
             , LocalCanonize(expected.Canonize(spaceReplacement))).Log();
 
-        false.Assert(() => $@"
+        false.Assert(() => $@"                    
 new:
 ----------------------
 {LocalCanonize(newText)}

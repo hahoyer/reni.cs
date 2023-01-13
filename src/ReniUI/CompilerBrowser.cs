@@ -43,7 +43,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     internal IExecutionContext ExecutionContext => Compiler;
     public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
-    internal IEnumerable<Issue> Issues => ExceptionGuard(() => Compiler.Issues);
+    internal IEnumerable<Issue> Issues => ExceptionGuard(() => Compiler.Issues, GetIssuesTest);
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Helper.Syntax Syntax
@@ -64,7 +64,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    TResult ExceptionGuard<TResult>(Func<TResult> getResult)
+    TResult ExceptionGuard<TResult>(Func<TResult> getResult, Func<string, string> getTestCode)
     {
         try
         {
@@ -72,7 +72,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         }
         catch(Exception exception)
         {
-            SaveException(exception);
+            SaveExceptionInIssues(exception,getTestCode);
             return default;
         }
     }
@@ -90,7 +90,7 @@ InnerException: {innerExceptionDump}".Indent();
 {exception.StackTrace}{innerExceptionDump}";
     }
 
-    void SaveException(Exception exception)
+    void SaveExceptionInIssues(Exception exception, Func<string,string> getTestCode)
     {
         var sourceFolder = SmbFile.SourceFolder ?? ".".ToSmbFile();
         var folderName = $"At{DateTime.Now:yyMMdd_HHmmss}";
@@ -98,7 +98,11 @@ InnerException: {innerExceptionDump}".Indent();
         (issueFolder / "Exception.txt").String = Dump(exception);
         (issueFolder / "Text.reni").String = @$"#( Source: {Compiler.Source.Identifier} )#
 {Compiler.Source.Data}";
-        (issueFolder / "Test.cs").String = @$"
+        (issueFolder / "Test.cs").String = getTestCode(folderName);
+        $"Exception data saved to :\n{Tracer.FilePosition((issueFolder / "Test.cs").FullName, 1, 1, FilePositionTag.Output)}".Log();
+    }
+
+    static string GetIssuesTest(string folderName) => @$"
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
@@ -108,11 +112,15 @@ namespace ReniUI.Generated.{folderName};
 [UnitTest]
 public class Test : CompilerTest
 {{
-    protected override string Target => ""Text.reni"".ToSmbFile().String;
+    protected override string Target => (SmbFile.SourceFolder / ""Text.reni"").String;
+
+    protected override void Verify(IEnumerable<Issue> issues)
+    {{
+        Dumpable.NotImplementedFunction(issues.ToArray().Dump());
+        base.Verify(issues);
+    }}
 }}
 ";
-        $"Exception data saved to :\n{Tracer.FilePosition((issueFolder / "Test.cs").FullName, 1, 1, FilePositionTag.Output)}".Log();
-    }
 
     public static CompilerBrowser FromText
         (string text, CompilerParameters parameters, string sourceIdentifier = null)
