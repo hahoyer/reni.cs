@@ -19,8 +19,8 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 {
     internal new abstract class NoChildren : ValueSyntax
     {
-        protected NoChildren(Anchor anchor, Issue issue = null)
-            : base(anchor, issue)
+        protected NoChildren(Anchor anchor)
+            : base(anchor)
             => anchor.AssertIsNotNull();
 
         [DisableDump]
@@ -39,12 +39,12 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     [DisableDump]
     internal Issue[] AllIssues => this.CachedValue(GetAllIssues);
 
-    protected ValueSyntax(Anchor anchor, Issue issue = null)
-        : base(anchor, issue)
+    protected ValueSyntax(Anchor anchor)
+        : base(anchor)
         => anchor.AssertIsNotNull();
 
-    protected ValueSyntax(int objectId, Anchor anchor, Issue issue = null)
-        : base(anchor, issue, objectId) { }
+    protected ValueSyntax(int objectId, Anchor anchor)
+        : base(anchor, objectId) { }
 
     DeclarerSyntax IStatementSyntax.Declarer => null;
 

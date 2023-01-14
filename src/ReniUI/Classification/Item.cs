@@ -37,8 +37,6 @@ public abstract class Item : DumpableObject
     {
         get
         {
-            if(IsError)
-                return 'e';
             if(IsComment)
                 return 'c';
             if(IsSpace)
@@ -55,6 +53,8 @@ public abstract class Item : DumpableObject
                 return 'i';
             if(IsBrace)
                 return 'b';
+            if(IsError)
+                return 'e';
             NotImplementedMethod();
             return '?';
         }
@@ -131,7 +131,7 @@ public abstract class Item : DumpableObject
     public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
 
     [DisableDump]
-    public virtual Issue Issue => null;
+    public virtual Issue[] Issues => null;
 
     internal virtual IWhitespaceItem GetItem<TItemType>()
         where TItemType : IItemType

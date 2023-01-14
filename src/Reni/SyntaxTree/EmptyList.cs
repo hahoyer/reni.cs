@@ -7,12 +7,21 @@ namespace Reni.SyntaxTree;
 
 sealed class EmptyList : ValueSyntax.NoChildren
 {
+    readonly Issue Issue;
+
     public EmptyList(Anchor anchor, Issue issue = null)
-        : base(anchor, issue)
+        : base(anchor)
     {
+        Issue = issue;
         anchor.AssertIsNotNull();
         StopByObjectIds();
         AssertValid();
+    }
+
+    protected override IEnumerable<Issue> GetIssues()
+    {
+        if(Issue != null)
+            yield return Issue;
     }
 
     protected override string GetNodeDump() => "()";

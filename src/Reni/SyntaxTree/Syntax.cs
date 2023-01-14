@@ -16,8 +16,8 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 {
     internal abstract class NoChildren : Syntax
     {
-        protected NoChildren(Anchor anchor, Issue issue = null)
-            : base(anchor, issue) { }
+        protected NoChildren(Anchor anchor)
+            : base(anchor) { }
 
         [DisableDump]
         protected sealed override int DirectChildCount => 0;
@@ -36,61 +36,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     internal readonly Anchor Anchor;
 
     [EnableDumpExcept(null)]
-    internal readonly Issue Issue;
-
-    protected Syntax(Anchor anchor, Issue issue = null, int? objectId = null)
-        : base(objectId)
-    {
-        Anchor = anchor;
-        if(!Anchor.IsEmpty)
-            Anchor.SourceParts.AssertIsNotNull();
-        Issue = issue;
-        Anchor.SetSyntax(this);
-    }
-
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
-
-    Anchor IItem.Anchor => Anchor;
-    Syntax[] IItem.DirectChildren => DirectChildren;
-    BinaryTree IItem.SpecialAnchor => null;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    int ITree<Syntax>.DirectChildCount => DirectChildCount;
-
-    Syntax ITree<Syntax>.GetDirectChild(int index)
-        => index < 0 || index >= DirectChildCount? null : DirectChildren[index];
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    int ITree<Syntax>.LeftDirectChildCount => 0;
-
-    [DisableDump]
-    protected abstract int DirectChildCount { get; }
-
-    protected abstract Syntax GetDirectChild(int index);
-
-    internal virtual Result<ValueSyntax> ToValueSyntax()
-    {
-        if(GetType().Is<ValueSyntax>())
-            return (ValueSyntax)this;
-
-        NotImplementedMethod();
-        return default;
-    }
-
-    internal virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
-    {
-        NotImplementedMethod(target);
-        return default;
-    }
-
-
-    internal virtual void AssertValid(Level level = null, BinaryTree target = null)
-    {
-        level ??= new();
-
-        foreach(var node in DirectChildren.Where(node => node != this))
-            node?.AssertValid();
-    }
+    internal Issue[] Issues => this.CachedValue(() => GetIssues()?.ToArray() ?? new Issue[0]);
 
     internal BinaryTree MainAnchor => Anchor.Main;
 
@@ -102,9 +48,6 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     internal IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
 
     internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
-
-    [DisableDump]
-    internal Issue[] Issues => this.CachedValue(() => GetIssues().ToArray());
 
     public BinaryTree LeftMostAnchor
     {
@@ -137,7 +80,60 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     public SourcePart ChildSourcePart => LeftMostAnchor.SourcePart.Start.Span(RightMostAnchor.SourcePart.End);
     internal SourcePart[] Anchors => Anchor.SourceParts;
 
-    IEnumerable<Issue> GetIssues() => Issue.NullableToArray();
+    protected Syntax(Anchor anchor, int? objectId = null)
+        : base(objectId)
+    {
+        Anchor = anchor;
+        if(!Anchor.IsEmpty)
+            Anchor.SourceParts.AssertIsNotNull();
+        Anchor.SetSyntax(this);
+    }
+
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+    Anchor IItem.Anchor => Anchor;
+    Syntax[] IItem.DirectChildren => DirectChildren;
+    BinaryTree IItem.SpecialAnchor => null;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    int ITree<Syntax>.DirectChildCount => DirectChildCount;
+
+    Syntax ITree<Syntax>.GetDirectChild(int index)
+        => index < 0 || index >= DirectChildCount? null : DirectChildren[index];
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    int ITree<Syntax>.LeftDirectChildCount => 0;
+
+    [DisableDump]
+    protected abstract int DirectChildCount { get; }
+
+    protected abstract Syntax GetDirectChild(int index);
+
+    protected virtual IEnumerable<Issue> GetIssues() => null;
+
+    internal virtual Result<ValueSyntax> ToValueSyntax()
+    {
+        if(GetType().Is<ValueSyntax>())
+            return (ValueSyntax)this;
+
+        NotImplementedMethod();
+        return default;
+    }
+
+    internal virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
+    {
+        NotImplementedMethod(target);
+        return default;
+    }
+
+
+    internal virtual void AssertValid(Level level = null, BinaryTree target = null)
+    {
+        level ??= new();
+
+        foreach(var node in DirectChildren.Where(node => node != this))
+            node?.AssertValid();
+    }
 
     internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
         => ToCompoundSyntaxHandler(target);

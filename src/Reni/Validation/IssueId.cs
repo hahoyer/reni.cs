@@ -21,6 +21,7 @@ sealed class IssueId : EnumEx, Match.IError
     public static readonly IssueId InvalidPrefixExpression = new();
     public static readonly IssueId InvalidSuffixExpression = new();
     public static readonly IssueId InvalidTerminalExpression = new();
+    public static readonly IssueId MissingDeclarationDeclarer = new();
     public static readonly IssueId MissingDeclarationForType = new();
     public static readonly IssueId MissingDeclarationInContext = new();
     public static readonly IssueId MissingDeclarationValue = new();

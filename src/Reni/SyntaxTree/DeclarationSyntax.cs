@@ -21,14 +21,13 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     [DisableDump]
     internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
-    DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor, Issue issue = null)
-        : base(anchor, issue)
+    int DirectChildCountOfDeclarer => Declarer?.DirectChildCount ?? 0;
+
+    DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
+        : base(anchor)
     {
         Declarer = declarer;
         Value = value;
-
-        Declarer.AssertIsNotNull();
-        //Value.AssertIsNotNull();
     }
 
     [DisableDump]
@@ -47,23 +46,25 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
             ? this
             : Create(Declarer, Value, anchor.Combine(Anchor, true));
 
+    protected override IEnumerable<Issue> GetIssues()
+    {
+        if(Declarer == null)
+            yield return IssueId.MissingDeclarationDeclarer.Issue(Anchor.Main.SourcePart);
+        if(Value == null)
+            yield return IssueId.MissingDeclarationValue.Issue(Anchor.Main.SourcePart);
+    }
+
     [DisableDump]
-    protected override int DirectChildCount => Declarer.DirectChildCount + 1;
+    protected override int DirectChildCount => DirectChildCountOfDeclarer + 1;
 
     protected override Syntax GetDirectChild(int index)
         => index switch
         {
-            { } when index < Declarer.DirectChildCount => Declarer.GetDirectChild(index)
-            , { } when index == Declarer.DirectChildCount => Value
+            { } when index < DirectChildCountOfDeclarer => Declarer.GetDirectChild(index)
+            , { } when index == DirectChildCountOfDeclarer => Value
             , _ => null
         };
 
     internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
-        => new DeclarationSyntax
-        (
-            declarer,
-            value,
-            anchor,
-            value == null? IssueId.MissingDeclarationValue.Issue(anchor.Main.SourcePart) : null
-        );
+        => new DeclarationSyntax(declarer, value, anchor);
 }

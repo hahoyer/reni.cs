@@ -12,19 +12,30 @@ sealed class DeclarerSyntax : DumpableObject
 {
     internal sealed class IssueSyntax : Syntax.NoChildren
     {
+        readonly Issue Issue;
+
         internal IssueSyntax(Issue issue, Anchor anchor)
-            : base(anchor, issue) { }
+            : base(anchor)
+            => Issue = issue;
+
+        protected override IEnumerable<Issue> GetIssues() => T(Issue);
     }
 
     internal sealed class TagSyntax : Syntax.NoChildren
     {
         internal readonly IDeclarationTagToken Value;
 
-        internal TagSyntax(IDeclarationTagToken value, Issue issue, Anchor anchor)
-            : base(anchor, issue)
+        internal TagSyntax(IDeclarationTagToken value, Anchor anchor)
+            : base(anchor)
         {
             Value = value;
             StopByObjectIds(590);
+        }
+
+        protected override IEnumerable<Issue> GetIssues()
+        {
+            if(Value == null)
+                yield return IssueId.InvalidDeclarationTag.Issue(Anchor.Main.SourcePart);
         }
 
         internal override void AssertValid(Level level, BinaryTree target = null)
@@ -49,30 +60,6 @@ sealed class DeclarerSyntax : DumpableObject
     readonly bool? MeansPublic;
 
     readonly ValueCache<Syntax[]> DirectChildrenCache;
-
-    DeclarerSyntax
-    (
-        TagSyntax[] tags
-        , NameSyntax name
-        , IssueSyntax issue
-        , bool? meansPublic
-    )
-    {
-        tags.AssertIsNotNull();
-        Tags = tags;
-        Name = name;
-        MeansPublic = meansPublic;
-        Issue = issue;
-        DirectChildrenCache = new(() => DirectChildCount.Select(GetDirectChild).ToArray());
-        StopByObjectIds();
-    }
-
-    protected override string GetNodeDump()
-        => base.GetNodeDump() +
-            "[" +
-            Tags.Select(tag => ((tag?.Value as TokenClass)?.Id ?? "?") + "!").Stringify("") +
-            (Name?.Value ?? "") +
-            "]";
 
     [DisableDump]
     internal Syntax[] DirectChildren => DirectChildrenCache.Value;
@@ -109,6 +96,30 @@ sealed class DeclarerSyntax : DumpableObject
     [DisableDump]
     internal int DirectChildCount => Tags.Length + 1 + (Issue == null? 0 : 1);
 
+    DeclarerSyntax
+    (
+        TagSyntax[] tags
+        , NameSyntax name
+        , IssueSyntax issue
+        , bool? meansPublic
+    )
+    {
+        tags.AssertIsNotNull();
+        Tags = tags;
+        Name = name;
+        MeansPublic = meansPublic;
+        Issue = issue;
+        DirectChildrenCache = new(() => DirectChildCount.Select(GetDirectChild).ToArray());
+        StopByObjectIds();
+    }
+
+    protected override string GetNodeDump()
+        => base.GetNodeDump()
+            + "["
+            + Tags.Select(tag => ((tag?.Value as TokenClass)?.Id ?? "?") + "!").Stringify("")
+            + (Name?.Value ?? "")
+            + "]";
+
     internal Syntax GetDirectChild(int index)
     {
         if(index < 0)
@@ -131,7 +142,7 @@ sealed class DeclarerSyntax : DumpableObject
     {
         var nameSyntax = GetNameSyntax(name);
 
-        if(tags == null)
+        if(!tags.Any())
             return new(new TagSyntax[0], nameSyntax, null, meansPublic);
 
         var issueAnchors = tags
@@ -168,12 +179,7 @@ sealed class DeclarerSyntax : DumpableObject
             return null;
 
         var tagToken = tag.TokenClass as DeclarationTagToken;
-        return new
-        (
-            tagToken
-            , tagToken == null? IssueId.InvalidDeclarationTag.Issue(tag.Token) : null
-            , Anchor.Create(tag).Combine(target.anchors)
-        );
+        return new(tagToken, Anchor.Create(tag).Combine(target.anchors));
     }
 
     public bool IsDefining(string name, bool publicOnly)

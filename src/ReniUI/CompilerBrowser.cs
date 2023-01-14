@@ -43,7 +43,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     internal IExecutionContext ExecutionContext => Compiler;
     public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
-    internal IEnumerable<Issue> Issues => ExceptionGuard(() => Compiler.Issues, GetIssuesTest);
+    internal IEnumerable<Issue> Issues => ExceptionGuard(() => Compiler.Issues, GetIssuesTest) ?? new Issue[0];
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Helper.Syntax Syntax
@@ -95,17 +95,19 @@ InnerException: {innerExceptionDump}".Indent();
         var sourceFolder = SmbFile.SourceFolder ?? ".".ToSmbFile();
         var folderName = $"At{DateTime.Now:yyMMdd_HHmmss}";
         var issueFolder = sourceFolder / "Generated" / folderName;
-        (issueFolder / "Exception.txt").String = Dump(exception);
-        (issueFolder / "Text.reni").String = @$"#( Source: {Compiler.Source.Identifier} )#
-{Compiler.Source.Data}";
-        (issueFolder / "Test.cs").String = getTestCode(folderName);
-        $"Exception data saved to :\n{Tracer.FilePosition((issueFolder / "Test.cs").FullName, 1, 1, FilePositionTag.Output)}".Log();
+
+        SaveExceptionInformationFile(issueFolder ,"Exception.txt",Dump(exception),"Exception Data");
+        SaveExceptionInformationFile(issueFolder ,"Test.cs", @$"#( Source: {Compiler.Source.Identifier} )#
+{Compiler.Source.Data}", "Source file ");
+        SaveExceptionInformationFile(issueFolder ,"Text.reni",getTestCode(folderName),"Test code");
     }
 
     static string GetIssuesTest(string folderName) => @$"
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
+using Reni.Validation;
 
 namespace ReniUI.Generated.{folderName};
 
@@ -116,11 +118,22 @@ public class Test : CompilerTest
 
     protected override void Verify(IEnumerable<Issue> issues)
     {{
-        Dumpable.NotImplementedFunction(issues.ToArray().Dump());
-        base.Verify(issues);
+        var issueArray = issues.ToArray();
+        var i = 0;
+        //var issueBase = issueArray[i];
+        //(issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
+        //i++;
+        (i == issueArray.Length).Assert();
     }}
 }}
 ";
+
+    static void SaveExceptionInformationFile(SmbFile folder, string name, string content, string title)
+    {
+        var file = folder / name;
+        file.String = content;
+        $"{title} saved to :\n{Tracer.FilePosition(file.FullName, 1, 1, FilePositionTag.Output)}".Log();
+    }
 
     public static CompilerBrowser FromText
         (string text, CompilerParameters parameters, string sourceIdentifier = null)
