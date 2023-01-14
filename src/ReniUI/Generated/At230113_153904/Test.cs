@@ -4,7 +4,7 @@ using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
-namespace ReniUI.Generated.At230110_010030;
+namespace ReniUI.Generated.At230113_153904;
 
 [UnitTest]
 public class Test : CompilerTest
@@ -16,10 +16,10 @@ public class Test : CompilerTest
         var issueArray = issues.ToArray();
         var i = 0;
         var issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
+        (issueBase.IssueId == IssueId.MissingDeclarationDeclarer).Assert(issueBase.Dump);
         i++;
         issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.InvalidDeclaration).Assert(issueBase.Dump);
+        (issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
         i++;
         (i == issueArray.Length).Assert();
     }
