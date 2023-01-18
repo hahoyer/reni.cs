@@ -7,6 +7,9 @@ using Microsoft.VisualStudio.Shell;
 
 namespace ReniLSPVSIX;
 
+[ProvideService(typeof(ReniService), ServiceName = "Reni Language Service")]
+[ProvideLanguageService(typeof(ReniService), Constants.LanguageName, 106)]
+[ProvideLanguageExtension(typeof(ReniService), ".reni")]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid("99058c20-8716-4632-a0a5-60de0d6ca628")]
 public sealed class ReniLSPVSIXPackage : AsyncPackage

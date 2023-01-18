@@ -25,6 +25,7 @@
     <Compile Include="LanguageClient.cs" />
     <Compile Include="ReniContent.cs" />
     <Compile Include="ReniLSPVSIXPackage.cs" />
+    <Compile Include="ReniService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="settings.json">
@@ -62,6 +63,10 @@
     <ProjectReference Include="..\ReniLSP\ReniLSP.csproj">
       <Project>{54d4a90b-c3cf-4f72-b447-cbc08b6ef5cd}</Project>
       <Name>ReniLSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Reni\Reni.csproj">
+      <Project>{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}</Project>
+      <Name>Reni</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="sys.targets" />
