@@ -4,6 +4,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -20,7 +21,7 @@ enum IssueStage
 
 sealed class IssueId : EnumEx, Match.IError
 {
-    public static readonly IssueId AmbiguousSymbol = new(IssueStage.Semantic);
+    public static readonly IssueId AmbiguousSymbol = new(IssueStage.Semantic, typeof(TypeBase), typeof(SearchResult[]));
     public static readonly IssueId EOFInComment = new(IssueStage.Parsing);
     public static readonly IssueId EOLInString = new(IssueStage.Parsing);
     public static readonly IssueId ExtraLeftBracket = new(IssueStage.Syntax, typeof(SourcePart));
@@ -77,9 +78,16 @@ sealed class IssueId : EnumEx, Match.IError
 
     internal Result GetResult
     (
-        Category category, SourcePart token, object additionalInformation = null, Issue[] foundIssues = null
+        Category category
+        , SourcePart token
+        , object target
+        , object[] results = null
+        , Issue[] foundIssues = null
     )
-        => new(category, T(foundIssues, T(GetIssue(token, additionalInformation))).ConcatMany().ToArray());
+    {
+        var additionalInformation = results == null? T(target) : T(target, results);
+        return new(category, T(foundIssues, T(GetIssue(token, additionalInformation))).ConcatMany().ToArray());
+    }
 
     internal Result<BinaryTree> GetSyntax(BinaryTree binaryTree) => new(binaryTree, GetIssue(binaryTree.SourcePart));
 

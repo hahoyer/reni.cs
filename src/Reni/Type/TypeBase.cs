@@ -703,9 +703,10 @@ abstract class TypeBase
     internal Result ObjectResult(Category category)
         => IsHollow? Result(category) : Pointer.Result(category | Category.Type, ForcedReference);
 
-    Result IssueResult(Category category, IssueId issueId, SourcePart token, Issue[] leftIssues)
+    Result IssueResult
+        (Category category, IssueId issueId, SourcePart token, SearchResult[] declarations, Issue[] leftIssues)
         => issueId
-            .GetResult(category, token, this, leftIssues);
+            .GetResult(category, token, T((object)this, declarations), leftIssues);
 
     internal Result Execute
     (
@@ -720,14 +721,14 @@ abstract class TypeBase
         (
             definable,
             result => result.Execute(category, left, currentTarget, context, right),
-            issueId => IssueResult(category, issueId, currentTarget, left.Issues)
+            (issueId, declarations) => IssueResult(category, issueId, currentTarget, declarations, left.Issues)
         );
 
     TResult ExecuteDeclaration<TResult>
     (
         Definable definable,
         Func<SearchResult, TResult> execute,
-        Func<IssueId, TResult> onError
+        Func<IssueId, SearchResult[], TResult> onError
     )
     {
         var searchResults
@@ -738,11 +739,11 @@ abstract class TypeBase
         switch(searchResults.Length)
         {
             case 0:
-                return onError(IssueId.MissingDeclarationForType);
+                return onError(IssueId.MissingDeclarationForType, null);
             case 1:
                 return execute(searchResults.First());
             default:
-                return onError(IssueId.AmbiguousSymbol);
+                return onError(IssueId.AmbiguousSymbol, searchResults);
         }
     }
 
