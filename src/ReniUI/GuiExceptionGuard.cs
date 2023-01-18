@@ -17,9 +17,9 @@ abstract class GuiExceptionGuard : DumpableObject
         var issueFolder = sourceFolder / "Generated" / folderName;
 
         SaveExceptionInformationFile(issueFolder, "Exception.txt", Dump(exception), "Exception Data");
-        SaveExceptionInformationFile(issueFolder, "Test.cs", @$"#( Source: {Parent.Source.Identifier} )#
+        SaveExceptionInformationFile(issueFolder, "Test.reni", @$"#( Source: {Parent.Source.Identifier} )#
 {Parent.Source.Data}", "Source file ");
-        SaveExceptionInformationFile(issueFolder, "Text.reni", GetTestCode(folderName), "Test code");
+        SaveExceptionInformationFile(issueFolder, "Text.cs", GetTestCode(folderName), "Test code");
         return default;
     }
 

@@ -21,7 +21,7 @@ namespace ReniUI.Test
             (issues.Length == 1).Assert();
             var issue = issues[0];
             (issue.IssueId == IssueId.InvalidSuffixExpression).Assert();
-            (issue.AdditionalMessage == "(actual: terminal)").Assert();
+            (issue.Message == "Using terminal as suffix is invalid.").Assert();
 
             var x = compiler.Locate(text.IndexOf("som"));
             x.AssertNotNull();

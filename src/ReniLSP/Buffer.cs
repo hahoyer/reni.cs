@@ -14,6 +14,7 @@ sealed class Buffer : DumpableObject
 
     readonly Handler Parent;
     readonly ValueCache<CompilerBrowser> CompilerCache;
+    readonly ValueCache<IEnumerable<(Range Range, string Type)>> ItemsCache;
 
     public Buffer(Handler parent)
     {
@@ -21,6 +22,7 @@ sealed class Buffer : DumpableObject
         CompilerCache = new(() => CompilerBrowser.FromText(Text
             , new() { ProcessErrors = true }
             , FileName));
+        ItemsCache = new(() => GetItems().ToArray());
     }
 
 
@@ -40,12 +42,18 @@ sealed class Buffer : DumpableObject
 
     internal void Validate()
     {
-        var issues = CompilerCache.Value.Issues.ToArray();
+        var issues = CompilerCache.Value.GuardedIssues.ToArray();
         if(issues.Any())
             Parent.PublishDiagnostics(FileName, issues);
     }
 
-    public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)
+    public void Tokenize(SemanticTokensBuilder builder)
+    {
+        foreach(var item in ItemsCache.Value)
+            builder.Push(item.Range, item.Type);
+    }
+
+    IEnumerable<(Range Range, string Type)> GetItems()
     {
         var nodes = CompilerCache
             .Value
@@ -59,7 +67,7 @@ sealed class Buffer : DumpableObject
             {
                 var range = line.GetRange();
                 foreach(var type in nodeTypes)
-                    builder.Push(range, type);
+                    yield return (range, type);
             }
         }
     }

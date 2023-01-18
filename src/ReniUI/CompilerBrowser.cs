@@ -23,6 +23,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
 
     readonly ValueCache<Helper.Syntax> SyntaxCache;
+    readonly ValueCache<Helper.Syntax> GuardedSyntaxCache;
 
     public Source Source => Compiler.Source;
 
@@ -44,8 +45,11 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
 
-    internal IEnumerable<Issue> Issues
-        => ExceptionGuard(() => Compiler.Issues, new IssuesExceptionGuard(this)) ?? new Issue[0];
+    internal IEnumerable<Issue> GuardedIssues
+        => ExceptionGuard(() => Issues, new IssuesExceptionGuard(this)) ?? new Issue[0];
+
+
+    internal IEnumerable<Issue> Issues => Compiler.Issues;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Helper.Syntax Syntax
@@ -61,7 +65,8 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     CompilerBrowser(Func<Compiler> parent)
     {
         ParentCache = new(parent);
-        SyntaxCache = new(() => ExceptionGuard(GetSyntax, new SyntaxExceptionGuard(this)));
+        SyntaxCache = new(GetSyntax);
+        GuardedSyntaxCache = new(() => ExceptionGuard(() => SyntaxCache.Value, new SyntaxExceptionGuard(this)));
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
