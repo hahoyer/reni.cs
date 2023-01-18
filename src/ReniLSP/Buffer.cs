@@ -65,10 +65,9 @@ sealed class Buffer : DumpableObject
     }
 
     public TextEditContainer Format(ReniUI.Formatting.Configuration options)
-    {
-        var edits = options.Create()
-            .GetEditPieces(CompilerCache.Value, CompilerCache.Value.Source.All)
-            .Select(edit => new TextEdit { NewText = edit.Insert, Range = edit.Remove.GetRange() });
-        return TextEditContainer.From(edits);
-    }
+        => TextEditContainer
+            .From(CompilerCache.Value.GetEditsForFormatting(options).Select(GetTextEdit));
+
+    static TextEdit GetTextEdit(Edit edit)
+        => new() { NewText = edit.Insert, Range = edit.Remove.GetRange() };
 }

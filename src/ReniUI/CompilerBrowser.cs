@@ -43,7 +43,9 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     internal IExecutionContext ExecutionContext => Compiler;
     public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
-    internal IEnumerable<Issue> Issues => ExceptionGuard(() => Compiler.Issues, GetIssuesTest) ?? new Issue[0];
+
+    internal IEnumerable<Issue> Issues
+        => ExceptionGuard(() => Compiler.Issues, new IssuesExceptionGuard(this)) ?? new Issue[0];
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Helper.Syntax Syntax
@@ -59,12 +61,12 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     CompilerBrowser(Func<Compiler> parent)
     {
         ParentCache = new(parent);
-        SyntaxCache = new(GetSyntax);
+        SyntaxCache = new(() => ExceptionGuard(GetSyntax, new SyntaxExceptionGuard(this)));
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    TResult ExceptionGuard<TResult>(Func<TResult> getResult, Func<string, string> getTestCode)
+    TResult ExceptionGuard<TResult>(Func<TResult> getResult, GuiExceptionGuard guard)
     {
         try
         {
@@ -72,67 +74,8 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         }
         catch(Exception exception)
         {
-            SaveExceptionInIssues(exception,getTestCode);
-            return default;
+            return guard.Run<TResult>(exception, this);
         }
-    }
-
-    static string Dump(Exception exception)
-    {
-        if(exception == null)
-            return "";
-        var innerExceptionDump = Dump(exception.InnerException);
-        if(innerExceptionDump.Length > 0)
-            innerExceptionDump = $@"
-InnerException: {innerExceptionDump}".Indent();
-
-        return @$"{exception.GetType().PrettyName()}: {exception.Message}
-{exception.StackTrace}{innerExceptionDump}";
-    }
-
-    void SaveExceptionInIssues(Exception exception, Func<string,string> getTestCode)
-    {
-        var sourceFolder = SmbFile.SourceFolder ?? ".".ToSmbFile();
-        var folderName = $"At{DateTime.Now:yyMMdd_HHmmss}";
-        var issueFolder = sourceFolder / "Generated" / folderName;
-
-        SaveExceptionInformationFile(issueFolder ,"Exception.txt",Dump(exception),"Exception Data");
-        SaveExceptionInformationFile(issueFolder ,"Test.cs", @$"#( Source: {Compiler.Source.Identifier} )#
-{Compiler.Source.Data}", "Source file ");
-        SaveExceptionInformationFile(issueFolder ,"Text.reni",getTestCode(folderName),"Test code");
-    }
-
-    static string GetIssuesTest(string folderName) => @$"
-using hw.DebugFormatter;
-using hw.Helper;
-using hw.UnitTest;
-using Reni.FeatureTest.Helper;
-using Reni.Validation;
-
-namespace ReniUI.Generated.{folderName};
-
-[UnitTest]
-public class Test : CompilerTest
-{{
-    protected override string Target => (SmbFile.SourceFolder / ""Text.reni"").String;
-
-    protected override void Verify(IEnumerable<Issue> issues)
-    {{
-        var issueArray = issues.ToArray();
-        var i = 0;
-        //var issueBase = issueArray[i];
-        //(issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
-        //i++;
-        (i == issueArray.Length).Assert();
-    }}
-}}
-";
-
-    static void SaveExceptionInformationFile(SmbFile folder, string name, string content, string title)
-    {
-        var file = folder / name;
-        file.String = content;
-        $"{title} saved to :\n{Tracer.FilePosition(file.FullName, 1, 1, FilePositionTag.Output)}".Log();
     }
 
     public static CompilerBrowser FromText
@@ -201,6 +144,7 @@ public class Test : CompilerTest
     internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
         => (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, sourcePart);
+
 
     Helper.Syntax GetSyntax()
     {
@@ -297,4 +241,8 @@ public class Test : CompilerTest
         NotImplementedFunction(target);
         return default;
     }
+
+    internal IEnumerable<Edit> GetEditsForFormatting(Formatting.Configuration options)
+        => options.Create()
+            .GetEditPieces(this, Source.All);
 }
