@@ -70,7 +70,7 @@ sealed class MainWrapper
 
     async Task<Container<JToken>> IRequestHandler<ConfigurationParams, Container<JToken>>
         .Handle(ConfigurationParams request, CancellationToken cancellationToken)
-        => await Handler.Configuration(request);
+        => await Task.FromResult(Handler.Configuration(request));
 
     async Task<Unit> IRequestHandler<DidChangeConfigurationParams, Unit>.Handle
         (DidChangeConfigurationParams request, CancellationToken cancellationToken)

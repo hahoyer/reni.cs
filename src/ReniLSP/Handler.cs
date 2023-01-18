@@ -54,7 +54,7 @@ sealed class Handler : DumpableObject
     }
 
     public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)
-        => Buffers[identifier.TextDocument.GetKey()].Tokenize(builder, identifier);
+        => Buffers[identifier.TextDocument.GetKey()].Tokenize(builder);
 
     public static TextDocumentAttributes GetTextDocumentAttributes(DocumentUri uri) => new(uri, "reni");
 
@@ -88,7 +88,7 @@ sealed class Handler : DumpableObject
         FormatOptions.IndentCount = options.TabSize;
     }
 
-    public Task<Container<JToken>> Configuration(ConfigurationParams request)
+    public Container<JToken> Configuration(ConfigurationParams request)
     {
         NotImplementedMethod(request);
 #pragma warning disable VSTHRD114 // Avoid returning a null Task
