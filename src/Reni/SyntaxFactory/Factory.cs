@@ -87,7 +87,7 @@ sealed class Factory : DumpableObject
                 return new EmptyList
                 (
                     Anchor.CreateAll(target).Combine(anchor, true)
-                    , IssueId.InvalidExpression.Issue(target.Token)
+                    , IssueId.InvalidExpression.GetIssue(target.Token)
                 );
         }
     }
@@ -105,13 +105,13 @@ sealed class Factory : DumpableObject
     {
         var resultingAnchor = Anchor.Create(target).Combine(anchor);
 
-        if(issueId == IssueId.MissingRightBracket)
+        if(issueId == IssueId.ExtraLeftBracket)
         {
             target.Left.AssertIsNull();
             return GetValueSyntax(target.Right, resultingAnchor);
         }
 
-        if(issueId == IssueId.MissingLeftBracket)
+        if(issueId == IssueId.ExtraRightBracket)
         {
             target.Right.AssertIsNull();
             return GetValueSyntax(target.Left, resultingAnchor);

@@ -20,8 +20,8 @@ public sealed class UnMatchedLeftParenthesis : CompilerTest
         var issueArray = issues.ToArray();
         var i = 0;
         var issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingRightBracket).Assert(issueBase.Dump);
-        (issueBase.Position.GetDumpAroundCurrent(2) == "... ([] }...").Assert(issueBase.Dump);
+        (issueBase.IssueId == IssueId.ExtraLeftBracket).Assert(issueBase.Dump);
+        (issueBase.Position.GetDumpAroundCurrent(2) == "...x [(] }...").Assert(issueBase.Dump);
         i++;
         (i == issueArray.Length).Assert(() => Tracer.Dump(issueArray));
     }
@@ -39,7 +39,7 @@ public sealed class UnMatchedRightParenthesis : CompilerTest
         var issueArray = issues.ToArray();
         var i = 0;
         var issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingLeftBracket).Assert(issueBase.Dump);
+        (issueBase.IssueId == IssueId.ExtraRightBracket).Assert(issueBase.Dump);
         i++;
         (i == issueArray.Length).Assert();
     }

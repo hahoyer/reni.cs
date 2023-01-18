@@ -150,9 +150,9 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
                     ? new BracketNodes { Left = Left, Center = Left.Right, Right = this }
                     : null;
 
-            if(errorToken.IssueId == MissingRightBracket)
+            if(errorToken.IssueId == ExtraLeftBracket)
                 return new() { Left = this, Center = Right, Right = RightMost };
-            if(errorToken.IssueId == MissingLeftBracket)
+            if(errorToken.IssueId == ExtraRightBracket)
                 return new() { Left = Left.LeftMost, Center = Left, Right = this };
             if(errorToken.IssueId == MissingMatchingRightBracket)
                 return new() { Left = Left, Center = Left.Right, Right = this };
@@ -185,7 +185,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
                     return null;
                 left.AssertIsNull();
                 rightBracket.AssertIsNull();
-                return MissingRightBracket;
+                return ExtraLeftBracket;
             }
 
             rightBracket.AssertIsNotNull();
@@ -195,7 +195,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
             var innerLeftBracket = left.InnerTokenClass as ILeftBracket;
             if(innerLeftBracket == null)
-                return MissingLeftBracket;
+                return ExtraRightBracket;
 
             left.Left.AssertIsNull();
 
@@ -230,14 +230,14 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         if(TokenClass is not IIssueTokenClass errorToken)
             return null;
 
-        if(errorToken.IssueId == MissingRightBracket)
-            return errorToken.IssueId.Issue(Right?.SourcePart ?? Token.End.Span(0));
-        if(errorToken.IssueId == MissingLeftBracket)
-            return errorToken.IssueId.Issue(Left.SourcePart);
+        if(errorToken.IssueId == ExtraLeftBracket)
+            return errorToken.IssueId.GetIssue(Token, Right?.SourcePart ?? Token.End.Span(0));
+        if(errorToken.IssueId == ExtraRightBracket)
+            return errorToken.IssueId.GetIssue(Token, Left.SourcePart);
         if(errorToken.IssueId == MissingMatchingRightBracket)
-            return errorToken.IssueId.Issue(Left.Right.SourcePart);
+            return errorToken.IssueId.GetIssue(Left.Right.SourcePart);
         if(errorToken.IssueId == EOFInComment || errorToken.IssueId == EOLInString)
-            return errorToken.IssueId.Issue(Token);
+            return errorToken.IssueId.GetIssue(Token);
 
         throw new InvalidEnumArgumentException($"Unexpected issue: {errorToken.IssueId}");
     }

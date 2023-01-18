@@ -705,7 +705,7 @@ abstract class TypeBase
 
     Result IssueResult(Category category, IssueId issueId, SourcePart token, Issue[] leftIssues)
         => issueId
-            .Result(category, token, Root, "Type: " + DumpPrintText, leftIssues);
+            .GetResult(category, token, this, leftIssues);
 
     internal Result Execute
     (

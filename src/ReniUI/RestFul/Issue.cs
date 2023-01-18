@@ -9,7 +9,7 @@
                 Start = arg.Position.Position,
                 Length = arg.Position.Length,
                 Id = arg.IssueId.Tag,
-                Message = arg.AdditionalMessage
+                Message = arg.Message
             };
 
         public string Source;

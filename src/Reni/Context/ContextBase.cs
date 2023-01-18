@@ -302,7 +302,7 @@ abstract class ContextBase
         if(searchResult == null)
             return IssueId
                 .MissingDeclarationInContext
-                .Result(category, token, RootContext, "Context: " + RootContext.Format);
+                .GetResult(category, token, RootContext);
 
         var result = searchResult.Result(category, CacheObject.AsObject, token, this, right);
 

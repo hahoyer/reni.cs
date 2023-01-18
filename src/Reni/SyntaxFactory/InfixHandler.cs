@@ -11,7 +11,7 @@ using Reni.Validation;
 
 namespace Reni.SyntaxFactory;
 
-class InfixHandler : DumpableObject, IValueProvider
+sealed class InfixHandler : DumpableObject, IValueProvider
 {
     abstract class InfixTypeErrorTokenClass : DumpableObject, IIssueTokenClass
     {
@@ -37,6 +37,24 @@ class InfixHandler : DumpableObject, IValueProvider
                 return $"(actual: {types.Stringify(",")})";
             }
         }
+        IEnumerable<string> Types
+        {
+            get
+            {
+                var tokenClass = ActualTokenClass;
+                var types = new List<string>();
+                if(tokenClass is IInfix)
+                    types.Add("infix");
+                if(tokenClass is ISuffix)
+                    types.Add("suffix");
+                if(tokenClass is IPrefix)
+                    types.Add("prefix");
+                if(tokenClass is ITerminal)
+                    types.Add("terminal");
+
+                return types;
+            }
+        }
 
         protected InfixTypeErrorTokenClass(IssueId issueId, ITokenClass actualTokenClass)
         {
@@ -47,7 +65,7 @@ class InfixHandler : DumpableObject, IValueProvider
         IssueId IIssueTokenClass.IssueId => IssueId;
         string ITokenClass.Id => $"<error:{IssueId}/{ActualTokenClass}>";
 
-        protected Issue GetIssue(SourcePart sourcePart) => IssueId.Issue(sourcePart, Message);
+        protected Issue GetIssue(SourcePart sourcePart) => IssueId.GetIssue(sourcePart, Types.Stringify("/"));
     }
 
     sealed class InfixErrorTokenClass : InfixTypeErrorTokenClass, IInfix

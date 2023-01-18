@@ -35,7 +35,7 @@ sealed class DeclarerSyntax : DumpableObject
         protected override IEnumerable<Issue> GetIssues()
         {
             if(Value == null)
-                yield return IssueId.InvalidDeclarationTag.Issue(Anchor.Main.SourcePart);
+                yield return IssueId.InvalidDeclarationTag.GetIssue(Anchor.Main.SourcePart);
         }
 
         internal override void AssertValid(Level level, BinaryTree target = null)
@@ -156,7 +156,7 @@ sealed class DeclarerSyntax : DumpableObject
             ? null
             : new IssueSyntax
             (
-                IssueId.InvalidDeclaration.Issue(issueAnchor.SourcePart)
+                IssueId.InvalidDeclaration.GetIssue(issueAnchor.SourcePart)
                 , Anchor.Create(issueAnchor.GetNodesFromLeftToRight().ToArray())
             );
 

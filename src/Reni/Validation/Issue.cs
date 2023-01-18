@@ -16,7 +16,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
     internal readonly IssueId IssueId;
 
     [EnableDump]
-    internal readonly string AdditionalMessage;
+    readonly object[] AdditionalInformation;
 
     [DisableDump]
     internal string Tag => IssueId.Tag;
@@ -28,29 +28,20 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
             var result = Position.Id == "("
                 ? Position.Start.FilePosition(Tag) + " Functional"
                 : Position.FileErrorPosition(Tag);
-            if(string.IsNullOrWhiteSpace(AdditionalMessage))
-                return result;
-            return result + " " + AdditionalMessage;
+            var additionalInformation = AdditionalInformation.Select(p => " " + p.NodeDump()).Stringify("");
+            return result + additionalInformation;
         }
     }
 
-    public string Message
-    {
-        get
-        {
-            var result = IssueId.Tag;
-            if(string.IsNullOrWhiteSpace(AdditionalMessage))
-                return result;
-            return result + " " + AdditionalMessage;
-        }
-    }
+    [DisableDump]
+    internal string Message => IssueId.GetMessage(AdditionalInformation);
 
-    internal Issue(IssueId issueId, SourcePart position, string additionalMessage = null)
+    internal Issue(IssueId issueId, SourcePart position, params object[] additionalInformation)
         : base(NextObjectId++)
     {
         IssueId = issueId;
-        AdditionalMessage = additionalMessage ?? "";
         Position = position;
+        AdditionalInformation = additionalInformation;
         AssertValid();
         StopByObjectIds();
     }
@@ -64,7 +55,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
         return
             Equals(Position, other.Position)
             && Equals(IssueId, other.IssueId)
-            && string.Equals(AdditionalMessage, other.AdditionalMessage);
+            && AdditionalInformation.SequenceEqual(other.AdditionalInformation);
     }
 
     protected override string GetNodeDump()
@@ -85,7 +76,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
         {
             var hashCode = Position.GetHashCode();
             hashCode = (hashCode * 397) ^ IssueId.GetHashCode();
-            hashCode = (hashCode * 397) ^ AdditionalMessage.GetHashCode();
+            hashCode = (hashCode * 397) ^ AdditionalInformation.GetHashCode();
             return hashCode;
         }
     }

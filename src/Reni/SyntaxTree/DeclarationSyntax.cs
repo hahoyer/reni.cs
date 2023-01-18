@@ -49,9 +49,9 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     protected override IEnumerable<Issue> GetIssues()
     {
         if(Declarer == null)
-            yield return IssueId.MissingDeclarationDeclarer.Issue(Anchor.Main.SourcePart);
+            yield return IssueId.MissingDeclarationDeclarer.GetIssue(Anchor.Main.SourcePart);
         if(Value == null)
-            yield return IssueId.MissingDeclarationValue.Issue(Anchor.Main.SourcePart);
+            yield return IssueId.MissingDeclarationValue.GetIssue(Anchor.Main.SourcePart);
     }
 
     [DisableDump]
