@@ -60,6 +60,7 @@ public abstract class Item : DumpableObject
         }
     }
 
+    internal string[] LSPTypes => GetLSPTypes().ToArray();
     internal string[] Types => GetTypes().ToArray();
     string TypeList => GetTypes().Stringify(",");
 
@@ -149,6 +150,20 @@ public abstract class Item : DumpableObject
     }
 
     public override int GetHashCode() => SourcePart.GetHashCode();
+
+    IEnumerable<string> GetLSPTypes()
+    {
+        if(IsComment)
+            yield return "comment";
+        if(IsKeyword)
+            yield return "keyword";
+        if(IsNumber)
+            yield return "number";
+        if(IsText)
+            yield return "string";
+        if(IsIdentifier)
+            yield return "variable";
+    }
 
     IEnumerable<string> GetTypes()
     {
