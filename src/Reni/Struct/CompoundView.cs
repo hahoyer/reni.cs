@@ -239,9 +239,9 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Result AccessViaPositionExpression(Category category, Result rightResult)
     {
         var position = rightResult
-            .Conversion(IndexType)
-            .SmartUn<PointerType>()
-            .Evaluate(Compound.Root.ExecutionContext)
+            .GetConversion(IndexType)
+            .GetSmartUn<PointerType>()
+            .GetValue(Compound.Root.ExecutionContext)
             .ToInt32();
         return AccessViaObjectPointer(category, position);
     }
@@ -385,5 +385,5 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
                 .ReferencePlus(CompoundViewSize);
 
     Result CreateElement(Category category, int index, TypeBase elementType)
-        => AccessViaObjectPointer(category, index).Conversion(elementType);
+        => AccessViaObjectPointer(category, index).GetConversion(elementType);
 }

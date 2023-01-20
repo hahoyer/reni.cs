@@ -350,6 +350,23 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         private set => IssueData.Issues = value;
     }
 
+    [DisableDump]
+    internal Result AutomaticDereferencedAlignedResult
+    {
+        get
+        {
+            var destinationType = Type
+                .AutomaticDereferenceType.Align;
+
+            if(destinationType == Type)
+                return this;
+
+            return Type
+                .GetConversion(CompleteCategory, destinationType)
+                .ReplaceArg(this);
+        }
+    }
+
     internal Result(Category category, Issue[] issues)
         : this
         (
@@ -594,7 +611,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         IsDirty = isDirty;
     }
 
-    internal Result Sequence(Result second)
+    internal Result GetSequence(Result second)
     {
         var result = Clone;
         result.Add(second);
@@ -710,7 +727,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    internal Result LocalBlock(Category category)
+    internal Result GetLocalBlock(Category category)
         => AutomaticDereferenceResult.InternalLocalBlock(category | Category.Type);
 
     Result InternalLocalBlock(Category category)
@@ -730,17 +747,17 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    internal Result Conversion(TypeBase target)
+    internal Result GetConversion(TypeBase target)
     {
-        var conversion = Type.Conversion(CompleteCategory, target);
+        var conversion = Type.GetConversion(CompleteCategory, target);
         return conversion.ReplaceArg(this);
     }
 
-    internal BitsConst Evaluate(IExecutionContext context)
+    internal BitsConst GetValue(IExecutionContext context)
     {
         Closures.IsNone.Assert(Dump);
-        var result = Align.LocalBlock(CompleteCategory);
-        return result.Code.Evaluate(context);
+        var result = Align.GetLocalBlock(CompleteCategory);
+        return result.Code.GetValue(context);
     }
 
     [DebuggerHidden]
@@ -755,7 +772,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult);
+    public static Result operator +(Result aResult, Result bResult) => aResult.GetSequence(bResult);
 
     [DebuggerHidden]
     [PublicAPI]
@@ -821,24 +838,11 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result.ReplaceArg(this);
     }
 
-    internal Result SmartUn<T>()
+    internal Result GetSmartUn<T>()
         where T : IConversion => Type is T? Un() : this;
 
-    internal Result AutomaticDereferencedAlignedResult()
-    {
-        var destinationType = Type
-            .AutomaticDereferenceType.Align;
-
-        if(destinationType == Type)
-            return this;
-
-        return Type
-            .Conversion(CompleteCategory, destinationType)
-            .ReplaceArg(this);
-    }
-
     [PublicAPI]
-    internal Result DereferencedAlignedResult(Size size)
+    internal Result GetDereferencedAlignedResult(Size size)
         => HasIssue? this :
             HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code.DePointer(size)) :
             this;
@@ -849,7 +853,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
 
     [PublicAPI]
-    internal Result AddCleanup(Result cleanup)
+    internal Result GetWithCleanupAdded(Result cleanup)
     {
         if(!HasCode || !HasClosures || cleanup.IsEmpty)
             return this;
@@ -859,7 +863,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
         var result = Clone;
         if(HasCode)
-            result.Code = result.Code.AddCleanup(cleanup.Code);
+            result.Code = result.Code.GetWithCleanupAdded(cleanup.Code);
         return result;
     }
 
@@ -877,10 +881,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    internal Result InvalidConversion(TypeBase destination)
+    internal Result GetInvalidConversion(TypeBase destination)
         =>
             destination.GetResult
-                (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Closures);
+                (CompleteCategory, () => Code.GetInvalidConversion(destination.Size), () => Closures);
 
     internal bool IsValidOrIssue(Category category)
         => HasIssue || CompleteCategory.Contains(category);

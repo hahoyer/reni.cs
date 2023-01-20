@@ -258,8 +258,8 @@ sealed class ArrayType
                 (category | Category.Type, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
         return elementConstructorResult
                 .ReplaceArg(resultForArg)
-                .Conversion(ElementAccessType)
-                .Conversion(ElementType)
+                .GetConversion(ElementAccessType)
+                .GetConversion(ElementType)
             & category;
     }
 
@@ -278,10 +278,10 @@ sealed class ArrayType
         var newCount = isElementArg? 1 : argsType.ArrayLength(ElementAccessType);
         var newElementsResultRaw
             = isElementArg
-                ? argsType.Conversion(category | Category.Type, ElementAccessType)
-                : argsType.Conversion(category | Category.Type, ElementType.Array(newCount, argsOptions));
+                ? argsType.GetConversion(category | Category.Type, ElementAccessType)
+                : argsType.GetConversion(category | Category.Type, ElementType.Array(newCount, argsOptions));
 
-        var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult();
+        var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult;
         var result = ElementType
             .Array(Count + newCount, argsOptions)
             .GetResult(category, newElementsResult + oldElementsResult);
@@ -313,9 +313,8 @@ sealed class ArrayType
     Result ToNumberOfBaseResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
-        var target = (left & Category.All)
-            .AutomaticDereferencedAlignedResult()
-            .Evaluate(context.RootContext.ExecutionContext)
+        var target = (left & Category.All).AutomaticDereferencedAlignedResult
+            .GetValue(context.RootContext.ExecutionContext)
             .ToString(ElementType.Size);
         var conversionBase = right.Evaluate(context).ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);

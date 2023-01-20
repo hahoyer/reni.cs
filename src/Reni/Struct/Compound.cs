@@ -110,7 +110,7 @@ sealed class Compound
                 .ToArray();
 
             var results = rawResults
-                .Select(r => r.Align.LocalBlock(category))
+                .Select(r => r.Align.GetLocalBlock(category))
                 .ToArray();
             Dump(nameof(results), results);
             BreakExecution();
@@ -118,7 +118,7 @@ sealed class Compound
                 .Aggregate
                 (
                     Root.VoidType.GetResult(category | Category.Type),
-                    (current, next) => current.Sequence(next)
+                    (current, next) => current.GetSequence(next)
                 );
             return ReturnMethodDump(result);
         }
@@ -199,7 +199,7 @@ sealed class Compound
             Dump(nameof(rawResult), rawResult);
             rawResult.CompleteCategory.Contains(category | Category.Type).Assert();
             BreakExecution();
-            var unFunction = rawResult.SmartUn<FunctionType>();
+            var unFunction = rawResult.GetSmartUn<FunctionType>();
             Dump(nameof(unFunction), unFunction);
             BreakExecution();
             var result = unFunction.AutomaticDereferenceResult;

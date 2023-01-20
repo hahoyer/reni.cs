@@ -208,7 +208,7 @@ abstract class CodeBase
         return newResult ?? this;
     }
 
-    internal BitsConst Evaluate(IExecutionContext context)
+    internal BitsConst GetValue(IExecutionContext context)
     {
         var dataStack = new DataStack(context);
         Visit(dataStack);
@@ -278,9 +278,9 @@ abstract class CodeBase
 
     public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
 
-    internal CodeBase AddCleanup(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
+    internal CodeBase GetWithCleanupAdded(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
 
-    internal CodeBase InvalidConversion(Size size) => Add(new InvalidConversionCode(Size, size));
+    internal CodeBase GetInvalidConversion(Size size) => Add(new InvalidConversionCode(Size, size));
 }
 
 abstract class UnexpectedVisitOfPending : Exception { }

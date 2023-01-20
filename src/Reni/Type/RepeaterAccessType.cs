@@ -29,19 +29,18 @@ sealed class RepeaterAccessType
 
     protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.Size;
 
-    protected override CodeBase SetterCode()
+    protected override CodeBase GetSetterCode()
         => Pair(ValueType.SmartPointer)
             .ArgCode
             .ArraySetter(ValueType.Size, IndexType.Size);
 
-    protected override CodeBase GetterCode()
+    protected override CodeBase GetGetterCode()
         => ArgCode.ArrayGetter(ValueType.Size, IndexType.Size);
 
     internal Result GetResult(Category category, Result leftResult, TypeBase right)
     {
         var rightResult = right
-            .Conversion(category | Category.Type, IndexType)
-            .AutomaticDereferencedAlignedResult();
+            .GetConversion(category | Category.Type, IndexType).AutomaticDereferencedAlignedResult;
 
         return GetResult(category, leftResult + rightResult);
     }

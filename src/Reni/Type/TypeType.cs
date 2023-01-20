@@ -79,7 +79,7 @@ sealed class TypeType
     {
         var countResult = right.GetResult(context).AutomaticDereferenceResult;
         var count = countResult
-            .Evaluate(context.RootContext.ExecutionContext)
+            .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();
         var type = Value
             .Align

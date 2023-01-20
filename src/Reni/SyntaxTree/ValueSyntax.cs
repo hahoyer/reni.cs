@@ -95,7 +95,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     internal Result GetResult(ContextBase context) => context.GetResult(Category.All, this);
 
     internal BitsConst Evaluate(ContextBase context)
-        => GetResult(context).Evaluate(context.RootContext.ExecutionContext);
+        => GetResult(context).GetValue(context.RootContext.ExecutionContext);
 
     //[DebuggerHidden]
     internal TypeBase Type(ContextBase context) => context.GetResult(Category.Type, this)?.Type;

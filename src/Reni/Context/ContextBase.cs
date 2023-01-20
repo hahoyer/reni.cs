@@ -312,7 +312,7 @@ abstract class ContextBase
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
     {
-        var target = GetResult(category | Category.Type, argsType).SmartUn<PointerType>().Align;
+        var target = GetResult(category | Category.Type, argsType).GetSmartUn<PointerType>().Align;
         return target
                 .Type
                 .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))

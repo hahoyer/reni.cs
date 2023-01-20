@@ -6,14 +6,14 @@ namespace Reni.Type;
 
 abstract class DataSetterTargetType : SetterTargetType
 {
-    protected abstract CodeBase SetterCode();
-    protected abstract CodeBase GetterCode();
+    protected abstract CodeBase GetSetterCode();
+    protected abstract CodeBase GetGetterCode();
 
     protected override Result SetterResult(Category category)
-        => Root.VoidType.GetResult(category, SetterCode);
+        => Root.VoidType.GetResult(category, GetSetterCode);
 
     protected override Result GetterResult(Category category)
         => ValueType
             .ForcedPointer
-            .GetResult(category, GetterCode);
+            .GetResult(category, GetGetterCode);
 }

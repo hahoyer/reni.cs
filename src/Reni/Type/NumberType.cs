@@ -140,7 +140,7 @@ sealed class NumberType
         var destination = enumerable.SingleOrDefault();
         if(destination != null)
             return OperationResult(category, operation, destination)
-                .ReplaceArg(c => right.Conversion(c, destination.Pointer));
+                .ReplaceArg(c => right.GetConversion(c, destination.Pointer));
 
         NotImplementedMethod(category, right, operation);
         return null;
@@ -165,8 +165,8 @@ sealed class NumberType
         );
 
         var leftResult = ObjectResult(category | Category.Type)
-            .Conversion(Align);
-        var rightResult = right.Pointer.ArgResult(category | Category.Type).Conversion(right.Align);
+            .GetConversion(Align);
+        var rightResult = right.Pointer.ArgResult(category | Category.Type).GetConversion(right.Align);
         var pair = leftResult + rightResult;
         return result.ReplaceArg(pair);
     }

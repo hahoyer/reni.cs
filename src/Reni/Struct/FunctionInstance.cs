@@ -146,7 +146,7 @@ abstract class FunctionInstance
             BreakExecution();
 
             var postProcessedResult = adjustedResult
-                .LocalBlock(category);
+                .GetLocalBlock(category);
 
             Dump("postProcessedResult", postProcessedResult);
             BreakExecution();

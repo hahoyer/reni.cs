@@ -78,7 +78,7 @@ abstract class SetterTargetType
         {
             BreakExecution();
             var sourceResult = right
-                .Conversion(category | Category.Type, ValueType.ForcedPointer);
+                .GetConversion(category | Category.Type, ValueType.ForcedPointer);
             Dump("sourceResult", sourceResult);
             BreakExecution();
 

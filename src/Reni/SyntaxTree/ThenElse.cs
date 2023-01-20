@@ -62,9 +62,9 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
 
     Result CondResult(ContextBase context, Category category)
         => context.GetResult(category | Category.Type, Cond)
-            .Conversion(context.RootContext.BitType.Align)
-            .LocalBlock(category | Category.Type)
-            .Conversion(context.RootContext.BitType);
+            .GetConversion(context.RootContext.BitType.Align)
+            .GetLocalBlock(category | Category.Type)
+            .GetConversion(context.RootContext.BitType);
 
     Result ElseResult(ContextBase context, Category category)
     {
@@ -89,7 +89,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
 
         var commonType = CommonType(context);
         return branchResult.Type
-                .Conversion(category | Category.Type, commonType)
+                .GetConversion(category | Category.Type, commonType)
                 .ReplaceArg(branchResult)
             & category;
     }

@@ -365,7 +365,7 @@ abstract class TypeBase
     internal virtual Result Copier(Category category) => VoidCodeAndRefs(category);
 
     internal virtual Result ApplyTypeOperator(Result argResult)
-        => argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
+        => argResult.Type.GetConversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
 
     protected virtual Result DeAlign(Category category) => ArgResult(category);
     protected virtual ResultCache DePointer(Category category) => ArgResult(category);
@@ -390,7 +390,7 @@ abstract class TypeBase
         try
         {
             BreakExecution();
-            var result = argsType.Conversion(category, this);
+            var result = argsType.GetConversion(category, this);
             return ReturnMethodDump(result);
         }
         finally
@@ -595,14 +595,14 @@ abstract class TypeBase
     internal bool IsConvertible(TypeBase destination)
         => ConversionService.FindPath(this, destination) != null;
 
-    internal Result Conversion(Category category, TypeBase destination)
+    internal Result GetConversion(Category category, TypeBase destination)
     {
         if(Category.Type.Replenished().Contains(category))
             return destination.SmartPointer.GetResult(category);
 
         var path = ConversionService.FindPath(this, destination);
         return path == null
-            ? ArgResult(category).InvalidConversion(destination)
+            ? ArgResult(category).GetInvalidConversion(destination)
             : path.Execute(category | Category.Type);
     }
 
@@ -751,7 +751,7 @@ abstract class TypeBase
     {
         if(AutomaticDereferenceType == right.AutomaticDereferenceType)
             return IdentityOperationResult(category, isEqual)
-                .ReplaceArg(c => right.Conversion(c, AutomaticDereferenceType.Pointer));
+                .ReplaceArg(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
 
         return Root.BitType.GetResult
         (
@@ -769,8 +769,8 @@ abstract class TypeBase
             Closures.Arg
         );
 
-        var leftResult = ObjectResult(category | Category.Type).Conversion(Align);
-        var rightResult = ObjectResult(category | Category.Type).Conversion(Align);
+        var leftResult = ObjectResult(category | Category.Type).GetConversion(Align);
+        var rightResult = ObjectResult(category | Category.Type).GetConversion(Align);
         var pair = leftResult + rightResult;
         return result.ReplaceArg(pair);
     }
