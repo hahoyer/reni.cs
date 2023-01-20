@@ -61,8 +61,12 @@ sealed class Handler : DumpableObject
     public void DidOpen(DidOpenTextDocumentParams request)
     {
         var fileName = request.TextDocument.GetKey();
-        Buffers[fileName] = new(this) { FileName = fileName, Text = request.TextDocument.Text };
-        Buffers[fileName].Validate();
+        Buffers[fileName] = new(this)
+        {
+            FileName = fileName
+            , Text = request.TextDocument.Text
+            , IsValid = true
+        };
     }
 
     public void DidChange(DidChangeTextDocumentParams request)

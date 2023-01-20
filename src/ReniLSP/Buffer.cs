@@ -16,6 +16,18 @@ sealed class Buffer : DumpableObject
     readonly ValueCache<CompilerBrowser> CompilerCache;
     readonly ValueCache<IEnumerable<(Range Range, string Type)>> ItemsCache;
 
+    internal bool IsValid
+    {
+        set
+        {
+            if(!value)
+                return;
+
+            var issues = CompilerCache.Value.GuardedIssues.ToArray();
+            Parent.PublishDiagnostics(FileName, issues);
+        }
+    }
+
     public Buffer(Handler parent)
     {
         Parent = parent;
@@ -28,28 +40,26 @@ sealed class Buffer : DumpableObject
 
     public void ApplyChanges(IEnumerable<TextDocumentContentChangeEvent> changes)
     {
-        foreach(var change in changes)
+        lock(CompilerCache)
         {
-            change.Range.AssertIsNull();
-            if(Text != change.Text)
-                CompilerCache.IsValid = false;
+            foreach(var change in changes)
+            {
+                change.Range.AssertIsNull();
+                if(Text != change.Text)
+                    CompilerCache.IsValid = false;
 
-            Text = change.Text;
+                Text = change.Text;
+            }
+
+            ItemsCache.IsValid = false;
+            IsValid = true;
         }
-
-        Validate();
-    }
-
-    internal void Validate()
-    {
-        var issues = CompilerCache.Value.GuardedIssues.ToArray();
-        if(issues.Any())
-            Parent.PublishDiagnostics(FileName, issues);
     }
 
     public void Tokenize(SemanticTokensBuilder builder)
     {
-        foreach(var item in ItemsCache.Value)
+        var items = ItemsCache.Value;
+        foreach(var item in items)
             builder.Push(item.Range, item.Type);
     }
 
@@ -62,7 +72,7 @@ sealed class Buffer : DumpableObject
 
         foreach(var node in nodes)
         {
-            var nodeTypes = node.GetTypes().ToArray();
+            var nodeTypes = node.LSPTypes.ToArray();
             foreach(var line in node.SourcePart.Split("\n"))
             {
                 var range = line.GetRange();

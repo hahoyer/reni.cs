@@ -1,26 +1,11 @@
 using hw.Scanner;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using ReniUI.Classification;
 
 namespace ReniLSP;
 
 static class Extension
 {
     public static string GetKey(this TextDocumentIdentifier target) => target.Uri.GetFileSystemPath();
-
-    public static IEnumerable<string> GetTypes(this Item item)
-    {
-        if(item.IsComment)
-            yield return "comment";
-        if(item.IsKeyword)
-            yield return "keyword";
-        if(item.IsNumber)
-            yield return "number";
-        if(item.IsText)
-            yield return "string";
-        if(item.IsIdentifier)
-            yield return "variable";
-    }
 
     public static Range GetRange(this SourcePart token)
     {
