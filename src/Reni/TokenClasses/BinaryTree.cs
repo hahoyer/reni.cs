@@ -133,12 +133,12 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     [DisableDump]
     internal IEnumerable<Issue> AllIssues
-        => T(Left?.AllIssues, T(Issue), Right?.AllIssues)
+        => T(Left?.AllIssues, Issues, Right?.AllIssues)
             .ConcatMany()
             .Where(node => node != null);
 
     [DisableDump]
-    internal Issue Issue => this.CachedValue(GetIssue);
+    internal Issue[] Issues => this.CachedValue(GetIssue).NullableToArray().ToArray();
 
     [DisableDump]
     internal BracketNodes BracketKernel

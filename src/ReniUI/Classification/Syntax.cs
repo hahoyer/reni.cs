@@ -49,5 +49,8 @@ sealed class Syntax : Item
             .Select(node => node.Token);
 
     [DisableDump]
-    public override Issue[] Issues => T(T(Master.MainAnchor.Issue), Master.Issues).ConcatMany().ToArray();
+    public override Issue[] Issues 
+        => T(Master.MainAnchor.Issues, Master.Issues)
+            .ConcatMany()
+            .ToArray();
 }
