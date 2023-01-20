@@ -5,5 +5,4 @@
     "reni.formatting.list.LineBreaksBeforeDeclarationToken": false,
     "reni.formatting.list.AdditionalLineBreaksForMultilineItems": true,
     "reni.formatting.list.LineBreaksBeforeListToken": false,
-    "reni.formatting.IndentCount": 2,
 }
