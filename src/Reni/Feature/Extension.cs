@@ -141,13 +141,17 @@ static class Extension
             if(argsType == null)
                 return argsResult.GetCategories(category);
 
-            var result = feature.Function.GetResult(category, argsType);
-            return result.ReplaceArgument(argsResult);
+            return feature
+                .Function
+                .GetResult(category, argsType)
+                .ReplaceArgument(argsResult);
         }
 
-        return valueResult
+        var (result, found) = valueResult
             .Type
-            .GetResult(category, valueResult, currentTarget, null, context, right);
+            .GetResult(category, valueResult, currentTarget, definable: null, context, right);
+        right.Anchor.Items.Single(item=>item.TokenClass is LeftParenthesis).Semantic.Declaration[context]= found;
+        return result;
     }
 
     static Result ValueResult

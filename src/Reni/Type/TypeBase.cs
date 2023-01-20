@@ -671,7 +671,8 @@ abstract class TypeBase
     bool IsDeclarationOption(Definable tokenClass)
         => GetDeclarationsForType(tokenClass).Any();
 
-    Result GetAlignedResult(Category category) => Align.GetResult(category, () => ArgumentCode.GetAlign(), Closures.Argument);
+    Result GetAlignedResult
+        (Category category) => Align.GetResult(category, () => ArgumentCode.GetAlign(), Closures.Argument);
 
     IEnumerable<IConversion> GetSymmetricConversionsForCache()
         => RawSymmetricConversions
@@ -712,7 +713,7 @@ abstract class TypeBase
         => issueId
             .GetResult(category, token, this, declarations, leftIssues);
 
-    internal Result GetResult
+    internal(Result, IImplementation) GetResult
     (
         Category category,
         ResultCache left,
@@ -728,11 +729,11 @@ abstract class TypeBase
             (issueId, declarations) => GetIssueResult(category, issueId, currentTarget, declarations, left.Issues)
         );
 
-    TResult FindDeclarationAndExecute<TResult>
+    (Result, IImplementation) FindDeclarationAndExecute
     (
         Definable definable,
-        Func<SearchResult, TResult> execute,
-        Func<IssueId, SearchResult[], TResult> onError
+        Func<SearchResult, Result> execute,
+        Func<IssueId, SearchResult[], Result> onError
     )
     {
         var searchResults
@@ -743,11 +744,11 @@ abstract class TypeBase
         switch(searchResults.Length)
         {
             case 0:
-                return onError(IssueId.MissingDeclarationForType, null);
+                return (onError(IssueId.MissingDeclarationForType, null), null);
             case 1:
-                return execute(searchResults.First());
+                return (execute(searchResults.First()), searchResults.First());
             default:
-                return onError(IssueId.AmbiguousSymbol, searchResults);
+                return (onError(IssueId.AmbiguousSymbol, searchResults), null);
         }
     }
 

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Remoting.Contexts;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -263,16 +264,18 @@ abstract class ContextBase
     internal Result GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
     {
         var argsType = FindRecentFunctionContextObject.ArgsType;
-        return argsType
+        var (result, found) = argsType
             .GetResult
             (
                 category,
                 new(GetFunctionalArgObjectResult),
                 token,
-                null,
+                definable: null,
                 this,
-                right
+        right
             );
+        right.Anchor.Items.Single(item=>item.TokenClass is LeftParenthesis).Semantic.Declaration[this]= found;
+        return result;
     }
 
     Result GetFunctionalArgObjectResult(Category category)
@@ -295,19 +298,19 @@ abstract class ContextBase
         return null;
     }
 
-    internal Result GetPrefixResult
+    internal(Result, IImplementation) GetPrefixResult
         (Category category, Definable definable, SourcePart token, ValueSyntax right)
     {
         var searchResult = GetDeclaration(definable);
         if(searchResult == null)
-            return IssueId
+            return (IssueId
                 .MissingDeclarationInContext
-                .GetResult(category, token, this);
+                .GetResult(category, token, this), null);
 
         var result = searchResult.GetResult(category, CacheObject.AsObject, token, this, right);
 
         (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
-        return result;
+        return (result, searchResult);
     }
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)

@@ -79,7 +79,11 @@ sealed class ExpressionSyntax : ValueSyntax
         {
             CurrentResultDepth++;
             if(Left == null)
-                return context.GetPrefixResult(category, Definable, Token, Right);
+            {
+                var (prefixResult, declaration) = context.GetPrefixResult(category, Definable, Token, Right);
+                Anchor.Items.Single(item => item.Token == Token).Semantic.Declaration[context] = declaration;
+                return prefixResult;
+            }
 
             var left = context.GetResultAsReferenceCache(Left);
 
@@ -90,8 +94,10 @@ sealed class ExpressionSyntax : ValueSyntax
             if(leftType.HasIssues)
                 return leftType.Issues.GetResult(category, context.RootContext);
 
-            return leftType
+            var (result, found) = leftType
                 .GetResult(category, left, Token, Definable, context, Right);
+            Anchor.Items.Single(item => item.Token == Token).Semantic.Declaration[context] = found;
+            return result;
         }
         finally
         {
@@ -106,7 +112,7 @@ sealed class ExpressionSyntax : ValueSyntax
         if(left == null && right == null)
             return null;
 
-        return Definable.CreateForVisit(left ?? Left, right ?? Right, Anchor, Token);
+        return Create(left ?? Left, Definable, Token, right ?? Right, Anchor);
     }
 
     internal static ExpressionSyntax Create

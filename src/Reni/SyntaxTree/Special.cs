@@ -16,8 +16,8 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
 
     readonly SourcePart Token;
 
-    [DisableDump]
-    internal string Id => Token.Id;
+    [EnableDump]
+    public string Id => Token.Id;
 
     [DisableDump]
     internal long ToNumber => BitsConst.Convert(Id).ToInt64();

@@ -72,6 +72,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     BinaryTree RightNeighbor;
 
     int Depth;
+    internal readonly Semantic Semantic = new ();
 
     BinaryTree
     (
