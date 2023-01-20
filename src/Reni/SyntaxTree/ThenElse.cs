@@ -90,7 +90,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         var commonType = CommonType(context);
         return branchResult.Type
                 .GetConversion(category | Category.Type, commonType)
-                .ReplaceArg(branchResult)
+                .ReplaceArgument(branchResult)
             & category;
     }
 
@@ -113,7 +113,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
             .GetResult
             (
                 category,
-                () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code),
+                () => condResult.Code.GetThenElse(thenResult.Code, elseResult.Code),
                 () => condResult.Closures + thenResult.Closures + elseResult.Closures
             );
     }

@@ -22,7 +22,7 @@ namespace Reni.Code
 
         protected override Size GetSize() => Initialisation.Size;
 
-        internal override CodeBase Add(FiberItem subsequentElement)
+        internal override CodeBase Concat(FiberItem subsequentElement)
         {
             NotImplementedMethod(subsequentElement);
             return null;

@@ -32,10 +32,10 @@ sealed class RepeaterAccessType
     protected override CodeBase GetSetterCode()
         => GetPair(ValueType.SmartPointer)
             .ArgumentCode
-            .ArraySetter(ValueType.Size, IndexType.Size);
+            .GetArraySetter(ValueType.Size, IndexType.Size);
 
     protected override CodeBase GetGetterCode()
-        => ArgumentCode.ArrayGetter(ValueType.Size, IndexType.Size);
+        => ArgumentCode.GetArrayGetter(ValueType.Size, IndexType.Size);
 
     internal Result GetResult(Category category, Result leftResult, TypeBase right)
     {

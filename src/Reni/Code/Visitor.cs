@@ -12,7 +12,7 @@ abstract class Visitor<TCode, TFiber> : DumpableObject
 
     internal abstract TCode Default(CodeBase codeBase);
 
-    internal virtual TCode Arg(Arg visitedObject)
+    internal virtual TCode Arg(Argument visitedObject)
     {
         NotImplementedMethod(visitedObject);
         return default;

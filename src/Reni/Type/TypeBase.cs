@@ -119,7 +119,7 @@ abstract class TypeBase
     internal IReference ForcedReference => Cache.ForcedReference.Value;
 
     [DisableDump]
-    internal CodeBase ArgumentCode => CodeBase.Arg(this);
+    internal CodeBase ArgumentCode => CodeBase.GetArgument(this);
 
     [DisableDump]
     internal TypeBase AutomaticDereferenceType
@@ -137,7 +137,7 @@ abstract class TypeBase
         get
         {
             var alignBits = Root.DefaultRefAlignParam.AlignBits;
-            return Size.Align(alignBits) == Size? this : Cache.Aligner[alignBits];
+            return Size.GetAlign(alignBits) == Size? this : Cache.Aligner[alignBits];
         }
     }
 
@@ -365,7 +365,7 @@ abstract class TypeBase
     internal virtual Result GetCopier(Category category) => GetVoidCodeAndRefs(category);
 
     internal virtual Result GetTypeOperatorApply(Result argResult)
-        => argResult.Type.GetConversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
+        => argResult.Type.GetConversion(argResult.CompleteCategory, this).ReplaceArgument(argResult);
 
     protected virtual Result GetDeAlign(Category category) => GetArgumentResult(category);
     protected virtual ResultCache GetDePointer(Category category) => GetArgumentResult(category);
@@ -477,7 +477,7 @@ abstract class TypeBase
         return GetResult
         (
             category,
-            () => CodeBase.ReferenceCode(target)
+            () => CodeBase.GetReferenceCode(target)
         );
     }
 
@@ -562,7 +562,7 @@ abstract class TypeBase
 
     CodeBase GetLocalReferenceCode()
         => ArgumentCode
-            .LocalReference(this);
+            .GetLocalReference(this);
 
     internal Result GetContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
     {
@@ -572,7 +572,7 @@ abstract class TypeBase
         return GetResult
         (
             category,
-            () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
+            () => CodeBase.GetReferenceCode(target).GetReferenceWithOffset(getOffset()).GetDePointer(Size)
         );
     }
 
@@ -620,7 +620,7 @@ abstract class TypeBase
         .GetResult
         (
             category,
-            () => CodeBase.DumpPrintText(DumpPrintText),
+            () => CodeBase.GetDumpPrintText(DumpPrintText),
             Closures.Void
         );
 
@@ -671,7 +671,7 @@ abstract class TypeBase
     bool IsDeclarationOption(Definable tokenClass)
         => GetDeclarationsForType(tokenClass).Any();
 
-    Result GetAlignedResult(Category category) => Align.GetResult(category, () => ArgumentCode.Align(), Closures.Argument);
+    Result GetAlignedResult(Category category) => Align.GetResult(category, () => ArgumentCode.GetAlign(), Closures.Argument);
 
     IEnumerable<IConversion> GetSymmetricConversionsForCache()
         => RawSymmetricConversions
@@ -696,7 +696,7 @@ abstract class TypeBase
 
     protected Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType.GetResult(category, () => DumpPrintCode)
-            .ReplaceArg(GetDereferencesObjectResult(category));
+            .ReplaceArgument(GetDereferencesObjectResult(category));
 
     Result GetDereferencesObjectResult(Category category)
         =>
@@ -755,12 +755,12 @@ abstract class TypeBase
     {
         if(AutomaticDereferenceType == right.AutomaticDereferenceType)
             return GetIdentityOperationResult(category, isEqual)
-                .ReplaceArg(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
+                .ReplaceArgument(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
 
         return Root.BitType.GetResult
         (
             category,
-            () => CodeBase.BitsConst(BitsConst.Convert(isEqual))
+            () => CodeBase.GetBitsConst(BitsConst.Convert(isEqual))
         );
     }
 
@@ -776,13 +776,13 @@ abstract class TypeBase
         var leftResult = GetObjectResult(category | Category.Type).GetConversion(Align);
         var rightResult = GetObjectResult(category | Category.Type).GetConversion(Align);
         var pair = leftResult + rightResult;
-        return result.ReplaceArg(pair);
+        return result.ReplaceArgument(pair);
     }
 
     CodeBase GetIdentityOperationCode(bool isEqual) => Align
         .GetPair(Align)
         .ArgumentCode
-        .Add(new IdentityTestCode(isEqual, Size.Bit, Align.Size));
+        .Concat(new IdentityTestCode(isEqual, Size.Bit, Align.Size));
 }
 
 // ReSharper disable CommentTypo

@@ -152,7 +152,7 @@ sealed class ArrayReferenceType
     internal override Size SimpleItemSize => ValueType.Size;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => ArgumentCode.DumpPrintText(SimpleItemSize);
+    protected override CodeBase DumpPrintCode => ArgumentCode.GetDumpPrintText(SimpleItemSize);
 
     protected override string GetNodeDump()
         => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;

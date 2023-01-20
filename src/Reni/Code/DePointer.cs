@@ -36,7 +36,7 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(LocalReference precedingElement)
         {
             if(precedingElement.ValueType.Size == DataSize)
-                return precedingElement.ValueCode.BitCast(OutputSize);
+                return precedingElement.ValueCode.GetBitCast(OutputSize);
             return null;
         }
 

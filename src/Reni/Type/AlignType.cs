@@ -49,7 +49,7 @@ sealed class AlignType
     [DisableDump]
     internal override bool IsPointerPossible => false;
 
-    protected override Size GetSize() => Parent.Size.Align(AlignBits);
+    protected override Size GetSize() => Parent.Size.GetAlign(AlignBits);
 
     internal override int? GetSmartArrayLength(TypeBase elementType)
         => Parent.GetSmartArrayLength(elementType);
@@ -65,5 +65,5 @@ sealed class AlignType
         => UnalignedResult(category);
 
     public Result UnalignedResult(Category category)
-        => Parent.GetResult(category, () => ArgumentCode.BitCast(Parent.Size));
+        => Parent.GetResult(category, () => ArgumentCode.GetBitCast(Parent.Size));
 }

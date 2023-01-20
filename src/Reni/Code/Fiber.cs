@@ -17,7 +17,7 @@ sealed class Fiber : CodeBase
     internal readonly FiberItem[] FiberItems;
 
     [DisableDump]
-    internal new bool HasArg => FiberHead.HasArg || FiberItems.Any(x => x.HasArg);
+    internal new bool HasArg => FiberHead.HasArgument || FiberItems.Any(x => x.HasArg);
 
     internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
         : this(fiberHead, null, fiberItem) { }
@@ -48,7 +48,7 @@ sealed class Fiber : CodeBase
             sizeSoFar -= codeBase.InputSize;
             var newResult = sizeSoFar + codeBase.TemporarySize;
             sizeSoFar += codeBase.OutputSize;
-            result = result.Max(newResult).Max(sizeSoFar);
+            result = result.GetMax(newResult).GetMax(sizeSoFar);
         }
 
         return result;
@@ -61,7 +61,7 @@ sealed class Fiber : CodeBase
             .Aggregate
                 (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));
 
-    internal override CodeBase Add(FiberItem subsequentElement)
+    internal override CodeBase Concat(FiberItem subsequentElement)
     {
         var lastFiberItems = new List<FiberItem>
         {

@@ -24,10 +24,10 @@ abstract class CodeBase
 
 
     [DisableDump]
-    internal bool HasArg => Visit(new HasArgVisitor());
+    internal bool HasArgument => Visit(new HasArgumentVisitor());
 
     [DisableDump]
-    internal TypeBase ArgType => Visit(new ArgTypeVisitor());
+    internal TypeBase ArgumentType => Visit(new ArgumentTypeVisitor());
 
     internal static CodeBase Void => BitArray.Void;
 
@@ -51,7 +51,7 @@ abstract class CodeBase
 
     protected abstract Size GetSize();
 
-    internal abstract CodeBase Add(FiberItem subsequentElement);
+    internal abstract CodeBase Concat(FiberItem subsequentElement);
 
     [DisableDump]
     internal virtual bool IsEmpty => false;
@@ -63,7 +63,7 @@ abstract class CodeBase
 
     protected virtual Closures GetRefsImplementation() => Closures.Void();
 
-    protected virtual IEnumerable<CodeBase> AsList() => new[] { this };
+    protected virtual IEnumerable<CodeBase> ToList() => new[] { this };
 
     protected virtual TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => actual.Default(this);
@@ -74,90 +74,90 @@ abstract class CodeBase
 
     protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
 
-    internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
-    internal static CodeBase BitsConst(BitsConst t) => BitsConst(t.Size, t);
+    internal static CodeBase GetBitsConst(Size size, BitsConst t) => new BitArray(size, t);
+    internal static CodeBase GetBitsConst(BitsConst t) => GetBitsConst(t.Size, t);
 
-    internal static CodeBase DumpPrintText(string dumpPrintText)
+    internal static CodeBase GetDumpPrintText(string dumpPrintText)
         => new DumpPrintText(dumpPrintText);
 
-    internal static CodeBase FrameRef() => new TopFrameRef();
+    internal static CodeBase GetFrameRef() => new TopFrameRef();
 
-    internal static FiberItem RecursiveCall(Size refsSize)
+    internal static FiberItem GetRecursiveCall(Size refsSize)
         => new RecursiveCallCandidate(refsSize);
 
-    internal static CodeBase ReferenceCode(IContextReference reference)
+    internal static CodeBase GetReferenceCode(IContextReference reference)
         => new ReferenceCode(reference);
 
-    internal static CodeBase TopRef() => new TopRef();
+    internal static CodeBase GetTopRef() => new TopRef();
 
-    internal static CodeBase List(IEnumerable<CodeBase> data)
+    internal static CodeBase GetList(IEnumerable<CodeBase> data)
     {
         var allData = data
-            .SelectMany(item => item.AsList())
+            .SelectMany(item => item.ToList())
             .ToArray();
 
         return Code.List.Create(allData);
     }
 
-    internal CodeBase Assignment(Size size)
+    internal CodeBase GetAssignment(Size size)
     {
         var alignedSize = size.ByteAlignedSize;
-        return Add(new Assign(alignedSize));
+        return Concat(new Assign(alignedSize));
     }
 
 
-    internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode)
-        => Add(new ThenElse(thenCode, elseCode));
+    internal CodeBase GetThenElse(CodeBase thenCode, CodeBase elseCode)
+        => Concat(new ThenElse(thenCode, elseCode));
 
-    internal LocalReference LocalReference(TypeBase type, bool isUsedOnce = false) => new(type, this, isUsedOnce);
+    internal LocalReference GetLocalReference(TypeBase type, bool isUsedOnce = false) => new(type, this, isUsedOnce);
 
-    internal CodeBase ReferencePlus(Size right)
+    internal CodeBase GetReferenceWithOffset(Size right)
     {
         if(right.IsZero)
             return this;
-        return Add(new ReferencePlusConstant(right, CallingMethodName));
+        return Concat(new ReferencePlusConstant(right, CallingMethodName));
     }
 
-    internal CodeBase ArrayGetter(Size elementSize, Size indexSize)
-        => Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
+    internal CodeBase GetArrayGetter(Size elementSize, Size indexSize)
+        => Concat(new ArrayGetter(elementSize, indexSize, CallingMethodName));
 
-    internal CodeBase ArraySetter(Size elementSize, Size indexSize)
-        => Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
+    internal CodeBase GetArraySetter(Size elementSize, Size indexSize)
+        => Concat(new ArraySetter(elementSize, indexSize, CallingMethodName));
 
-    internal CodeBase DePointer(Size targetSize)
+    internal CodeBase GetDePointer(Size targetSize)
     {
         if(Size.IsZero && targetSize.IsZero)
             return this;
-        return Add(new DePointer(targetSize.ByteAlignedSize, targetSize));
+        return Concat(new DePointer(targetSize.ByteAlignedSize, targetSize));
     }
 
-    internal CodeBase BitCast(Size size)
+    internal CodeBase GetBitCast(Size size)
     {
         if(Size == size)
             return this;
-        return Add(new BitCast(size, Size, Size));
+        return Concat(new BitCast(size, Size, Size));
     }
 
-    CodeBase Sequence(params CodeBase[] data) => List(this.Plus(data));
+    CodeBase GetSequence(params CodeBase[] data) => GetList(this.Plus(data));
 
-    internal CodeBase ReplaceArg(ResultCache arg)
+    internal CodeBase ReplaceArgument(ResultCache argument)
     {
         try
         {
-            var result = arg.Code.IsRelativeReference
-                ? Visit(new ReplaceRelRefArg(arg))
-                : Visit(new ReplaceAbsoluteArg(arg));
+            var result = argument.Code.IsRelativeReference
+                ? Visit(new ReplaceRelRefArgument(argument))
+                : Visit(new ReplaceAbsoluteArgument(argument));
             return result ?? this;
         }
-        catch(ReplaceArg.TypeException typeException)
+        catch(ReplaceArgument.TypeException typeException)
         {
-            DumpDataWithBreak("", "this", this, "arg", arg, "typeException", typeException);
+            DumpDataWithBreak("", "this", this, "argument", argument, "typeException", typeException);
             throw;
         }
     }
 
     /// <summary>
-    ///     Replaces appearences of context in code tree. Assumes, that replacement requires offset alignment when walking
+    ///     Replaces appearances of context in code tree. Assumes, that replacement requires offset alignment when walking
     ///     along code tree
     /// </summary>
     /// <typeparam name="TContext"> </typeparam>
@@ -174,7 +174,7 @@ abstract class CodeBase
     }
 
     /// <summary>
-    ///     Replaces appearences of context in code tree. Assumes, that replacement isn't a reference, that changes when
+    ///     Replaces appearances of context in code tree. Assumes, that replacement isn't a reference, that changes when
     ///     walking along the code tree
     /// </summary>
     /// <typeparam name="TContext"> </typeparam>
@@ -193,10 +193,10 @@ abstract class CodeBase
     internal TCode Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => VisitImplementation(actual);
 
-    internal CodeBase Call(FunctionId index, Size resultSize)
+    internal CodeBase GetCall(FunctionId index, Size resultSize)
     {
         var subsequentElement = new Call(index, resultSize, Size);
-        return Add(subsequentElement);
+        return Concat(subsequentElement);
     }
 
     internal CodeBase TryReplacePrimitiveRecursivity(FunctionId functionId)
@@ -215,38 +215,38 @@ abstract class CodeBase
         return dataStack.Value;
     }
 
-    internal CodeBase Align()
-        => BitCast(Size.NextPacketSize(Root.DefaultRefAlignParam.AlignBits));
+    internal CodeBase GetAlign()
+        => GetBitCast(Size.GetNextPacketSize(Root.DefaultRefAlignParam.AlignBits));
 
-    internal CodeBase LocalBlock(CodeBase copier)
+    internal CodeBase GetLocalBlock(CodeBase copier)
         => new RemoveLocalReferences(this, copier).NewBody;
 
-    internal CodeBase LocalBlockEnd(CodeBase copier, Size initialSize)
+    internal CodeBase GetLocalBlockEnd(CodeBase copier, Size initialSize)
     {
         if(initialSize.IsZero)
             return this;
 
         copier.IsEmpty.Assert();
-        return Add(new Drop(Size, Size - initialSize));
+        return Concat(new Drop(Size, Size - initialSize));
     }
 
-    internal CodeBase NumberOperation
+    internal CodeBase GetNumberOperation
         (string name, Size resultSize, Size leftSize, Size rightSize)
-        => Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
+        => Concat(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
 
-    internal CodeBase DumpPrintNumber() => Add(new DumpPrintNumberOperation(Size, Size.Zero));
+    internal CodeBase GetDumpPrintNumber() => Concat(new DumpPrintNumberOperation(Size, Size.Zero));
 
-    internal CodeBase DumpPrintNumber(Size leftSize)
-        => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
+    internal CodeBase GetDumpPrintNumber(Size leftSize)
+        => Concat(new DumpPrintNumberOperation(leftSize, Size - leftSize));
 
-    internal CodeBase DumpPrintText(Size itemSize)
-        => Add(new DumpPrintTextOperation(Size, itemSize.AssertNotNull()));
+    internal CodeBase GetDumpPrintText(Size itemSize)
+        => Concat(new DumpPrintTextOperation(Size, itemSize.AssertNotNull()));
 
-    internal CodeBase NumberOperation(string operation, Size size)
-        => Add(new BitArrayPrefixOp(operation, size, Size));
+    internal CodeBase GetNumberOperation(string operation, Size size)
+        => Concat(new BitArrayPrefixOp(operation, size, Size));
 
     internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement) => subsequentElement
-        .Aggregate(this, (current, fiberItem) => current.Add(fiberItem));
+        .Aggregate(this, (current, fiberItem) => current.Concat(fiberItem));
 
     internal void Execute(IExecutionContext context, ITraceCollector traceCollector)
     {
@@ -265,22 +265,22 @@ abstract class CodeBase
         }
     }
 
-    protected static Closures GetRefs(CodeBase[] codeBases)
+    protected static Closures GetClosures(CodeBase[] codeBases)
     {
-        var refs = codeBases.Select(code => code.Closures).ToArray();
-        return refs.Aggregate(Closures.Void(), (r1, r2) => r1.Sequence(r2));
+        var closures = codeBases.Select(code => code.Closures).ToArray();
+        return closures.Aggregate(Closures.Void(), (r1, r2) => r1.Sequence(r2));
     }
 
-    internal static CodeBase Arg(TypeBase type) => new Arg(type);
+    internal static CodeBase GetArgument(TypeBase type) => new Argument(type);
 
-    internal Container Container(string description, FunctionId functionId = null)
-        => new(Align(), null, description, functionId);
+    internal Container GetContainer(string description, FunctionId functionId = null)
+        => new(GetAlign(), null, description, functionId);
 
-    public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
+    public static CodeBase operator +(CodeBase a, CodeBase b) => a.GetSequence(b);
 
     internal CodeBase GetWithCleanupAdded(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
 
-    internal CodeBase GetInvalidConversion(Size size) => Add(new InvalidConversionCode(Size, size));
+    internal CodeBase GetInvalidConversion(Size size) => Concat(new InvalidConversionCode(Size, size));
 }
 
 abstract class UnexpectedVisitOfPending : Exception { }

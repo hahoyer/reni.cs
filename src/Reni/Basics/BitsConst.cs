@@ -124,7 +124,7 @@ public sealed class BitsConst : DumpableObject
         : this(new BitsConst(value), size) { }
 
     BitsConst(long value)
-        : this(Size.AutoSize(value))
+        : this(Size.GetAutoSize(value))
         => DataHandler.MoveBytes(DataSize(Size), Data, 0, value);
 
     BitsConst(BitsConst value, Size size)
@@ -436,7 +436,7 @@ public sealed class BitsConst : DumpableObject
     static void MoveData(byte[] data, Size size, byte[] source, Size sourceSize)
     {
         var i = 0;
-        var n = size.Min(sourceSize).ToInt() >> SegmentAlignBits;
+        var n = size.GetMin(sourceSize).ToInt() >> SegmentAlignBits;
         for(; i < n; i++)
             data[i] = source[i];
 
@@ -449,7 +449,7 @@ public sealed class BitsConst : DumpableObject
             return;
         else
         {
-            var bitsToByte = (Size.Byte - sizeEnd.Min(sourceSizeEnd)).ToInt();
+            var bitsToByte = (Size.Byte - sizeEnd.GetMin(sourceSizeEnd)).ToInt();
             data[i] = (byte)((sbyte)((sbyte)source[i] << bitsToByte) >> bitsToByte);
         }
 

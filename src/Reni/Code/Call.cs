@@ -66,7 +66,7 @@ namespace Reni.Code
             if(FunctionId != functionId)
                 return this;
             ResultSize.IsZero.Assert();
-            return CodeBase.RecursiveCall(ArgsAndRefsSize);
+            return CodeBase.GetRecursiveCall(ArgsAndRefsSize);
         }
     }
 }

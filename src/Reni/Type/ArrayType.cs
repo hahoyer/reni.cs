@@ -95,7 +95,7 @@ sealed class ArrayType
     [DisableDump]
     TypeBase IndexType => Root.BitType.Number(IndexSize.ToInt());
 
-    Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
+    Size IndexSize => Size.GetAutoSize(Count).GetAlign(Root.DefaultRefAlignParam.AlignBits);
 
     public ArrayType(TypeBase elementType, int count, string optionsId)
     {
@@ -210,7 +210,7 @@ sealed class ArrayType
             return null;
 
         if(argsType == Root.VoidType)
-            return GetResult(category, () => CodeBase.BitsConst(Size, BitsConst.Convert(0)));
+            return GetResult(category, () => CodeBase.GetBitsConst(Size, BitsConst.Convert(0)));
 
         var function = argsType as IFunction;
         if(function != null)
@@ -226,7 +226,7 @@ sealed class ArrayType
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => ArgumentCode.DumpPrintText(SimpleItemSize);
+    protected override CodeBase DumpPrintCode => ArgumentCode.GetDumpPrintText(SimpleItemSize);
 
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
@@ -256,9 +256,9 @@ sealed class ArrayType
     {
         var resultForArg = indexType
             .GetResult
-                (category | Category.Type, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
+                (category | Category.Type, () => CodeBase.GetBitsConst(indexType.Size, BitsConst.Convert(i)));
         return elementConstructorResult
-                .ReplaceArg(resultForArg)
+                .ReplaceArgument(resultForArg)
                 .GetConversion(ElementAccessType)
                 .GetConversion(ElementType)
             & category;
@@ -293,7 +293,7 @@ sealed class ArrayType
     {
         var result = Root.ConcatPrintResult(category, Count, DumpPrintResult);
         if(category.HasCode())
-            result.Code = CodeBase.DumpPrintText
+            result.Code = CodeBase.GetDumpPrintText
                     ("<<" + (OptionsValue.IsMutable.Value? ":=" : ""))
                 + result.Code;
         return result;
@@ -328,7 +328,7 @@ sealed class ArrayType
     {
         (right == null).Assert();
         return IndexType.GetResult
-            (category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
+            (category, () => CodeBase.GetBitsConst(IndexSize, BitsConst.Convert(Count)));
     }
 
     IConversion ForcedConversion(ArrayReferenceType destination)

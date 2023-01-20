@@ -7,15 +7,15 @@ namespace Reni.Code.ReplaceVisitor;
 /// <summary>
 ///     Handle argument replaces
 /// </summary>
-abstract class ReplaceArg : Base
+abstract class ReplaceArgument : Base
 {
     [Dump("Dump")]
     internal sealed class TypeException : Exception
     {
         readonly CodeBase Actual;
-        readonly Arg VisitedObject;
+        readonly Argument VisitedObject;
 
-        public TypeException(CodeBase actual, Arg visitedObject)
+        public TypeException(CodeBase actual, Argument visitedObject)
         {
             Actual = actual;
             VisitedObject = visitedObject;
@@ -40,7 +40,7 @@ abstract class ReplaceArg : Base
     [DisableDump]
     protected ResultCache ActualArg { get; }
 
-    internal ReplaceArg(ResultCache actualArg)
+    internal ReplaceArgument(ResultCache actualArg)
         : base(NextObjectId++)
     {
         (actualArg != null).Assert(() => "actualArg != null");
@@ -49,7 +49,7 @@ abstract class ReplaceArg : Base
 
     protected abstract CodeBase ActualCode { get; }
 
-    internal override CodeBase Arg(Arg visitedObject)
+    internal override CodeBase Arg(Argument visitedObject)
     {
         if(ActualArg.Type == visitedObject.Type)
             return ActualCode;

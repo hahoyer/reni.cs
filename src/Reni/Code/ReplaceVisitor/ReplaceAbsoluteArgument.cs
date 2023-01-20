@@ -1,8 +1,8 @@
 namespace Reni.Code.ReplaceVisitor
 {
-    sealed class ReplaceAbsoluteArg : ReplaceArg
+    sealed class ReplaceAbsoluteArgument : ReplaceArgument
     {
-        public ReplaceAbsoluteArg(ResultCache actualArg)
+        public ReplaceAbsoluteArgument(ResultCache actualArg)
             : base(actualArg) { }
 
         protected override CodeBase ActualCode => ActualArg.Code;

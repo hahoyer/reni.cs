@@ -3,14 +3,14 @@ using Reni.Type;
 
 namespace Reni.Code
 {
-    sealed class Arg : FiberHead
+    sealed class Argument : FiberHead
     {
         static int NextObjectId;
 
         [Node]
         internal TypeBase Type { get; }
 
-        internal Arg(TypeBase type)
+        internal Argument(TypeBase type)
             : base(NextObjectId++)
         {
             Type = type;

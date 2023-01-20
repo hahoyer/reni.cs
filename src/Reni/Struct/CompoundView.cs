@@ -40,7 +40,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         {
             var innerResult = ((IConversion)Parent).Execute(category);
             var conversion = Type.Pointer.GetMutation(Parent);
-            var result = innerResult.ReplaceArg(conversion);
+            var result = innerResult.ReplaceArgument(conversion);
             return result;
         }
 
@@ -252,7 +252,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Result GetDumpPrintResultViaObject(Category category)
     {
         if(IsDumpPrintResultViaObjectActive)
-            return Root.VoidType.GetResult(category, () => CodeBase.DumpPrintText("?"));
+            return Root.VoidType.GetResult(category, () => CodeBase.GetDumpPrintText("?"));
 
         IsDumpPrintResultViaObjectActive = true;
         var result = Root.ConcatPrintResult
@@ -305,7 +305,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
         var source = result.Source;
         (source == Type.Pointer).Assert(source.Dump);
-        (source == result.GetResult(Category.Code).Code.ArgType).Assert();
+        (source == result.GetResult(Category.Code).Code.ArgumentType).Assert();
         return result;
     }
 
@@ -356,7 +356,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     }
 
     CodeBase ObjectPointerViaContext()
-        => CodeBase.ReferenceCode(Compound).ReferencePlus(CompoundViewSize * -1);
+        => CodeBase.GetReferenceCode(Compound).GetReferenceWithOffset(CompoundViewSize * -1);
 
     internal TypeBase ValueType(int position)
         => Compound
@@ -372,7 +372,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result AtTokenResult(Category category, Result rightResult)
         => AccessViaPositionExpression(category, rightResult)
-            .ReplaceArg(ObjectPointerViaContext);
+            .ReplaceArgument(ObjectPointerViaContext);
 
     internal Result ContextOperatorResult(Category category)
         => ContextReferenceType.GetResult(category, ContextOperatorCode);
@@ -381,8 +381,8 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         => IsHollow
             ? CodeBase.Void
             : CodeBase
-                .ReferenceCode(Type.ForcedReference)
-                .ReferencePlus(CompoundViewSize);
+                .GetReferenceCode(Type.ForcedReference)
+                .GetReferenceWithOffset(CompoundViewSize);
 
     Result CreateElement(Category category, int index, TypeBase elementType)
         => AccessViaObjectPointer(category, index).GetConversion(elementType);

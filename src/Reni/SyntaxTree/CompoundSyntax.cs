@@ -56,7 +56,7 @@ sealed class CompoundSyntax : ValueSyntax
     internal int EndPosition => Statements.Length;
 
     [DisableDump]
-    internal Size IndexSize => Size.AutoSize(Statements.Length);
+    internal Size IndexSize => Size.GetAutoSize(Statements.Length);
 
     [DisableDump]
     internal string[] AllNames => Statements

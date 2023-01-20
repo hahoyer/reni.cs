@@ -113,7 +113,7 @@ sealed class Root
         try
         {
             if(category.HasCode())
-                result.Code = CodeBase.DumpPrintText("(");
+                result.Code = CodeBase.GetDumpPrintText("(");
 
             for(var i = 0; i < count; i++)
             {
@@ -128,7 +128,7 @@ sealed class Root
                 if(category.HasCode())
                 {
                     if(i > 0)
-                        result.Code = result.Code + CodeBase.DumpPrintText(", ");
+                        result.Code = result.Code + CodeBase.GetDumpPrintText(", ");
                     result.Code = result.Code + elemResult.Code;
                 }
 
@@ -141,7 +141,7 @@ sealed class Root
             }
 
             if(category.HasCode())
-                result.Code = result.Code + CodeBase.DumpPrintText(")");
+                result.Code = result.Code + CodeBase.GetDumpPrintText(")");
             return ReturnMethodDump(result);
         }
         finally
@@ -159,8 +159,8 @@ sealed class Root
 
         var result = rawResult
             .Code?
-            .LocalBlock(rawResult.Type.GetCopier(Category.Code).Code)
-            .Align();
+            .GetLocalBlock(rawResult.Type.GetCopier(Category.Code).Code)
+            .GetAlign();
 
         return new(result, rawResult.Issues.ToArray(), description);
     }

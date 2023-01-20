@@ -105,7 +105,7 @@ sealed class SearchResult : DumpableObject, IImplementation
                 Dump(nameof(left), left.Code);
             BreakExecution();
 
-            return ReturnMethodDump(replaceAbsolute.ReplaceArg(left));
+            return ReturnMethodDump(replaceAbsolute.ReplaceArgument(left));
         }
         finally
         {

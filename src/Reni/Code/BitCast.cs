@@ -35,7 +35,7 @@ sealed class BitCast : FiberItem
 
     internal override FiberItem[] TryToCombineBack(BitCast preceding)
     {
-        var inputDataSize = InputDataSize.Min(preceding.InputDataSize);
+        var inputDataSize = InputDataSize.GetMin(preceding.InputDataSize);
         if(OutputSize == InputSize && OutputSize == inputDataSize)
             return new FiberItem[0];
         if(OutputSize == preceding.InputSize && OutputSize == inputDataSize)
@@ -65,7 +65,7 @@ sealed class BitCast : FiberItem
         {
             var result = new TopData(precedingElement.Offset, OutputSize, InputDataSize);
             return result
-                .Add(new BitCast(OutputSize, OutputSize, InputDataSize));
+                .Concat(new BitCast(OutputSize, OutputSize, InputDataSize));
         }
 
         return null;
@@ -77,7 +77,7 @@ sealed class BitCast : FiberItem
            && OutputSize >= InputDataSize
            && OutputSize > InputSize)
             return new TopFrameData(precedingElement.Offset, OutputSize, InputDataSize)
-                .Add(new BitCast(OutputSize, OutputSize, InputDataSize));
+                .Concat(new BitCast(OutputSize, OutputSize, InputDataSize));
         return null;
     }
 

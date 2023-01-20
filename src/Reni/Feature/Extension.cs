@@ -72,8 +72,8 @@ static class Extension
         var result = conversion.Execute(category);
         (result != null).Assert();
 
-        if(result.HasIssue != true && category.HasCode() && result.Code.ArgType != null)
-            (result.Code.ArgType == conversion.Source).Assert
+        if(result.HasIssue != true && category.HasCode() && result.Code.ArgumentType != null)
+            (result.Code.ArgumentType == conversion.Source).Assert
                 (() => result.DebuggerDump());
 
         return result;
@@ -142,7 +142,7 @@ static class Extension
                 return argsResult.GetCategories(category);
 
             var result = feature.Function.GetResult(category, argsType);
-            return result.ReplaceArg(argsResult);
+            return result.ReplaceArgument(argsResult);
         }
 
         return valueResult
@@ -165,7 +165,7 @@ static class Extension
                 .GetResult(valueCategory, Root.VoidType);
 
             return result
-                .ReplaceArg(Root.VoidType.GetResult(Category.All));
+                .ReplaceArgument(Root.VoidType.GetResult(Category.All));
         }
 
         if(right != null && feature.Function != null)
@@ -190,7 +190,7 @@ static class Extension
 
         return feature
             .GetResult(category, token, context, right)
-            .ReplaceArg(left);
+            .ReplaceArgument(left);
     }
 
     internal static T DistinctNotNull<T>(this IEnumerable<T> enumerable)

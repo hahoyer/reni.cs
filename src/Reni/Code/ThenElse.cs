@@ -34,7 +34,7 @@ sealed class ThenElse : FiberItem
 
     internal override Size InputSize => CondSize;
     internal override Size OutputSize => ThenCode.Size;
-    internal override bool HasArg => ThenCode.HasArg || ElseCode.HasArg;
+    internal override bool HasArg => ThenCode.HasArgument || ElseCode.HasArgument;
 
     protected override Closures GetRefsImplementation() => ThenCode.Closures.Sequence(ElseCode.Closures);
 
@@ -50,7 +50,7 @@ sealed class ThenElse : FiberItem
     }
 
     protected override Size GetAdditionalTemporarySize()
-        => ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize;
+        => ThenCode.TemporarySize.GetMax(ElseCode.TemporarySize).GetMax(OutputSize) - OutputSize;
 
     protected override TFiber VisitImplementation<TResult, TFiber>
         (Visitor<TResult, TFiber> actual) => actual.ThenElse(this);

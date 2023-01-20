@@ -42,10 +42,10 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
     protected override string Dump(bool isRecursion) => GetType().PrettyName();
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Align.ArgumentCode.DumpPrintNumber();
+    protected override CodeBase DumpPrintCode => Align.ArgumentCode.GetDumpPrintNumber();
 
     internal NumberType Number(int bitCount) => GetArray(bitCount).Number;
 
     internal Result GetResult(Category category, BitsConst bitsConst) => Number(bitsConst.Size.ToInt())
-        .GetResult(category, () => CodeBase.BitsConst(bitsConst));
+        .GetResult(category, () => CodeBase.GetBitsConst(bitsConst));
 }

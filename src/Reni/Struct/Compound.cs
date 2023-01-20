@@ -154,7 +154,7 @@ sealed class Compound
             BreakExecution();
 
             var result = resultWithCleanup
-                    .ReplaceRelative(this, CodeBase.TopRef, Closures.Void)
+                    .ReplaceRelative(this, CodeBase.GetTopRef, Closures.Void)
                 & category;
 
             if(result.HasIssue)

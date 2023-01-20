@@ -21,7 +21,7 @@ namespace Reni.Code
 
         protected virtual CodeBase TryToCombine(FiberItem subsequentElement) => null;
 
-        internal override CodeBase Add(FiberItem subsequentElement)
+        internal override CodeBase Concat(FiberItem subsequentElement)
             => TryToCombine(subsequentElement) ?? new Fiber(this, subsequentElement);
     }
 }

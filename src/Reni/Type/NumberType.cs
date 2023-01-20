@@ -102,12 +102,12 @@ sealed class NumberType
     protected override Size GetSize() => Parent.Size;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Align.ArgumentCode.DumpPrintNumber(Align.Size);
+    protected override CodeBase DumpPrintCode => Align.ArgumentCode.GetDumpPrintNumber(Align.Size);
 
     Result GetZeroResult() => Root
         .BitType
         .Number(1)
-        .GetResult(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
+        .GetResult(Category.All, () => CodeBase.GetBitsConst(BitsConst.Convert(0)));
 
     Result TextItemResult(Category category) => Parent
         .TextItem
@@ -125,7 +125,7 @@ sealed class NumberType
         (
             ZeroResult.Value.Type.ForcedReference,
             c => ZeroResult.Value.LocalReferenceResult & c)
-        .ReplaceArg(GetObjectResult);
+        .ReplaceArgument(GetObjectResult);
 
     Result EnableCutTokenResult(Category category)
         => EnableCut
@@ -141,7 +141,7 @@ sealed class NumberType
         var destination = enumerable.SingleOrDefault();
         if(destination != null)
             return OperationResult(category, operation, destination)
-                .ReplaceArg(c => right.GetConversion(c, destination.Pointer));
+                .ReplaceArgument(c => right.GetConversion(c, destination.Pointer));
 
         NotImplementedMethod(category, right, operation);
         return null;
@@ -169,7 +169,7 @@ sealed class NumberType
             .GetConversion(Align);
         var rightResult = right.Pointer.GetArgumentResult(category | Category.Type).GetConversion(right.Align);
         var pair = leftResult + rightResult;
-        return result.ReplaceArg(pair);
+        return result.ReplaceArgument(pair);
     }
 
     CodeBase OperationCode(Size resultSize, string token, TypeBase right)
@@ -178,7 +178,7 @@ sealed class NumberType
         return Align
             .GetPair(right.Align)
             .ArgumentCode
-            .NumberOperation(token, resultSize, Align.Size, right.Align.Size);
+            .GetNumberOperation(token, resultSize, Align.Size, right.Align.Size);
     }
 
     Result FlatConversion(Category category, NumberType source)
@@ -189,7 +189,7 @@ sealed class NumberType
         return GetResult
         (
             category,
-            () => source.ArgumentCode.BitCast(Size),
+            () => source.ArgumentCode.GetBitCast(Size),
             Closures.Argument
         );
     }
@@ -203,7 +203,7 @@ sealed class NumberType
             .GetResult
             (
                 category,
-                () => EnableCut.ArgumentCode.BitCast(destination.Size),
+                () => EnableCut.ArgumentCode.GetBitCast(destination.Size),
                 Closures.Argument
             );
     }

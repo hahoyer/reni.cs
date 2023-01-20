@@ -3,16 +3,16 @@ using Reni.Basics;
 
 namespace Reni.Code.ReplaceVisitor
 {
-    sealed class ReplaceRelRefArg : ReplaceArg
+    sealed class ReplaceRelRefArgument : ReplaceArgument
     {
-        ReplaceRelRefArg(ResultCache actualArg, Size offset)
+        ReplaceRelRefArgument(ResultCache actualArg, Size offset)
             : base(actualArg)
         {
             Offset = offset;
             StopByObjectIds(-9);
         }
 
-        internal ReplaceRelRefArg(ResultCache actualArg)
+        internal ReplaceRelRefArgument(ResultCache actualArg)
             : this(actualArg, Size.Zero) {}
 
         [EnableDump]
@@ -20,9 +20,9 @@ namespace Reni.Code.ReplaceVisitor
 
         [DisableDump]
         protected override CodeBase ActualCode
-            => Offset.IsZero ? ActualArg.Code : ActualArg.Code.ReferencePlus(Offset);
+            => Offset.IsZero ? ActualArg.Code : ActualArg.Code.GetReferenceWithOffset(Offset);
 
         protected override Visitor<CodeBase, FiberItem> After(Size size)
-            => new ReplaceRelRefArg(ActualArg, Offset + size);
+            => new ReplaceRelRefArgument(ActualArg, Offset + size);
     }
 }

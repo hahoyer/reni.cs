@@ -32,7 +32,7 @@ sealed class IssueData : DumpableObject
             : base(0) { }
 
         protected override Size GetSize() => Size.Zero;
-        internal override CodeBase Add(FiberItem subsequentElement) => this;
+        internal override CodeBase Concat(FiberItem subsequentElement) => this;
     }
 
     public Issue[] Issues;

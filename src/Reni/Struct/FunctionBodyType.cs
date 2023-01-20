@@ -115,7 +115,7 @@ sealed class FunctionBodyType
     [DisableDump]
     internal override IImplementation FunctionDeclarationForType => this;
 
-    [DisableDump] protected override CodeBase DumpPrintCode => CodeBase.DumpPrintText(Syntax.Tag);
+    [DisableDump] protected override CodeBase DumpPrintCode => CodeBase.GetDumpPrintText(Syntax.Tag);
 
     new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType

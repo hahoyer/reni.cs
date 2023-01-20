@@ -121,7 +121,7 @@ sealed class PointerType
             .GetResult
             (
                 category,
-                () => ArgumentCode.DePointer(ValueType.Size),
+                () => ArgumentCode.GetDePointer(ValueType.Size),
                 Closures.Argument
             );
 
@@ -134,7 +134,7 @@ sealed class PointerType
             .GetResult
             (
                 category,
-                () => ArgumentCode.DePointer(ValueType.Size).Align(),
+                () => ArgumentCode.GetDePointer(ValueType.Size).GetAlign(),
                 Closures.Argument
             );
 }

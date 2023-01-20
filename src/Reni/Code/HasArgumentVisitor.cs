@@ -1,8 +1,8 @@
 namespace Reni.Code;
 
-sealed class HasArgVisitor : Visitor<bool, bool>
+sealed class HasArgumentVisitor : Visitor<bool, bool>
 {
-    internal override bool Arg(Arg visitedObject) => true;
+    internal override bool Arg(Argument visitedObject) => true;
     internal override bool BitArray(BitArray visitedObject) => false;
     internal override bool ContextRef(ReferenceCode visitedObject) => false;
     internal override bool Fiber(Fiber visitedObject) => visitedObject.HasArg;

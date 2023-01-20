@@ -83,7 +83,7 @@ abstract class SetterTargetType
             BreakExecution();
 
             var destinationResult = DestinationResult(category | Category.Type)
-                .ReplaceArg(GetResult(category | Category.Type, this));
+                .ReplaceArgument(GetResult(category | Category.Type, this));
             Dump("destinationResult", destinationResult);
             BreakExecution();
 
@@ -94,7 +94,7 @@ abstract class SetterTargetType
             Dump("result", result);
             BreakExecution();
 
-            return ReturnMethodDump(result.ReplaceArg(resultForArg));
+            return ReturnMethodDump(result.ReplaceArgument(resultForArg));
         }
         finally
         {

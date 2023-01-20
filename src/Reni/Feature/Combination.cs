@@ -16,7 +16,7 @@ sealed class Combination : DumpableObject, IConversion, IEquatable<IConversion>
     }
 
     Result IConversion.Execute(Category category)
-        => Right.GetResult(category).ReplaceArg(Left.GetResult);
+        => Right.GetResult(category).ReplaceArgument(Left.GetResult);
 
     TypeBase IConversion.Source => Left.Source;
 

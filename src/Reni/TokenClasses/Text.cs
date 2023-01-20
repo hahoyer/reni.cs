@@ -23,6 +23,6 @@ sealed class Text : TerminalSyntaxToken
             .GetArray(data.Length)
             .TextItem
             .GetResult
-                (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), Closures.Void);
+                (category, () => CodeBase.GetBitsConst(BitsConst.ConvertAsText(data)), Closures.Void);
     }
 }

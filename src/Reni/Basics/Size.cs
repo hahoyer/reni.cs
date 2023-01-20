@@ -37,7 +37,7 @@ public sealed class Size
         static void TestNextPacketSize(int x, int b)
         {
             var xs = Create(x);
-            (xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b)).Assert();
+            (xs.GetNextPacketSize(BitsConst.SegmentAlignBits) == Create(b)).Assert();
         }
     }
 
@@ -47,13 +47,13 @@ public sealed class Size
 
     public bool IsZero => Value == 0;
 
-    public int SaveByteCount => SaveSizeToPacketCount(BitsConst.SegmentAlignBits);
+    public int SaveByteCount => GetSaveSizeToPacketCount(BitsConst.SegmentAlignBits);
     public static Size Zero => Create(0);
     public static Size Bit => Create(1);
     public static Size Byte => Bit.ByteAlignedSize;
     public bool IsPositive => Value > 0;
     public int ByteCount => GetPacketCount(BitsConst.SegmentAlignBits);
-    public Size ByteAlignedSize => NextPacketSize(BitsConst.SegmentAlignBits);
+    public Size ByteAlignedSize => GetNextPacketSize(BitsConst.SegmentAlignBits);
 
     internal bool IsNegative => !(IsPositive || IsZero);
 
@@ -101,7 +101,7 @@ public sealed class Size
         return result;
     }
 
-    public Size Align(int alignBits)
+    public Size GetAlign(int alignBits)
     {
         var result = GetPacketCount(alignBits) << alignBits;
         if(result == Value)
@@ -111,7 +111,7 @@ public sealed class Size
 
     public int GetPacketCount(int alignBits) => ((Value - 1) >> alignBits) + 1;
 
-    public Size NextPacketSize(int alignBits)
+    public Size GetNextPacketSize(int alignBits)
         => Create(GetPacketCount(alignBits) << alignBits);
 
     public int ToInt() => Value;
@@ -154,14 +154,14 @@ public sealed class Size
 
     public static Size Multiply(int x, Size y) => y.Times(x);
 
-    public Size Max(Size x)
+    public Size GetMax(Size x)
     {
         if(Value > x.Value)
             return this;
         return x;
     }
 
-    public Size Min(Size x)
+    public Size GetMin(Size x)
     {
         if(Value < x.Value)
             return this;
@@ -173,7 +173,7 @@ public sealed class Size
     [UsedImplicitly]
     public string CodeDump() => ByteCount.ToString();
 
-    internal static Size AutoSize(long value)
+    internal static Size GetAutoSize(long value)
     {
         var size = 1;
         var xn = value >= 0? value : -value;
@@ -194,7 +194,7 @@ public sealed class Size
 
     internal string FormatForView() => ToString() + " " + ToCCodeByteType();
 
-    int SaveSizeToPacketCount(int alignBits)
+    int GetSaveSizeToPacketCount(int alignBits)
     {
         AssertAlignedSize(alignBits);
         return GetPacketCount(alignBits);

@@ -126,7 +126,7 @@ sealed class Closures : DumpableObject
             .OrderBy(codeArg => codeArg.Order)
             .ToArray();
 
-    public Closures WithoutArg() => Without(Closure.Instance);
+    public Closures WithoutArgument() => Without(Closure.Instance);
 
     Closures Without(Closures other)
         => other
@@ -172,7 +172,7 @@ sealed class Closures : DumpableObject
 
     internal CodeBase ToCode()
         => Data
-            .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.ReferenceCode(t));
+            .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
 
     internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase codeArgsReference)
     {
@@ -181,15 +181,15 @@ sealed class Closures : DumpableObject
         try
         {
             var refSize = Root.DefaultRefAlignParam.RefSize;
-            var reference = codeArgsReference.ReferencePlus(refSize * Data.Count);
+            var reference = codeArgsReference.GetReferenceWithOffset(refSize * Data.Count);
             var result = code;
             foreach(var referenceInCode in Data)
             {
                 Dump("reference", reference);
                 BreakExecution();
-                reference = reference.ReferencePlus(refSize * -1);
+                reference = reference.GetReferenceWithOffset(refSize * -1);
                 result = result.ReplaceAbsolute
-                    (referenceInCode, () => reference.DePointer(refSize));
+                    (referenceInCode, () => reference.GetDePointer(refSize));
                 Dump("result", result);
             }
 

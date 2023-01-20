@@ -55,7 +55,7 @@ sealed class RemoveLocalReferences : Base
         {
             var valueCode = reference.ValueCode;
             return (valueCode.Visit(this) ?? valueCode)
-                .LocalReference(reference.ValueType, true);
+                .GetLocalReference(reference.ValueType, true);
         }
     }
 
@@ -77,8 +77,8 @@ sealed class RemoveLocalReferences : Base
             => visitedObject != Target
                 ? null
                 : CodeBase
-                    .TopRef()
-                    .ReferencePlus(Offset);
+                    .GetTopRef()
+                    .GetReferenceWithOffset(Offset);
 
 
         protected override Visitor<CodeBase, FiberItem> After(Size size)
@@ -106,7 +106,7 @@ sealed class RemoveLocalReferences : Base
             {
                 BreakExecution();
 
-                (!ReducedBody.HasArg).Assert(ReducedBody.Dump);
+                (!ReducedBody.HasArgument).Assert(ReducedBody.Dump);
 
                 Dump(nameof(ReducedBody), ReducedBody);
                 Dump(nameof(References), References);
@@ -132,13 +132,13 @@ sealed class RemoveLocalReferences : Base
                     var cleanup1 = reference
                         .ValueType
                         .GetCleanup(Category.Code | Category.Closures)
-                        .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, Closures.Void);
+                        .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.GetTopRef, Closures.Void);
                     cleanup = cleanup1 + cleanup;
                     Dump(nameof(cleanup), cleanup);
                     BreakExecution();
                 }
 
-                var result = (body + cleanup.Code).LocalBlockEnd(Copier, initialSize);
+                var result = (body + cleanup.Code).GetLocalBlockEnd(Copier, initialSize);
                 return ReturnMethodDump(result);
             }
             finally

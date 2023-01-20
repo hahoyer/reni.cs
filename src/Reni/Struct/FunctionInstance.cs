@@ -29,7 +29,7 @@ abstract class FunctionInstance
     internal CodeBase BodyCode => this.CachedValue(GetBodyCode);
 
     [DisableDump]
-    internal CodeBase AlignedBodyCode => BodyCode?.Align();
+    internal CodeBase AlignedBodyCode => BodyCode?.GetAlign();
 
     [DisableDump]
     Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
@@ -114,7 +114,7 @@ abstract class FunctionInstance
         if(result.HasIssue != true && category.HasCode())
             result.Code = CallType
                 .ArgumentCode
-                .Call(FunctionId, result.Size);
+                .GetCall(FunctionId, result.Size);
         return result;
     }
 
@@ -174,13 +174,13 @@ abstract class FunctionInstance
 
         return result
             .ReplaceAbsolute
-                (reference, () => CodeBase.FrameRef().DePointer(reference.Size()), Closures.Void);
+                (reference, () => CodeBase.GetFrameRef().GetDePointer(reference.Size()), Closures.Void);
     }
 
     CodeBase CreateContextRefCode()
         => CodeBase
-            .FrameRef()
-            .ReferencePlus(ArgsPartSize);
+            .GetFrameRef()
+            .GetReferenceWithOffset(ArgsPartSize);
 
     CodeBase GetBodyCode()
     {

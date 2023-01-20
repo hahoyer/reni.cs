@@ -33,7 +33,7 @@ sealed class ReplaceRelativeContextRef<TContext> : ReplaceContextRef<TContext>
     protected override Visitor<CodeBase, FiberItem> After
         (Size size) => new ReplaceRelativeContextRef<TContext>(Context, () => AfterCode(size));
 
-    CodeBase AfterCode(Size size) => Replacement().ReferencePlus(size);
+    CodeBase AfterCode(Size size) => Replacement().GetReferenceWithOffset(size);
 }
 
 sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>

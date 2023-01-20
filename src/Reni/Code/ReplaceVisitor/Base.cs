@@ -15,7 +15,7 @@ abstract class Base : Visitor<CodeBase, FiberItem>
 
     protected Base() => InternalRefs = new(ReVisit);
 
-    internal override CodeBase Arg(Arg visitedObject) => null;
+    internal override CodeBase Arg(Argument visitedObject) => null;
     internal override CodeBase ContextRef(ReferenceCode visitedObject) => null;
     internal override CodeBase BitArray(BitArray visitedObject) => null;
     internal override CodeBase Default(CodeBase codeBase) => null;
@@ -41,7 +41,7 @@ abstract class Base : Visitor<CodeBase, FiberItem>
                 return newListCompleted[0];
         }
 
-        return CodeBase.List(newListCompleted);
+        return CodeBase.GetList(newListCompleted);
     }
 
     protected override FiberItem ThenElse
@@ -65,5 +65,5 @@ abstract class Base : Visitor<CodeBase, FiberItem>
         => visitedObject
             .ValueCode
             .Visit(this)
-            ?.LocalReference(visitedObject.ValueType);
+            ?.GetLocalReference(visitedObject.ValueType);
 }

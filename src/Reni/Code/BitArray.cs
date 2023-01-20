@@ -26,7 +26,7 @@ sealed class BitArray : FiberHead
 
     protected override Size GetSize() => SizeValue;
 
-    protected override IEnumerable<CodeBase> AsList()
+    protected override IEnumerable<CodeBase> ToList()
     {
         if(IsHollow)
             return new CodeBase[0];

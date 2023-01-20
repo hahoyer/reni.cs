@@ -28,7 +28,7 @@ namespace Reni.Code
         [Node]
         public TypeBase ValueType { get; }
         [DisableDump]
-        internal CodeBase AlignedValueCode => ValueCode.Align();
+        internal CodeBase AlignedValueCode => ValueCode.GetAlign();
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override Closures GetRefsImplementation() => ValueCode.Closures;
