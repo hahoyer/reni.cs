@@ -26,24 +26,24 @@ sealed class TypeType
         StopByObjectIds(-61);
     }
 
-    IImplementation ISymbolProvider<ArrayReference>.Feature
+    IImplementation ISymbolProvider<ArrayReference>.GetFeature
         (ArrayReference tokenClass)
         => Value is ArrayType? Feature.Extension.Value(ArrayReferenceResult) : null;
 
-    IImplementation ISymbolProvider<DumpPrintToken>.Feature
+    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature
         (DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult);
+        => Feature.Extension.Value(GetDumpPrintTokenResult);
 
-    IImplementation ISymbolProvider<Mutable>.Feature
+    IImplementation ISymbolProvider<Mutable>.GetFeature
         (Mutable tokenClass)
         => Value is ArrayType? Feature.Extension.Value(MutableArrayResult) :
             Value is ArrayReferenceType? Feature.Extension.Value(MutableReferenceResult) : null;
 
-    IImplementation ISymbolProvider<Slash>.Feature
+    IImplementation ISymbolProvider<Slash>.GetFeature
         (Slash tokenClass)
         => Feature.Extension.MetaFeature(SlashResult);
 
-    IImplementation ISymbolProvider<Star>.Feature
+    IImplementation ISymbolProvider<Star>.GetFeature
         (Star tokenClass)
         => Feature.Extension.MetaFeature(StarResult);
 
@@ -71,7 +71,7 @@ sealed class TypeType
             .ReplaceArg(getRightResult);
     }
 
-    new Result DumpPrintTokenResult(Category category)
+    new Result GetDumpPrintTokenResult(Category category)
         => Value.GetDumpPrintTypeNameResult(category);
 
     Result StarResult

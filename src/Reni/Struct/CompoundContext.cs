@@ -27,7 +27,7 @@ sealed class CompoundContext : Child, ISymbolProviderForPointer<Definable>, ICon
 
     int IContextReference.Order => Order;
 
-    IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
+    IImplementation ISymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, false);
 
     protected override string GetContextChildIdentificationDump()

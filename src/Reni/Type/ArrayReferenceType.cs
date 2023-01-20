@@ -106,23 +106,23 @@ sealed class ArrayReferenceType
     TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
     bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
         => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     IImplementation ISymbolProviderForPointer<EnableReinterpretation>.
-        Feature
+        GetFeature
         (EnableReinterpretation tokenClass)
         => Feature.Extension.Value(EnableReinterpretationResult);
 
-    IImplementation ISymbolProviderForPointer<Minus>.Feature
+    IImplementation ISymbolProviderForPointer<Minus>.GetFeature
         (Minus tokenClass)
         => Feature.Extension.FunctionFeature(MinusResult);
 
-    IImplementation ISymbolProviderForPointer<Mutable>.Feature
+    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature
         (Mutable tokenClass)
         => Feature.Extension.Value(MutableResult);
 
-    IImplementation ISymbolProviderForPointer<Plus>.Feature
+    IImplementation ISymbolProviderForPointer<Plus>.GetFeature
         (Plus tokenClass)
         => Feature.Extension.FunctionFeature(PlusResult);
 

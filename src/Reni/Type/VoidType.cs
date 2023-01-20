@@ -7,8 +7,8 @@ namespace Reni.Type;
 
 sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
 {
-    IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult);
+    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
+        => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     [DisableDump]
     internal override Root Root => null;
@@ -24,5 +24,5 @@ sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
     protected override TypeBase GetReversePair(TypeBase first) => first;
     internal override TypeBase GetPair(TypeBase second) => second;
 
-    new Result DumpPrintTokenResult(Category category) => GetResult(category);
+    new Result GetDumpPrintTokenResult(Category category) => GetResult(category);
 }

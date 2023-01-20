@@ -120,12 +120,12 @@ sealed class ArrayType
     bool IRepeaterType.IsMutable => IsMutable;
 
     IImplementation ISymbolProviderForPointer<ArrayReference>.
-        Feature
+        GetFeature
         (ArrayReference tokenClass)
         => Feature.Extension.Value(ReferenceResult);
 
     IImplementation ISymbolProviderForPointer<ConcatArrays>.
-        Feature(ConcatArrays tokenClass)
+        GetFeature(ConcatArrays tokenClass)
         =>
             Feature.Extension.FunctionFeature
             (
@@ -138,29 +138,29 @@ sealed class ArrayType
                         OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
                 this);
 
-    IImplementation ISymbolProviderForPointer<Count>.Feature
+    IImplementation ISymbolProviderForPointer<Count>.GetFeature
         (Count tokenClass)
         => Feature.Extension.MetaFeature(CountResult);
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.
-        Feature
+        GetFeature
         (DumpPrintToken tokenClass)
         =>
             OptionsValue.IsTextItem.Value
                 ? Feature.Extension.Value(GetDumpPrintTokenResult)
                 : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
-    IImplementation ISymbolProviderForPointer<Mutable>.Feature
+    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature
         (Mutable tokenClass)
         => Feature.Extension.Value(MutableResult);
 
-    IImplementation ISymbolProviderForPointer<TextItem>.Feature
+    IImplementation ISymbolProviderForPointer<TextItem>.GetFeature
         (TextItem tokenClass)
         => Feature.Extension.Value(TextItemResult);
 
 
     IImplementation ISymbolProviderForPointer<ToNumberOfBase>.
-        Feature
+        GetFeature
         (ToNumberOfBase tokenClass)
         =>
             OptionsValue.IsTextItem.Value

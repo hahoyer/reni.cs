@@ -44,7 +44,7 @@ sealed class PointerType
     IConversion IReference.Converter => this;
     bool IReference.IsWeak => true;
 
-    IImplementation ISymbolProvider<StableReference>.Feature
+    IImplementation ISymbolProvider<StableReference>.GetFeature
         (StableReference tokenClass)
         => Feature.Extension.Value(GetConversionToStableReference);
 
@@ -106,7 +106,7 @@ sealed class PointerType
 
     internal override IEnumerable<SearchResult> GetDeclarations<TDefinable>(TDefinable tokenClass)
     {
-        var feature = (ValueType as ISymbolProviderForPointer<TDefinable>)?.Feature(tokenClass);
+        var feature = (ValueType as ISymbolProviderForPointer<TDefinable>)?.GetFeature(tokenClass);
         if(feature == null)
             return base.GetDeclarations(tokenClass);
 

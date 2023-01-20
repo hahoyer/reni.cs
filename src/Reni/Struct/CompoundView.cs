@@ -249,7 +249,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Size FieldOffset(int position)
         => Compound.FieldOffsetFromAccessPoint(ViewPosition, position);
 
-    internal Result DumpPrintResultViaObject(Category category)
+    internal Result GetDumpPrintResultViaObject(Category category)
     {
         if(IsDumpPrintResultViaObjectActive)
             return Root.VoidType.GetResult(category, () => CodeBase.DumpPrintText("?"));
@@ -259,7 +259,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         (
             category,
             ViewPosition,
-            DumpPrintResultViaObject
+            GetDumpPrintResultViaObject
         );
         IsDumpPrintResultViaObjectActive = false;
         return result;
@@ -333,7 +333,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             );
     }
 
-    Result DumpPrintResultViaObject(Category category, int position)
+    Result GetDumpPrintResultViaObject(Category category, int position)
     {
         var trace = ObjectId == -5 && position == 1;
         StartMethodDump(trace, category, position);

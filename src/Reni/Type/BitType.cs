@@ -23,7 +23,7 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
 
     internal BitType(Root root) => Root = root;
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature
         (DumpPrintToken tokenClass)
         => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 

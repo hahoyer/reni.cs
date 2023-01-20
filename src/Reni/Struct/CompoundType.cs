@@ -29,18 +29,18 @@ sealed class CompoundType
 
     ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
-    IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
+    IImplementation ISymbolProvider<Definable>.GetFeature(Definable tokenClass)
         => IsHollow? View.Find(tokenClass, true) : null;
 
-    IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-        => IsHollow? Feature.Extension.Value(DumpPrintTokenResult) : null;
+    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
+        => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
 
-    IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
+    IImplementation ISymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, true);
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature
         (DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult);
+        => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     [DisableDump]
     internal override Root Root => View.Root;
@@ -100,6 +100,6 @@ sealed class CompoundType
 
     Result VoidConversion(Category category) => GetMutation(Root.VoidType) & category;
 
-    new Result DumpPrintTokenResult(Category category)
-        => View.DumpPrintResultViaObject(category);
+    new Result GetDumpPrintTokenResult(Category category)
+        => View.GetDumpPrintResultViaObject(category);
 }

@@ -56,12 +56,12 @@ sealed class Root
 
     internal Root(IParent parent) => Parent = parent;
 
-    IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature(ConcatArrays tokenClass)
+    IImplementation ISymbolProviderForPointer<ConcatArrays>.GetFeature(ConcatArrays tokenClass)
         => tokenClass.IsMutable
             ? this.CachedValue(() => GetCreateArrayFeature(true))
             : this.CachedValue(() => GetCreateArrayFeature(false));
 
-    IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass)
+    IImplementation ISymbolProviderForPointer<Minus>.GetFeature(Minus tokenClass)
         => this.CachedValue(GetMinusFeature);
 
     [DisableDump]

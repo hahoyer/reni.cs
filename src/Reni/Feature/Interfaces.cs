@@ -107,7 +107,7 @@ interface ISearchTarget { }
 interface ISymbolProviderForPointer<TDefinable>
     where TDefinable : Definable
 {
-    IImplementation Feature(TDefinable tokenClass);
+    IImplementation GetFeature(TDefinable tokenClass);
 }
 
 // ReSharper disable once TypeParameterCanBeVariant
@@ -115,7 +115,7 @@ interface ISymbolProviderForPointer<TDefinable>
 interface ISymbolProvider<TDefinable>
     where TDefinable : Definable
 {
-    IImplementation Feature(TDefinable tokenClass);
+    IImplementation GetFeature(TDefinable tokenClass);
 }
 
 interface IGenericProviderForType
@@ -125,8 +125,8 @@ interface IGenericProviderForType
 
 interface IDeclarationProvider
 {
-    IEnumerable<SearchResult> Declarations(TypeBase source);
-    IEnumerable<IImplementation> Declarations(ContextBase source);
+    IEnumerable<SearchResult> GetDeclarations(TypeBase source);
+    IEnumerable<IImplementation> GetDeclarations(ContextBase source);
 }
 
 sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
@@ -144,10 +144,10 @@ sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvid
     readonly T Target;
     public GenericProviderForDefinable(T target) => Target = target;
 
-    IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
+    IEnumerable<SearchResult> IDeclarationProvider.GetDeclarations(TypeBase source)
         => source.GetDeclarations(Target);
 
-    IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
+    IEnumerable<IImplementation> IDeclarationProvider.GetDeclarations(ContextBase source)
         => source.GetDeclarations(Target);
 }
 

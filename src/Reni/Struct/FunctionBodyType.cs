@@ -97,8 +97,8 @@ sealed class FunctionBodyType
 
     IMeta IMetaImplementation.Function => null;
 
-    IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult, this);
+    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
+        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     Result IValue.Execute(Category category)
     {
@@ -117,7 +117,7 @@ sealed class FunctionBodyType
 
     [DisableDump] protected override CodeBase DumpPrintCode => CodeBase.DumpPrintText(Syntax.Tag);
 
-    new Result DumpPrintTokenResult(Category category)
+    new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType
             .GetResult(category, () => DumpPrintCode);
 

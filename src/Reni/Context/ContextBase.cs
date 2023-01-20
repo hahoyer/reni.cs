@@ -182,7 +182,7 @@ abstract class ContextBase
         where TDefinable : Definable
     {
         var provider = this as ISymbolProviderForPointer<TDefinable>;
-        var feature = provider?.Feature(tokenClass);
+        var feature = provider?.GetFeature(tokenClass);
         if(feature != null)
             yield return feature;
     }
@@ -286,7 +286,7 @@ abstract class ContextBase
         var genericTokenClass = tokenClass.MakeGeneric.ToArray();
         var results
             = genericTokenClass
-                .SelectMany(g => g.Declarations(this));
+                .SelectMany(g => g.GetDeclarations(this));
         var result = results.SingleOrDefault();
         if(result != null || RootContext.ProcessErrors)
             return result;

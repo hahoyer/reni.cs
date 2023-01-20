@@ -54,19 +54,19 @@ sealed class NumberType
                     (category => destination.FlatConversion(category, this), this);
     }
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
         => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
-    IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
+    IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.GetFeature
         (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
 
-    IImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
+    IImplementation ISymbolProviderForPointer<Negate>.GetFeature(Negate tokenClass)
         => Feature.Extension.Value(NegationResult);
 
-    IImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
+    IImplementation ISymbolProviderForPointer<Operation>.GetFeature(Operation tokenClass)
         => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
 
-    IImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
+    IImplementation ISymbolProviderForPointer<TextItem>.GetFeature(TextItem tokenClass)
         => Feature.Extension.Value(TextItemResult);
 
     [DisableDump]

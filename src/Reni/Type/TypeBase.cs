@@ -205,7 +205,7 @@ abstract class TypeBase
 
     Root IRootProvider.Value => Root;
 
-    IImplementation ISymbolProviderForPointer<IdentityOperation>.Feature(IdentityOperation tokenClass)
+    IImplementation ISymbolProviderForPointer<IdentityOperation>.GetFeature(IdentityOperation tokenClass)
         => Feature.Extension.FunctionFeature(
             (category, right, operation) => GetIdentityOperationResult(category, right, operation.IsEqual), tokenClass);
 
@@ -419,7 +419,7 @@ abstract class TypeBase
         where TDefinable : Definable
     {
         var provider = this as ISymbolProvider<TDefinable>;
-        var feature = provider?.Feature(tokenClass);
+        var feature = provider?.GetFeature(tokenClass);
         if(feature != null)
             yield return SearchResult.Create(feature, this);
     }
@@ -644,7 +644,7 @@ abstract class TypeBase
 
         return definable
             .MakeGeneric
-            .SelectMany(g => g.Declarations(this))
+            .SelectMany(g => g.GetDeclarations(this))
             .ToArray();
     }
 

@@ -24,8 +24,8 @@ sealed class ContextReferenceType
 
     internal ContextReferenceType(CompoundView parent) => Parent = parent;
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult, this);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
+        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     [DisableDump]
     internal override Root Root => Parent.Root;
@@ -52,7 +52,7 @@ sealed class ContextReferenceType
         => base.StripConversions
             .Concat(new[] { Feature.Extension.Conversion(PointerConversion) });
 
-    new Result DumpPrintTokenResult(Category category)
+    new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType
             .GetResult(category, ()=>DumpPrintCode);
 
