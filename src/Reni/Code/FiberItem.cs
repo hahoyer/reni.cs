@@ -63,7 +63,7 @@ abstract class FiberItem : DumpableObject, IFormalCodeItem
     internal abstract void Visit(IVisitor visitor);
 
     [DisableDump]
-    internal virtual bool HasArg => false;
+    internal virtual bool HasArgument => false;
 
     protected virtual Size GetAdditionalTemporarySize() => Size.Zero;
 

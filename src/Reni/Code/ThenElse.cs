@@ -34,7 +34,7 @@ sealed class ThenElse : FiberItem
 
     internal override Size InputSize => CondSize;
     internal override Size OutputSize => ThenCode.Size;
-    internal override bool HasArg => ThenCode.HasArgument || ElseCode.HasArgument;
+    internal override bool HasArgument => ThenCode.HasArgument || ElseCode.HasArgument;
 
     protected override Closures GetRefsImplementation() => ThenCode.Closures.Sequence(ElseCode.Closures);
 

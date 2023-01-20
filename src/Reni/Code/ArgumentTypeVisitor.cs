@@ -4,7 +4,7 @@ namespace Reni.Code
 {
     sealed class ArgumentTypeVisitor : Visitor<TypeBase, TypeBase>
     {
-        internal override TypeBase Arg(Argument visitedObject) => visitedObject.Type;
+        internal override TypeBase Argument(Argument visitedObject) => visitedObject.Type;
         internal override TypeBase BitArray(BitArray visitedObject) => null;
         internal override TypeBase ContextRef(ReferenceCode visitedObject) => null;
 

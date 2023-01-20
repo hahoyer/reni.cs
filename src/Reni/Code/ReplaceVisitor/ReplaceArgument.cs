@@ -49,7 +49,7 @@ abstract class ReplaceArgument : Base
 
     protected abstract CodeBase ActualCode { get; }
 
-    internal override CodeBase Arg(Argument visitedObject)
+    internal override CodeBase Argument(Argument visitedObject)
     {
         if(ActualArg.Type == visitedObject.Type)
             return ActualCode;

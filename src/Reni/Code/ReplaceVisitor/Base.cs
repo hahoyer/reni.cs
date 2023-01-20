@@ -15,7 +15,7 @@ abstract class Base : Visitor<CodeBase, FiberItem>
 
     protected Base() => InternalRefs = new(ReVisit);
 
-    internal override CodeBase Arg(Argument visitedObject) => null;
+    internal override CodeBase Argument(Argument visitedObject) => null;
     internal override CodeBase ContextRef(ReferenceCode visitedObject) => null;
     internal override CodeBase BitArray(BitArray visitedObject) => null;
     internal override CodeBase Default(CodeBase codeBase) => null;
