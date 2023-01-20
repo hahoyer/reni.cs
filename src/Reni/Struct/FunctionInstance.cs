@@ -110,10 +110,10 @@ abstract class FunctionInstance
             return null;
 
         if(category.HasClosures())
-            result.Closures = Closures.Arg();
+            result.Closures = Closures.Argument();
         if(result.HasIssue != true && category.HasCode())
             result.Code = CallType
-                .ArgCode
+                .ArgumentCode
                 .Call(FunctionId, result.Size);
         return result;
     }
@@ -133,7 +133,7 @@ abstract class FunctionInstance
 
             (rawResult.HasIssue || rawResult.CompleteCategory == (category | Category.Type)).Assert();
             if(rawResult.FindClosures != null)
-                (!rawResult.SmartClosures.Contains(Closures.Arg())).Assert(rawResult.Dump);
+                (!rawResult.SmartClosures.Contains(Closures.Argument())).Assert(rawResult.Dump);
 
             Dump("rawResult", rawResult);
             BreakExecution();

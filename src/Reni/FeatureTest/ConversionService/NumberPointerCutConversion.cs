@@ -21,7 +21,7 @@ public sealed class NumberPointerCutConversion : DependenceProvider
         (calculatedDestination == destination).Assert();
 
         var code = path.Execute(Category.Code | Category.Type).Code
-            .ReplaceArg(source.ArgResult(Category.Code | Category.Type));
+            .ReplaceArg(source.GetArgumentResult(Category.Code | Category.Type));
         code.AssertIsNotNull();
     }
 }

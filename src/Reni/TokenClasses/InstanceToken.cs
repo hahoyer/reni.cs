@@ -46,6 +46,6 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
         var leftType = left.Type(context);
         (leftType != null).Assert();
         return leftType
-            .InstanceResult(category, c => context.GetResultAsReference(c, right));
+            .GetInstanceResult(category, c => context.GetResultAsReference(c, right));
     }
 }

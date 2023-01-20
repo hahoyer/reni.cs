@@ -274,7 +274,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             var weakType = Type?.Weaken;
             return weakType == null
                 ? this
-                : (Type.Mutation(weakType) & CompleteCategory).ReplaceArg(this);
+                : (Type.GetMutation(weakType) & CompleteCategory).ReplaceArg(this);
         }
     }
 
@@ -339,7 +339,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             if(Type is IReference)
                 return this;
             return Type
-                .LocalReferenceResult(CompleteCategory)
+                .GetLocalReferenceResult(CompleteCategory)
                 .ReplaceArg(this);
         }
     }
@@ -584,7 +584,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 Size = null;
 
             if(category.HasType())
-                Type = Type.Pair(other.Type);
+                Type = Type.GetPair(other.Type);
             else if(HasType)
                 Type = null;
 
@@ -739,7 +739,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             return this;
 
         var result = this & category;
-        var copier = Type.Copier(category);
+        var copier = Type.GetCopier(category);
         if(category.HasCode())
             result.Code = Code.LocalBlock(copier.Code);
         if(category.HasClosures())
@@ -850,7 +850,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result ConvertToConverter(TypeBase source)
         => source.IsHollow || (!HasClosures && !HasCode)
             ? this
-            : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
+            : ReplaceAbsolute(source.CheckedReference, source.GetArgumentResult);
 
     [PublicAPI]
     internal Result GetWithCleanupAdded(Result cleanup)

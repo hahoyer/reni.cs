@@ -68,7 +68,7 @@ sealed class CSharpGenerator : DumpableObject, IVisitor
     void IVisitor.DePointer(Size size, Size dataSize)
         => AddCode
         (
-            $"data.Push(data.Pull({RefBytes}).DePointer({dataSize.ByteCount}){BitCast(size, dataSize)})"
+            $"data.Push(data.Pull({RefBytes}).GetDePointer({dataSize.ByteCount}){BitCast(size, dataSize)})"
         );
 
 

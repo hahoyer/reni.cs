@@ -39,7 +39,7 @@ abstract class SetterTargetType
     protected abstract Result SetterResult(Category category);
     protected abstract Result GetterResult(Category category);
 
-    internal virtual Result DestinationResult(Category category) => ArgResult(category);
+    internal virtual Result DestinationResult(Category category) => GetArgumentResult(category);
 
     [DisableDump]
     internal override bool IsAligningPossible => false;

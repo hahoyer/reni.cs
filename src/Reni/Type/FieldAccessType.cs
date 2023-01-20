@@ -37,19 +37,19 @@ sealed class FieldAccessType : DataSetterTargetType
     protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
     protected override CodeBase GetGetterCode()
-        => ArgCode.ReferencePlus(FieldOffset);
+        => ArgumentCode.ReferencePlus(FieldOffset);
 
     protected override CodeBase GetSetterCode()
-        => Pair(ValueType.ForcedPointer)
-            .ArgCode
+        => GetPair(ValueType.ForcedPointer)
+            .ArgumentCode
             .Assignment(ValueType.Size);
 
     internal override Result DestinationResult(Category category) => base
         .DestinationResult(category)
         .AddToReference(() => FieldOffset);
 
-    internal override int? SmartArrayLength(TypeBase elementType)
-        => ValueType.SmartArrayLength(elementType);
+    internal override int? GetSmartArrayLength(TypeBase elementType)
+        => ValueType.GetSmartArrayLength(elementType);
 
     [DisableDump]
     internal override ContextBase ToContext => ValueType.ToContext;

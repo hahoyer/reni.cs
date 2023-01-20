@@ -55,7 +55,7 @@ sealed class NumberType
     }
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult, this);
+        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
         (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
@@ -89,7 +89,7 @@ sealed class NumberType
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-    internal override IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
+    internal override IEnumerable<IConversion> GetCutEnabledConversion(NumberType destination)
     {
         yield return
             Feature.Extension.Conversion
@@ -97,11 +97,12 @@ sealed class NumberType
     }
 
     protected override Result ParentConversionResult(Category category)
-        => Mutation(Parent) & category;
+        => GetMutation(Parent) & category;
 
     protected override Size GetSize() => Parent.Size;
 
-    protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
+    [DisableDump]
+    protected override CodeBase DumpPrintCode => Align.ArgumentCode.DumpPrintNumber(Align.Size);
 
     Result GetZeroResult() => Root
         .BitType
@@ -116,7 +117,7 @@ sealed class NumberType
             category,
             Parent
                 .Pointer
-                .GetResult(category, ObjectResult(category | Category.Type)));
+                .GetResult(category, GetObjectResult(category | Category.Type)));
 
     Result NegationResult(Category category) => ((NumberType)ZeroResult.Value.Type)
         .OperationResult(category, MinusOperation, this)
@@ -124,12 +125,12 @@ sealed class NumberType
         (
             ZeroResult.Value.Type.ForcedReference,
             c => ZeroResult.Value.LocalReferenceResult & c)
-        .ReplaceArg(ObjectResult);
+        .ReplaceArg(GetObjectResult);
 
     Result EnableCutTokenResult(Category category)
         => EnableCut
             .Pointer
-            .GetResult(category | Category.Type, ObjectResult(category));
+            .GetResult(category | Category.Type, GetObjectResult(category));
 
     Result OperationResult(Category category, TypeBase right, IOperation operation)
     {
@@ -161,12 +162,12 @@ sealed class NumberType
         (
             category,
             () => OperationCode(resultType.Size, operationName, right),
-            Closures.Arg
+            Closures.Argument
         );
 
-        var leftResult = ObjectResult(category | Category.Type)
+        var leftResult = GetObjectResult(category | Category.Type)
             .GetConversion(Align);
-        var rightResult = right.Pointer.ArgResult(category | Category.Type).GetConversion(right.Align);
+        var rightResult = right.Pointer.GetArgumentResult(category | Category.Type).GetConversion(right.Align);
         var pair = leftResult + rightResult;
         return result.ReplaceArg(pair);
     }
@@ -175,35 +176,35 @@ sealed class NumberType
     {
         (!(right is PointerType)).Assert();
         return Align
-            .Pair(right.Align)
-            .ArgCode
+            .GetPair(right.Align)
+            .ArgumentCode
             .NumberOperation(token, resultSize, Align.Size, right.Align.Size);
     }
 
     Result FlatConversion(Category category, NumberType source)
     {
         if(Bits == source.Bits)
-            return ArgResult(category | Category.Type);
+            return GetArgumentResult(category | Category.Type);
 
         return GetResult
         (
             category,
-            () => source.ArgCode.BitCast(Size),
-            Closures.Arg
+            () => source.ArgumentCode.BitCast(Size),
+            Closures.Argument
         );
     }
 
     Result CutEnabledBitCountConversion(Category category, NumberType destination)
     {
         if(Bits == destination.Bits)
-            return EnableCut.Mutation(this) & category;
+            return EnableCut.GetMutation(this) & category;
 
         return destination
             .GetResult
             (
                 category,
-                () => EnableCut.ArgCode.BitCast(destination.Size),
-                Closures.Arg
+                () => EnableCut.ArgumentCode.BitCast(destination.Size),
+                Closures.Argument
             );
     }
 }

@@ -29,7 +29,7 @@ sealed class Function : Child, IFunctionContext
     TypeBase IFunctionContext.ArgsType => ArgsType;
 
     Result IFunctionContext.CreateArgReferenceResult(Category category) => ArgsType
-            .ContextAccessResult(category | Category.Type, this, () => ArgsType.Size * -1)
+            .GetContextAccessResult(category | Category.Type, this, () => ArgsType.Size * -1)
         & category;
 
     Result IFunctionContext.CreateValueReferenceResult(Category category)
@@ -37,7 +37,7 @@ sealed class Function : Child, IFunctionContext
         if(ValueType == null)
             throw new ValueCannotBeUsedHereException();
         return ValueType.Pointer
-                .ContextAccessResult
+                .GetContextAccessResult
                 (
                     category | Category.Type,
                     this,

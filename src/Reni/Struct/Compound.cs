@@ -273,7 +273,7 @@ sealed class Compound
 
     Result GetCleanup(Category category, int index)
     {
-        var result = AccessType(EndPosition, index).Cleanup(category);
+        var result = AccessType(EndPosition, index).GetCleanup(category);
         (result.CompleteCategory == category).Assert();
         return result;
     }

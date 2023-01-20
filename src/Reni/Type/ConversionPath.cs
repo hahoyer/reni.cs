@@ -76,7 +76,7 @@ sealed class ConversionPath
     Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
     {
         (pendingCategory == Category.None).Assert();
-        return Source.ArgResult(category);
+        return Source.GetArgumentResult(category);
     }
 
     void AssertValid()
@@ -178,7 +178,7 @@ sealed class ConversionPath
 
     internal IEnumerable<SearchResult> CloseRelativeSearchResults(Definable tokenClass)
         => Destination
-            .DeclarationsForType(tokenClass)
+            .GetDeclarationsForType(tokenClass)
             .Select(result => new SearchResult(result, this));
 
     internal bool HasHigherPriority(ConversionPath other)

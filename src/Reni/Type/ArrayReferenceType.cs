@@ -78,11 +78,11 @@ sealed class ArrayReferenceType
 
     [DisableDump]
     internal ArrayReferenceType Mutable
-        => ValueType.ArrayReference(OptionsValue.IsMutable.SetTo(true));
+        => ValueType.GetArrayReference(OptionsValue.IsMutable.SetTo(true));
 
     [DisableDump]
     internal ArrayReferenceType EnableReinterpretation
-        => ValueType.ArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
+        => ValueType.GetArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
 
     internal ArrayReferenceType(TypeBase valueType, string optionsId)
     {
@@ -107,7 +107,7 @@ sealed class ArrayReferenceType
     bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult);
+        => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     IImplementation ISymbolProviderForPointer<EnableReinterpretation>.
         Feature
@@ -151,7 +151,8 @@ sealed class ArrayReferenceType
 
     internal override Size SimpleItemSize => ValueType.Size;
 
-    protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
+    [DisableDump]
+    protected override CodeBase DumpPrintCode => ArgumentCode.DumpPrintText(SimpleItemSize);
 
     protected override string GetNodeDump()
         => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
@@ -166,11 +167,11 @@ sealed class ArrayReferenceType
     Result MutableResult(Category category)
     {
         OptionsValue.IsForceMutable.Value.Assert();
-        return ResultFromPointer(category, Mutable);
+        return GetResultFromPointer(category, Mutable);
     }
 
     Result EnableReinterpretationResult(Category category)
-        => ResultFromPointer(category, EnableReinterpretation);
+        => GetResultFromPointer(category, EnableReinterpretation);
 
     IConversion ForcedConversion(ArrayReferenceType destination)
         =>
@@ -197,7 +198,7 @@ sealed class ArrayReferenceType
     }
 
     Result ConversionResult(Category category, ArrayReferenceType source)
-        => source.Mutation(this) & category;
+        => source.GetMutation(this) & category;
 
     internal Result ConversionResult(Category category, ArrayType source)
     {
@@ -205,7 +206,7 @@ sealed class ArrayReferenceType
         StartMethodDump(trace, category, source);
         try
         {
-            return ReturnMethodDump(source.Pointer.Mutation(this) & category);
+            return ReturnMethodDump(source.Pointer.GetMutation(this) & category);
         }
         finally
         {
@@ -215,7 +216,7 @@ sealed class ArrayReferenceType
 
     Result AccessResult(Category category, TypeBase right)
     {
-        var leftResult = ObjectResult(category).DereferenceResult;
+        var leftResult = GetObjectResult(category).DereferenceResult;
         return AccessType
             .GetResult(category, leftResult, right);
     }

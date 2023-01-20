@@ -77,7 +77,7 @@ interface IValue
 interface IFunction
 {
     /// <summary>
-    ///     GetResult code contains CodeBase.Arg for argsType and ObjectReference for function object, if appropriate
+    ///     GetResult code contains CodeBase.Argument for argsType and ObjectReference for function object, if appropriate
     /// </summary>
     /// <param name="category"> </param>
     /// <param name="argsType"> </param>
@@ -145,7 +145,7 @@ sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvid
     public GenericProviderForDefinable(T target) => Target = target;
 
     IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
-        => source.Declarations(Target);
+        => source.GetDeclarations(Target);
 
     IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
         => source.GetDeclarations(Target);

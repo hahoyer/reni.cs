@@ -159,7 +159,7 @@ sealed class Root
 
         var result = rawResult
             .Code?
-            .LocalBlock(rawResult.Type.Copier(Category.Code).Code)
+            .LocalBlock(rawResult.Type.GetCopier(Category.Code).Code)
             .Align();
 
         return new(result, rawResult.Issues.ToArray(), description);

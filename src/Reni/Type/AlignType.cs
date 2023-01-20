@@ -30,7 +30,7 @@ sealed class AlignType
 
     protected override IReference GetForcedReferenceForCache() => Parent.ForcedReference;
 
-    protected override Result DeAlign(Category category) => Mutation(Parent) & category;
+    protected override Result GetDeAlign(Category category) => GetMutation(Parent) & category;
     protected override PointerType GetPointerForCache() => Parent.ForcedPointer;
 
     [DisableDump]
@@ -51,13 +51,13 @@ sealed class AlignType
 
     protected override Size GetSize() => Parent.Size.Align(AlignBits);
 
-    internal override int? SmartArrayLength(TypeBase elementType)
-        => Parent.SmartArrayLength(elementType);
+    internal override int? GetSmartArrayLength(TypeBase elementType)
+        => Parent.GetSmartArrayLength(elementType);
 
-    internal override Result Copier(Category category) => Parent.Copier(category);
+    internal override Result GetCopier(Category category) => Parent.GetCopier(category);
 
-    internal override Result ApplyTypeOperator(Result argResult)
-        => Parent.ApplyTypeOperator(argResult);
+    internal override Result GetTypeOperatorApply(Result argResult)
+        => Parent.GetTypeOperatorApply(argResult);
 
     protected override string GetNodeDump() => base.GetNodeDump() + "(" + Parent.NodeDump + ")";
 
@@ -65,5 +65,5 @@ sealed class AlignType
         => UnalignedResult(category);
 
     public Result UnalignedResult(Category category)
-        => Parent.GetResult(category, () => ArgCode.BitCast(Parent.Size));
+        => Parent.GetResult(category, () => ArgumentCode.BitCast(Parent.Size));
 }

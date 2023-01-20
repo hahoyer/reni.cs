@@ -24,11 +24,11 @@ abstract class TagChild<TParent> : Child<TParent>
 
     protected sealed override Size GetSize() => Parent.Size;
     protected override string GetNodeDump() => Parent.NodeDump + "[" + TagTitle + "]";
-    internal sealed override Result Cleanup(Category category) => Parent.Cleanup(category);
-    internal sealed override Result Copier(Category category) => Parent.Copier(category);
+    internal sealed override Result GetCleanup(Category category) => Parent.GetCleanup(category);
+    internal sealed override Result GetCopier(Category category) => Parent.GetCopier(category);
 
     protected override Result ParentConversionResult(Category category)
-        => Mutation(Parent) & category;
+        => GetMutation(Parent) & category;
 
     [DisableDump]
     protected override IEnumerable<IConversion> StripConversions

@@ -25,7 +25,7 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
         (DumpPrintToken tokenClass)
-        => Feature.Extension.Value(DumpPrintTokenResult, this);
+        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     [DisableDump]
     internal override string DumpPrintText => "bit";
@@ -41,10 +41,10 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
 
     protected override string Dump(bool isRecursion) => GetType().PrettyName();
 
+    [DisableDump]
+    protected override CodeBase DumpPrintCode => Align.ArgumentCode.DumpPrintNumber();
 
-    protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber();
-
-    internal NumberType Number(int bitCount) => Array(bitCount).Number;
+    internal NumberType Number(int bitCount) => GetArray(bitCount).Number;
 
     internal Result GetResult(Category category, BitsConst bitsConst) => Number(bitsConst.Size.ToInt())
         .GetResult(category, () => CodeBase.BitsConst(bitsConst));

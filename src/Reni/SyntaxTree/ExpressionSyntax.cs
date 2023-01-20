@@ -91,7 +91,7 @@ sealed class ExpressionSyntax : ValueSyntax
                 return leftType.Issues.GetResult(category, context.RootContext);
 
             return leftType
-                .Execute(category, left, Token, Definable, context, Right);
+                .GetResult(category, left, Token, Definable, context, Right);
         }
         finally
         {

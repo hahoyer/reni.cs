@@ -21,8 +21,8 @@ sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
     [DisableDump]
     internal override bool IsHollow => true;
 
-    protected override TypeBase ReversePair(TypeBase first) => first;
-    internal override TypeBase Pair(TypeBase second) => second;
+    protected override TypeBase GetReversePair(TypeBase first) => first;
+    internal override TypeBase GetPair(TypeBase second) => second;
 
     new Result DumpPrintTokenResult(Category category) => GetResult(category);
 }

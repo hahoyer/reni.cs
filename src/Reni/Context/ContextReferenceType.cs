@@ -41,8 +41,8 @@ sealed class ContextReferenceType
 
     protected override Size GetSize() => IsHollow? Size.Zero : Root.DefaultRefAlignParam.RefSize;
 
-    protected override CodeBase DumpPrintCode()
-        => CodeBase.DumpPrintText(ContextOperator.TokenId);
+    [DisableDump]
+    protected override CodeBase DumpPrintCode => CodeBase.DumpPrintText(ContextOperator.TokenId);
 
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
@@ -54,12 +54,12 @@ sealed class ContextReferenceType
 
     new Result DumpPrintTokenResult(Category category)
         => Root.VoidType
-            .GetResult(category, DumpPrintCode);
+            .GetResult(category, ()=>DumpPrintCode);
 
     Result PointerConversion(Category category)
         => Parent
             .Type
             .Pointer
             .GetResult
-                (category, c => ArgResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
+                (category, c => GetArgumentResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
 }

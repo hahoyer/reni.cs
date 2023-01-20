@@ -13,7 +13,7 @@ x: @
   !mutable xxx: 257;
   '12345678901234567890123456789';
 ~~~
-'Cleanup' dump_print
+'GetCleanup' dump_print
 );
 
 xx : x();

@@ -115,12 +115,11 @@ sealed class FunctionBodyType
     [DisableDump]
     internal override IImplementation FunctionDeclarationForType => this;
 
-    protected override CodeBase DumpPrintCode()
-        => CodeBase.DumpPrintText(Syntax.Tag);
+    [DisableDump] protected override CodeBase DumpPrintCode => CodeBase.DumpPrintText(Syntax.Tag);
 
     new Result DumpPrintTokenResult(Category category)
         => Root.VoidType
-            .GetResult(category, DumpPrintCode);
+            .GetResult(category, () => DumpPrintCode);
 
     FunctionType Function(TypeBase argsType) => FindRecentCompoundView.Function(Syntax, argsType.AssertNotNull());
 }

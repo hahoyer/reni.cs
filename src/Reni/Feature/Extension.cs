@@ -147,7 +147,7 @@ static class Extension
 
         return valueResult
             .Type
-            .Execute(category, valueResult, currentTarget, null, context, right);
+            .GetResult(category, valueResult, currentTarget, null, context, right);
     }
 
     static Result ValueResult

@@ -130,6 +130,6 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         if(elseType == null)
             return thenType.Align;
 
-        return thenType.CommonType(elseType).Align;
+        return thenType.GetCommonType(elseType).Align;
     }
 }

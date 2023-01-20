@@ -46,7 +46,7 @@ sealed class PointerType
 
     IImplementation ISymbolProvider<StableReference>.Feature
         (StableReference tokenClass)
-        => Feature.Extension.Value(ConvertToStableReference);
+        => Feature.Extension.Value(GetConversionToStableReference);
 
     [DisableDump]
     internal override Root Root => ValueType.Root;
@@ -76,13 +76,13 @@ sealed class PointerType
 
     protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 
-    internal override int? SmartArrayLength(TypeBase elementType)
-        => ValueType.SmartArrayLength(elementType);
+    internal override int? GetSmartArrayLength(TypeBase elementType)
+        => ValueType.GetSmartArrayLength(elementType);
 
     protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
     protected override ArrayType GetArrayForCache(int count, string optionsId)
-        => ValueType.Array(count, optionsId);
+        => ValueType.GetArray(count, optionsId);
 
     internal override IEnumerable<IConversion> GetForcedConversions<TDestination>
         (TDestination destination)
@@ -104,11 +104,11 @@ sealed class PointerType
     internal override IImplementation FunctionDeclarationForType
         => ValueType.FunctionDeclarationForPointerType ?? base.FunctionDeclarationForType;
 
-    internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+    internal override IEnumerable<SearchResult> GetDeclarations<TDefinable>(TDefinable tokenClass)
     {
         var feature = (ValueType as ISymbolProviderForPointer<TDefinable>)?.Feature(tokenClass);
         if(feature == null)
-            return base.Declarations(tokenClass);
+            return base.GetDeclarations(tokenClass);
 
         return new[]
         {
@@ -116,17 +116,17 @@ sealed class PointerType
         };
     }
 
-    protected override ResultCache DePointer(Category category)
+    protected override ResultCache GetDePointer(Category category)
         => ValueType
             .GetResult
             (
                 category,
-                () => ArgCode.DePointer(ValueType.Size),
-                Closures.Arg
+                () => ArgumentCode.DePointer(ValueType.Size),
+                Closures.Argument
             );
 
-    internal override Result ConvertToStableReference(Category category)
-        => Mutation(StableReferenceType) & category;
+    internal override Result GetConversionToStableReference(Category category)
+        => GetMutation(StableReferenceType) & category;
 
     Result DereferenceResult(Category category)
         => ValueType
@@ -134,7 +134,7 @@ sealed class PointerType
             .GetResult
             (
                 category,
-                () => ArgCode.DePointer(ValueType.Size).Align(),
-                Closures.Arg
+                () => ArgumentCode.DePointer(ValueType.Size).Align(),
+                Closures.Argument
             );
 }

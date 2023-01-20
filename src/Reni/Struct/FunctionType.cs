@@ -165,8 +165,8 @@ sealed class FunctionType : SetterTargetType
             var result = GetResult
             (
                 category,
-                () => Closures.ToCode() + ArgsType.ArgCode,
-                () => Closures + Closures.Arg()
+                () => Closures.ToCode() + ArgsType.ArgumentCode,
+                () => Closures + Closures.Argument()
             );
             (category == result.CompleteCategory).Assert();
             return ReturnMethodDump(result);

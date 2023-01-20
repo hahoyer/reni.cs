@@ -26,5 +26,5 @@ sealed class StableReferenceType
 
     protected override string TagTitle => "stable";
 
-    Result ConvertToPointer(Category category) => Mutation(Parent) & category;
+    Result ConvertToPointer(Category category) => GetMutation(Parent) & category;
 }

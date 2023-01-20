@@ -57,7 +57,7 @@ sealed class TypeType
 
     protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
-    internal override Result InstanceResult
+    internal override Result GetInstanceResult
         (Category category, Func<Category, Result> getRightResult)
         => RawInstanceResult(category | Category.Type, getRightResult).LocalReferenceResult;
 
@@ -66,13 +66,13 @@ sealed class TypeType
         if(Category.Type.Replenished().Contains(category))
             return Value.GetResult(category | Category.Type);
         var constructorResult = Value
-            .ConstructorResult(category, getRightResult(Category.Type).Type);
+            .GetConstructorResult(category, getRightResult(Category.Type).Type);
         return constructorResult
             .ReplaceArg(getRightResult);
     }
 
     new Result DumpPrintTokenResult(Category category)
-        => Value.DumpPrintTypeNameResult(category);
+        => Value.GetDumpPrintTypeNameResult(category);
 
     Result StarResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
@@ -83,7 +83,7 @@ sealed class TypeType
             .ToInt32();
         var type = Value
             .Align
-            .Array(count)
+            .GetArray(count)
             .TypeType;
         return type.GetResult(category);
     }
@@ -93,8 +93,8 @@ sealed class TypeType
     {
         var rightType = right
             .Type(context)
-            .SmartUn<FunctionType>()
-            .SmartUn<PointerType>();
+            .GetSmartUn<FunctionType>()
+            .GetSmartUn<PointerType>();
         var rightTypeType = rightType as TypeType;
         if(rightTypeType == null)
         {
@@ -102,7 +102,7 @@ sealed class TypeType
             return null;
         }
 
-        var count = Value.SmartArrayLength(rightTypeType.Value);
+        var count = Value.GetSmartArrayLength(rightTypeType.Value);
         if(count == null)
         {
             NotImplementedMethod(context, category, left, right, "rightType", rightType);

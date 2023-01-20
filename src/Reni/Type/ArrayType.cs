@@ -73,13 +73,13 @@ sealed class ArrayType
     internal NumberType Number => NumberCache.Value;
 
     [DisableDump]
-    ArrayType NoTextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(false));
+    ArrayType NoTextItem => ElementType.GetArray(Count, OptionsValue.IsTextItem.SetTo(false));
 
     [DisableDump]
-    internal ArrayType TextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(true));
+    internal ArrayType TextItem => ElementType.GetArray(Count, OptionsValue.IsTextItem.SetTo(true));
 
     [DisableDump]
-    internal ArrayType Mutable => ElementType.Array(Count, OptionsValue.IsMutable.SetTo(true));
+    internal ArrayType Mutable => ElementType.GetArray(Count, OptionsValue.IsMutable.SetTo(true));
 
     IEnumerable<string> InternalDeclarationOptions
     {
@@ -147,7 +147,7 @@ sealed class ArrayType
         (DumpPrintToken tokenClass)
         =>
             OptionsValue.IsTextItem.Value
-                ? Feature.Extension.Value(DumpPrintTokenResult)
+                ? Feature.Extension.Value(GetDumpPrintTokenResult)
                 : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
     IImplementation ISymbolProviderForPointer<Mutable>.Feature
@@ -187,16 +187,16 @@ sealed class ArrayType
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-    internal override int? SmartArrayLength(TypeBase elementType)
-        => ElementType.IsConvertible(elementType)? Count : base.SmartArrayLength(elementType);
+    internal override int? GetSmartArrayLength(TypeBase elementType)
+        => ElementType.IsConvertible(elementType)? Count : base.GetSmartArrayLength(elementType);
 
     protected override Size GetSize() => ElementType.Size * Count;
 
-    internal override Result Copier(Category category)
-        => ElementType.ArrayCopier(category);
+    internal override Result GetCopier(Category category)
+        => ElementType.GetArrayCopier(category);
 
-    internal override Result Cleanup(Category category)
-        => ElementType.ArrayCleanup(category);
+    internal override Result GetCleanup(Category category)
+        => ElementType.GetArrayCleanup(category);
 
     [DisableDump]
     protected override IEnumerable<IConversion> StripConversions
@@ -204,7 +204,7 @@ sealed class ArrayType
         get { yield return Feature.Extension.Conversion(NoTextItemResult); }
     }
 
-    internal override Result ConstructorResult(Category category, TypeBase argsType)
+    internal override Result GetConstructorResult(Category category, TypeBase argsType)
     {
         if(category == Category.None)
             return null;
@@ -216,7 +216,7 @@ sealed class ArrayType
         if(function != null)
             return ConstructorResult(category, function);
 
-        return base.ConstructorResult(category, argsType);
+        return base.GetConstructorResult(category, argsType);
     }
 
     [DisableDump]
@@ -225,17 +225,18 @@ sealed class ArrayType
     protected override string GetNodeDump()
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
-    protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
+    [DisableDump]
+    protected override CodeBase DumpPrintCode => ArgumentCode.DumpPrintText(SimpleItemSize);
 
     internal ArrayReferenceType Reference(bool isForceMutable)
-        => ElementType.ArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
+        => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
 
-    Result NoTextItemResult(Category category) => ResultFromPointer(category, NoTextItem);
-    Result TextItemResult(Category category) => ResultFromPointer(category, TextItem);
-    Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
+    Result NoTextItemResult(Category category) => GetResultFromPointer(category, NoTextItem);
+    Result TextItemResult(Category category) => GetResultFromPointer(category, TextItem);
+    Result MutableResult(Category category) => GetResultFromPointer(category, Mutable);
 
     Result ReferenceResult(Category category)
-        => Reference(IsMutable).GetResult(category, ObjectResult);
+        => Reference(IsMutable).GetResult(category, GetObjectResult);
 
     Result ConstructorResult(Category category, IFunction function)
     {
@@ -275,15 +276,15 @@ sealed class ArrayType
             .GetResult(category | Category.Type, objectReference).DereferenceResult;
 
         var isElementArg = argsType.IsConvertible(ElementAccessType);
-        var newCount = isElementArg? 1 : argsType.ArrayLength(ElementAccessType);
+        var newCount = isElementArg? 1 : argsType.GetArrayLength(ElementAccessType);
         var newElementsResultRaw
             = isElementArg
                 ? argsType.GetConversion(category | Category.Type, ElementAccessType)
-                : argsType.GetConversion(category | Category.Type, ElementType.Array(newCount, argsOptions));
+                : argsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, argsOptions));
 
         var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult;
         var result = ElementType
-            .Array(Count + newCount, argsOptions)
+            .GetArray(Count + newCount, argsOptions)
             .GetResult(category, newElementsResult + oldElementsResult);
         return result;
     }
@@ -300,7 +301,7 @@ sealed class ArrayType
 
     Result DumpPrintResult(Category category, int position) => ElementType
         .SmartPointer
-        .GenericDumpPrintResult(category)
+        .GetGenericDumpPrintResult(category)
         .ReplaceAbsolute
         (
             ElementType.Pointer.CheckedReference,
@@ -308,7 +309,7 @@ sealed class ArrayType
         );
 
     Result ElementAccessResult(Category category, TypeBase right)
-        => AccessType.GetResult(category, ObjectResult(category), right);
+        => AccessType.GetResult(category, GetObjectResult(category), right);
 
     Result ToNumberOfBaseResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)

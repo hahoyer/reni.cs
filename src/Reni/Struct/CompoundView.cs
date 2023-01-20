@@ -39,7 +39,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         Result IConversion.Execute(Category category)
         {
             var innerResult = ((IConversion)Parent).Execute(category);
-            var conversion = Type.Pointer.Mutation(Parent);
+            var conversion = Type.Pointer.GetMutation(Parent);
             var result = innerResult.ReplaceArg(conversion);
             return result;
         }
@@ -271,7 +271,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(resultType.IsHollow)
             return resultType.GetResult(category);
 
-        return Type.SmartPointer.Mutation(resultType) & category;
+        return Type.SmartPointer.GetMutation(resultType) & category;
     }
 
     internal Result AccessViaObject(Category category, int position)
@@ -280,7 +280,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(resultType.IsHollow)
             return resultType.GetResult(category);
 
-        return resultType.GetResult(category, Type.ObjectResult);
+        return resultType.GetResult(category, Type.GetObjectResult);
     }
 
     internal Result AccessValueViaObject(Category category, int position)
@@ -290,7 +290,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             return resultType.GetResult(category);
 
         return resultType.GetResult
-            (category, c => Type.ObjectResult(c).AddToReference(() => FieldOffset(position)));
+            (category, c => Type.GetObjectResult(c).AddToReference(() => FieldOffset(position)));
     }
 
 
@@ -341,7 +341,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         {
             BreakExecution();
             var accessType = ValueType(position).SmartPointer;
-            var genericDumpPrintResult = accessType.GenericDumpPrintResult(category);
+            var genericDumpPrintResult = accessType.GetGenericDumpPrintResult(category);
             Dump("genericDumpPrintResult", genericDumpPrintResult);
             BreakExecution();
             return ReturnMethodDump

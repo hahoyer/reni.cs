@@ -95,7 +95,7 @@ sealed class Closures : DumpableObject
     }
 
     internal static Closures Void() => new();
-    internal static Closures Arg() => new(Closure.Instance);
+    internal static Closures Argument() => new(Closure.Instance);
 
     public Closures Sequence(Closures closures)
         => closures.Count == 0? this :

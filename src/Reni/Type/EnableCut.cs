@@ -12,7 +12,7 @@ sealed class EnableCut
         => Parent.IsCuttingPossible.Assert(Parent.Dump);
 
     IEnumerable<IConversion> IForcedConversionProvider<NumberType>.GetResult(NumberType destination)
-        => Parent.CutEnabledConversion(destination);
+        => Parent.GetCutEnabledConversion(destination);
 
     [DisableDump]
     protected override string TagTitle => "enable_cut";

@@ -18,9 +18,9 @@ sealed class Text : TerminalSyntaxToken
     {
         var data = Lexer.Instance.ExtractText(token);
         return context
-            .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()))
+            .RootContext.BitType.GetArray(BitsConst.BitSize(data[0].GetType()))
             .TextItem
-            .Array(data.Length)
+            .GetArray(data.Length)
             .TextItem
             .GetResult
                 (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), Closures.Void);
