@@ -14,7 +14,7 @@ sealed class ContextOperator : TerminalSyntaxToken
     protected override Declaration[] Declarations => throw new NotImplementedException();
     public override string Id => TokenId;
 
-    protected override Result Result(ContextBase context, Category category, SourcePart token)
+    protected override Result GetResult(ContextBase context, Category category, SourcePart token)
         => context
             .FindRecentCompoundView
             .ContextOperatorResult(category);

@@ -304,7 +304,7 @@ abstract class ContextBase
                 .MissingDeclarationInContext
                 .GetResult(category, token, this);
 
-        var result = searchResult.Result(category, CacheObject.AsObject, token, this, right);
+        var result = searchResult.GetResult(category, CacheObject.AsObject, token, this, right);
 
         (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
         return result;
@@ -316,7 +316,7 @@ abstract class ContextBase
         return target
                 .Type
                 .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
-                .Result(category | Category.Type, target)
+                .GetResult(category | Category.Type, target)
                 .LocalReferenceResult
             & category;
     }

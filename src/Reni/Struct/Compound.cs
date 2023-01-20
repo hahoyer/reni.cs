@@ -117,7 +117,7 @@ sealed class Compound
             var result = results
                 .Aggregate
                 (
-                    Root.VoidType.Result(category | Category.Type),
+                    Root.VoidType.GetResult(category | Category.Type),
                     (current, next) => current.Sequence(next)
                 );
             return ReturnMethodDump(result);
@@ -128,7 +128,7 @@ sealed class Compound
         }
     }
 
-    internal Result Result(Category category)
+    internal Result GetResult(Category category)
     {
         var trace = Syntax.ObjectId.In() && category.HasType();
         StartMethodDump(trace, category);

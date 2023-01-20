@@ -70,7 +70,7 @@ abstract class SetterTargetType
     Result ReassignResult(Category category, TypeBase right)
     {
         if(category == Category.Type)
-            return Root.VoidType.Result(category);
+            return Root.VoidType.GetResult(category);
 
         var trace = ObjectId == -97 && category.HasCode();
         StartMethodDump(trace, category, right);
@@ -83,7 +83,7 @@ abstract class SetterTargetType
             BreakExecution();
 
             var destinationResult = DestinationResult(category | Category.Type)
-                .ReplaceArg(Result(category | Category.Type, this));
+                .ReplaceArg(GetResult(category | Category.Type, this));
             Dump("destinationResult", destinationResult);
             BreakExecution();
 

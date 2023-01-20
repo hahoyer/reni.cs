@@ -14,7 +14,7 @@ sealed class Text : TerminalSyntaxToken
     protected override Declaration[] Declarations => PredefinedDeclarations;
     public override string Id => "<text>";
 
-    protected override Result Result(ContextBase context, Category category, SourcePart token)
+    protected override Result GetResult(ContextBase context, Category category, SourcePart token)
     {
         var data = Lexer.Instance.ExtractText(token);
         return context
@@ -22,7 +22,7 @@ sealed class Text : TerminalSyntaxToken
             .TextItem
             .Array(data.Length)
             .TextItem
-            .Result
+            .GetResult
                 (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), Closures.Void);
     }
 }

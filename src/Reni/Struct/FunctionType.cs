@@ -162,7 +162,7 @@ sealed class FunctionType : SetterTargetType
         try
         {
             BreakExecution();
-            var result = Result
+            var result = GetResult
             (
                 category,
                 () => Closures.ToCode() + ArgsType.ArgCode,

@@ -37,12 +37,12 @@ sealed class RepeaterAccessType
     protected override CodeBase GetterCode()
         => ArgCode.ArrayGetter(ValueType.Size, IndexType.Size);
 
-    internal Result Result(Category category, Result leftResult, TypeBase right)
+    internal Result GetResult(Category category, Result leftResult, TypeBase right)
     {
         var rightResult = right
             .Conversion(category | Category.Type, IndexType)
             .AutomaticDereferencedAlignedResult();
 
-        return Result(category, leftResult + rightResult);
+        return GetResult(category, leftResult + rightResult);
     }
 }

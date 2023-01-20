@@ -41,7 +41,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         (syntax == this).Assert();
 
         if(!asReference && Category.Type.Replenished().Contains(category | pendingCategory) && Else == null)
-            return Root.VoidType.Result(Category.Type);
+            return Root.VoidType.GetResult(Category.Type);
 
         NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
         return null;
@@ -69,7 +69,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
     Result ElseResult(ContextBase context, Category category)
     {
         if(Else == null)
-            return Root.VoidType.Result(category);
+            return Root.VoidType.GetResult(category);
 
         return BranchResult(context, category, Else);
     }
@@ -98,7 +98,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
     {
         var commonType = CommonType(context);
         if(Category.Type.Replenished().Contains(category))
-            return commonType.Result(category);
+            return commonType.GetResult(category);
 
         var branchCategory = category & Category.Code.Replenished();
         var condResult = CondResult(context, category);
@@ -110,7 +110,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
             return condResult + (thenResult + elseResult);
 
         return commonType
-            .Result
+            .GetResult
             (
                 category,
                 () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code),

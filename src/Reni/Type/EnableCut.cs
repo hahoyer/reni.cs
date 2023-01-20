@@ -11,7 +11,7 @@ sealed class EnableCut
         : base(parent)
         => Parent.IsCuttingPossible.Assert(Parent.Dump);
 
-    IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+    IEnumerable<IConversion> IForcedConversionProvider<NumberType>.GetResult(NumberType destination)
         => Parent.CutEnabledConversion(destination);
 
     [DisableDump]

@@ -9,9 +9,9 @@ sealed class FunctionInstanceToken : SuffixSyntaxToken
     public const string TokenId = "function_instance";
     public override string Id => TokenId;
 
-    protected override Result Result(ContextBase context, Category category, ValueSyntax left)
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax left)
         => context.GetResult(category | Category.Type, left)
             .Type
             .FunctionInstance
-            .Result(category, context.GetResult(category | Category.Type, left));
+            .GetResult(category, context.GetResult(category | Category.Type, left));
 }

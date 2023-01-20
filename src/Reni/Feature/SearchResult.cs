@@ -88,10 +88,10 @@ sealed class SearchResult : DumpableObject, IImplementation
         {
             var metaFeature = ((IMetaImplementation)Feature).Function;
             if(metaFeature != null)
-                return metaFeature.Result(category, left, context, right);
+                return metaFeature.GetResult(category, left, context, right);
 
             BreakExecution();
-            var result = Feature.Result(category | Category.Type, currentTarget, context, right);
+            var result = Feature.GetResult(category | Category.Type, currentTarget, context, right);
             Dump(nameof(result), result);
             Dump("ConverterPath.Destination.CheckedReference", ConverterPath.Destination.CheckedReference);
             Dump("ConverterPath.Execute", ConverterPath.Execute(Category.Code));
@@ -114,7 +114,7 @@ sealed class SearchResult : DumpableObject, IImplementation
     }
 
     internal Result SpecialExecute(Category category)
-        => Feature.Result(category, null, null, null);
+        => Feature.GetResult(category, null, null, null);
 
     internal bool HasHigherPriority(SearchResult other)
         => Feature is AccessFeature == other.Feature is AccessFeature

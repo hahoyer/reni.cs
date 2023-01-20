@@ -12,6 +12,6 @@ sealed class Number : TerminalSyntaxToken
     protected override Declaration[] Declarations => PredefinedDeclarations;
     public override string Id => "<number>";
 
-    protected override Result Result(ContextBase context, Category category, SourcePart token)
-        => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Id));
+    protected override Result GetResult(ContextBase context, Category category, SourcePart token)
+        => context.RootContext.BitType.GetResult(category, BitsConst.Convert(token.Id));
 }

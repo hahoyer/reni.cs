@@ -64,7 +64,7 @@ sealed class TypeType
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
         if(Category.Type.Replenished().Contains(category))
-            return Value.Result(category | Category.Type);
+            return Value.GetResult(category | Category.Type);
         var constructorResult = Value
             .ConstructorResult(category, getRightResult(Category.Type).Type);
         return constructorResult
@@ -77,7 +77,7 @@ sealed class TypeType
     Result StarResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
-        var countResult = right.Result(context).AutomaticDereferenceResult;
+        var countResult = right.GetResult(context).AutomaticDereferenceResult;
         var count = countResult
             .Evaluate(context.RootContext.ExecutionContext)
             .ToInt32();
@@ -85,7 +85,7 @@ sealed class TypeType
             .Align
             .Array(count)
             .TypeType;
-        return type.Result(category);
+        return type.GetResult(category);
     }
 
     Result SlashResult
@@ -109,15 +109,15 @@ sealed class TypeType
             return null;
         }
 
-        return Root.BitType.Result(category, BitsConst.Convert(count.Value));
+        return Root.BitType.GetResult(category, BitsConst.Convert(count.Value));
     }
 
     Result MutableArrayResult(Category category)
-        => ((ArrayType)Value).Mutable.TypeType.Result(category);
+        => ((ArrayType)Value).Mutable.TypeType.GetResult(category);
 
     Result ArrayReferenceResult(Category category)
-        => ((ArrayType)Value).Reference(true).TypeType.Result(category);
+        => ((ArrayType)Value).Reference(true).TypeType.GetResult(category);
 
     Result MutableReferenceResult(Category category)
-        => ((ArrayReferenceType)Value).Mutable.TypeType.Result(category);
+        => ((ArrayReferenceType)Value).Mutable.TypeType.GetResult(category);
 }

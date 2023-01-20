@@ -26,10 +26,10 @@ abstract class ObjectFunctionBase : DumpableObject, IFunction
         Target = target;
     }
 
-    bool IFunction.IsImplicit => false;
-
-    Result IFunction.Result(Category category, TypeBase argsType)
+    Result IFunction.GetResult(Category category, TypeBase argsType)
         => Function(category, ObjectReference, argsType);
+
+    bool IFunction.IsImplicit => false;
 }
 
 sealed class ObjectFunction : ObjectFunctionBase, IImplementation
@@ -50,7 +50,7 @@ sealed class Function : FunctionFeatureImplementation
 
     internal Function(Func<Category, TypeBase, Result> function) => Data = function;
 
-    protected override Result Result(Category category, TypeBase argsType) => Data(category, argsType);
+    protected override Result GetResult(Category category, TypeBase argsType) => Data(category, argsType);
     protected override bool IsImplicit => false;
 }
 
@@ -73,6 +73,6 @@ sealed class ExtendedFunction<T> : FunctionFeatureImplementation
         (Function.Target is IContextReferenceProvider).Assert();
     }
 
-    protected override Result Result(Category category, TypeBase argsType) => Function(category, argsType, Argument);
+    protected override Result GetResult(Category category, TypeBase argsType) => Function(category, argsType, Argument);
     protected override bool IsImplicit => false;
 }

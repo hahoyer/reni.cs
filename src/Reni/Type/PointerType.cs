@@ -89,7 +89,7 @@ sealed class PointerType
     {
         var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;
         if(provider != null)
-            foreach(var feature in provider.Result(destination))
+            foreach(var feature in provider.GetResult(destination))
                 yield return feature;
 
         foreach(var feature in base.GetForcedConversions(destination))
@@ -118,7 +118,7 @@ sealed class PointerType
 
     protected override ResultCache DePointer(Category category)
         => ValueType
-            .Result
+            .GetResult
             (
                 category,
                 () => ArgCode.DePointer(ValueType.Size),
@@ -131,7 +131,7 @@ sealed class PointerType
     Result DereferenceResult(Category category)
         => ValueType
             .Align
-            .Result
+            .GetResult
             (
                 category,
                 () => ArgCode.DePointer(ValueType.Size).Align(),

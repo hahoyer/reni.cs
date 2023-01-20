@@ -54,12 +54,12 @@ sealed class ContextReferenceType
 
     new Result DumpPrintTokenResult(Category category)
         => Root.VoidType
-            .Result(category, DumpPrintCode);
+            .GetResult(category, DumpPrintCode);
 
     Result PointerConversion(Category category)
         => Parent
             .Type
             .Pointer
-            .Result
+            .GetResult
                 (category, c => ArgResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
 }

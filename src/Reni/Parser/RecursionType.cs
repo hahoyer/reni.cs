@@ -30,15 +30,16 @@ sealed class RecursionType
     int IContextReference.Order => ObjectId;
     IFunction IEvalImplementation.Function => this;
     IValue IEvalImplementation.Value => this;
-    bool IFunction.IsImplicit => false;
 
-    Result IFunction.Result(Category category, TypeBase argsType)
+    Result IFunction.GetResult(Category category, TypeBase argsType)
     {
         NotImplementedMethod(category, argsType);
         return null;
     }
 
-    Result IMeta.Result
+    bool IFunction.IsImplicit => false;
+
+    Result IMeta.GetResult
         (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
     {
         NotImplementedMethod(contextBase, left, category, right);

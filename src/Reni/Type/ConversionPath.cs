@@ -34,7 +34,7 @@ sealed class ConversionPath
     [UsedImplicitly]
     IEnumerable<string> DumpConversions
         => Elements
-            .Select(element => element.Result(Category.Code).Code.DebuggerDump())
+            .Select(element => element.GetResult(Category.Code).Code.DebuggerDump())
             .ToArray();
 
     internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
@@ -165,7 +165,7 @@ sealed class ConversionPath
     internal Result Execute(Category category)
     {
         var results = Elements
-                .Select(item => item.Result(category | Category.Type))
+                .Select(item => item.GetResult(category | Category.Type))
             //  .ToArray()
             ;
         //Tracer.FlaggedLine("\n"+Tracer.Dump(results));

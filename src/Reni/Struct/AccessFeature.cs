@@ -5,81 +5,80 @@ using Reni.Feature;
 using Reni.SyntaxTree;
 using Reni.Type;
 
-namespace Reni.Struct
+namespace Reni.Struct;
+
+sealed class AccessFeature
+    : DumpableObject
+        , IImplementation
+        , IValue
+        , IConversion
+        , ResultCache.IResultProvider
 {
-    sealed class AccessFeature
-        : DumpableObject
-            , IImplementation
-            , IValue
-            , IConversion
-            , ResultCache.IResultProvider
+    static int NextObjectId;
+
+    [EnableDump]
+    public CompoundView View { get; }
+
+    [EnableDump]
+    public int Position { get; }
+
+    ValueCache<IFunction> FunctionFeature { get; }
+
+    ValueSyntax Statement => View
+        .Compound
+        .Syntax
+        .PureStatements[Position];
+
+    internal AccessFeature(CompoundView compoundView, int position)
+        : base(NextObjectId++)
     {
-        static int NextObjectId;
+        View = compoundView;
+        Position = position;
+        FunctionFeature = new(ObtainFunctionFeature);
+        StopByObjectIds();
+    }
 
-        [EnableDump]
-        public CompoundView View { get; }
+    Result IConversion.Execute(Category category)
+        => GetResult(category).ConvertToConverter(View.Type.Pointer);
 
-        [EnableDump]
-        public int Position { get; }
+    TypeBase IConversion.Source => View.Type.Pointer;
 
-        ValueCache<IFunction> FunctionFeature { get; }
+    IFunction IEvalImplementation.Function => FunctionFeature.Value;
 
-        internal AccessFeature(CompoundView compoundView, int position)
-            : base(NextObjectId++)
+    IValue IEvalImplementation.Value
+    {
+        get
         {
-            View = compoundView;
-            Position = position;
-            FunctionFeature = new(ObtainFunctionFeature);
-            StopByObjectIds();
+            var function = FunctionFeature.Value;
+            if(function != null && function.IsImplicit)
+                return null;
+            return this;
         }
+    }
 
-        Result IConversion.Execute(Category category)
-            => Result(category).ConvertToConverter(View.Type.Pointer);
+    IMeta IMetaImplementation.Function
+        => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
-        TypeBase IConversion.Source => View.Type.Pointer;
+    Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+    {
+        if(pendingCategory == Category.None)
+            return GetResult(category);
+        NotImplementedMethod(category, pendingCategory);
+        return null;
+    }
 
-        IFunction IEvalImplementation.Function => FunctionFeature.Value;
+    Result IValue.Execute(Category category) => GetResult(category);
 
-        IValue IEvalImplementation.Value
-        {
-            get
-            {
-                var function = FunctionFeature.Value;
-                if(function != null && function.IsImplicit)
-                    return null;
-                return this;
-            }
-        }
+    Result GetResult(Category category) => View.AccessViaObject(category, Position);
 
-        IMeta IMetaImplementation.Function
-            => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
+    IFunction ObtainFunctionFeature()
+    {
+        var functionSyntax = Statement as FunctionSyntax;
+        if(functionSyntax != null)
+            return functionSyntax.FunctionFeature(View);
 
-        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-        {
-            if(pendingCategory == Category.None)
-                return Result(category);
-            NotImplementedMethod(category, pendingCategory);
-            return null;
-        }
-
-        Result IValue.Execute(Category category) => Result(category);
-
-        ValueSyntax Statement => View
-            .Compound
-            .Syntax
-            .PureStatements[Position];
-
-        Result Result(Category category) => View.AccessViaObject(category, Position);
-
-        IFunction ObtainFunctionFeature()
-        {
-            var functionSyntax = Statement as FunctionSyntax;
-            if(functionSyntax != null)
-                return functionSyntax.FunctionFeature(View);
-
-            var valueType = View.ValueType(Position);
-            StopByObjectIds();
-            return ((IEvalImplementation)valueType.CheckedFeature)?.Function;
-        }
+        var valueType = View.ValueType(Position);
+        StopByObjectIds();
+        return ((IEvalImplementation)valueType.CheckedFeature)?.Function;
     }
 }

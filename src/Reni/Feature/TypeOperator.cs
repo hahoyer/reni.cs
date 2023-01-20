@@ -13,7 +13,7 @@ sealed class TypeOperator : SuffixSyntaxToken
     public const string TokenId = "type";
     public override string Id => TokenId;
 
-    protected override Result Result(ContextBase context, Category category, ValueSyntax left)
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax left)
     {
         if(category.HasType())
         {
@@ -24,9 +24,9 @@ sealed class TypeOperator : SuffixSyntaxToken
             return leftType
                 .TypeForTypeOperator
                 .TypeType
-                .Result(category);
+                .GetResult(category);
         }
 
-        return Root.VoidType.Result(category);
+        return Root.VoidType.GetResult(category);
     }
 }

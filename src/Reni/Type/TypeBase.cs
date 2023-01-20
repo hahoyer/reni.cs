@@ -426,7 +426,7 @@ abstract class TypeBase
 
     internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination)
         => this is IForcedConversionProvider<TDestination> provider
-            ? provider.Result(destination)
+            ? provider.GetResult(destination)
             : new IConversion[0];
 
     internal virtual IEnumerable<IConversion> CutEnabledConversion(NumberType destination) { yield break; }
@@ -441,7 +441,7 @@ abstract class TypeBase
     Size GetSizeForCache() => IsHollow? Size.Zero : GetSize();
 
     static Result VoidCodeAndRefs(Category category)
-        => Root.VoidType.Result(category & (Category.Code | Category.Closures));
+        => Root.VoidType.GetResult(category & (Category.Code | Category.Closures));
 
     internal ArrayType Array(int count, string options = null)
         => Cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
@@ -461,35 +461,35 @@ abstract class TypeBase
         return VoidCodeAndRefs(category);
     }
 
-    internal Result ArgResult(Category category) => Result(category, () => ArgCode, Closures.Arg);
+    internal Result ArgResult(Category category) => GetResult(category, () => ArgCode, Closures.Arg);
 
     Result PointerArgResult(Category category) => Pointer.ArgResult(category);
 
-    internal Result Result(Category category, IContextReference target)
+    internal Result GetResult(Category category, IContextReference target)
     {
         if(IsHollow)
-            return Result(category);
+            return GetResult(category);
 
-        return Result
+        return GetResult
         (
             category,
             () => CodeBase.ReferenceCode(target)
         );
     }
 
-    internal Result Result(Category category, Result codeAndClosures)
-        => Result
+    internal Result GetResult(Category category, Result codeAndClosures)
+        => GetResult
         (
             category,
             () => codeAndClosures.Code,
             () => codeAndClosures.Closures
         );
 
-    internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
+    internal Result GetResult(Category category, Func<Category, Result> getCodeAndRefs)
     {
         var localCategory = category & (Category.Code | Category.Closures);
         var codeAndClosures = getCodeAndRefs(localCategory);
-        return Result
+        return GetResult
         (
             category,
             () => codeAndClosures.Code,
@@ -497,7 +497,7 @@ abstract class TypeBase
         );
     }
 
-    internal Result Result(Category category, Func<CodeBase> getCode = null, Func<Closures> getClosures = null)
+    internal Result GetResult(Category category, Func<CodeBase> getCode = null, Func<Closures> getClosures = null)
         => new(
             category,
             getClosures, getCode, () => this);
@@ -509,8 +509,8 @@ abstract class TypeBase
         if(IsConvertible(elseType))
             return elseType;
 
-        var thenConversions = ConversionService.ClosureService.Result(this);
-        var elseConversions = ConversionService.ClosureService.Result(elseType);
+        var thenConversions = ConversionService.ClosureService.GetResult(this);
+        var elseConversions = ConversionService.ClosureService.GetResult(elseType);
 
         var combination = thenConversions
             .Merge(elseConversions, item => item.Destination)
@@ -548,7 +548,7 @@ abstract class TypeBase
             return ArgResult(category);
 
         return ForcedPointer
-            .Result
+            .GetResult
             (
                 category,
                 LocalReferenceCode,
@@ -563,9 +563,9 @@ abstract class TypeBase
     internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
     {
         if(IsHollow)
-            return Result(category);
+            return GetResult(category);
 
-        return Result
+        return GetResult
         (
             category,
             () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
@@ -590,7 +590,7 @@ abstract class TypeBase
     internal Result CreateArray(Category category, string optionsId = null) => Align
         .Array(1, optionsId)
         .Pointer
-        .Result(category, PointerArgResult(category));
+        .GetResult(category, PointerArgResult(category));
 
     internal bool IsConvertible(TypeBase destination)
         => ConversionService.FindPath(this, destination) != null;
@@ -598,7 +598,7 @@ abstract class TypeBase
     internal Result Conversion(Category category, TypeBase destination)
     {
         if(Category.Type.Replenished().Contains(category))
-            return destination.SmartPointer.Result(category);
+            return destination.SmartPointer.GetResult(category);
 
         var path = ConversionService.FindPath(this, destination);
         return path == null
@@ -607,13 +607,13 @@ abstract class TypeBase
     }
 
     Result Mutation(Category category, TypeBase destination)
-        => destination.Result(category, ArgResult);
+        => destination.GetResult(category, ArgResult);
 
     internal ResultCache Mutation(TypeBase destination)
         => Cache.Mutation[destination];
 
     internal Result DumpPrintTypeNameResult(Category category) => Root.VoidType
-        .Result
+        .GetResult
         (
             category,
             () => CodeBase.DumpPrintText(DumpPrintText),
@@ -622,11 +622,11 @@ abstract class TypeBase
 
     internal TypeBase SmartUn<T>()
         where T : IConversion
-        => this is T? ((IConversion)this).Result(Category.Type).Type : this;
+        => this is T? ((IConversion)this).GetResult(Category.Type).Type : this;
 
     internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
         .Pointer
-        .Result(category, ObjectResult);
+        .GetResult(category, ObjectResult);
 
     /// <summary>
     ///     Call this function to get declarations of definable for this type.
@@ -667,7 +667,7 @@ abstract class TypeBase
     bool IsDeclarationOption(Definable tokenClass)
         => DeclarationsForType(tokenClass).Any();
 
-    Result AlignResult(Category category) => Align.Result(category, () => ArgCode.Align(), Closures.Arg);
+    Result AlignResult(Category category) => Align.GetResult(category, () => ArgCode.Align(), Closures.Arg);
 
     IEnumerable<IConversion> GetSymmetricConversionsForCache()
         => RawSymmetricConversions
@@ -691,17 +691,17 @@ abstract class TypeBase
     }
 
     protected Result DumpPrintTokenResult(Category category)
-        => Root.VoidType.Result(category, DumpPrintCode)
+        => Root.VoidType.GetResult(category, DumpPrintCode)
             .ReplaceArg(DereferencesObjectResult(category));
 
     Result DereferencesObjectResult(Category category)
         =>
             IsHollow
-                ? Result(category)
-                : Pointer.Result(category | Category.Type, ForcedReference).DereferenceResult;
+                ? GetResult(category)
+                : Pointer.GetResult(category | Category.Type, ForcedReference).DereferenceResult;
 
     internal Result ObjectResult(Category category)
-        => IsHollow? Result(category) : Pointer.Result(category | Category.Type, ForcedReference);
+        => IsHollow? GetResult(category) : Pointer.GetResult(category | Category.Type, ForcedReference);
 
     Result IssueResult
         (Category category, IssueId issueId, SourcePart token, SearchResult[] declarations, Issue[] leftIssues)
@@ -753,7 +753,7 @@ abstract class TypeBase
             return IdentityOperationResult(category, isEqual)
                 .ReplaceArg(c => right.Conversion(c, AutomaticDereferenceType.Pointer));
 
-        return Root.BitType.Result
+        return Root.BitType.GetResult
         (
             category,
             () => CodeBase.BitsConst(BitsConst.Convert(isEqual))
@@ -762,7 +762,7 @@ abstract class TypeBase
 
     Result IdentityOperationResult(Category category, bool isEqual)
     {
-        var result = Root.BitType.Result
+        var result = Root.BitType.GetResult
         (
             category,
             () => IdentityOperationCode(isEqual),

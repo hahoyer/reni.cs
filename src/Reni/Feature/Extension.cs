@@ -65,9 +65,9 @@ static class Extension
         => MetaFunctionCache[function];
 
     internal static TypeBase ResultType(this IConversion conversion)
-        => conversion.Result(Category.Type).Type;
+        => conversion.GetResult(Category.Type).Type;
 
-    internal static Result Result(this IConversion conversion, Category category)
+    internal static Result GetResult(this IConversion conversion, Category category)
     {
         var result = conversion.Execute(category);
         (result != null).Assert();
@@ -101,7 +101,7 @@ static class Extension
             yield return item;
     }
 
-    internal static Result Result
+    internal static Result GetResult
     (
         this IEvalImplementation feature,
         Category category,
@@ -141,7 +141,7 @@ static class Extension
             if(argsType == null)
                 return argsResult.GetCategories(category);
 
-            var result = feature.Function.Result(category, argsType);
+            var result = feature.Function.GetResult(category, argsType);
             return result.ReplaceArg(argsResult);
         }
 
@@ -162,10 +162,10 @@ static class Extension
         {
             var result = feature
                 .Function
-                .Result(valueCategory, Root.VoidType);
+                .GetResult(valueCategory, Root.VoidType);
 
             return result
-                .ReplaceArg(Root.VoidType.Result(Category.All));
+                .ReplaceArg(Root.VoidType.GetResult(Category.All));
         }
 
         if(right != null && feature.Function != null)
@@ -174,7 +174,7 @@ static class Extension
         return feature.Value?.Execute(valueCategory);
     }
 
-    internal static Result Result
+    internal static Result GetResult
     (
         this IImplementation feature,
         Category category,
@@ -186,10 +186,10 @@ static class Extension
     {
         var metaFeature = ((IMetaImplementation)feature).Function;
         if(metaFeature != null)
-            return metaFeature.Result(category, left, context, right);
+            return metaFeature.GetResult(category, left, context, right);
 
         return feature
-            .Result(category, token, context, right)
+            .GetResult(category, token, context, right)
             .ReplaceArg(left);
     }
 
@@ -200,5 +200,5 @@ static class Extension
             .Distinct()
             .SingleOrDefault();
 
-    internal static Result Result(this Issue[] issues, Category category, Root root) => new(category, issues);
+    internal static Result GetResult(this Issue[] issues, Category category, Root root) => new(category, issues);
 }

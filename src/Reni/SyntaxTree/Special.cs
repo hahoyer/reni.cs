@@ -16,6 +16,12 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
 
     readonly SourcePart Token;
 
+    [DisableDump]
+    internal string Id => Token.Id;
+
+    [DisableDump]
+    internal long ToNumber => BitsConst.Convert(Id).ToInt64();
+
     internal TerminalSyntax(ITerminal terminal, SourcePart token, Anchor anchor)
         : base(anchor)
     {
@@ -26,15 +32,9 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
     }
 
     internal override Result ResultForCache(ContextBase context, Category category)
-        => Terminal.Result(context, category, Token);
+        => Terminal.GetResult(context, category, Token);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
-
-    [DisableDump]
-    internal string Id => Token.Id;
-
-    [DisableDump]
-    internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 }
 
 sealed class PrefixSyntax : ValueSyntax
@@ -61,7 +61,7 @@ sealed class PrefixSyntax : ValueSyntax
     protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
     internal override Result ResultForCache(ContextBase context, Category category)
-        => Prefix.Result(context, category, Right, Token);
+        => Prefix.GetResult(context, category, Right, Token);
 
     public static Result<ValueSyntax> Create
         (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
@@ -104,7 +104,7 @@ sealed class InfixSyntax : ValueSyntax
         };
 
     internal override Result ResultForCache(ContextBase context, Category category) => Infix
-        .Result(context, category, Left, Right);
+        .GetResult(context, category, Left, Right);
 
     public static Result<ValueSyntax> Create
     (
@@ -119,7 +119,7 @@ sealed class InfixSyntax : ValueSyntax
 
 interface IPendingProvider
 {
-    Result Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
+    Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 }
 
 sealed class SuffixSyntax : ValueSyntax
@@ -147,7 +147,7 @@ sealed class SuffixSyntax : ValueSyntax
     protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
     internal override Result ResultForCache(ContextBase context, Category category)
-        => Suffix.Result(context, category, Left);
+        => Suffix.GetResult(context, category, Left);
 
     public static Result<ValueSyntax> Create
         (Result<ValueSyntax> left, ISuffix suffix, SourcePart token, Anchor brackets)
@@ -159,22 +159,22 @@ sealed class SuffixSyntax : ValueSyntax
 
 interface ITerminal
 {
-    Result Result(ContextBase context, Category category, SourcePart token);
+    Result GetResult(ContextBase context, Category category, SourcePart token);
     ValueSyntax Visit(ISyntaxVisitor visitor);
     Declaration[] Declarations { get; }
 }
 
 interface IPrefix
 {
-    Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token);
+    Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
 }
 
 interface IInfix
 {
-    Result Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
+    Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 }
 
 interface ISuffix
 {
-    Result Result(ContextBase context, Category category, ValueSyntax left);
+    Result GetResult(ContextBase context, Category category, ValueSyntax left);
 }

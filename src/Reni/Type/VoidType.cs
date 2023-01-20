@@ -24,5 +24,5 @@ sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
     protected override TypeBase ReversePair(TypeBase first) => first;
     internal override TypeBase Pair(TypeBase second) => second;
 
-    new Result DumpPrintTokenResult(Category category) => Result(category);
+    new Result DumpPrintTokenResult(Category category) => GetResult(category);
 }

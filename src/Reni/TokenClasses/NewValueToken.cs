@@ -17,12 +17,12 @@ sealed class NewValueToken : NonSuffixSyntaxToken
     protected override Declaration[] Declarations => PredefinedDeclarations;
     public override string Id => TokenId;
 
-    protected override Result Result(ContextBase context, Category category)
+    protected override Result GetResult(ContextBase context, Category category)
         => context
             .FindRecentFunctionContextObject
             .CreateValueReferenceResult(category);
 
-    protected override Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
     {
         NotImplementedMethod(context, category, token, right);
         return null;

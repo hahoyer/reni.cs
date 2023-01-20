@@ -18,8 +18,8 @@ static class ConversionService
             NewPathsCache = new(() => new());
         }
 
-        internal static IEnumerable<ConversionPath> Result(TypeBase source)
-            => new ClosureService(source).Result();
+        internal static IEnumerable<ConversionPath> GetResult(TypeBase source)
+            => new ClosureService(source).GetResult();
 
         IEnumerable<ConversionPath> ExtendPathByOneConversionAndCollect(ConversionPath startFeature = null)
         {
@@ -45,7 +45,7 @@ static class ConversionService
             return !(resultType == null || FoundTypes.Contains(resultType));
         }
 
-        IEnumerable<ConversionPath> Result()
+        IEnumerable<ConversionPath> GetResult()
         {
             NewPathsCache.IsValid = false;
             var singularPath = new ConversionPath(Source);
@@ -80,7 +80,7 @@ static class ConversionService
                 if(IsDestination(Source))
                     return SimplePath;
 
-                var paths = ClosureService.Result(Source);
+                var paths = ClosureService.GetResult(Source);
                 if(paths == null)
                     return new();
 
@@ -162,7 +162,7 @@ static class ConversionService
 
     internal static IEnumerable<ConversionPath> CloseRelativeConversions(this TypeBase source)
     {
-        var paths = ClosureService.Result(source);
+        var paths = ClosureService.GetResult(source);
         return paths.Where(path => path.Elements.Any());
     }
 

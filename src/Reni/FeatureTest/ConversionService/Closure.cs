@@ -53,7 +53,7 @@ public sealed class Closure : DependenceProvider
     public void ClosureServiceOfNumber()
     {
         var source = new Root(null).BitType.Number(1);
-        var paths = Type.ConversionService.ClosureService.Result(source);
+        var paths = Type.ConversionService.ClosureService.GetResult(source);
         var destinations = paths.Select(p => p.Destination).ToArray();
 
         destinations.Contains(source.Pointer).Assert();

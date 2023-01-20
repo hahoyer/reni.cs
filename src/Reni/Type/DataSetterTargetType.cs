@@ -10,10 +10,10 @@ abstract class DataSetterTargetType : SetterTargetType
     protected abstract CodeBase GetterCode();
 
     protected override Result SetterResult(Category category)
-        => Root.VoidType.Result(category, SetterCode);
+        => Root.VoidType.GetResult(category, SetterCode);
 
     protected override Result GetterResult(Category category)
         => ValueType
             .ForcedPointer
-            .Result(category, GetterCode);
+            .GetResult(category, GetterCode);
 }

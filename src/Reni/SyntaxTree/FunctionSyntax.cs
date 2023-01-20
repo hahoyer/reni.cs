@@ -4,76 +4,75 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
 
-namespace Reni.SyntaxTree
+namespace Reni.SyntaxTree;
+
+sealed class FunctionSyntax : ValueSyntax
 {
-    sealed class FunctionSyntax : ValueSyntax
+    [EnableDumpExcept(null)]
+    internal ValueSyntax Getter { get; }
+
+    [EnableDump]
+    [EnableDumpExcept(false)]
+    internal bool IsImplicit { get; }
+
+    [EnableDumpExcept(null)]
+    internal ValueSyntax Setter { get; }
+
+    bool IsMetaFunction { get; }
+
+    [DisableDump]
+    internal string Tag
+        => "@" + (IsMetaFunction? "@" : "") + (IsImplicit? "!" : "");
+
+    internal FunctionSyntax
+    (
+        ValueSyntax setter,
+        bool isImplicit,
+        bool isMetaFunction,
+        ValueSyntax getter, Anchor anchor
+    )
+        : base(anchor)
     {
-        [EnableDumpExcept(null)]
-        internal ValueSyntax Getter { get; }
+        Getter = getter;
+        Setter = setter;
+        IsImplicit = isImplicit;
+        IsMetaFunction = isMetaFunction;
+    }
 
-        [EnableDump]
-        [EnableDumpExcept(false)]
-        internal bool IsImplicit { get; }
+    [DisableDump]
+    internal override bool IsLambda => true;
 
-        [EnableDumpExcept(null)]
-        internal ValueSyntax Setter { get; }
+    [DisableDump]
+    protected override int DirectChildCount => 2;
 
-        bool IsMetaFunction { get; }
-
-        internal FunctionSyntax
-        (
-            ValueSyntax setter,
-            bool isImplicit,
-            bool isMetaFunction,
-            ValueSyntax getter, Anchor anchor
-        )
-            : base(anchor)
+    protected override Syntax GetDirectChild(int index)
+        => index switch
         {
-            Getter = getter;
-            Setter = setter;
-            IsImplicit = isImplicit;
-            IsMetaFunction = isMetaFunction;
-        }
+            0 => Setter, 1 => Getter, _ => null
+        };
 
-        [DisableDump]
-        internal override bool IsLambda => true;
+    internal override Result ResultForCache(ContextBase context, Category category)
+        => context
+            .FindRecentCompoundView
+            .FunctionalType(this)
+            .GetResult(category);
 
-        [DisableDump]
-        protected override int DirectChildCount => 2;
+    protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
 
-        protected override Syntax GetDirectChild(int index)
-            => index switch
-            {
-                0 => Setter, 1 => Getter, _ => null
-            };
-
-        internal override Result ResultForCache(ContextBase context, Category category)
-            => context
-                .FindRecentCompoundView
-                .FunctionalType(this)
-                .Result(category);
-
-        protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
-
-        [DisableDump]
-        internal string Tag
-            => "@" + (IsMetaFunction? "@" : "") + (IsImplicit? "!" : "");
-
-        internal IMeta MetaFunctionFeature(CompoundView compoundView)
-        {
-            if(!IsMetaFunction)
-                return null;
-
-            NotImplementedMethod(compoundView);
+    internal IMeta MetaFunctionFeature(CompoundView compoundView)
+    {
+        if(!IsMetaFunction)
             return null;
-        }
 
-        internal IFunction FunctionFeature(CompoundView compoundView)
-        {
-            if(IsMetaFunction)
-                return null;
+        NotImplementedMethod(compoundView);
+        return null;
+    }
 
-            return new FunctionBodyType(compoundView, this);
-        }
+    internal IFunction FunctionFeature(CompoundView compoundView)
+    {
+        if(IsMetaFunction)
+            return null;
+
+        return new FunctionBodyType(compoundView, this);
     }
 }

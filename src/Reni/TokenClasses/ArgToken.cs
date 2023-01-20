@@ -16,13 +16,13 @@ sealed class ArgToken : NonSuffixSyntaxToken
     static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
     public override string Id => TokenId;
 
-    protected override Result Result(ContextBase context, Category category)
+    protected override Result GetResult(ContextBase context, Category category)
         => context.GetArgReferenceResult(category);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
     protected override Declaration[] Declarations => PredefinedDeclarations;
 
-    protected override Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
         => context.GetFunctionalArgResult(category, right, token);
 }

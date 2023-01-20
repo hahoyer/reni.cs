@@ -12,11 +12,11 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
 {
     public const string TokenId = "instance";
 
-    Result IPendingProvider.Result
+    Result IPendingProvider.GetResult
         (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
         if(Category.Type.Replenished().Contains(category))
-            return Result(context, category, left, right);
+            return GetResult(context, category, left, right);
 
         NotImplementedMethod(context, category, left, right);
         return null;
@@ -40,7 +40,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
 
     public override string Id => TokenId;
 
-    protected override Result Result
+    protected override Result GetResult
         (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
         var leftType = left.Type(context);

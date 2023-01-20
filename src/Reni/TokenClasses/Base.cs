@@ -17,15 +17,15 @@ abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
 {
     Declaration[] ITerminal.Declarations => Declarations;
 
-    Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
-        => Result(context, category, token);
+    Result ITerminal.GetResult(ContextBase context, Category category, SourcePart token)
+        => GetResult(context, category, token);
 
     ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
     protected abstract Declaration[] Declarations { get; }
 
-    protected abstract Result Result(ContextBase context, Category category, SourcePart token);
+    protected abstract Result GetResult(ContextBase context, Category category, SourcePart token);
 
     protected ValueSyntax Visit(ISyntaxVisitor visitor)
     {
@@ -36,37 +36,37 @@ abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
 
 abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueToken
 {
-    Result IInfix.Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-        => Result(context, category, left, right);
+    Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+        => GetResult(context, category, left, right);
 
-    Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
-        => Result(context, category, right);
+    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        => GetResult(context, category, right);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
 
-    protected abstract Result Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
+    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 
-    protected abstract Result Result(ContextBase context, Category category, ValueSyntax right);
+    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax right);
 }
 
 abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueToken
 {
-    Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
-        => Result(context, category, right, token);
+    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        => GetResult(context, category, right, token);
 
     Declaration[] ITerminal.Declarations => Declarations;
 
-    Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
-        => Result(context, category);
+    Result ITerminal.GetResult(ContextBase context, Category category, SourcePart token)
+        => GetResult(context, category);
 
     ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
     protected abstract Declaration[] Declarations { get; }
 
-    protected abstract Result Result(ContextBase context, Category category);
+    protected abstract Result GetResult(ContextBase context, Category category);
 
-    protected abstract Result Result
+    protected abstract Result GetResult
         (ContextBase callContext, Category category, ValueSyntax right, SourcePart token);
 
     internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
@@ -78,21 +78,21 @@ abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValue
 
 abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueToken
 {
-    Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
-        => Result(context, category, left);
+    Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
+        => GetResult(context, category, left);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
 
-    protected abstract Result Result(ContextBase context, Category category, ValueSyntax left);
+    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax left);
 }
 
 abstract class InfixSyntaxToken : InfixToken, IInfix, IValueToken
 {
-    Result IInfix.Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-        => Result(context, category, left, right);
+    Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+        => GetResult(context, category, left, right);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
 
-    protected abstract Result Result
+    protected abstract Result GetResult
         (ContextBase callContext, Category category, ValueSyntax left, ValueSyntax right);
 }

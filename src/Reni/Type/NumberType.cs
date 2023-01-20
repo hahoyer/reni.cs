@@ -46,7 +46,7 @@ sealed class NumberType
         : base(parent)
         => ZeroResult = new(GetZeroResult);
 
-    IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+    IEnumerable<IConversion> IForcedConversionProvider<NumberType>.GetResult(NumberType destination)
     {
         if(Bits <= destination.Bits)
             yield return
@@ -106,17 +106,17 @@ sealed class NumberType
     Result GetZeroResult() => Root
         .BitType
         .Number(1)
-        .Result(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
+        .GetResult(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
 
     Result TextItemResult(Category category) => Parent
         .TextItem
         .Pointer
-        .Result
+        .GetResult
         (
             category,
             Parent
                 .Pointer
-                .Result(category, ObjectResult(category | Category.Type)));
+                .GetResult(category, ObjectResult(category | Category.Type)));
 
     Result NegationResult(Category category) => ((NumberType)ZeroResult.Value.Type)
         .OperationResult(category, MinusOperation, this)
@@ -129,7 +129,7 @@ sealed class NumberType
     Result EnableCutTokenResult(Category category)
         => EnableCut
             .Pointer
-            .Result(category | Category.Type, ObjectResult(category));
+            .GetResult(category | Category.Type, ObjectResult(category));
 
     Result OperationResult(Category category, TypeBase right, IOperation operation)
     {
@@ -157,7 +157,7 @@ sealed class NumberType
 
     Result OperationResult(Category category, TypeBase resultType, string operationName, NumberType right)
     {
-        var result = resultType.Result
+        var result = resultType.GetResult
         (
             category,
             () => OperationCode(resultType.Size, operationName, right),
@@ -185,7 +185,7 @@ sealed class NumberType
         if(Bits == source.Bits)
             return ArgResult(category | Category.Type);
 
-        return Result
+        return GetResult
         (
             category,
             () => source.ArgCode.BitCast(Size),
@@ -199,7 +199,7 @@ sealed class NumberType
             return EnableCut.Mutation(this) & category;
 
         return destination
-            .Result
+            .GetResult
             (
                 category,
                 () => EnableCut.ArgCode.BitCast(destination.Size),

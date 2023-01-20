@@ -252,7 +252,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Result DumpPrintResultViaObject(Category category)
     {
         if(IsDumpPrintResultViaObjectActive)
-            return Root.VoidType.Result(category, () => CodeBase.DumpPrintText("?"));
+            return Root.VoidType.GetResult(category, () => CodeBase.DumpPrintText("?"));
 
         IsDumpPrintResultViaObjectActive = true;
         var result = Root.ConcatPrintResult
@@ -269,7 +269,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     {
         var resultType = AccessType(position);
         if(resultType.IsHollow)
-            return resultType.Result(category);
+            return resultType.GetResult(category);
 
         return Type.SmartPointer.Mutation(resultType) & category;
     }
@@ -278,18 +278,18 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     {
         var resultType = AccessType(position);
         if(resultType.IsHollow)
-            return resultType.Result(category);
+            return resultType.GetResult(category);
 
-        return resultType.Result(category, Type.ObjectResult);
+        return resultType.GetResult(category, Type.ObjectResult);
     }
 
     internal Result AccessValueViaObject(Category category, int position)
     {
         var resultType = ValueType(position);
         if(resultType.IsHollow)
-            return resultType.Result(category);
+            return resultType.GetResult(category);
 
-        return resultType.Result
+        return resultType.GetResult
             (category, c => Type.ObjectResult(c).AddToReference(() => FieldOffset(position)));
     }
 
@@ -305,7 +305,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
         var source = result.Source;
         (source == Type.Pointer).Assert(source.Dump);
-        (source == result.Result(Category.Code).Code.ArgType).Assert();
+        (source == result.GetResult(Category.Code).Code.ArgType).Assert();
         return result;
     }
 
@@ -322,10 +322,10 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Result ObjectPointerViaContext(Category category)
     {
         if(IsHollow)
-            return Type.Result(category);
+            return Type.GetResult(category);
 
         return Type.SmartPointer
-            .Result
+            .GetResult
             (
                 category,
                 ObjectPointerViaContext,
@@ -375,7 +375,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             .ReplaceArg(ObjectPointerViaContext);
 
     internal Result ContextOperatorResult(Category category)
-        => ContextReferenceType.Result(category, ContextOperatorCode);
+        => ContextReferenceType.GetResult(category, ContextOperatorCode);
 
     CodeBase ContextOperatorCode()
         => IsHollow

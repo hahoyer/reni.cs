@@ -92,10 +92,10 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
         => ResultCache.Add(context, cacheItem);
 
-    internal Result Result(ContextBase context) => context.GetResult(Category.All, this);
+    internal Result GetResult(ContextBase context) => context.GetResult(Category.All, this);
 
     internal BitsConst Evaluate(ContextBase context)
-        => Result(context).Evaluate(context.RootContext.ExecutionContext);
+        => GetResult(context).Evaluate(context.RootContext.ExecutionContext);
 
     //[DebuggerHidden]
     internal TypeBase Type(ContextBase context) => context.GetResult(Category.Type, this)?.Type;

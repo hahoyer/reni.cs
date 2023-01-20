@@ -31,14 +31,14 @@ abstract class FunctionFeatureImplementation
     IFunction IEvalImplementation.Function => this;
     IValue IEvalImplementation.Value => null;
 
-    bool IFunction.IsImplicit => IsImplicit;
+    Result IFunction.GetResult(Category category, TypeBase argsType)
+        => GetResult(category, argsType);
 
-    Result IFunction.Result(Category category, TypeBase argsType)
-        => Result(category, argsType);
+    bool IFunction.IsImplicit => IsImplicit;
 
     IMeta IMetaImplementation.Function => null;
 
-    protected abstract Result Result(Category category, TypeBase argsType);
+    protected abstract Result GetResult(Category category, TypeBase argsType);
     protected abstract bool IsImplicit { get; }
 }
 
@@ -50,13 +50,13 @@ abstract class ContextMetaFeatureImplementation
     IFunction IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => null;
 
-    Result IMeta.Result
+    Result IMeta.GetResult
         (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
-        => Result(contextBase, category, right);
+        => GetResult(contextBase, category, right);
 
     IMeta IMetaImplementation.Function => this;
 
-    protected abstract Result Result
+    protected abstract Result GetResult
         (ContextBase contextBase, Category category, ValueSyntax right);
 }
 
@@ -77,12 +77,12 @@ interface IValue
 interface IFunction
 {
     /// <summary>
-    ///     Result code contains CodeBase.Arg for argsType and ObjectReference for function object, if appropriate
+    ///     GetResult code contains CodeBase.Arg for argsType and ObjectReference for function object, if appropriate
     /// </summary>
     /// <param name="category"> </param>
     /// <param name="argsType"> </param>
     /// <returns> </returns>
-    Result Result(Category category, TypeBase argsType);
+    Result GetResult(Category category, TypeBase argsType);
 
     /// <summary>
     ///     Gets a value indicating whether this function requires implicit call (i. e. call without argument list).
@@ -96,7 +96,7 @@ interface IFunction
 
 interface IMeta
 {
-    Result Result
+    Result GetResult
         (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
 }
 
@@ -162,7 +162,7 @@ sealed class MetaFunction : DumpableObject, IImplementation, IMeta
     IFunction IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => null;
 
-    Result IMeta.Result
+    Result IMeta.GetResult
         (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
         => Function(category, left, contextBase, right);
 
@@ -175,7 +175,7 @@ sealed class ContextMetaFunction : ContextMetaFeatureImplementation
 
     public ContextMetaFunction(Func<ContextBase, Category, ValueSyntax, Result> function) => Function = function;
 
-    protected override Result Result
+    protected override Result GetResult
         (ContextBase contextBase, Category category, ValueSyntax right)
         => Function(contextBase, category, right);
 }
@@ -190,7 +190,7 @@ sealed class ContextMetaFunctionFromSyntax
     IFunction IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => null;
 
-    Result IMeta.Result
+    Result IMeta.GetResult
         (Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
         => callContext.GetResult(category, Definition.ReplaceArg(right));
 
@@ -199,12 +199,12 @@ sealed class ContextMetaFunctionFromSyntax
 
 interface IForcedConversionProvider<in TDestination>
 {
-    IEnumerable<IConversion> Result(TDestination destination);
+    IEnumerable<IConversion> GetResult(TDestination destination);
 }
 
 interface IForcedConversionProviderForPointer<in TDestination>
 {
-    IEnumerable<IConversion> Result(TDestination destination);
+    IEnumerable<IConversion> GetResult(TDestination destination);
 }
 
 interface IChild<out TParent>

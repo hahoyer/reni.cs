@@ -111,7 +111,7 @@ sealed class ArrayType
 
     TypeBase IChild<TypeBase>.Parent => ElementType;
 
-    IEnumerable<IConversion> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
+    IEnumerable<IConversion> IForcedConversionProviderForPointer<ArrayReferenceType>.GetResult
         (ArrayReferenceType destination)
         => ForcedConversion(destination).NullableToArray();
 
@@ -210,7 +210,7 @@ sealed class ArrayType
             return null;
 
         if(argsType == Root.VoidType)
-            return Result(category, () => CodeBase.BitsConst(Size, BitsConst.Convert(0)));
+            return GetResult(category, () => CodeBase.BitsConst(Size, BitsConst.Convert(0)));
 
         var function = argsType as IFunction;
         if(function != null)
@@ -235,26 +235,26 @@ sealed class ArrayType
     Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
 
     Result ReferenceResult(Category category)
-        => Reference(IsMutable).Result(category, ObjectResult);
+        => Reference(IsMutable).GetResult(category, ObjectResult);
 
     Result ConstructorResult(Category category, IFunction function)
     {
         var indexType = BitType
             .Number(BitsConst.Convert(Count).Size.ToInt())
             .Align;
-        var constructorResult = function.Result(category | Category.Type, indexType);
+        var constructorResult = function.GetResult(category | Category.Type, indexType);
         var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
                 .Aggregate((c, n) => n + c)
-            ?? Root.VoidType.Result(category);
-        return Result(category, elements);
+            ?? Root.VoidType.GetResult(category);
+        return GetResult(category, elements);
     }
 
     Result ElementConstructorResult
         (Category category, Result elementConstructorResult, int i, TypeBase indexType)
     {
         var resultForArg = indexType
-            .Result
+            .GetResult
                 (category | Category.Type, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
         return elementConstructorResult
                 .ReplaceArg(resultForArg)
@@ -272,7 +272,7 @@ sealed class ArrayType
     )
     {
         var oldElementsResult = Pointer
-            .Result(category | Category.Type, objectReference).DereferenceResult;
+            .GetResult(category | Category.Type, objectReference).DereferenceResult;
 
         var isElementArg = argsType.IsConvertible(ElementAccessType);
         var newCount = isElementArg? 1 : argsType.ArrayLength(ElementAccessType);
@@ -284,7 +284,7 @@ sealed class ArrayType
         var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult();
         var result = ElementType
             .Array(Count + newCount, argsOptions)
-            .Result(category, newElementsResult + oldElementsResult);
+            .GetResult(category, newElementsResult + oldElementsResult);
         return result;
     }
 
@@ -308,7 +308,7 @@ sealed class ArrayType
         );
 
     Result ElementAccessResult(Category category, TypeBase right)
-        => AccessType.Result(category, ObjectResult(category), right);
+        => AccessType.GetResult(category, ObjectResult(category), right);
 
     Result ToNumberOfBaseResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
@@ -320,14 +320,14 @@ sealed class ArrayType
         var conversionBase = right.Evaluate(context).ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);
         var result = BitsConst.Convert(target, conversionBase);
-        return Root.BitType.Result(category, result).Align;
+        return Root.BitType.GetResult(category, result).Align;
     }
 
     Result CountResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         (right == null).Assert();
-        return IndexType.Result
+        return IndexType.GetResult
             (category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
     }
 

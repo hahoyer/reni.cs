@@ -65,5 +65,5 @@ sealed class AlignType
         => UnalignedResult(category);
 
     public Result UnalignedResult(Category category)
-        => Parent.Result(category, () => ArgCode.BitCast(Parent.Size));
+        => Parent.GetResult(category, () => ArgCode.BitCast(Parent.Size));
 }

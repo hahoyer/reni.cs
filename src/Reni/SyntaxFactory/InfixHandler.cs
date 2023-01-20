@@ -73,7 +73,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public InfixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidInfixExpression, tokenClass) { }
 
-        Result IInfix.Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+        Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
             => new(category, GetIssue(left.Anchor.SourcePart + right.Anchor.SourcePart));
     }
 
@@ -82,7 +82,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public SuffixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidSuffixExpression, tokenClass) { }
 
-        Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
+        Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
             => new(category, GetIssue(left.Anchor.SourcePart));
     }
 
@@ -91,7 +91,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public PrefixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidPrefixExpression, tokenClass) { }
 
-        Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
             => new(category, GetIssue(right.Anchor.SourcePart));
     }
 
@@ -105,7 +105,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         Declaration[] ITerminal.Declarations => PredefinedDeclarations;
 
 
-        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
+        Result ITerminal.GetResult(ContextBase context, Category category, SourcePart token)
             => new(category, GetIssue(token));
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor)

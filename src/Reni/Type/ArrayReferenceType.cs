@@ -98,7 +98,7 @@ sealed class ArrayReferenceType
 
     TypeBase IChild<TypeBase>.Parent => ValueType;
 
-    IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
+    IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.GetResult
         (ArrayReferenceType destination)
         => ForcedConversion(destination).NullableToArray();
 
@@ -217,13 +217,13 @@ sealed class ArrayReferenceType
     {
         var leftResult = ObjectResult(category).DereferenceResult;
         return AccessType
-            .Result(category, leftResult, right);
+            .GetResult(category, leftResult, right);
     }
 
     Result PlusResult(Category category, TypeBase right)
     {
         var codeAndClosures = AccessResult(category, right).DereferenceResult;
-        return Result(category, codeAndClosures);
+        return GetResult(category, codeAndClosures);
     }
 
     Result MinusResult(Category category, TypeBase right)

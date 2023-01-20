@@ -69,9 +69,7 @@ sealed class FunctionBodyType
     IFunction IEvalImplementation.Function => this;
     IValue IEvalImplementation.Value => this;
 
-    bool IFunction.IsImplicit => Syntax.IsImplicit;
-
-    Result IFunction.Result(Category category, TypeBase argsType)
+    Result IFunction.GetResult(Category category, TypeBase argsType)
     {
         var trace = ObjectId == -49 && category.Replenished().HasClosures();
         StartMethodDump(trace, category, argsType);
@@ -94,6 +92,8 @@ sealed class FunctionBodyType
             EndMethodDump();
         }
     }
+
+    bool IFunction.IsImplicit => Syntax.IsImplicit;
 
     IMeta IMetaImplementation.Function => null;
 
@@ -120,7 +120,7 @@ sealed class FunctionBodyType
 
     new Result DumpPrintTokenResult(Category category)
         => Root.VoidType
-            .Result(category, DumpPrintCode);
+            .GetResult(category, DumpPrintCode);
 
     FunctionType Function(TypeBase argsType) => FindRecentCompoundView.Function(Syntax, argsType.AssertNotNull());
 }

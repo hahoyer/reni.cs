@@ -105,7 +105,7 @@ sealed class Root
 
     internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
     {
-        var result = VoidType.Result(category);
+        var result = VoidType.GetResult(category);
         if(!(category.HasCode() || category.HasClosures()))
             return result;
 
@@ -155,7 +155,7 @@ sealed class Root
 
     internal Container MainContainer(ValueSyntax syntax, string description)
     {
-        var rawResult = syntax.Result(this);
+        var rawResult = syntax.GetResult(this);
 
         var result = rawResult
             .Code?

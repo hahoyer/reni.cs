@@ -107,7 +107,7 @@ sealed class CompoundSyntax : ValueSyntax
     }
 
     internal override Result ResultForCache(ContextBase context, Category category)
-        => context.GetCompound(this).Result(category);
+        => context.GetCompound(this).GetResult(category);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor)
     {
@@ -157,7 +157,7 @@ sealed class CompoundSyntax : ValueSyntax
                     .LocalBlock(category)
                 & category;
 
-        return Root.VoidType.Result(category);
+        return Root.VoidType.GetResult(category);
     }
 
     IEnumerable<int> IndexList(Func<DeclarerSyntax, bool> selector)

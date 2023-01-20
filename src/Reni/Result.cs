@@ -21,7 +21,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     readonly ResultData Data;
 
     /// <summary>
-    ///     Result in case of Issues
+    ///     GetResult in case of Issues
     /// </summary>
     readonly IssueData IssueData;
 
@@ -306,7 +306,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             HasType.Assert(() => "Dereference requires type category:\n " + Dump());
             var referenceType = Type.CheckedReference;
             var converter = referenceType.Converter;
-            var result = converter.Result(CompleteCategory);
+            var result = converter.GetResult(CompleteCategory);
             return result
                 .ReplaceArg(this);
         }
@@ -817,7 +817,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     Result Un()
     {
-        var result = ((IConversion)Type).Result(CompleteCategory);
+        var result = ((IConversion)Type).GetResult(CompleteCategory);
         return result.ReplaceArg(this);
     }
 
@@ -879,7 +879,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     internal Result InvalidConversion(TypeBase destination)
         =>
-            destination.Result
+            destination.GetResult
                 (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Closures);
 
     internal bool IsValidOrIssue(Category category)
