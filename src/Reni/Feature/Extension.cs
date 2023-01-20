@@ -136,7 +136,7 @@ static class Extension
 
             (feature.Function != null).Assert();
 
-            var argsResult = context.ResultAsReferenceCache(right);
+            var argsResult = context.GetResultAsReferenceCache(right);
             var argsType = argsResult.Type;
             if(argsType == null)
                 return argsResult.GetCategories(category);

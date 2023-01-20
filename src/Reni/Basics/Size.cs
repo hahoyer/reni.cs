@@ -52,7 +52,7 @@ public sealed class Size
     public static Size Bit => Create(1);
     public static Size Byte => Bit.ByteAlignedSize;
     public bool IsPositive => Value > 0;
-    public int ByteCount => SizeToPacketCount(BitsConst.SegmentAlignBits);
+    public int ByteCount => GetPacketCount(BitsConst.SegmentAlignBits);
     public Size ByteAlignedSize => NextPacketSize(BitsConst.SegmentAlignBits);
 
     internal bool IsNegative => !(IsPositive || IsZero);
@@ -103,16 +103,16 @@ public sealed class Size
 
     public Size Align(int alignBits)
     {
-        var result = SizeToPacketCount(alignBits) << alignBits;
+        var result = GetPacketCount(alignBits) << alignBits;
         if(result == Value)
             return this;
         return Create(result);
     }
 
-    public int SizeToPacketCount(int alignBits) => ((Value - 1) >> alignBits) + 1;
+    public int GetPacketCount(int alignBits) => ((Value - 1) >> alignBits) + 1;
 
     public Size NextPacketSize(int alignBits)
-        => Create(SizeToPacketCount(alignBits) << alignBits);
+        => Create(GetPacketCount(alignBits) << alignBits);
 
     public int ToInt() => Value;
 
@@ -184,7 +184,7 @@ public sealed class Size
 
     internal void AssertAlignedSize(int alignBits)
     {
-        var result = SizeToPacketCount(alignBits);
+        var result = GetPacketCount(alignBits);
         if(result << alignBits == Value)
             return;
         NotImplementedMethod(alignBits);
@@ -197,7 +197,7 @@ public sealed class Size
     int SaveSizeToPacketCount(int alignBits)
     {
         AssertAlignedSize(alignBits);
-        return SizeToPacketCount(alignBits);
+        return GetPacketCount(alignBits);
     }
 
     bool LessThan(Size x) => Value < x.Value;

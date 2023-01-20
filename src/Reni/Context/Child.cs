@@ -27,17 +27,17 @@ abstract class Child : ContextBase
     [DisableDump]
     internal override Root RootContext => Parent.RootContext;
 
-    internal override CompoundView ObtainRecentCompoundView()
-        => Parent.ObtainRecentCompoundView();
+    internal override CompoundView GetRecentCompoundView()
+        => Parent.GetRecentCompoundView();
 
-    internal override IFunctionContext ObtainRecentFunctionContext()
-        => Parent.ObtainRecentFunctionContext();
+    internal override IFunctionContext GetRecentFunctionContext()
+        => Parent.GetRecentFunctionContext();
 
-    internal override IEnumerable<IImplementation> Declarations<TDefinable>
+    internal override IEnumerable<IImplementation> GetDeclarations<TDefinable>
         (TDefinable tokenClass)
     {
-        var result = base.Declarations(tokenClass).ToArray();
-        return result.Any()? result : Parent.Declarations(tokenClass);
+        var result = base.GetDeclarations(tokenClass).ToArray();
+        return result.Any()? result : Parent.GetDeclarations(tokenClass);
     }
 
     [DisableDump]

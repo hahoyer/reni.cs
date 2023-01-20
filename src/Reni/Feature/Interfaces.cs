@@ -148,7 +148,7 @@ sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvid
         => source.Declarations(Target);
 
     IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
-        => source.Declarations(Target);
+        => source.GetDeclarations(Target);
 }
 
 sealed class MetaFunction : DumpableObject, IImplementation, IMeta
@@ -192,7 +192,7 @@ sealed class ContextMetaFunctionFromSyntax
 
     Result IMeta.Result
         (Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
-        => callContext.Result(category, Definition.ReplaceArg(right));
+        => callContext.GetResult(category, Definition.ReplaceArg(right));
 
     IMeta IMetaImplementation.Function => this;
 }

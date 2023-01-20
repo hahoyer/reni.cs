@@ -80,7 +80,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     [DisableDump]
     internal ContextBase Context
-        => Compound.Parent.CompoundPositionContext(Compound.Syntax, ViewPosition);
+        => Compound.Parent.GetCompoundPositionContext(Compound.Syntax, ViewPosition);
 
     [DisableDump]
     internal CompoundType Type => TypeCache.Value;

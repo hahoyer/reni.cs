@@ -49,8 +49,8 @@ abstract class ContextBase
         {
             if(pendingCategory == Category.None)
                 return AsReference
-                    ? Context.ResultAsReference(category, Syntax)
-                    : Context.ResultForCache(category, Syntax);
+                    ? Context.GetResultAsReference(category, Syntax)
+                    : Context.GetResultForCache(category, Syntax);
 
             var recursionHandler = Syntax.RecursionHandler;
             if(recursionHandler != null)
@@ -90,10 +90,10 @@ abstract class ContextBase
 
         public Cache(ContextBase target)
         {
-            ResultCache = new(target.ResultCacheForCache);
+            ResultCache = new(target.GetResultCacheForCache);
             ResultAsReferenceCache = new(target.GetResultAsReferenceCacheForCache);
-            RecentStructure = new(target.ObtainRecentCompoundView);
-            RecentFunctionContextObject = new(target.ObtainRecentFunctionContext);
+            RecentStructure = new(target.GetRecentCompoundView);
+            RecentFunctionContextObject = new(target.GetRecentFunctionContext);
             Compounds = new(container => new(container, target));
 
             AsObject = new(target);
@@ -165,19 +165,19 @@ abstract class ContextBase
         get { yield return this; }
     }
 
-    internal virtual CompoundView ObtainRecentCompoundView()
+    internal virtual CompoundView GetRecentCompoundView()
     {
         NotImplementedMethod();
         return null;
     }
 
-    internal virtual IFunctionContext ObtainRecentFunctionContext()
+    internal virtual IFunctionContext GetRecentFunctionContext()
     {
         NotImplementedMethod();
         return null;
     }
 
-    internal virtual IEnumerable<IImplementation> Declarations<TDefinable>
+    internal virtual IEnumerable<IImplementation> GetDeclarations<TDefinable>
         (TDefinable tokenClass)
         where TDefinable : Definable
     {
@@ -191,32 +191,32 @@ abstract class ContextBase
         => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
     [UsedImplicitly]
-    internal int SizeToPacketCount(Size size)
-        => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
+    internal int GetPacketCount(Size size)
+        => size.GetPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
-    internal ContextBase CompoundPositionContext(CompoundSyntax container, int? position = null)
-        => CompoundView(container, position)?.CompoundContext;
+    internal ContextBase GetCompoundPositionContext(CompoundSyntax container, int? position = null)
+        => GetCompoundView(container, position)?.CompoundContext;
 
-    internal CompoundView CompoundView(CompoundSyntax syntax, int? accessPosition = null)
+    internal CompoundView GetCompoundView(CompoundSyntax syntax, int? accessPosition = null)
         => CacheObject.Compounds[syntax].View[accessPosition ?? syntax.EndPosition];
 
-    internal Compound Compound(CompoundSyntax context) => CacheObject.Compounds[context];
+    internal Compound GetCompound(CompoundSyntax context) => CacheObject.Compounds[context];
 
     //[DebuggerHidden]
-    internal Result Result(Category category, ValueSyntax syntax)
-        => ResultCache(syntax).GetCategories(category);
+    internal Result GetResult(Category category, ValueSyntax syntax)
+        => GetResultCache(syntax).GetCategories(category);
 
-    internal ResultCache ResultCache(ValueSyntax syntax)
+    internal ResultCache GetResultCache(ValueSyntax syntax)
         => CacheObject.ResultCache[syntax];
 
-    internal ResultCache ResultAsReferenceCache(ValueSyntax syntax)
+    internal ResultCache GetResultAsReferenceCache(ValueSyntax syntax)
         => CacheObject.ResultAsReferenceCache[syntax];
 
-    internal TypeBase TypeIfKnown(ValueSyntax syntax)
+    internal TypeBase GetTypeIfKnown(ValueSyntax syntax)
         => CacheObject.ResultCache[syntax].Data.Type;
 
     //[DebuggerHidden]
-    Result ResultForCache(Category category, ValueSyntax syntax)
+    Result GetResultForCache(Category category, ValueSyntax syntax)
     {
         var trace = syntax.ObjectId.In() && ObjectId.In(7) && category.HasType();
         StartMethodDump(trace, category, syntax);
@@ -234,7 +234,7 @@ abstract class ContextBase
     }
 
     [DebuggerHidden]
-    ResultCache ResultCacheForCache(ValueSyntax syntax)
+    ResultCache GetResultCacheForCache(ValueSyntax syntax)
     {
         var result = new ResultCache(new ResultProvider(this, syntax));
         syntax.AddToCacheForDebug(this, result);
@@ -244,11 +244,11 @@ abstract class ContextBase
     ResultCache GetResultAsReferenceCacheForCache
         (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true));
 
-    internal Result ResultAsReference(Category category, ValueSyntax syntax)
-        => Result(category | Category.Type, syntax)
+    internal Result GetResultAsReference(Category category, ValueSyntax syntax)
+        => GetResult(category | Category.Type, syntax)
             .LocalReferenceResult;
 
-    internal Result ArgReferenceResult(Category category)
+    internal Result GetArgReferenceResult(Category category)
         => FindRecentFunctionContextObject
             .CreateArgReferenceResult(category);
 
@@ -260,14 +260,14 @@ abstract class ContextBase
     /// <param name="right"> the expression of the argument of the call. Must not be null </param>
     /// <param name="token"></param>
     /// <returns> </returns>
-    internal Result FunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
+    internal Result GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
     {
         var argsType = FindRecentFunctionContextObject.ArgsType;
         return argsType
             .Execute
             (
                 category,
-                new(FunctionalArgObjectResult),
+                new(GetFunctionalArgObjectResult),
                 token,
                 null,
                 this,
@@ -275,13 +275,13 @@ abstract class ContextBase
             );
     }
 
-    Result FunctionalArgObjectResult(Category category)
+    Result GetFunctionalArgObjectResult(Category category)
     {
         NotImplementedMethod(category);
         return null;
     }
 
-    IImplementation Declaration(Definable tokenClass)
+    IImplementation GetDeclaration(Definable tokenClass)
     {
         var genericTokenClass = tokenClass.MakeGeneric.ToArray();
         var results
@@ -295,10 +295,10 @@ abstract class ContextBase
         return null;
     }
 
-    internal Result PrefixResult
+    internal Result GetPrefixResult
         (Category category, Definable definable, SourcePart token, ValueSyntax right)
     {
-        var searchResult = Declaration(definable);
+        var searchResult = GetDeclaration(definable);
         if(searchResult == null)
             return IssueId
                 .MissingDeclarationInContext
@@ -312,7 +312,7 @@ abstract class ContextBase
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
     {
-        var target = Result(category | Category.Type, argsType).SmartUn<PointerType>().Align;
+        var target = GetResult(category | Category.Type, argsType).SmartUn<PointerType>().Align;
         return target
                 .Type
                 .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))

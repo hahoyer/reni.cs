@@ -61,7 +61,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         => InternalResult(context, category);
 
     Result CondResult(ContextBase context, Category category)
-        => context.Result(category | Category.Type, Cond)
+        => context.GetResult(category | Category.Type, Cond)
             .Conversion(context.RootContext.BitType.Align)
             .LocalBlock(category | Category.Type)
             .Conversion(context.RootContext.BitType);
@@ -79,7 +79,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
 
     Result BranchResult(ContextBase context, Category category, ValueSyntax syntax)
     {
-        var result = context.Result(category | Category.Type, syntax);
+        var result = context.GetResult(category | Category.Type, syntax);
         if(result == null)
             return null;
 

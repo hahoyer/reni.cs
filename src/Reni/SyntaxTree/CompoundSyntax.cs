@@ -107,7 +107,7 @@ sealed class CompoundSyntax : ValueSyntax
     }
 
     internal override Result ResultForCache(ContextBase context, Category category)
-        => context.Compound(this).Result(category);
+        => context.GetCompound(this).Result(category);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor)
     {
@@ -152,7 +152,7 @@ sealed class CompoundSyntax : ValueSyntax
     {
         if(CleanupSection != null && (category.HasCode() || category.HasClosures()))
             return context
-                    .Result(category | Category.Type, CleanupSection.Value)
+                    .GetResult(category | Category.Type, CleanupSection.Value)
                     .Conversion(Root.VoidType)
                     .LocalBlock(category)
                 & category;

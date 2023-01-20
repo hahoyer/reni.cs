@@ -16,7 +16,7 @@ sealed class AtToken : InfixPrefixSyntaxToken
     protected override Result Result
         (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
-        var target = context.ResultAsReference(category | Category.Type, left);
+        var target = context.GetResultAsReference(category | Category.Type, left);
         return target
             .Type
             .FindRecentCompoundView

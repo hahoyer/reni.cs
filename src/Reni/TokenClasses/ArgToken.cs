@@ -17,12 +17,12 @@ sealed class ArgToken : NonSuffixSyntaxToken
     public override string Id => TokenId;
 
     protected override Result Result(ContextBase context, Category category)
-        => context.ArgReferenceResult(category);
+        => context.GetArgReferenceResult(category);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
     protected override Declaration[] Declarations => PredefinedDeclarations;
 
     protected override Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
-        => context.FunctionalArgResult(category, right, token);
+        => context.GetFunctionalArgResult(category, right, token);
 }

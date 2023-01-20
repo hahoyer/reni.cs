@@ -79,9 +79,9 @@ sealed class ExpressionSyntax : ValueSyntax
         {
             CurrentResultDepth++;
             if(Left == null)
-                return context.PrefixResult(category, Definable, Token, Right);
+                return context.GetPrefixResult(category, Definable, Token, Right);
 
-            var left = context.ResultAsReferenceCache(Left);
+            var left = context.GetResultAsReferenceCache(Left);
 
             var leftType = left.Type;
             if(leftType == null)

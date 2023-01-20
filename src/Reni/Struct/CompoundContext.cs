@@ -33,7 +33,7 @@ sealed class CompoundContext : Child, ISymbolProviderForPointer<Definable>, ICon
     protected override string GetContextChildIdentificationDump()
         => GetCompoundIdentificationDump();
 
-    internal override CompoundView ObtainRecentCompoundView() => View;
+    internal override CompoundView GetRecentCompoundView() => View;
 
     [DisableDump]
     protected override string LevelFormat => "compount";

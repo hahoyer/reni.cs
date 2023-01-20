@@ -34,7 +34,7 @@ sealed class Compound
     internal Root Root => Parent.RootContext;
 
     [DisableDump]
-    internal CompoundView CompoundView => Parent.CompoundView(Syntax);
+    internal CompoundView CompoundView => Parent.GetCompoundView(Syntax);
 
     Size IndexSize => Syntax.IndexSize;
 
@@ -74,8 +74,8 @@ sealed class Compound
 
     ResultCache CachedResult(int position)
         => Parent
-            .CompoundPositionContext(Syntax, position)
-            .ResultCache(Syntax.PureStatements[position]);
+            .GetCompoundPositionContext(Syntax, position)
+            .GetResultCache(Syntax.PureStatements[position]);
 
     internal Size Size(int? position = null)
     {
@@ -172,7 +172,7 @@ sealed class Compound
     }
 
     Result Combine(Result result, int position)
-        => Parent.CompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
+        => Parent.GetCompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
 
     Result AccessResult(Category category, int position)
     {
@@ -191,10 +191,10 @@ sealed class Compound
         StartMethodDump(trace, category, accessPosition, position);
         try
         {
-            var uniqueChildContext = Parent.CompoundPositionContext(Syntax, accessPosition);
+            var uniqueChildContext = Parent.GetCompoundPositionContext(Syntax, accessPosition);
             Dump(nameof(Syntax.PureStatements), Syntax.PureStatements[position]);
             BreakExecution();
-            var rawResult = uniqueChildContext.Result
+            var rawResult = uniqueChildContext.GetResult
                 (category | Category.Type, Syntax.PureStatements[position]);
             Dump(nameof(rawResult), rawResult);
             rawResult.CompleteCategory.Contains(category | Category.Type).Assert();
@@ -246,7 +246,7 @@ sealed class Compound
     bool InternalInnerIsHollowStructureElement(int position)
     {
         var uniqueChildContext = Parent
-            .CompoundPositionContext(Syntax, position);
+            .GetCompoundPositionContext(Syntax, position);
         return Syntax
             .PureStatements[position]
             .IsHollowStructureElement(uniqueChildContext);
@@ -261,7 +261,7 @@ sealed class Compound
 
     internal Result Cleanup(Category category)
     {
-        var uniqueChildContext = Parent.CompoundPositionContext(Syntax);
+        var uniqueChildContext = Parent.GetCompoundPositionContext(Syntax);
         var cleanup = Syntax.Cleanup(uniqueChildContext, category);
         var aggregate = EndPosition
             .Select()

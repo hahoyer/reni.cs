@@ -48,7 +48,7 @@ sealed class Function : Child, IFunctionContext
     protected override string GetContextChildIdentificationDump()
         => "@(." + ArgsType.ObjectId + "i)";
 
-    internal override IFunctionContext ObtainRecentFunctionContext() => this;
+    internal override IFunctionContext GetRecentFunctionContext() => this;
 
     [DisableDump]
     protected override string LevelFormat => "function";

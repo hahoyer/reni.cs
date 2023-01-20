@@ -129,7 +129,7 @@ abstract class FunctionInstance
         {
             Dump(nameof(Body), Body.Anchor.SourceParts);
             BreakExecution();
-            var rawResult = Context.Result(category | Category.Type, Body);
+            var rawResult = Context.GetResult(category | Category.Type, Body);
 
             (rawResult.HasIssue || rawResult.CompleteCategory == (category | Category.Type)).Assert();
             if(rawResult.FindClosures != null)
