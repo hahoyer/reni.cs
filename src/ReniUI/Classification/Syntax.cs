@@ -15,6 +15,27 @@ sealed class Syntax : Item
     [EnableDumpExcept(false)]
     public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
 
+    [DisableDump]
+//    [EnableDumpExcept(false)]
+    public override bool IsProperty
+    {
+        get {
+            if(SourcePart.Id == " MaxNumber8")
+                NotImplementedMethod();
+            return default;
+        }
+    }
+    [DisableDump]
+//    [EnableDumpExcept(false)]
+    public override bool IsFunction
+    {
+        get {
+            if(SourcePart.Id == " repeat")
+                NotImplementedMethod();
+            return default;
+        }
+    }
+
     [EnableDumpExcept(false)]
     public override bool IsIdentifier => TokenClass is Definable;
 

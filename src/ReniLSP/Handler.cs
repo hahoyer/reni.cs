@@ -19,6 +19,8 @@ sealed class Handler : DumpableObject
         , "number"
         , "string"
         , "variable"
+        , "function"
+        , "property"
     );
 
     internal readonly ITextDocumentLanguageServer Server;

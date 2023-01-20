@@ -134,6 +134,12 @@ public abstract class Item : DumpableObject
     [DisableDump]
     public virtual Issue[] Issues => null;
 
+    [DisableDump]
+    public virtual bool IsProperty => false;
+
+    [DisableDump]
+    public virtual bool IsFunction => false;
+
     internal virtual IWhitespaceItem GetItem<TItemType>()
         where TItemType : IItemType
         => null;
@@ -153,6 +159,10 @@ public abstract class Item : DumpableObject
 
     IEnumerable<string> GetLSPTypes()
     {
+        if(IsFunction)
+            yield return "function";
+        if(IsProperty)
+            yield return "property";
         if(IsComment)
             yield return "comment";
         if(IsKeyword)
