@@ -706,7 +706,7 @@ abstract class TypeBase
     Result IssueResult
         (Category category, IssueId issueId, SourcePart token, SearchResult[] declarations, Issue[] leftIssues)
         => issueId
-            .GetResult(category, token, T((object)this, declarations), leftIssues);
+            .GetResult(category, token, this, declarations, leftIssues);
 
     internal Result Execute
     (

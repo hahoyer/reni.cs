@@ -1,3 +1,4 @@
+using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Validation;
 
@@ -5,6 +6,12 @@ namespace Reni.Parser;
 
 public sealed class Lexer : Match2TwoLayerScannerGuard
 {
+    sealed class Issue : DumpableObject, Match.IError
+    {
+        internal readonly IssueId IssueId;
+        internal Issue(IssueId issueId) => IssueId = issueId;
+    }
+
     const string Symbols = "^!%&/=?\\*@+~><|:-";
     const string SingleCharSymbol = "({[)}];,.";
     internal static readonly Lexer Instance = new();
@@ -20,8 +27,8 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
     internal readonly Match LineEndOrEnd;
 
     readonly IMatch Any;
-    readonly IssueId InvalidComment = IssueId.EOFInComment;
-    readonly IssueId InvalidTextEnd = IssueId.EOLInString;
+    readonly Issue InvalidComment = new(IssueId.EOFInComment);
+    readonly Issue InvalidTextEnd = new(IssueId.EOLInString);
     readonly IMatch Number;
     readonly IMatch Text;
     readonly IMatch VerbatimTextHead;
@@ -31,7 +38,7 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
     readonly IMatch WhiteSpaces;
 
     Lexer()
-        : base(error => new ScannerSyntaxError((IssueId)error))
+        : base(error => new ScannerSyntaxError(((Issue)error).IssueId))
     {
         var alpha = Match.Letter.Else("_");
         var symbol1 = SingleCharSymbol.AnyChar();

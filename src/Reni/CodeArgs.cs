@@ -13,7 +13,7 @@ namespace Reni;
 /// </summary>
 sealed class Closures : DumpableObject
 {
-    sealed class Closure : Singleton<Closure, DumpableObject>, IContextReference
+    sealed class Closure : Singleton<Closure>, IContextReference
     {
         int IContextReference.Order => -1;
         protected override string GetNodeDump() => "Closure";

@@ -8,7 +8,7 @@
                 Source= arg.Position.Source.Identifier,
                 Start = arg.Position.Position,
                 Length = arg.Position.Length,
-                Id = arg.IssueId.Tag,
+                Id = $"{arg.IssueId}",
                 Message = arg.Message
             };
 

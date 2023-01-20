@@ -1,17 +1,12 @@
-using hw.DebugFormatter;
-using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni.Basics;
+using JetBrains.Annotations;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Validation;
 
-enum IssueStage
+enum Stage
 {
     Unexpected
     , Parsing
@@ -19,84 +14,82 @@ enum IssueStage
     , Semantic
 }
 
-sealed class IssueId : EnumEx, Match.IError
+[AttributeUsage(AttributeTargets.Field)]
+public sealed class Setup : Attribute
 {
-    public static readonly IssueId AmbiguousSymbol = new(IssueStage.Semantic, typeof(TypeBase), typeof(SearchResult[]));
-    public static readonly IssueId EOFInComment = new(IssueStage.Parsing);
-    public static readonly IssueId EOLInString = new(IssueStage.Parsing);
-    public static readonly IssueId ExtraLeftBracket = new(IssueStage.Syntax, typeof(SourcePart));
-    public static readonly IssueId ExtraRightBracket = new(IssueStage.Syntax, typeof(SourcePart));
-    public static readonly IssueId InvalidCharacter = new(IssueStage.Parsing);
-    public static readonly IssueId InvalidDeclaration = new(IssueStage.Syntax);
-    public static readonly IssueId InvalidDeclarationTag = new(IssueStage.Syntax);
-    public static readonly IssueId InvalidExpression = new(IssueStage.Syntax);
-    public static readonly IssueId InvalidInfixExpression = new(IssueStage.Syntax);
-    public static readonly IssueId InvalidPrefixExpression = new(IssueStage.Syntax);
-    public static readonly IssueId InvalidSuffixExpression = new(IssueStage.Syntax, typeof(string));
-    public static readonly IssueId InvalidTerminalExpression = new(IssueStage.Syntax);
-    public static readonly IssueId MissingDeclarationDeclarer = new(IssueStage.Syntax);
-    public static readonly IssueId MissingDeclarationForType = new(IssueStage.Semantic, typeof(TypeBase));
-    public static readonly IssueId MissingDeclarationInContext = new(IssueStage.Semantic, typeof(ContextBase));
-    public static readonly IssueId MissingDeclarationValue = new(IssueStage.Syntax);
-    public static readonly IssueId MissingMatchingRightBracket = new(IssueStage.Syntax);
-    public static readonly IssueId MissingRightExpression = new(IssueStage.Semantic);
-    public static readonly IssueId StrangeDeclaration = new(IssueStage.Unexpected);
-    readonly IssueStage Stage;
-    readonly System.Type[] AdditionalInformation;
+    internal readonly System.Type[] AdditionalInformation;
+    readonly Stage Stage;
 
-    public static IEnumerable<IssueId> All => AllInstances<IssueId>();
-
-    IssueId(IssueStage stage, params System.Type[] additionalInformation)
+    internal Setup(Stage stage, params System.Type[] additionalInformation)
     {
         Stage = stage;
         AdditionalInformation = additionalInformation;
     }
+}
 
-    internal Issue GetIssue(IToken position, params object[] additionalInformation)
-        => GetIssue(position.Characters, additionalInformation);
+enum IssueId
+{
+    [UsedImplicitly]
+    None
 
-    internal Issue GetIssue(SourcePart position, params object[] additionalInformation)
-    {
-        Validate(additionalInformation);
-        return new(this, position, additionalInformation);
-    }
+    , [Setup(Stage.Semantic, typeof(TypeBase), typeof(SearchResult[]))]
+    AmbiguousSymbol
 
-    void Validate(object[] additionalInformation)
-    {
-        (AdditionalInformation.Length == additionalInformation.Length).Assert();
-        additionalInformation
-            .Select((value, index) => value.GetType().Is(AdditionalInformation[index]))
-            .All(value => value)
-            .Assert();
-    }
+    , [Setup(Stage.Parsing)]
+    EOFInComment
 
-    internal Issue GetIssue(BinaryTree[] anchors)
-    {
-        var sourceParts = anchors.Select(anchor => anchor.SourcePart).ToArray();
-        return GetIssue(sourceParts.First(), sourceParts.Skip(1).ToArray());
-    }
+    , [Setup(Stage.Parsing)]
+    EOLInString
 
-    internal Result GetResult
-    (
-        Category category
-        , SourcePart token
-        , object target
-        , object[] results = null
-        , Issue[] foundIssues = null
-    )
-    {
-        var additionalInformation = results == null? T(target) : T(target, results);
-        return new(category, T(foundIssues, T(GetIssue(token, additionalInformation))).ConcatMany().ToArray());
-    }
+    , [Setup(Stage.Syntax, typeof(SourcePart))]
+    ExtraLeftBracket
 
-    internal Result<BinaryTree> GetSyntax(BinaryTree binaryTree) => new(binaryTree, GetIssue(binaryTree.SourcePart));
+    , [Setup(Stage.Syntax, typeof(SourcePart))]
+    ExtraRightBracket
 
-    internal string GetMessage(object[] additionalInformation)
-    {
-        if(this == InvalidSuffixExpression)
-            return $"Using {additionalInformation[0]} as suffix is invalid.";
+    , [Setup(Stage.Parsing)]
+    InvalidCharacter
 
-        NotImplementedMethod(additionalInformation);
-        return default;
-    }
+    , [Setup(Stage.Syntax)]
+    InvalidDeclaration
+
+    , [Setup(Stage.Syntax)]
+    InvalidDeclarationTag
+
+    , [Setup(Stage.Syntax)]
+    InvalidExpression
+
+    , [Setup(Stage.Syntax)]
+    InvalidInfixExpression
+
+    , [Setup(Stage.Syntax)]
+    InvalidPrefixExpression
+
+    , [Setup(Stage.Syntax, typeof(string))]
+    InvalidSuffixExpression
+
+    , [Setup(Stage.Syntax)]
+    InvalidTerminalExpression
+
+    , [Setup(Stage.Syntax)]
+    MissingDeclarationDeclarer
+
+    , [Setup(Stage.Semantic, typeof(TypeBase))]
+    MissingDeclarationForType
+
+    , [Setup(Stage.Semantic, typeof(ContextBase))]
+    MissingDeclarationInContext
+
+    , [Setup(Stage.Syntax)]
+    MissingDeclarationValue
+
+    , [Setup(Stage.Syntax)]
+    MissingMatchingRightBracket
+
+    , [Setup(Stage.Semantic)]
+    MissingRightExpression
+
+    , [Setup(Stage.Unexpected)]
+    [PublicAPI]
+    StrangeDeclaration
 }

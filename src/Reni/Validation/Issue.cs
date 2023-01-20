@@ -19,7 +19,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
     readonly object[] AdditionalInformation;
 
     [DisableDump]
-    internal string Tag => IssueId.Tag;
+    internal string Tag => $"{IssueId}";
 
     internal string LogDump
     {

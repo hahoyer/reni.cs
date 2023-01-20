@@ -177,12 +177,12 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
             var rightBracket = tokenClass as IRightBracket;
 
             if(rightBracket == null && leftBracket == null)
-                return null;
+                return default;
 
             if(leftBracket != null)
             {
                 if(Parent is { IsBracketLevel: true })
-                    return null;
+                    return default;
                 left.AssertIsNull();
                 rightBracket.AssertIsNull();
                 return ExtraLeftBracket;
@@ -199,7 +199,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
             left.Left.AssertIsNull();
 
-            return innerLeftBracket.Level > level? MissingMatchingRightBracket : null;
+            return innerLeftBracket.Level > level? MissingMatchingRightBracket : default;
         }
     }
 
@@ -245,7 +245,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     ITokenClass GetTokenClass()
     {
         var issueId = BracketIssueId;
-        return issueId == null? InnerTokenClass : IssueTokenClass.From[issueId];
+        return issueId == default? InnerTokenClass : IssueTokenClass.From[issueId];
     }
 
     BinaryTree FindItemForCache(SourcePosition position)
