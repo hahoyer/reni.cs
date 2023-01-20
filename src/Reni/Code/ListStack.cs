@@ -61,7 +61,7 @@ sealed class ListStack : StackData
     internal override StackData PushOnto(ListStack formerStack)
         => new ListStack(Data, formerStack);
 
-    internal override BitsConst GetBitsConst() => Data.Aggregate(BitsConst.None(), Paste);
+    internal override BitsConst GetBitsConst() => Data.Aggregate(BitsConst.GetNone(), Paste);
 
     internal override StackData Push(StackData formerStack) => formerStack.PushOnto(this);
 

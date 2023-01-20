@@ -165,7 +165,7 @@ public sealed class BitsConst : DumpableObject
 
     public static BitsConst Convert(int bytes, byte[] data, int position) => new(bytes, data, position);
 
-    public static BitsConst None() => new(Size.Zero);
+    public static BitsConst GetNone() => new(Size.Zero);
 
     public static BitsConst Convert(long value) => new(value);
 
@@ -298,7 +298,7 @@ public sealed class BitsConst : DumpableObject
         outStream.AddData(left);
     }
 
-    public void PrintNumber(IOutStream outStream) => PrintNumber(None(), outStream);
+    public void PrintNumber(IOutStream outStream) => PrintNumber(GetNone(), outStream);
 
     public void PrintText(Size itemSize, IOutStream outStream)
         => outStream.AddData(ToString(itemSize));

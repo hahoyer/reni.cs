@@ -11,6 +11,6 @@ namespace Reni.Code
         internal override StackData PushOnto(NonListStackData formerStack) => formerStack;
         internal override StackData PushOnto(ListStack formerStack) => formerStack;
         internal override Size Size => Size.Zero;
-        internal override BitsConst GetBitsConst() => BitsConst.None();
+        internal override BitsConst GetBitsConst() => BitsConst.GetNone();
     }
 }

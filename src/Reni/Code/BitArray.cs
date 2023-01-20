@@ -11,7 +11,7 @@ sealed class BitArray : FiberHead
 
     readonly Size SizeValue;
 
-    internal new static BitArray Void => new(Size.Create(0), Basics.BitsConst.None());
+    internal new static BitArray Void => new(Size.Create(0), BitsConst.GetNone());
 
     public BitArray(Size size, BitsConst data)
     {
@@ -22,7 +22,7 @@ sealed class BitArray : FiberHead
     }
 
     public BitArray()
-        : this(Size.Zero, Basics.BitsConst.None()) { }
+        : this(Size.Zero, BitsConst.GetNone()) { }
 
     protected override Size GetSize() => SizeValue;
 

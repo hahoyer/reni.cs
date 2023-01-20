@@ -96,7 +96,7 @@ abstract class CodeBase
             .SelectMany(item => item.ToList())
             .ToArray();
 
-        return Code.List.Create(allData);
+        return List.Create(allData);
     }
 
     internal CodeBase GetAssignment(Size size)
