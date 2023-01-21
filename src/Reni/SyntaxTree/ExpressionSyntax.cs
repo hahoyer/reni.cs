@@ -70,7 +70,7 @@ sealed class ExpressionSyntax : ValueSyntax
             0 => Left, 1 => Right, _ => null
         };
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
     {
         if(CurrentResultDepth > 20)
             throw new EvaluationDepthExhaustedException(Anchor.SourceParts.Combine(), context, CurrentResultDepth);
@@ -81,7 +81,8 @@ sealed class ExpressionSyntax : ValueSyntax
             if(Left == null)
             {
                 var (prefixResult, declaration) = context.GetPrefixResult(category, Definable, Token, Right);
-                Anchor.Items.Single(item => item.Token == Token).Semantic.Declaration[context] = declaration;
+                (Definable.Id == "repeat").ConditionalBreak();
+                Semantic.Declaration[context] = declaration;
                 return prefixResult;
             }
 
@@ -96,7 +97,7 @@ sealed class ExpressionSyntax : ValueSyntax
 
             var (result, found) = leftType
                 .GetResult(category, left, Token, Definable, context, Right);
-            Anchor.Items.Single(item => item.Token == Token).Semantic.Declaration[context] = found;
+            Semantic.Declaration[context] = found;
             return result;
         }
         finally

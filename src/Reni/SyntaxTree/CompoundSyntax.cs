@@ -44,13 +44,13 @@ sealed class CompoundSyntax : ValueSyntax
             .ToDictionary(item => item.Key, item => item.Value);
 
     [EnableDump(Order = 100)]
-    internal int[] MutableDeclarations => IndexList(item => item.IsMutableSyntax).ToArray();
+    internal int[] MutableDeclarations => GetIndexList(item => item.IsMutableSyntax).ToArray();
 
     [EnableDump(Order = 100)]
-    internal int[] Converters => IndexList(item => item.IsConverterSyntax).ToArray();
+    internal int[] Converters => GetIndexList(item => item.IsConverterSyntax).ToArray();
 
     [EnableDump(Order = 100)]
-    internal int[] MixInDeclarations => IndexList(item => item.IsMixInSyntax).ToArray();
+    internal int[] MixInDeclarations => GetIndexList(item => item.IsMixInSyntax).ToArray();
 
     [DisableDump]
     internal int EndPosition => Statements.Length;
@@ -106,7 +106,7 @@ sealed class CompoundSyntax : ValueSyntax
         return index == Statements.Length? CleanupSection : null;
     }
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => context.GetCompound(this).GetResult(category);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor)
@@ -148,7 +148,7 @@ sealed class CompoundSyntax : ValueSyntax
             .FirstOrDefault(data => data != null);
     }
 
-    internal Result Cleanup(ContextBase context, Category category)
+    internal Result GetCleanup(ContextBase context, Category category)
     {
         if(CleanupSection != null && (category.HasCode() || category.HasClosures()))
             return context
@@ -160,7 +160,7 @@ sealed class CompoundSyntax : ValueSyntax
         return Root.VoidType.GetResult(category);
     }
 
-    IEnumerable<int> IndexList(Func<DeclarerSyntax, bool> selector)
+    IEnumerable<int> GetIndexList(Func<DeclarerSyntax, bool> selector)
     {
         for(var index = 0; index < Statements.Length; index++)
         {

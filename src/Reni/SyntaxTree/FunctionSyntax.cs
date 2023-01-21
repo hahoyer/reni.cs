@@ -51,7 +51,7 @@ sealed class FunctionSyntax : ValueSyntax
             0 => Setter, 1 => Getter, _ => null
         };
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => context
             .FindRecentCompoundView
             .FunctionalType(this)

@@ -262,7 +262,7 @@ sealed class Compound
     internal Result Cleanup(Category category)
     {
         var uniqueChildContext = Parent.GetCompoundPositionContext(Syntax);
-        var cleanup = Syntax.Cleanup(uniqueChildContext, category);
+        var cleanup = Syntax.GetCleanup(uniqueChildContext, category);
         var aggregate = EndPosition
             .Select()
             .Reverse()

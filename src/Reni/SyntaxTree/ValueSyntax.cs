@@ -72,7 +72,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     internal virtual IRecursionHandler RecursionHandler => null;
 
     //[DebuggerHidden]
-    internal virtual Result ResultForCache(ContextBase context, Category category)
+    internal virtual Result GetResultForCache(ContextBase context, Category category)
     {
         NotImplementedMethod(context, category);
         return null;

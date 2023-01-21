@@ -57,7 +57,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
             0 => Cond, 1 => Then, 2 => Else, _ => null
         };
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => InternalResult(context, category);
 
     Result CondResult(ContextBase context, Category category)

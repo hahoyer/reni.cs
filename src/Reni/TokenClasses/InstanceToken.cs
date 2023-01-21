@@ -32,7 +32,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
     )
     {
         if(!asReference && Category.Type.Contains(category | pendingCategory))
-            return syntax.ResultForCache(context, Category.Type);
+            return syntax.GetResultForCache(context, Category.Type);
 
         NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
         return null;

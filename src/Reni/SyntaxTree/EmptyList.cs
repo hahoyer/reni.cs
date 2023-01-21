@@ -26,6 +26,6 @@ sealed class EmptyList : ValueSyntax.NoChildren
 
     protected override string GetNodeDump() => "()";
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => Root.VoidType.GetResult(category);
 }

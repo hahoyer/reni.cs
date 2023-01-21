@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
+using Reni.Feature;
 using Reni.Parser;
 
 namespace Reni.SyntaxTree;
@@ -31,7 +32,7 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
         Token.AssertIsNotNull();
     }
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => Terminal.GetResult(context, category, Token);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
@@ -60,8 +61,12 @@ sealed class PrefixSyntax : ValueSyntax
 
     protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
-    internal override Result ResultForCache(ContextBase context, Category category)
-        => Prefix.GetResult(context, category, Right, Token);
+    internal override Result GetResultForCache(ContextBase context, Category category)
+    {
+        var (result, declaration) = Prefix.GetResult(context, category, Right, Token);
+        Semantic.Declaration[context] = declaration;
+        return result;
+    }
 
     public static Result<ValueSyntax> Create
         (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
@@ -103,7 +108,7 @@ sealed class InfixSyntax : ValueSyntax
             0 => Left, 1 => Right, _ => null
         };
 
-    internal override Result ResultForCache(ContextBase context, Category category) => Infix
+    internal override Result GetResultForCache(ContextBase context, Category category) => Infix
         .GetResult(context, category, Left, Right);
 
     public static Result<ValueSyntax> Create
@@ -146,7 +151,7 @@ sealed class SuffixSyntax : ValueSyntax
 
     protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
-    internal override Result ResultForCache(ContextBase context, Category category)
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => Suffix.GetResult(context, category, Left);
 
     public static Result<ValueSyntax> Create
@@ -166,7 +171,7 @@ interface ITerminal
 
 interface IPrefix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
+    (Result, IImplementation) GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
 }
 
 interface IInfix

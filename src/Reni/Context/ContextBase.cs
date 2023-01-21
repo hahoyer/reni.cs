@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.Remoting.Contexts;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -224,7 +223,7 @@ abstract class ContextBase
         try
         {
             BreakExecution();
-            var result = syntax.ResultForCache(this, category.Replenished());
+            var result = syntax.GetResultForCache(this, category.Replenished());
             (result == null || result.IsValidOrIssue(category)).Assert();
             return ReturnMethodDump(result);
         }
@@ -261,21 +260,19 @@ abstract class ContextBase
     /// <param name="right"> the expression of the argument of the call. Must not be null </param>
     /// <param name="token"></param>
     /// <returns> </returns>
-    internal Result GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
+    internal (Result, IImplementation) GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
     {
         var argsType = FindRecentFunctionContextObject.ArgsType;
-        var (result, found) = argsType
+        return argsType
             .GetResult
             (
                 category,
                 new(GetFunctionalArgObjectResult),
                 token,
-                definable: null,
+                null,
                 this,
-        right
+                right
             );
-        right.Anchor.Items.Single(item=>item.TokenClass is LeftParenthesis).Semantic.Declaration[this]= found;
-        return result;
     }
 
     Result GetFunctionalArgObjectResult(Category category)
