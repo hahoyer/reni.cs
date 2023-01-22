@@ -1,7 +1,7 @@
 reni.cs
 =======
 
-hahoyers programming language  http://hahoyer-compiler.blogspot.com/
+hahoyer's programming language  http://hahoyer-compiler.blogspot.com/
 
 siehe auch [https://github.com/hahoyer/reni.cpp/wiki/Die-Programmiersprache-Reni](https://github.com/hahoyer/reni.cpp/wiki/Die-Programmiersprache-Reni)
 
