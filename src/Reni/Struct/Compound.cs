@@ -17,6 +17,7 @@ sealed class Compound
     static int NextObjectId;
 
     [Node]
+    [DisableDump]
     internal readonly ContextBase Parent;
 
     [Node]
@@ -59,6 +60,7 @@ sealed class Compound
         StopByObjectIds();
     }
 
+    [DisableDump]
     ContextBase IChild<ContextBase>.Parent => Parent;
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();

@@ -138,6 +138,7 @@ sealed class ArrayReferenceType
     [DisableDump]
     internal override bool IsAligningPossible => false;
 
+    [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 

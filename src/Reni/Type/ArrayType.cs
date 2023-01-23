@@ -81,6 +81,7 @@ sealed class ArrayType
     [DisableDump]
     internal ArrayType Mutable => ElementType.GetArray(Count, OptionsValue.IsMutable.SetTo(true));
 
+    [DisableDump]
     IEnumerable<string> InternalDeclarationOptions
     {
         get
@@ -184,6 +185,7 @@ sealed class ArrayType
     internal override IImplementation FunctionDeclarationForPointerType
         => Feature.Extension.FunctionFeature(ElementAccessResult);
 
+    [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 

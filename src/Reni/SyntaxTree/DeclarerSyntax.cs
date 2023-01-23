@@ -54,8 +54,10 @@ sealed class DeclarerSyntax : DumpableObject
             => base.AssertValid(level == null? null : new Level { IsCorrectOrder = level.IsCorrectOrder }, target);
     }
 
+    [EnableDumpExcept(null)]
     internal readonly NameSyntax Name;
     internal readonly TagSyntax[] Tags;
+    [EnableDumpExcept(null)]
     internal readonly IssueSyntax Issue;
     readonly bool? MeansPublic;
 
@@ -64,12 +66,14 @@ sealed class DeclarerSyntax : DumpableObject
     [DisableDump]
     internal Syntax[] DirectChildren => DirectChildrenCache.Value;
 
+    [DisableDump]
     internal SourcePart SourcePart
         => T(Tags.SelectMany(node => node.Anchor.SourceParts), Name?.Anchor.SourceParts)
             .ConcatMany()
             .Where(i => i != null)
             .Aggregate();
 
+    [EnableDumpExcept(false)]
     internal bool IsPublic
     {
         get

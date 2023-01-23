@@ -11,6 +11,7 @@ sealed class AlignType
     [DisableDump]
     readonly int AlignBits;
 
+    [DisableDump]
     IEnumerable<string> InternalDeclarationOptions => Parent.DeclarationOptions;
 
     public AlignType(TypeBase target, int alignBits)
