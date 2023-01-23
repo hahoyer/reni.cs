@@ -3,6 +3,7 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.SyntaxTree;
 
@@ -23,6 +24,7 @@ sealed class ArgToken : NonSuffixSyntaxToken
 
     protected override Declaration[] Declarations => PredefinedDeclarations;
 
-    protected override Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+    protected override(Result, IImplementation) GetResult
+        (ContextBase context, Category category, ValueSyntax right, SourcePart token)
         => context.GetFunctionalArgResult(category, right, token);
 }

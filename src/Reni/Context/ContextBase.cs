@@ -295,19 +295,18 @@ abstract class ContextBase
         return null;
     }
 
-    internal(Result, IImplementation) GetPrefixResult
-        (Category category, Definable definable, SourcePart token, ValueSyntax right)
+    internal (Result, IImplementation) GetPrefixResult(Category category, Definable definable, SourcePart token, ValueSyntax right)
     {
         var searchResult = GetDeclaration(definable);
         if(searchResult == null)
             return (IssueId
                 .MissingDeclarationInContext
-                .GetResult(category, token, this), null);
+                .GetResult(category, token, this),null);
 
         var result = searchResult.GetResult(category, CacheObject.AsObject, token, this, right);
 
         (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
-        return (result, searchResult);
+        return (result,searchResult);
     }
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)

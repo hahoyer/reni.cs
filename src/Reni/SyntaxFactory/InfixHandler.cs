@@ -4,6 +4,7 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -91,8 +92,8 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public PrefixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidPrefixExpression, tokenClass) { }
 
-        Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
-            => new(category, GetIssue(right.Anchor.SourcePart));
+        (Result, IImplementation) IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+            => (new(category, GetIssue(right.Anchor.SourcePart)),null);
     }
 
     sealed class TerminalErrorTokenClass : InfixTypeErrorTokenClass, ITerminal

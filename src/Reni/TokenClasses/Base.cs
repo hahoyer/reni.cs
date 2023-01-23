@@ -2,6 +2,7 @@
 using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
+using Reni.Feature;
 using Reni.SyntaxFactory;
 using Reni.SyntaxTree;
 
@@ -39,8 +40,8 @@ abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValu
     Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         => GetResult(context, category, left, right);
 
-    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
-        => GetResult(context, category, right);
+    (Result, IImplementation) IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        => (GetResult(context, category, right), null);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
 
@@ -51,7 +52,7 @@ abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValu
 
 abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueToken
 {
-    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+    (Result, IImplementation) IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
         => GetResult(context, category, right, token);
 
     Declaration[] ITerminal.Declarations => Declarations;
@@ -66,7 +67,7 @@ abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValue
 
     protected abstract Result GetResult(ContextBase context, Category category);
 
-    protected abstract Result GetResult
+    protected abstract(Result, IImplementation) GetResult
         (ContextBase callContext, Category category, ValueSyntax right, SourcePart token);
 
     internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
