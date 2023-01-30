@@ -33,7 +33,7 @@ sealed class Closures : DumpableObject
     [DisableDump]
     SizeArray Sizes => SizesCache ??= CalculateSizes();
 
-    internal bool HasArg => Contains(Closure.Instance);
+    internal bool HasArgument => Contains(Closure.Instance);
     public int Count => Data.Count;
 
     [UsedImplicitly]
@@ -174,22 +174,22 @@ sealed class Closures : DumpableObject
         => Data
             .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
 
-    internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase codeArgsReference)
+    internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closure)
     {
         var trace = ObjectId == -1;
-        StartMethodDump(trace, code, codeArgsReference);
+        StartMethodDump(trace, code, closure);
         try
         {
-            var refSize = Root.DefaultRefAlignParam.RefSize;
-            var reference = codeArgsReference.GetReferenceWithOffset(refSize * Data.Count);
+            var size = Root.DefaultRefAlignParam.RefSize;
+            var reference = closure.GetReferenceWithOffset(size * Data.Count);
             var result = code;
             foreach(var referenceInCode in Data)
             {
                 Dump("reference", reference);
                 BreakExecution();
-                reference = reference.GetReferenceWithOffset(refSize * -1);
+                reference = reference.GetReferenceWithOffset(size * -1);
                 result = result.ReplaceAbsolute
-                    (referenceInCode, () => reference.GetDePointer(refSize));
+                    (referenceInCode, () => reference.GetDePointer(size));
                 Dump("result", result);
             }
 

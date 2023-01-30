@@ -224,7 +224,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     bool HasArg
-        => HasClosures? Closures.HasArg : HasCode && Code.HasArgument;
+        => HasClosures? Closures.HasArgument : HasCode && Code.HasArgument;
 
     public Category PendingCategory
     {

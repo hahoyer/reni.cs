@@ -250,7 +250,7 @@ abstract class ContextBase
 
     internal Result GetArgReferenceResult(Category category)
         => FindRecentFunctionContextObject
-            .CreateArgReferenceResult(category);
+            .CreateArgumentReferenceResult(category);
 
     /// <summary>
     ///     Obtains the feature result of a functional argument object.
@@ -262,7 +262,7 @@ abstract class ContextBase
     /// <returns> </returns>
     internal (Result, IImplementation) GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
     {
-        var argsType = FindRecentFunctionContextObject.ArgsType;
+        var argsType = FindRecentFunctionContextObject.ArgumentsType;
         return argsType
             .GetResult
             (

@@ -8,28 +8,28 @@ namespace Reni.Context;
 sealed class Function : Child, IFunctionContext
 {
     [Node]
-    internal TypeBase ArgsType { get; }
+    internal TypeBase ArgumentsType { get; }
 
     readonly int Order;
 
     [Node]
     TypeBase ValueType { get; }
 
-    internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
+    internal Function(ContextBase parent, TypeBase argumentsType, TypeBase valueType = null)
         : base(parent)
     {
         Order = Closures.NextOrder++;
-        ArgsType = argsType;
+        ArgumentsType = argumentsType;
         ValueType = valueType;
         StopByObjectIds();
     }
 
     int IContextReference.Order => Order;
 
-    TypeBase IFunctionContext.ArgsType => ArgsType;
+    TypeBase IFunctionContext.ArgumentsType => ArgumentsType;
 
-    Result IFunctionContext.CreateArgReferenceResult(Category category) => ArgsType
-            .GetContextAccessResult(category | Category.Type, this, () => ArgsType.Size * -1)
+    Result IFunctionContext.CreateArgumentReferenceResult(Category category) => ArgumentsType
+            .GetContextAccessResult(category | Category.Type, this, () => ArgumentsType.Size * -1)
         & category;
 
     Result IFunctionContext.CreateValueReferenceResult(Category category)
@@ -41,12 +41,12 @@ sealed class Function : Child, IFunctionContext
                 (
                     category | Category.Type,
                     this,
-                    () => (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
+                    () => (ArgumentsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
             & category;
     }
 
     protected override string GetContextChildIdentificationDump()
-        => "@(." + ArgsType.ObjectId + "i)";
+        => "@(." + ArgumentsType.ObjectId + "i)";
 
     internal override IFunctionContext GetRecentFunctionContext() => this;
 
@@ -58,7 +58,7 @@ sealed class ValueCannotBeUsedHereException : Exception { }
 
 interface IFunctionContext : IContextReference
 {
-    Result CreateArgReferenceResult(Category category);
+    Result CreateArgumentReferenceResult(Category category);
     Result CreateValueReferenceResult(Category category);
-    TypeBase ArgsType { get; }
+    TypeBase ArgumentsType { get; }
 }
