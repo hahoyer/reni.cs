@@ -63,6 +63,7 @@ public sealed class CompilerParameters : Attribute
     public bool ProcessErrors;
 
     public bool RunFromCode;
+    public bool Semantics;
 
     public bool IsParserRequired => CompilationLevel >= CompilationLevel.Parser;
     public bool IsSyntaxRequired => CompilationLevel >= CompilationLevel.Syntax;

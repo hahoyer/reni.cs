@@ -82,7 +82,7 @@ sealed class ExpressionSyntax : ValueSyntax
             {
                 var (prefixResult, declaration) = context.GetPrefixResult(category, Definable, Token, Right);
                 (Definable.Id == "repeat").ConditionalBreak();
-                Semantic.Declaration[context] = declaration;
+                Semantics.Declaration[context] = declaration;
                 return prefixResult;
             }
 
@@ -97,7 +97,7 @@ sealed class ExpressionSyntax : ValueSyntax
 
             var (result, found) = leftType
                 .GetResult(category, left, Token, Definable, context, Right);
-            Semantic.Declaration[context] = found;
+            Semantics.Declaration[context] = found;
             return result;
         }
         finally

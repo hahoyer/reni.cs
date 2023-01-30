@@ -50,14 +50,12 @@ abstract class ContextMetaFeatureImplementation
     IFunction IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult
-        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
+    Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
         => GetResult(contextBase, category, right);
 
     IMeta IMetaImplementation.Function => this;
 
-    protected abstract Result GetResult
-        (ContextBase contextBase, Category category, ValueSyntax right);
+    protected abstract Result GetResult(ContextBase contextBase, Category category, ValueSyntax right);
 }
 
 /// <summary>
@@ -96,8 +94,7 @@ interface IFunction
 
 interface IMeta
 {
-    Result GetResult
-        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
+    Result GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
 }
 
 interface ISearchTarget { }
@@ -155,15 +152,13 @@ sealed class MetaFunction : DumpableObject, IImplementation, IMeta
 {
     readonly Func<Category, ResultCache, ContextBase, ValueSyntax, Result> Function;
 
-    public MetaFunction
-        (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
+    public MetaFunction(Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
         => Function = function;
 
     IFunction IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult
-        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
+    Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
         => Function(category, left, contextBase, right);
 
     IMeta IMetaImplementation.Function => this;
@@ -190,8 +185,7 @@ sealed class ContextMetaFunctionFromSyntax
     IFunction IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult
-        (Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
+    Result IMeta.GetResult(Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
         => callContext.GetResult(category, Definition.ReplaceArg(right));
 
     IMeta IMetaImplementation.Function => this;

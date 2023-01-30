@@ -20,6 +20,7 @@ sealed class Root
         bool ProcessErrors { get; }
         IExecutionContext ExecutionContext { get; }
         IEnumerable<Definable> DefinedNames { get; }
+        bool Semantics { get; }
         Result<ValueSyntax> ParsePredefinedItem(string source);
     }
 
@@ -33,6 +34,7 @@ sealed class Root
     [Node]
     readonly IParent Parent;
 
+    [DisableDump]
     public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
     [DisableDump]
@@ -50,6 +52,9 @@ sealed class Root
 
     [DisableDump]
     public bool ProcessErrors => Parent.ProcessErrors;
+
+    [DisableDump]
+    public bool Semantics => Parent.Semantics;
 
     [DisableDump]
     internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
@@ -164,4 +169,5 @@ sealed class Root
 
         return new(result, rawResult.Issues.ToArray(), description);
     }
+
 }

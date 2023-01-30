@@ -163,14 +163,10 @@ static class Extension
     )
     {
         if(feature.Function != null && feature.Function.IsImplicit)
-        {
-            var result = feature
+            return feature
                 .Function
-                .GetResult(valueCategory, Root.VoidType);
-
-            return result
+                .GetResult(valueCategory, Root.VoidType)
                 .ReplaceArgument(Root.VoidType.GetResult(Category.All));
-        }
 
         if(right != null && feature.Function != null)
             return null;

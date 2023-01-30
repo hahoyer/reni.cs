@@ -32,7 +32,7 @@ sealed class Buffer : DumpableObject
     {
         Parent = parent;
         CompilerCache = new(() => CompilerBrowser.FromText(Text
-            , new() { ProcessErrors = true }
+            , new() { ProcessErrors = true , Semantics = true}
             , FileName));
         ItemsCache = new(() => GetItems().ToArray());
     }

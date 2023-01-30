@@ -64,7 +64,7 @@ sealed class PrefixSyntax : ValueSyntax
     internal override Result GetResultForCache(ContextBase context, Category category)
     {
         var (result, declaration) = Prefix.GetResult(context, category, Right, Token);
-        Semantic.Declaration[context] = declaration;
+        Semantics.Declaration[context] = declaration;
         return result;
     }
 

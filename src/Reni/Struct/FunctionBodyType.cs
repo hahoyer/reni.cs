@@ -17,6 +17,7 @@ sealed class FunctionBodyType
         , IImplementation
         , IChild<CompoundView>
         , ISymbolProvider<DumpPrintToken>
+        , ITemplateProvider
 {
     sealed class ContextReference : DumpableObject, IContextReference
     {
@@ -48,13 +49,20 @@ sealed class FunctionBodyType
     [Node]
     internal readonly FunctionSyntax Syntax;
 
+    readonly TypeBase TemplateArguments;
+
     [DisableDump]
     internal IEnumerable<FunctionType> Functions => FindRecentCompoundView.Functions(Syntax);
+
+    [DisableDump]
+    internal TypeBase Template => this.CachedValue(GetTemplate);
 
     public FunctionBodyType(CompoundView compoundView, FunctionSyntax syntax)
     {
         FindRecentCompoundView = compoundView;
         Syntax = syntax;
+        TemplateArguments = new TemplateArguments(this);
+        StopByObjectIds(47);
     }
 
     CompoundView IChild<CompoundView>.Parent => FindRecentCompoundView;
@@ -69,29 +77,7 @@ sealed class FunctionBodyType
     IFunction IEvalImplementation.Function => this;
     IValue IEvalImplementation.Value => this;
 
-    Result IFunction.GetResult(Category category, TypeBase argsType)
-    {
-        var trace = ObjectId == -49 && category.Replenished().HasClosures();
-        StartMethodDump(trace, category, argsType);
-        try
-        {
-            BreakExecution();
-
-            var functionType = Function(argsType.AssertNotNull());
-
-            Dump("functionType", functionType);
-            BreakExecution();
-
-            var result = functionType.ApplyResult(category);
-            (category == result.CompleteCategory).Assert();
-
-            return ReturnMethodDump(result);
-        }
-        finally
-        {
-            EndMethodDump();
-        }
-    }
+    Result IFunction.GetResult(Category category, TypeBase argumentsType) => GetResult(category, argumentsType);
 
     bool IFunction.IsImplicit => Syntax.IsImplicit;
 
@@ -99,6 +85,8 @@ sealed class FunctionBodyType
 
     IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
         => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+
+    Root ITemplateProvider.Root => Root;
 
     Result IValue.Execute(Category category)
     {
@@ -115,11 +103,55 @@ sealed class FunctionBodyType
     [DisableDump]
     internal override IImplementation FunctionDeclarationForType => this;
 
-    [DisableDump] protected override CodeBase DumpPrintCode => CodeBase.GetDumpPrintText(Syntax.Tag);
+    [DisableDump]
+    protected override CodeBase DumpPrintCode => CodeBase.GetDumpPrintText(Syntax.Tag);
+
+    TypeBase GetTemplate()
+    {
+        var argumentsType = Syntax.IsImplicit? Root.VoidType : TemplateArguments;
+        return GetResult(Category.Type, argumentsType).Type;
+    }
+
+    Result GetResult(Category category, TypeBase argumentsType)
+    {
+        var trace = ObjectId == -49 && category.Replenished().HasClosures();
+        StartMethodDump(trace, category, argumentsType);
+        try
+        {
+            BreakExecution();
+
+            var functionType = Function(argumentsType.AssertNotNull());
+
+            Dump("functionType", functionType);
+            BreakExecution();
+
+            var result = functionType.ApplyResult(category);
+            (category == result.CompleteCategory).Assert();
+
+            return ReturnMethodDump(result);
+        }
+        finally
+        {
+            EndMethodDump();
+        }
+    }
 
     new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType
             .GetResult(category, () => DumpPrintCode);
 
     FunctionType Function(TypeBase argsType) => FindRecentCompoundView.Function(Syntax, argsType.AssertNotNull());
+}
+
+sealed class TemplateArguments : TypeBase
+{
+    readonly ITemplateProvider Parent;
+    public TemplateArguments(ITemplateProvider parent) => Parent = parent;
+
+    internal override Root Root => Parent.Root;
+}
+
+interface ITemplateProvider
+{
+    Root Root { get; }
 }
