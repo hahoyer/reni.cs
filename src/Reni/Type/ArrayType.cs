@@ -128,12 +128,12 @@ sealed class ArrayType
         .GetFeature(ConcatArrays tokenClass)
         => Feature.Extension.FunctionFeature
         (
-            (category, objectReference, argsType) =>
+            (category, objectReference, argumentsType) =>
                 ConcatArraysResult
                 (
                     category,
                     objectReference,
-                    argsType,
+                    argumentsType,
                     OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
             this);
 
@@ -195,18 +195,18 @@ sealed class ArrayType
         get { yield return Feature.Extension.Conversion(NoTextItemResult); }
     }
 
-    internal override Result GetConstructorResult(Category category, TypeBase argsType)
+    internal override Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
         if(category == Category.None)
             return null;
 
-        if(argsType == Root.VoidType)
+        if(argumentsType == Root.VoidType)
             return GetResult(category, () => CodeBase.GetBitsConst(Size, BitsConst.Convert(0)));
 
-        if(argsType is IFunction function)
+        if(argumentsType is IFunction function)
             return ConstructorResult(category, function);
 
-        return base.GetConstructorResult(category, argsType);
+        return base.GetConstructorResult(category, argumentsType);
     }
 
     [DisableDump]
@@ -257,23 +257,23 @@ sealed class ArrayType
     (
         Category category,
         IContextReference objectReference,
-        TypeBase argsType,
-        string argsOptions
+        TypeBase argumentsType,
+        string options
     )
     {
         var oldElementsResult = Pointer
             .GetResult(category | Category.Type, objectReference).DereferenceResult;
 
-        var isElementArg = argsType.IsConvertible(ElementAccessType);
-        var newCount = isElementArg? 1 : argsType.GetArrayLength(ElementAccessType);
+        var isElementArgument = argumentsType.IsConvertible(ElementAccessType);
+        var newCount = isElementArgument? 1 : argumentsType.GetArrayLength(ElementAccessType);
         var newElementsResultRaw
-            = isElementArg
-                ? argsType.GetConversion(category | Category.Type, ElementAccessType)
-                : argsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, argsOptions));
+            = isElementArgument
+                ? argumentsType.GetConversion(category | Category.Type, ElementAccessType)
+                : argumentsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, options));
 
         var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult;
         var result = ElementType
-            .GetArray(Count + newCount, argsOptions)
+            .GetArray(Count + newCount, options)
             .GetResult(category, newElementsResult + oldElementsResult);
         return result;
     }

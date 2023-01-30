@@ -384,13 +384,13 @@ abstract class TypeBase
 
     protected virtual ArrayType GetArrayForCache(int count, string optionsId) => new(this, count, optionsId);
 
-    internal virtual Result GetConstructorResult(Category category, TypeBase argsType)
+    internal virtual Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
-        StartMethodDump(false, category, argsType);
+        StartMethodDump(false, category, argumentsType);
         try
         {
             BreakExecution();
-            var result = argsType.GetConversion(category, this);
+            var result = argumentsType.GetConversion(category, this);
             return ReturnMethodDump(result);
         }
         finally
