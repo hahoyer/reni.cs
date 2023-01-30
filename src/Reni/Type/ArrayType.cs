@@ -112,61 +112,50 @@ sealed class ArrayType
 
     TypeBase IChild<TypeBase>.Parent => ElementType;
 
-    IEnumerable<IConversion> IForcedConversionProviderForPointer<ArrayReferenceType>.GetResult
-        (ArrayReferenceType destination)
+    IEnumerable<IConversion> IForcedConversionProviderForPointer<ArrayReferenceType>
+        .GetResult(ArrayReferenceType destination)
         => ForcedConversion(destination).NullableToArray();
 
     TypeBase IRepeaterType.ElementType => ElementType;
     TypeBase IRepeaterType.IndexType => Root.BitType.Number(IndexSize.ToInt());
     bool IRepeaterType.IsMutable => IsMutable;
 
-    IImplementation ISymbolProviderForPointer<ArrayReference>.
-        GetFeature
-        (ArrayReference tokenClass)
+    IImplementation ISymbolProviderForPointer<ArrayReference>
+        .GetFeature(ArrayReference tokenClass)
         => Feature.Extension.Value(ReferenceResult);
 
-    IImplementation ISymbolProviderForPointer<ConcatArrays>.
-        GetFeature(ConcatArrays tokenClass)
-        =>
-            Feature.Extension.FunctionFeature
-            (
-                (category, objectReference, argsType) =>
-                    ConcatArraysResult
-                    (
-                        category,
-                        objectReference,
-                        argsType,
-                        OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
-                this);
+    IImplementation ISymbolProviderForPointer<ConcatArrays>
+        .GetFeature(ConcatArrays tokenClass)
+        => Feature.Extension.FunctionFeature
+        (
+            (category, objectReference, argsType) =>
+                ConcatArraysResult
+                (
+                    category,
+                    objectReference,
+                    argsType,
+                    OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
+            this);
 
-    IImplementation ISymbolProviderForPointer<Count>.GetFeature
-        (Count tokenClass)
+    IImplementation ISymbolProviderForPointer<Count>.GetFeature(Count tokenClass)
         => Feature.Extension.MetaFeature(CountResult);
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.
-        GetFeature
-        (DumpPrintToken tokenClass)
-        =>
-            OptionsValue.IsTextItem.Value
-                ? Feature.Extension.Value(GetDumpPrintTokenResult)
-                : Feature.Extension.Value(DumpPrintTokenArrayResult);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
+        => OptionsValue.IsTextItem.Value
+            ? Feature.Extension.Value(GetDumpPrintTokenResult)
+            : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
-    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature
-        (Mutable tokenClass)
+    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature(Mutable tokenClass)
         => Feature.Extension.Value(MutableResult);
 
-    IImplementation ISymbolProviderForPointer<TextItem>.GetFeature
-        (TextItem tokenClass)
+    IImplementation ISymbolProviderForPointer<TextItem>.GetFeature(TextItem tokenClass)
         => Feature.Extension.Value(TextItemResult);
 
 
-    IImplementation ISymbolProviderForPointer<ToNumberOfBase>.
-        GetFeature
-        (ToNumberOfBase tokenClass)
-        =>
-            OptionsValue.IsTextItem.Value
-                ? Feature.Extension.MetaFeature(ToNumberOfBaseResult)
-                : null;
+    IImplementation ISymbolProviderForPointer<ToNumberOfBase>.GetFeature(ToNumberOfBase tokenClass)
+        => OptionsValue.IsTextItem.Value
+            ? Feature.Extension.MetaFeature(ToNumberOfBaseResult)
+            : null;
 
     [DisableDump]
     internal override bool IsHollow => Count == 0 || ElementType.IsHollow;
@@ -214,8 +203,7 @@ sealed class ArrayType
         if(argsType == Root.VoidType)
             return GetResult(category, () => CodeBase.GetBitsConst(Size, BitsConst.Convert(0)));
 
-        var function = argsType as IFunction;
-        if(function != null)
+        if(argsType is IFunction function)
             return ConstructorResult(category, function);
 
         return base.GetConstructorResult(category, argsType);
@@ -253,8 +241,7 @@ sealed class ArrayType
         return GetResult(category, elements);
     }
 
-    Result ElementConstructorResult
-        (Category category, Result elementConstructorResult, int i, TypeBase indexType)
+    Result ElementConstructorResult(Category category, Result elementConstructorResult, int i, TypeBase indexType)
     {
         var resultForArg = indexType
             .GetResult
@@ -301,20 +288,20 @@ sealed class ArrayType
         return result;
     }
 
-    Result DumpPrintResult(Category category, int position) => ElementType
-        .SmartPointer
-        .GetGenericDumpPrintResult(category)
-        .ReplaceAbsolute
-        (
-            ElementType.Pointer.CheckedReference,
-            c => ReferenceResult(c).AddToReference(() => ElementType.Size * position)
-        );
+    Result DumpPrintResult(Category category, int position)
+        => ElementType
+            .SmartPointer
+            .GetGenericDumpPrintResult(category)
+            .ReplaceAbsolute
+            (
+                ElementType.Pointer.CheckedReference,
+                c => ReferenceResult(c).AddToReference(() => ElementType.Size * position)
+            );
 
     Result ElementAccessResult(Category category, TypeBase right)
         => AccessType.GetResult(category, GetObjectResult(category), right);
 
-    Result ToNumberOfBaseResult
-        (Category category, ResultCache left, ContextBase context, ValueSyntax right)
+    Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         var target = (left & Category.All).AutomaticDereferencedAlignedResult
             .GetValue(context.RootContext.ExecutionContext)
@@ -325,8 +312,7 @@ sealed class ArrayType
         return Root.BitType.GetResult(category, result).Align;
     }
 
-    Result CountResult
-        (Category category, ResultCache left, ContextBase context, ValueSyntax right)
+    Result CountResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         (right == null).Assert();
         return IndexType.GetResult
