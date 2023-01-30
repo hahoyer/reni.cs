@@ -172,6 +172,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
             PositionDictionary.AssertValid(Compiler.BinaryTree);
             if(trace)
                 syntax.Dump().FlaggedLine();
+
             return syntax;
         }
         catch(Exception e)
