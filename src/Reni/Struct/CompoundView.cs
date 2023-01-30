@@ -172,18 +172,10 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         Compound = compound;
         ViewPosition = viewPosition;
         CompoundContextCache = new(() => new(this));
-
         TypeCache = new(() => new(this));
-
-        AccessFeaturesCache
-            = new(position => new(this, position));
-
-        FieldAccessTypeCache
-            = new(position => new(this, position));
-
-        FunctionBodyTypeCache
-            = new(syntax => new(this, syntax));
-
+        AccessFeaturesCache = new(position => new(this, position));
+        FieldAccessTypeCache = new(position => new(this, position));
+        FunctionBodyTypeCache = new(syntax => new(this, syntax));
         StopByObjectIds();
     }
 
