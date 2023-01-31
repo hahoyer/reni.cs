@@ -167,7 +167,7 @@ sealed class ResultCache : DumpableObject
     }
 
     /// <summary>
-    ///     Try to update simple cases.
+    ///     Try to update simple cases that provider independent.
     ///     For instance <see cref="IsHollow" /> may be obvious since it is a function.
     ///     This is essential to avoid recursion.
     /// </summary>
