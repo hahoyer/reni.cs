@@ -115,4 +115,6 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 
     internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
         => Type(context).DeclarationOptions;
+
 }
+

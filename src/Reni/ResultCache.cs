@@ -151,6 +151,34 @@ sealed class ResultCache : DumpableObject
     //[DebuggerHidden]
     void Update(Category category)
     {
+        var localCategory = SimpleUpdateAndGetLocalCategory(category);
+
+        if(localCategory != Category.None || (category & Data.PendingCategory) != Category.None)
+            DeepUpdate(category, localCategory);
+    }
+
+    void DeepUpdate(Category category, Category localCategory)
+    {
+        var oldPendingCategory = Data.PendingCategory;
+        Data.HasIssue.ConditionalBreak();
+        Data.PendingCategory |= localCategory;
+
+        try
+        {
+            var result = Provider.Execute(localCategory, oldPendingCategory & category);
+
+            (result != null).Assert(() => Tracer.Dump(Provider));
+            result.IsValidOrIssue(localCategory).Assert();
+            Data.Update(result);
+        }
+        finally
+        {
+            Data.PendingCategory = oldPendingCategory.Without(Data.CompleteCategory);
+        }
+    }
+
+    Category SimpleUpdateAndGetLocalCategory(Category category)
+    {
         var localCategory = category.Without(Data.CompleteCategory | Data.PendingCategory);
 
         if(localCategory.HasIsHollow() && Data.FindIsHollow != null)
@@ -171,25 +199,7 @@ sealed class ResultCache : DumpableObject
             localCategory = localCategory.Without(Category.Closures);
         }
 
-        if(localCategory == Category.None && (category & Data.PendingCategory) == Category.None)
-            return;
-
-        var oldPendingCategory = Data.PendingCategory;
-        try
-        {
-            Data.HasIssue.ConditionalBreak();
-
-            Data.PendingCategory |= localCategory;
-            var result = Provider.Execute(localCategory, oldPendingCategory & category);
-
-            (result != null).Assert(() => Tracer.Dump(Provider));
-            result.IsValidOrIssue(localCategory).Assert();
-            Data.Update(result);
-        }
-        finally
-        {
-            Data.PendingCategory = oldPendingCategory.Without(Data.CompleteCategory);
-        }
+        return localCategory;
     }
 
     public static Result operator &(ResultCache resultCache, Category category)
