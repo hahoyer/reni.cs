@@ -12,7 +12,7 @@ public enum Category
     , Type = 4
     , Code = 8
     , Closures = 16
-    , Issues = 32
+    , Semantics = 32
     , All = 31
 }
 
