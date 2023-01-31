@@ -11,7 +11,7 @@ using Reni.Validation;
 namespace Reni.Struct;
 
 abstract class FunctionInstance
-    : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer
+    : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer, ResultCache.IRecursiveResultProvider
 {
     [DisableDump]
     protected readonly FunctionType Parent;
@@ -86,14 +86,13 @@ abstract class FunctionInstance
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+    Result ResultCache.IRecursiveResultProvider.Execute(Category category)
     {
-        if(category == Category.None && pendingCategory == Category.Closures)
-            return new(Category.Closures, Closures.Void);
-
-        (pendingCategory == Category.None).Assert();
-        return GetResult(category);
+        (category == Category.Closures).Assert();
+        return new(Category.Closures, Closures.Void);
     }
+
+    Result ResultCache.IResultProvider.Execute(Category category) => GetResult(category);
 
     [DisableDump]
     protected abstract Size RelevantValueSize { get; }

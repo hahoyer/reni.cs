@@ -26,15 +26,14 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
     (
         ContextBase context,
         Category category,
-        Category pendingCategory,
         ValueSyntax syntax,
         bool asReference
     )
     {
-        if(!asReference && Category.Type.Contains(category | pendingCategory))
+        if(!asReference && Category.Type.Contains(category))
             return syntax.GetResultForCache(context, Category.Type);
 
-        NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
+        NotImplementedMethod(context, category, syntax, asReference);
         return null;
     }
 

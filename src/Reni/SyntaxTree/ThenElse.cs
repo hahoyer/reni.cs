@@ -33,17 +33,16 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
     (
         ContextBase context,
         Category category,
-        Category pendingCategory,
         ValueSyntax syntax,
         bool asReference
     )
     {
         (syntax == this).Assert();
 
-        if(!asReference && Category.Type.Replenished().Contains(category | pendingCategory) && Else == null)
+        if(!asReference && Category.Type.Replenished().Contains(category) && Else == null)
             return Root.VoidType.GetResult(Category.Type);
 
-        NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
+        NotImplementedMethod(context, category, syntax, asReference);
         return null;
     }
 

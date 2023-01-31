@@ -59,13 +59,7 @@ sealed class AccessFeature
     IMeta IMetaImplementation.Function
         => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
-    Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-    {
-        if(pendingCategory == Category.None)
-            return GetResult(category);
-        NotImplementedMethod(category, pendingCategory);
-        return null;
-    }
+    Result ResultCache.IResultProvider.Execute(Category category) => GetResult(category);
 
     Result IValue.Execute(Category category) => GetResult(category);
 
@@ -73,8 +67,7 @@ sealed class AccessFeature
 
     IFunction ObtainFunctionFeature()
     {
-        var functionSyntax = Statement as FunctionSyntax;
-        if(functionSyntax != null)
+        if(Statement is FunctionSyntax functionSyntax)
             return functionSyntax.FunctionFeature(View);
 
         var valueType = View.ValueType(Position);

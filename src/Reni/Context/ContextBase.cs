@@ -19,7 +19,7 @@ namespace Reni.Context;
 abstract class ContextBase
     : DumpableObject, ResultCache.IResultProvider, IIconKeyProvider, ValueCache.IContainer, IRootProvider
 {
-    internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
+    internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider, ResultCache.IRecursiveResultProvider
     {
         static int NextObjectId;
 
@@ -45,19 +45,19 @@ abstract class ContextBase
             StopByObjectIds();
         }
 
-        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-        {
-            if(pendingCategory == Category.None)
-                return AsReference
-                    ? Context.GetResultAsReference(category, Syntax)
-                    : Context.GetResultForCache(category, Syntax);
+        Result ResultCache.IResultProvider.Execute(Category category)
+            => AsReference
+                ? Context.GetResultAsReference(category, Syntax)
+                : Context.GetResultForCache(category, Syntax);
 
+        Result ResultCache.IRecursiveResultProvider.Execute(Category category)
+        {
             var recursionHandler = Syntax.RecursionHandler;
             if(recursionHandler != null)
                 return recursionHandler
-                    .Execute(Context, category, pendingCategory, Syntax, AsReference);
+                    .Execute(Context, category, Syntax, AsReference);
 
-            NotImplementedMethod(category, pendingCategory);
+            NotImplementedMethod(category);
             return null;
         }
     }
@@ -126,16 +126,6 @@ abstract class ContextBase
 
     string IIconKeyProvider.IconKey => "Context";
 
-
-    Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-    {
-        if(pendingCategory == Category.None)
-            return FindRecentCompoundView.ObjectPointerViaContext(category);
-
-        NotImplementedMethod(category, pendingCategory);
-        return null;
-    }
-
     Root IRootProvider.Value => RootContext;
 
     [DisableDump]
@@ -189,6 +179,11 @@ abstract class ContextBase
 
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
+
+
+    Result ResultCache.IResultProvider.Execute(Category category) 
+        => FindRecentCompoundView.ObjectPointerViaContext(category);
+
 
     [UsedImplicitly]
     internal int GetPacketCount(Size size)
@@ -260,7 +255,7 @@ abstract class ContextBase
     /// <param name="right"> the expression of the argument of the call. Must not be null </param>
     /// <param name="token"></param>
     /// <returns> </returns>
-    internal (Result, IImplementation) GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
+    internal(Result, IImplementation) GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
     {
         var argsType = FindRecentFunctionContextObject.ArgumentsType;
         return argsType
@@ -295,18 +290,19 @@ abstract class ContextBase
         return null;
     }
 
-    internal (Result, IImplementation) GetPrefixResult(Category category, Definable definable, SourcePart token, ValueSyntax right)
+    internal(Result, IImplementation) GetPrefixResult
+        (Category category, Definable definable, SourcePart token, ValueSyntax right)
     {
         var searchResult = GetDeclaration(definable);
         if(searchResult == null)
             return (IssueId
                 .MissingDeclarationInContext
-                .GetResult(category, token, this),null);
+                .GetResult(category, token, this), null);
 
         var result = searchResult.GetResult(category, CacheObject.AsObject, token, this, right);
 
         (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
-        return (result,searchResult);
+        return (result, searchResult);
     }
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)

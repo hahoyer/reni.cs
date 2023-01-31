@@ -73,11 +73,7 @@ sealed class ConversionPath
         return !Elements.Where((element, index) => element != Elements[index]).Any();
     }
 
-    Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-    {
-        (pendingCategory == Category.None).Assert();
-        return Source.GetArgumentResult(category);
-    }
+    Result ResultCache.IResultProvider.Execute(Category category) => Source.GetArgumentResult(category);
 
     void AssertValid()
     {

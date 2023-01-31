@@ -2,16 +2,9 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.SyntaxTree;
 
-namespace Reni.Parser
+namespace Reni.Parser;
+
+interface IRecursionHandler
 {
-    interface IRecursionHandler
-    {
-        Result Execute
-            (
-            ContextBase context,
-            Category category,
-            Category pendingCategory,
-            ValueSyntax syntax,
-            bool asReference);
-    }
+    Result Execute(ContextBase context, Category category, ValueSyntax syntax, bool asReference);
 }

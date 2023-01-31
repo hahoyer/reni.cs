@@ -13,14 +13,19 @@ sealed class ResultCache : DumpableObject
 {
     internal interface IResultProvider
     {
-        Result Execute(Category category, Category pendingCategory);
+        Result Execute(Category category);
+    }
+
+    internal interface IRecursiveResultProvider
+    {
+        Result Execute(Category category);
     }
 
     sealed class ResultNotSupported : DumpableObject, IResultProvider
     {
-        Result IResultProvider.Execute(Category category, Category pendingCategory)
+        Result IResultProvider.Execute(Category category)
         {
-            NotImplementedMethod(category, pendingCategory);
+            NotImplementedMethod(category);
             return null;
         }
     }
@@ -31,11 +36,7 @@ sealed class ResultCache : DumpableObject
 
         public SimpleProvider(Func<Category, Result> obtainResult) => ObtainResult = obtainResult;
 
-        Result IResultProvider.Execute(Category category, Category pendingCategory)
-        {
-            (pendingCategory == Category.None).Assert();
-            return ObtainResult(category);
-        }
+        Result IResultProvider.Execute(Category category) => ObtainResult(category);
     }
 
     sealed class CallStack : DumpableObject
@@ -148,27 +149,64 @@ sealed class ResultCache : DumpableObject
 
     public static implicit operator ResultCache(Result x) => new(x);
 
+    /// <summary>
+    ///     Try to update all categories according to <see cref="category" />.
+    ///     Complete categories left untouched.
+    ///     Pending categories are treated by recursion handlers
+    /// </summary>
+    /// <param name="category"></param>
     //[DebuggerHidden]
     void Update(Category category)
     {
-        var localCategory = SimpleUpdateAndGetLocalCategory(category);
+        var availableCategory = category.Without(Data.PendingCategory);
+        var pendingCategory = category & Data.PendingCategory;
 
-        if(localCategory != Category.None || (category & Data.PendingCategory) != Category.None)
-            DeepUpdate(category, localCategory);
+        SimpleUpdate(availableCategory.Without(Data.CompleteCategory));
+        // Watch out! Data.CompleteCategory may have changed by SimpleUpdate
+        SmartUpdate(availableCategory.Without(Data.CompleteCategory) | pendingCategory, pendingCategory == Category.None);
     }
 
-    void DeepUpdate(Category category, Category localCategory)
+    /// <summary>
+    ///     Try to update simple cases.
+    ///     For instance <see cref="IsHollow" /> may be obvious since it is a function.
+    ///     This is essential to avoid recursion.
+    /// </summary>
+    /// <param name="category"></param>
+    void SimpleUpdate(Category category)
     {
+        if(category.HasIsHollow())
+            Data.IsHollow = Data.FindIsHollow;
+
+        if(category.HasSize())
+            Data.Size = Data.FindSize;
+
+        if(category.HasClosures())
+            Data.Closures = Data.FindClosures;
+    }
+
+    /// <summary>
+    ///     Update anything that is hasn't been obtained yet.
+    ///     Since it may cause recursion, pending categories are temporarily extended during call.
+    ///     It executes in two variants: linear or recursive mode.
+    /// </summary>
+    /// <param name="category"></param>
+    /// <param name="isLinear"></param>
+    void SmartUpdate(Category category, bool isLinear)
+    {
+        if(category == Category.None)
+            return;
         var oldPendingCategory = Data.PendingCategory;
         Data.HasIssue.ConditionalBreak();
-        Data.PendingCategory |= localCategory;
+        Data.PendingCategory |= category;
 
         try
         {
-            var result = Provider.Execute(localCategory, oldPendingCategory & category);
+            var result = isLinear
+                ? Provider.Execute(category)
+                : ((IRecursiveResultProvider)Provider).Execute(category);
 
             (result != null).Assert(() => Tracer.Dump(Provider));
-            result.IsValidOrIssue(localCategory).Assert();
+            result.IsValidOrIssue(category).Assert();
             Data.Update(result);
         }
         finally
@@ -177,34 +215,15 @@ sealed class ResultCache : DumpableObject
         }
     }
 
-    Category SimpleUpdateAndGetLocalCategory(Category category)
-    {
-        var localCategory = category.Without(Data.CompleteCategory | Data.PendingCategory);
-
-        if(localCategory.HasIsHollow() && Data.FindIsHollow != null)
-        {
-            Data.IsHollow = Data.FindIsHollow;
-            localCategory = localCategory.Without(Category.IsHollow);
-        }
-
-        if(localCategory.HasSize() && Data.FindSize != null)
-        {
-            Data.Size = Data.FindSize;
-            localCategory = localCategory.Without(Category.Size);
-        }
-
-        if(localCategory.HasClosures() && Data.FindClosures != null)
-        {
-            Data.Closures = Data.FindClosures;
-            localCategory = localCategory.Without(Category.Closures);
-        }
-
-        return localCategory;
-    }
-
     public static Result operator &(ResultCache resultCache, Category category)
         => resultCache.GetCategories(category);
 
+    /// <summary>
+    ///     Obtain the categories requested.
+    ///     This will try to obtain categories that are not yet obtained.
+    /// </summary>
+    /// <param name="category"></param>
+    /// <returns></returns>
     //[DebuggerHidden]
     internal Result GetCategories(Category category)
     {
@@ -213,7 +232,7 @@ sealed class ResultCache : DumpableObject
         try
         {
             BreakExecution();
-            GuardedUpdate(category);
+            Update(category);
             Dump(nameof(Provider), Provider);
             Data.CompleteCategory.Contains(category).Assert(Data.Dump);
             return ReturnMethodDump(Data & category);
@@ -224,7 +243,14 @@ sealed class ResultCache : DumpableObject
         }
     }
 
+    /// <summary>
+    ///     Obtain the categories requested.
+    /// Internal function that collects some information for debugging purposes
+    /// </summary>
+    /// <param name="category"></param>
+    /// <returns></returns>
     [DebuggerHidden]
+    [PublicAPI]
     void GuardedUpdate(Category category)
     {
         try
