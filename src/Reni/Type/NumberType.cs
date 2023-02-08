@@ -33,7 +33,7 @@ sealed class NumberType
     readonly ValueCache<Result> ZeroResult;
 
     [EnableDump]
-    internal int Bits => Size.ToInt();
+    internal int Bits => IsInDump? -1: Size.ToInt();
 
     static IEnumerable<string> InternalDeclarationOptions
         => new[]

@@ -441,8 +441,15 @@ abstract class TypeBase
         }
     }
 
+    [CanBeNull]
+    public Size SmartSize => Cache.Size.IsBusy? null : Size;
+
     [NotNull]
-    Size GetSizeForCache() => IsHollow? Size.Zero : GetSize();
+    Size GetSizeForCache()
+    {
+        StopByObjectIds();
+        return IsHollow? Size.Zero : GetSize();
+    }
 
     static Result GetVoidCodeAndRefs(Category category)
         => Root.VoidType.GetResult(category & (Category.Code | Category.Closures));
