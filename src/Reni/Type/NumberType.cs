@@ -162,7 +162,7 @@ sealed class NumberType
         (
             category,
             () => OperationCode(resultType.Size, operationName, right),
-            Closures.Argument
+            Closures.GetArgument
         );
 
         var leftResult = GetObjectResult(category | Category.Type)
@@ -190,7 +190,7 @@ sealed class NumberType
         (
             category,
             () => source.ArgumentCode.GetBitCast(Size),
-            Closures.Argument
+            Closures.GetArgument
         );
     }
 
@@ -204,7 +204,7 @@ sealed class NumberType
             (
                 category,
                 () => EnableCut.ArgumentCode.GetBitCast(destination.Size),
-                Closures.Argument
+                Closures.GetArgument
             );
     }
 }

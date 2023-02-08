@@ -56,4 +56,16 @@ sealed class IssueData : DumpableObject
         else
             Category &= ~category;
     }
+
+    public static void AssertValid(Issue[] issues)
+    {
+        if(issues == null)
+            return;
+        for(var first = 0; first < issues.Length-1; first++)
+        for(var other = first + 1; other < issues.Length; other++)
+        {
+            (issues[first] != issues[other]).Assert();
+        }
+    }
+    public void AssertValid() => AssertValid(Issues);
 }

@@ -68,9 +68,6 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     [DisableDump]
     internal virtual bool? IsHollow => IsLambda? true : null;
 
-    [DisableDump]
-    internal virtual IRecursionHandler RecursionHandler => null;
-
     //[DebuggerHidden]
     internal virtual Result GetResultForCache(ContextBase context, Category category)
     {

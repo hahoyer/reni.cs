@@ -168,7 +168,7 @@ sealed class FunctionType : SetterTargetType
             (
                 category,
                 () => Closures.ToCode() + ArgumentsType.ArgumentCode,
-                () => Closures + Closures.Argument()
+                () => Closures + Closures.GetArgument()
             );
             (result.CompleteCategory.Contains(category)).Assert();
             return ReturnMethodDump(result);

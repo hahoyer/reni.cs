@@ -67,7 +67,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
             return false;
         if(ReferenceEquals(this, obj))
             return true;
-        return obj is Issue issue && Equals(issue);
+        return obj is IEquatable<Issue> issue && issue.Equals(this);
     }
 
     public override int GetHashCode()

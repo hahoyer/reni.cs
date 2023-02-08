@@ -11,7 +11,7 @@ using Reni.Validation;
 namespace Reni.Struct;
 
 abstract class FunctionInstance
-    : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer, ResultCache.IRecursiveResultProvider
+    : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer
 {
     [DisableDump]
     protected readonly FunctionType Parent;
@@ -86,12 +86,6 @@ abstract class FunctionInstance
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    Result ResultCache.IRecursiveResultProvider.Execute(Category category)
-    {
-        (category == Category.Closures).Assert();
-        return new(Category.Closures, Closures.Void);
-    }
-
     Result ResultCache.IResultProvider.Execute(Category category) => GetResult(category);
 
     [DisableDump]
@@ -109,7 +103,7 @@ abstract class FunctionInstance
             return null;
 
         if(category.HasClosures())
-            result.Closures = Closures.Argument();
+            result.Closures = Closures.GetArgument();
         if(result.HasIssue != true && category.HasCode())
             result.Code = CallType
                 .ArgumentCode
@@ -130,9 +124,9 @@ abstract class FunctionInstance
             BreakExecution();
             var rawResult = Context.GetResult(category | Category.Type, Body);
 
-            (rawResult.HasIssue || rawResult.CompleteCategory == (category | Category.Type)).Assert();
+            (rawResult.HasIssue || rawResult.CompleteCategory.Contains(category | Category.Type)).Assert();
             if(rawResult.FindClosures != null)
-                (!rawResult.SmartClosures.Contains(Closures.Argument())).Assert(rawResult.Dump);
+                (!rawResult.SmartClosures.Contains(Closures.GetArgument())).Assert(rawResult.Dump);
 
             Dump("rawResult", rawResult);
             BreakExecution();
@@ -154,7 +148,7 @@ abstract class FunctionInstance
 
             var result = argReferenceReplaced
                 .ReplaceAbsolute
-                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, Closures.Void)
+                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, Closures.GetVoid)
                 .Weaken;
 
             return ReturnMethodDump(result);
@@ -173,7 +167,7 @@ abstract class FunctionInstance
 
         return result
             .ReplaceAbsolute
-                (reference, () => CodeBase.GetFrameRef().GetDePointer(reference.Size()), Closures.Void);
+                (reference, () => CodeBase.GetFrameRef().GetDePointer(reference.Size()), Closures.GetVoid);
     }
 
     CodeBase CreateContextRefCode()

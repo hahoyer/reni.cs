@@ -22,9 +22,11 @@ sealed class Closures : DumpableObject
     public static int NextOrder;
     static int NextId;
 
+    internal readonly bool IsRecursive;
+
     [SmartNode]
     [DisableDump]
-    public List<IContextReference> Data { get; }
+    readonly List<IContextReference> Data = new();
 
     readonly ValueCache<IContextReference[]> SortedDataCache;
 
@@ -43,34 +45,34 @@ sealed class Closures : DumpableObject
     public bool IsNone => Count == 0;
     IContextReference[] SortedData => SortedDataCache.Value;
 
-    Closures()
+    Closures(bool isRecursive)
         : base(NextId++)
     {
-        Data = new();
+        IsRecursive = isRecursive;
         SortedDataCache = new(ObtainSortedData);
         StopByObjectIds(-10);
     }
 
     Closures(IContextReference context)
-        : this()
+        : this(false)
         => Add(context);
 
     Closures(IEnumerable<IContextReference> a, IEnumerable<IContextReference> b)
-        : this()
+        : this(false)
     {
         AddRange(a);
         AddRange(b);
     }
 
     Closures(IEnumerable<IContextReference> a)
-        : this()
+        : this(false)
         => AddRange(a);
 
-    protected override string GetNodeDump() => base.GetNodeDump() + "#" + Count;
+    protected override string GetNodeDump() => $"{base.GetNodeDump()}{(IsRecursive? "r" : "")}#{Count}";
 
     public override string DumpData()
     {
-        var result = "";
+        var result = IsRecursive? "recursive/":"";
         for(var i = 0; i < Count; i++)
         {
             if(i > 0)
@@ -80,6 +82,10 @@ sealed class Closures : DumpableObject
 
         return result;
     }
+
+    internal static Closures GetRecursivity() => new(true);
+    internal static Closures GetVoid() => new(false);
+    internal static Closures GetArgument() => new(Closure.Instance);
 
 
     void AddRange(IEnumerable<IContextReference> a)
@@ -94,8 +100,6 @@ sealed class Closures : DumpableObject
             Data.Add(e);
     }
 
-    internal static Closures Void() => new();
-    internal static Closures Argument() => new(Closure.Instance);
 
     public Closures Sequence(Closures closures)
         => closures.Count == 0? this :
@@ -121,17 +125,17 @@ sealed class Closures : DumpableObject
         return new(r);
     }
 
-    IContextReference[] ObtainSortedData()
+    IContextReference[] ObtainSortedData() 
         => Data
-            .OrderBy(codeArg => codeArg.Order)
-            .ToArray();
+        .OrderBy(codeArg => codeArg.Order)
+        .ToArray();
 
     public Closures WithoutArgument() => Without(Closure.Instance);
 
-    Closures Without(Closures other)
+    Closures Without(Closures other) 
         => other
-            .Data
-            .Aggregate(this, (current, refInCode) => current.Without(refInCode));
+        .Data
+        .Aggregate(this, (current, refInCode) => current.Without(refInCode));
 
     public bool Contains(IContextReference context) => Data.Contains(context);
 
@@ -160,6 +164,8 @@ sealed class Closures : DumpableObject
 
     public bool IsEqual(Closures other)
     {
+        (IsRecursive == other.IsRecursive).Assert();
+
         if(Count != other.Count)
             return false;
 
@@ -170,12 +176,13 @@ sealed class Closures : DumpableObject
         return true;
     }
 
-    internal CodeBase ToCode()
+    internal CodeBase ToCode() 
         => Data
-            .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
+        .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
 
     internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closure)
     {
+        (!IsRecursive).Assert();
         var trace = ObjectId == -1;
         StartMethodDump(trace, code, closure);
         try

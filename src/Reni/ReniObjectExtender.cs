@@ -11,6 +11,17 @@ namespace Reni;
 
 static class Extension
 {
+    sealed class EqualityComparer<T>
+        : IEqualityComparer<T>
+    {
+        new readonly Func<T, T, bool> Equals;
+
+        public EqualityComparer(Func<T, T, bool> equals) => Equals = equals;
+
+        bool IEqualityComparer<T>.Equals(T x, T y) => Equals(x, y);
+        int IEqualityComparer<T>.GetHashCode(T obj) => 1;
+    }
+
     // will throw an exception if not a ReniObject
     internal static int GetObjectId(this object reniObject)
         => ((DumpableObject)reniObject).ObjectId;
@@ -88,4 +99,7 @@ static class Extension
         result += n.Millisecond.ToString("000");
         return result;
     }
+
+    public static IEqualityComparer<T> Comparer<T>(Func<T, T, bool> equals)
+        => new EqualityComparer<T>(equals);
 }

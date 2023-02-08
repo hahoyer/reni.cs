@@ -472,7 +472,7 @@ abstract class TypeBase
         return GetVoidCodeAndRefs(category);
     }
 
-    internal Result GetArgumentResult(Category category) => GetResult(category, () => ArgumentCode, Closures.Argument);
+    internal Result GetArgumentResult(Category category) => GetResult(category, () => ArgumentCode, Closures.GetArgument);
 
     Result GetPointerArgumentResult(Category category) => Pointer.GetArgumentResult(category);
 
@@ -563,7 +563,7 @@ abstract class TypeBase
             (
                 category,
                 GetLocalReferenceCode,
-                Closures.Argument
+                Closures.GetArgument
             );
     }
 
@@ -628,7 +628,7 @@ abstract class TypeBase
         (
             category,
             () => CodeBase.GetDumpPrintText(DumpPrintText),
-            Closures.Void
+            Closures.GetVoid
         );
 
     internal TypeBase GetSmartUn<T>()
@@ -679,7 +679,7 @@ abstract class TypeBase
         => GetDeclarationsForType(tokenClass).Any();
 
     Result GetAlignedResult
-        (Category category) => Align.GetResult(category, () => ArgumentCode.GetAlign(), Closures.Argument);
+        (Category category) => Align.GetResult(category, () => ArgumentCode.GetAlign(), Closures.GetArgument);
 
     IEnumerable<IConversion> GetSymmetricConversionsForCache()
         => RawSymmetricConversions
@@ -778,7 +778,7 @@ abstract class TypeBase
         (
             category,
             () => GetIdentityOperationCode(isEqual),
-            Closures.Argument
+            Closures.GetArgument
         );
 
         var leftResult = GetObjectResult(category | Category.Type).GetConversion(Align);

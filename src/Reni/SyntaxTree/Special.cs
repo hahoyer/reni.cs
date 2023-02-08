@@ -98,8 +98,6 @@ sealed class InfixSyntax : ValueSyntax
         StopByObjectIds();
     }
 
-    internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
-
     protected override int DirectChildCount => 2;
 
     protected override Syntax GetDirectChild(int index)

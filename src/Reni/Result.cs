@@ -25,7 +25,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     /// </summary>
     readonly IssueData IssueData;
 
-    Category PendingCategoryValue = Category.None;
     bool IsDirtyValue;
 
     bool HasSize => Size != null;
@@ -73,7 +72,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             if(value == true)
                 Size = Size.Zero;
-            
+
             AssertValid();
         }
     }
@@ -87,7 +86,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         {
             if(Size == value)
                 return;
-            
+
             Set(Category.Size, value);
             IsHollow = value == Size.Zero;
 
@@ -217,16 +216,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     bool HasArg
         => HasClosures? Closures.HasArgument : HasCode && Code.HasArgument;
 
-    public Category PendingCategory
-    {
-        get => PendingCategoryValue;
-        set
-        {
-            PendingCategoryValue = value;
-            AssertValid();
-        }
-    }
-
     [DisableDump]
     internal Result Align
     {
@@ -338,7 +327,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     public Issue[] Issues
     {
         get => IssueData.Issues;
-        private set => IssueData.Issues = value;
+        private set
+        {
+            IssueData.Issues = value
+                .Distinct(Extension.Comparer<Issue>((x, y) => x==y))
+                .ToArray();
+            IssueData.AssertValid();
+        }
     }
 
     [DisableDump]
@@ -414,8 +409,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             , getIsHollow, ToString
         );
 
-        //AssertValid();
-        //Replenish();
+        Replenish();
         AssertValid();
         StopByObjectIds();
     }
@@ -425,8 +419,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     public override string DumpData()
     {
         var result = "";
-        if(PendingCategory != Category.None)
-            result += "\nPendingCategory=" + PendingCategory.Dump();
         if(CompleteCategory != Category.None)
             result += "\nCompleteCategory=" + CompleteCategory.Dump();
         if(HasIssue)
@@ -448,8 +440,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     void Replenish()
     {
-        if(Closures == null && Code != null)
-            Closures = Code.Closures;
+        AssertValid();
+
+        //if(Closures == null && Code != null)
+        //    Closures = Code.Closures;
 
         if(Size == null && Type != null)
             Size = Type.SmartSize;
@@ -474,10 +468,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal void Update(Result result)
     {
         Issues = T(Issues, result.Issues).ConcatMany().ToArray();
-
         if(HasIssue)
         {
-            IssueData.Set(result.CompleteCategory);
+            IssueData.Set(CompleteCategory|result.CompleteCategory);
             Data.Reset(Category.All);
         }
         else
@@ -498,8 +491,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 Data.Closures = result.Closures;
         }
 
-        PendingCategory = PendingCategory.Without(result.CompleteCategory);
-
         AssertValid();
     }
 
@@ -513,8 +504,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             () => Size,
             () => Type,
             () => Code,
-            () => Closures);
-        result.PendingCategory &= category;
+            () => Closures
+        );
         return result;
     }
 
@@ -523,7 +514,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(IsDirty)
             return;
 
-        ((CompleteCategory & PendingCategory) == Category.None).Assert();
+        IssueData.AssertValid(IssueData.Issues);
 
         if(HasIssue)
         {
@@ -771,6 +762,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     public static Result operator &(Result result, Category category) => result.Filter(category);
 
     [DebuggerHidden]
+    [Obsolete("", true)]
     public static Result operator |(Result aResult, Result bResult)
     {
         ((aResult.CompleteCategory & bResult.CompleteCategory) == Category.None).Assert();

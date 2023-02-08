@@ -1,12 +1,11 @@
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Type;
 
 namespace Reni.SyntaxTree;
 
-sealed class CondSyntax : ValueSyntax, IRecursionHandler
+sealed class CondSyntax : ValueSyntax
 {
     [Node]
     [EnableDump]
@@ -29,26 +28,7 @@ sealed class CondSyntax : ValueSyntax, IRecursionHandler
         Else = elseSyntax;
     }
 
-    Result IRecursionHandler.Execute
-    (
-        ContextBase context,
-        Category category,
-        ValueSyntax syntax,
-        bool asReference
-    )
-    {
-        (syntax == this).Assert();
-
-        if(!asReference && Category.Type.Replenished().Contains(category) && Else == null)
-            return Root.VoidType.GetResult(Category.Type);
-
-        NotImplementedMethod(context, category, syntax, asReference);
-        return null;
-    }
-
     protected override int DirectChildCount => 3;
-
-    internal override IRecursionHandler RecursionHandler => this;
 
     protected override Syntax GetDirectChild(int index)
         => index switch

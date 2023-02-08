@@ -114,7 +114,7 @@ static class ResultExtension
         if(getCode != null)
             return getCode.Value.Closures;
         if(TryGetIsHollow(getIsHollow, getSize, getType, getCode) == true)
-            return Closures.Void();
+            return Closures.GetVoid();
 
         return null;
     }

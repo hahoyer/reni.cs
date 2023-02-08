@@ -61,7 +61,7 @@ abstract class CodeBase
 
     protected virtual Size GetTemporarySize() => Size;
 
-    protected virtual Closures GetRefsImplementation() => Closures.Void();
+    protected virtual Closures GetRefsImplementation() => Closures.GetVoid();
 
     protected virtual IEnumerable<CodeBase> ToList() => new[] { this };
 
@@ -268,7 +268,7 @@ abstract class CodeBase
     protected static Closures GetClosures(CodeBase[] codeBases)
     {
         var closures = codeBases.Select(code => code.Closures).ToArray();
-        return closures.Aggregate(Closures.Void(), (r1, r2) => r1.Sequence(r2));
+        return closures.Aggregate(Closures.GetVoid(), (r1, r2) => r1.Sequence(r2));
     }
 
     internal static CodeBase GetArgument(TypeBase type) => new Argument(type);

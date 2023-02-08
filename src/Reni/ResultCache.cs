@@ -16,11 +16,6 @@ sealed class ResultCache : DumpableObject
         Result Execute(Category category);
     }
 
-    internal interface IRecursiveResultProvider
-    {
-        Result Execute(Category category);
-    }
-
     sealed class ResultNotSupported : DumpableObject, IResultProvider
     {
         Result IResultProvider.Execute(Category category)
@@ -65,8 +60,8 @@ sealed class ResultCache : DumpableObject
         {
             var result = Item.NodeDump + " ";
             result += Category.Dump();
-            if(Category != Item.Data.PendingCategory)
-                result += "(Pending=" + Item.Data.PendingCategory.Dump() + ")";
+            if(Category != Item.PendingCategory)
+                result += "(Pending=" + Item.PendingCategory.Dump() + ")";
             result += "\n";
             result += Tracer.Dump(Item.Provider);
             return result;
@@ -86,31 +81,46 @@ sealed class ResultCache : DumpableObject
     static int NextObjectId;
 
     [DisableDump]
-    internal Result Data { get; }
+    internal readonly Result Data;
 
     [DisableDump]
-    internal IResultProvider Provider { get; }
+    internal readonly IResultProvider Provider;
+
+    [DisableDump]
+    Category PendingCategory;
 
     [DisableDump]
     [PublicAPI]
     static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
 
     [DisableDump]
+    [DebuggerHidden]
+    [DebuggerNonUserCode]
     internal TypeBase Type => Get(Category.Type).Type;
 
     [DisableDump]
+    [DebuggerHidden]
+    [DebuggerNonUserCode]
     internal CodeBase Code => Get(Category.Code).Code;
 
     [DisableDump]
+    [DebuggerHidden]
+    [DebuggerNonUserCode]
     internal Closures Closures => Get(Category.Closures).Closures;
 
     [DisableDump]
+    [DebuggerHidden]
+    [DebuggerNonUserCode]
     internal Size Size => Get(Category.Size).Size;
 
     [DisableDump]
+    [DebuggerHidden]
+    [DebuggerNonUserCode]
     internal bool? IsHollow => Get(Category.IsHollow).IsHollow;
 
     [DisableDump]
+    [DebuggerHidden]
+    [DebuggerNonUserCode]
     internal Issue[] Issues => Get(Category.IsHollow).Issues;
 
     internal ResultCache(IResultProvider obtainResult)
@@ -143,6 +153,8 @@ sealed class ResultCache : DumpableObject
         var result = FunctionDump;
         if(result != "")
             result += "\n";
+        if(PendingCategory != Category.None)
+            result += $"PendingCategory={PendingCategory.Dump()}\n";
         result += Data.DumpData();
         return result;
     }
@@ -158,13 +170,16 @@ sealed class ResultCache : DumpableObject
     //[DebuggerHidden]
     void Update(Category category)
     {
-        var availableCategory = category.Without(Data.PendingCategory);
+        var availableCategory = category.Without(PendingCategory);
 
         SimpleUpdate(availableCategory.Without(Data.CompleteCategory));
         // Watch out! Data.CompleteCategory may have changed by SimpleUpdate
 
+        // Getting type first is required to treat recursivity
+        if(availableCategory.Without(Data.CompleteCategory).HasType())
+            LinearUpdate(Category.Type);
         LinearUpdate(availableCategory.Without(Data.CompleteCategory));
-        RecursiveUpdate(category & Data.PendingCategory);
+        RecursiveUpdate(category & PendingCategory);
     }
 
     /// <summary>
@@ -186,7 +201,7 @@ sealed class ResultCache : DumpableObject
 
     /// <summary>
     ///     Update anything that is hasn't been obtained yet.
-    /// Pending categories are not treated here
+    ///     Pending categories are not treated here
     ///     Since it may cause recursion, pending categories are temporarily extended during call.
     /// </summary>
     /// <param name="category"></param>
@@ -195,9 +210,8 @@ sealed class ResultCache : DumpableObject
         if(category == Category.None)
             return;
 
-        var oldPendingCategory = Data.PendingCategory;
-        Data.HasIssue.ConditionalBreak();
-        Data.PendingCategory |= category;
+        var oldPendingCategory = PendingCategory;
+        PendingCategory |= category;
 
         try
         {
@@ -205,11 +219,13 @@ sealed class ResultCache : DumpableObject
 
             (result != null).Assert(() => Tracer.Dump(Provider));
             result.IsValidOrIssue(category).Assert();
+
             Data.Update(result);
+            PendingCategory = PendingCategory.Without(result.CompleteCategory);
         }
         finally
         {
-            Data.PendingCategory = oldPendingCategory.Without(Data.CompleteCategory);
+            PendingCategory = oldPendingCategory.Without(Data.CompleteCategory);
         }
     }
 
@@ -223,11 +239,14 @@ sealed class ResultCache : DumpableObject
         if(category == Category.None)
             return;
 
-        var result = ((IRecursiveResultProvider)Provider).Execute(category);
+        if(category == Category.Closures)
+        {
+            Data.Closures = Closures.GetRecursivity();
+            return;
+        }
 
-        (result != null).Assert(() => Tracer.Dump(Provider));
-        result.IsValidOrIssue(category).Assert();
-        Data.Update(result);
+        NotImplementedMethod(category);
+        return;
     }
 
     public static Result operator &(ResultCache resultCache, Category category)
@@ -249,7 +268,11 @@ sealed class ResultCache : DumpableObject
             BreakExecution();
             Update(category);
             Dump(nameof(Provider), Provider);
-            Data.CompleteCategory.Contains(category).Assert(Data.Dump);
+            var t = Data.Type;
+            var completeCategory = Data.CompleteCategory;
+            completeCategory
+                .Contains(category)
+                .Assert(() => $"{ObjectId}i: {Data.Dump()}\nPendingCategory={PendingCategory.Dump()}");
             return ReturnMethodDump(Data & category);
         }
         finally

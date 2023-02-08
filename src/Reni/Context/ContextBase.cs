@@ -22,7 +22,6 @@ abstract class ContextBase
     internal sealed class ResultProvider
         : DumpableObject
             , ResultCache.IResultProvider
-            , ResultCache.IRecursiveResultProvider
     {
         static int NextObjectId;
 
@@ -45,17 +44,6 @@ abstract class ContextBase
             Syntax = syntax;
             AsReference = asReference;
             StopByObjectIds();
-        }
-
-        Result ResultCache.IRecursiveResultProvider.Execute(Category category)
-        {
-            var recursionHandler = Syntax.RecursionHandler;
-            if(recursionHandler != null)
-                return recursionHandler
-                    .Execute(Context, category, Syntax, AsReference);
-
-            NotImplementedMethod(category);
-            return null;
         }
 
         Result ResultCache.IResultProvider.Execute(Category category)

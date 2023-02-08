@@ -89,7 +89,7 @@ abstract class FiberItem : DumpableObject, IFormalCodeItem
     protected virtual TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => default;
 
-    protected virtual Closures GetRefsImplementation() => Closures.Void();
+    protected virtual Closures GetRefsImplementation() => Closures.GetVoid();
 
     protected override string GetNodeDump() => base.GetNodeDump() + DumpSignature;
 

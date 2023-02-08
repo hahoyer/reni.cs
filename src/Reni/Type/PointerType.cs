@@ -122,7 +122,7 @@ sealed class PointerType
             (
                 category,
                 () => ArgumentCode.GetDePointer(ValueType.Size),
-                Closures.Argument
+                Closures.GetArgument
             );
 
     internal override Result GetConversionToStableReference(Category category)
@@ -135,6 +135,6 @@ sealed class PointerType
             (
                 category,
                 () => ArgumentCode.GetDePointer(ValueType.Size).GetAlign(),
-                Closures.Argument
+                Closures.GetArgument
             );
 }
