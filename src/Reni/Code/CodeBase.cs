@@ -12,15 +12,18 @@ namespace Reni.Code;
 abstract class CodeBase
     : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
 {
+    Closures ClosuresValue;
+    Size SizeValue;
+
     [Node]
     [DisableDump]
-    internal Size Size => GetSize().AssertNotNull();
+    internal Size Size => SizeValue ??= GetSize().AssertNotNull();
 
     [DisableDump]
     internal Size TemporarySize => GetTemporarySize();
 
     [DisableDump]
-    internal Closures Closures => GetClosures();
+    internal Closures Closures => ClosuresValue ??= GetClosures();
 
 
     [DisableDump]
