@@ -139,7 +139,7 @@ static class Extension
             var argsResult = context.GetResultAsReferenceCache(right);
             var argsType = argsResult.Type;
             if(argsType == null)
-                return argsResult.GetCategories(category);
+                return argsResult.Get(category);
 
             return feature
                 .Function

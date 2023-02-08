@@ -96,22 +96,22 @@ sealed class ResultCache : DumpableObject
     static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
 
     [DisableDump]
-    internal TypeBase Type => GetCategories(Category.Type).Type;
+    internal TypeBase Type => Get(Category.Type).Type;
 
     [DisableDump]
-    internal CodeBase Code => GetCategories(Category.Code).Code;
+    internal CodeBase Code => Get(Category.Code).Code;
 
     [DisableDump]
-    internal Closures Closures => GetCategories(Category.Closures).Closures;
+    internal Closures Closures => Get(Category.Closures).Closures;
 
     [DisableDump]
-    internal Size Size => GetCategories(Category.Size).Size;
+    internal Size Size => Get(Category.Size).Size;
 
     [DisableDump]
-    internal bool? IsHollow => GetCategories(Category.IsHollow).IsHollow;
+    internal bool? IsHollow => Get(Category.IsHollow).IsHollow;
 
     [DisableDump]
-    internal Issue[] Issues => GetCategories(Category.IsHollow).Issues;
+    internal Issue[] Issues => Get(Category.IsHollow).Issues;
 
     internal ResultCache(IResultProvider obtainResult)
         : this()
@@ -216,7 +216,7 @@ sealed class ResultCache : DumpableObject
     }
 
     public static Result operator &(ResultCache resultCache, Category category)
-        => resultCache.GetCategories(category);
+        => resultCache.Get(category);
 
     /// <summary>
     ///     Obtain the categories requested.
@@ -225,7 +225,7 @@ sealed class ResultCache : DumpableObject
     /// <param name="category"></param>
     /// <returns></returns>
     //[DebuggerHidden]
-    internal Result GetCategories(Category category)
+    internal Result Get(Category category)
     {
         var trace = ObjectId.In();
         StartMethodDump(trace, category);

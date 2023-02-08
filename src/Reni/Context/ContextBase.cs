@@ -201,7 +201,7 @@ abstract class ContextBase
 
     //[DebuggerHidden]
     internal Result GetResult(Category category, ValueSyntax syntax)
-        => GetResultCache(syntax).GetCategories(category);
+        => GetResultCache(syntax).Get(category);
 
     internal ResultCache GetResultCache(ValueSyntax syntax)
         => CacheObject.ResultCache[syntax];
