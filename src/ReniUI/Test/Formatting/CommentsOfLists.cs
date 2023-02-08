@@ -4,6 +4,7 @@ namespace ReniUI.Test.Formatting;
 
 [UnitTest]
 [Lists]
+[LowPriority]
 public class CommentsOfLists : DependenceProvider
 {
     [UnitTest]
