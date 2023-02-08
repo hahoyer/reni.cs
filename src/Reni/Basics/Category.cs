@@ -67,6 +67,9 @@ public static class CategoryExtension
         return result.Without(Category.Closures);
     }
 
+    internal static Category SmartTyped(this Category category)
+        => category == Category.All? category : category | Category.Type;
+
     internal static bool Contains(this Category container, Category content)
         => (~container & content) == Category.None;
 
