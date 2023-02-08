@@ -57,9 +57,8 @@ sealed class TypeType
 
     protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
-    internal override Result GetInstanceResult
-        (Category category, Func<Category, Result> getRightResult)
-        => RawInstanceResult(category | Category.Type, getRightResult).LocalReferenceResult;
+    internal override Result GetInstanceResult(Category category, Func<Category, Result> getRightResult)
+        => RawInstanceResult(category.SmartTyped(), getRightResult).LocalReferenceResult;
 
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
@@ -77,7 +76,7 @@ sealed class TypeType
     Result StarResult
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
-        var countResult = right.GetResult(context).AutomaticDereferenceResult;
+        var countResult = right.GetResultForAll(context).AutomaticDereferenceResult;
         var count = countResult
             .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();

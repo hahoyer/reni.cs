@@ -160,7 +160,7 @@ sealed class Root
 
     internal Container MainContainer(ValueSyntax syntax, string description)
     {
-        var rawResult = syntax.GetResult(this);
+        var rawResult = syntax.GetResultForAll(this);
 
         var result = rawResult
             .Code?

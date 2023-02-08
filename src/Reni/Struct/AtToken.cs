@@ -20,10 +20,10 @@ sealed class AtToken : InfixPrefixSyntaxToken
         return target
             .Type
             .FindRecentCompoundView
-            .AccessViaPositionExpression(category, right.GetResult(context))
+            .AccessViaPositionExpression(category, right.GetResultForAll(context))
             .ReplaceArgument(target);
     }
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax right)
-        => context.FindRecentCompoundView.AtTokenResult(category, right.GetResult(context));
+        => context.FindRecentCompoundView.AtTokenResult(category, right.GetResultForAll(context));
 }

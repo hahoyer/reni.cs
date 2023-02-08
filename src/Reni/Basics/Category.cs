@@ -48,13 +48,13 @@ public static class CategoryExtension
     public static Category Replenished(this Category category)
     {
         var result = category;
-        if(category.HasCode())
+        if(result.HasCode())
         {
             result |= Category.Size;
             result |= Category.Closures;
         }
 
-        if(category.HasSize())
+        if(result.HasSize())
             result |= Category.IsHollow;
         return result;
     }
