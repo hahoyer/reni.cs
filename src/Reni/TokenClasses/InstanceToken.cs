@@ -1,5 +1,6 @@
 using hw.DebugFormatter;
 using hw.Parser;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -10,10 +11,10 @@ namespace Reni.TokenClasses;
 [BelongsTo(typeof(MainTokenFactory))]
 sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandler
 {
-    public const string TokenId = "instance";
+    [PublicAPI]
+    internal const string TokenId = "instance";
 
-    Result IPendingProvider.GetResult
-        (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+    Result IPendingProvider.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
         if(Category.Type.Replenished().Contains(category))
             return GetResult(context, category, left, right);
@@ -39,8 +40,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandl
 
     public override string Id => TokenId;
 
-    protected override Result GetResult
-        (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
         var leftType = left.Type(context);
         (leftType != null).Assert();
