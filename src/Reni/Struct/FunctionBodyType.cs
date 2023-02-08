@@ -62,7 +62,7 @@ sealed class FunctionBodyType
         FindRecentCompoundView = compoundView;
         Syntax = syntax;
         TemplateArguments = new TemplateArguments(this);
-        StopByObjectIds(47);
+        StopByObjectIds();
     }
 
     CompoundView IChild<CompoundView>.Parent => FindRecentCompoundView;
@@ -126,7 +126,7 @@ sealed class FunctionBodyType
             BreakExecution();
 
             var result = functionType.ApplyResult(category);
-            (category == result.CompleteCategory).Assert();
+            (result.CompleteCategory .Contains(category)).Assert();
 
             return ReturnMethodDump(result);
         }
