@@ -27,7 +27,7 @@ abstract class CodeBase
 
 
     [DisableDump]
-    internal bool HasArgument => Visit(new HasArgumentVisitor());
+    internal bool HasArguments => Visit(new HasArgumentVisitor());
 
     [DisableDump]
     internal TypeBase ArgumentType => Visit(new ArgumentTypeVisitor());

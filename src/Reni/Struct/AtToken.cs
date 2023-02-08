@@ -21,7 +21,7 @@ sealed class AtToken : InfixPrefixSyntaxToken
             .Type
             .FindRecentCompoundView
             .AccessViaPositionExpression(category, right.GetResultForAll(context))
-            .ReplaceArgument(target);
+            .ReplaceArguments(target);
     }
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax right)

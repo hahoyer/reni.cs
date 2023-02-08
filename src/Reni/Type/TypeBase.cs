@@ -365,7 +365,7 @@ abstract class TypeBase
     internal virtual Result GetCopier(Category category) => GetVoidCodeAndRefs(category);
 
     internal virtual Result GetTypeOperatorApply(Result argResult)
-        => argResult.Type.GetConversion(argResult.CompleteCategory, this).ReplaceArgument(argResult);
+        => argResult.Type.GetConversion(argResult.CompleteCategory, this).ReplaceArguments(argResult);
 
     protected virtual Result GetDeAlign(Category category) => GetArgumentResult(category);
     protected virtual ResultCache GetDePointer(Category category) => GetArgumentResult(category);
@@ -704,7 +704,7 @@ abstract class TypeBase
 
     protected Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType.GetResult(category, () => DumpPrintCode)
-            .ReplaceArgument(GetDereferencesObjectResult(category));
+            .ReplaceArguments(GetDereferencesObjectResult(category));
 
     Result GetDereferencesObjectResult(Category category)
         =>
@@ -763,7 +763,7 @@ abstract class TypeBase
     {
         if(AutomaticDereferenceType == right.AutomaticDereferenceType)
             return GetIdentityOperationResult(category, isEqual)
-                .ReplaceArgument(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
+                .ReplaceArguments(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
 
         return Root.BitType.GetResult
         (
@@ -784,7 +784,7 @@ abstract class TypeBase
         var leftResult = GetObjectResult(category | Category.Type).GetConversion(Align);
         var rightResult = GetObjectResult(category | Category.Type).GetConversion(Align);
         var pair = leftResult + rightResult;
-        return result.ReplaceArgument(pair);
+        return result.ReplaceArguments(pair);
     }
 
     CodeBase GetIdentityOperationCode(bool isEqual) => Align

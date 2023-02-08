@@ -35,7 +35,7 @@ sealed class Closures : DumpableObject
     [DisableDump]
     SizeArray Sizes => SizesCache ??= CalculateSizes();
 
-    internal bool HasArgument => Contains(Closure.Instance);
+    internal bool HasArguments => Contains(Closure.Instance);
     public int Count => Data.Count;
 
     [UsedImplicitly]
@@ -183,7 +183,7 @@ sealed class Closures : DumpableObject
     internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closureBase)
     {
         (!IsRecursive).Assert();
-        var trace = ObjectId != 5245;
+        var trace = ObjectId.In(59,509);
         StartMethodDump(trace, code, closureBase);
         try
         {

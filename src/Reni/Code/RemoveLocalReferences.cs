@@ -106,7 +106,7 @@ sealed class RemoveLocalReferences : Base
             {
                 BreakExecution();
 
-                (!ReducedBody.HasArgument).Assert(ReducedBody.Dump);
+                (!ReducedBody.HasArguments).Assert(ReducedBody.Dump);
 
                 Dump(nameof(ReducedBody), ReducedBody);
                 Dump(nameof(References), References);

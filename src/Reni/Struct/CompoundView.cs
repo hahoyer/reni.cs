@@ -40,7 +40,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         {
             var innerResult = ((IConversion)Parent).Execute(category);
             var conversion = Type.Pointer.GetMutation(Parent);
-            var result = innerResult.ReplaceArgument(conversion);
+            var result = innerResult.ReplaceArguments(conversion);
             return result;
         }
 
@@ -364,7 +364,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result AtTokenResult(Category category, Result rightResult)
         => AccessViaPositionExpression(category, rightResult)
-            .ReplaceArgument(ObjectPointerViaContext);
+            .ReplaceArguments(ObjectPointerViaContext);
 
     internal Result ContextOperatorResult(Category category)
         => ContextReferenceType.GetResult(category, ContextOperatorCode);

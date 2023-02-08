@@ -144,7 +144,7 @@ static class Extension
             return feature
                 .Function
                 .GetResult(category, argsType)
-                .ReplaceArgument(argsResult);
+                .ReplaceArguments(argsResult);
         }
 
         var (result, found) = valueResult
@@ -166,7 +166,7 @@ static class Extension
             return feature
                 .Function
                 .GetResult(valueCategory, Root.VoidType)
-                .ReplaceArgument(Root.VoidType.GetResult(Category.All));
+                .ReplaceArguments(Root.VoidType.GetResult(Category.All));
 
         if(right != null && feature.Function != null)
             return null;
@@ -190,7 +190,7 @@ static class Extension
 
         return feature
             .GetResult(category, token, context, right)
-            .ReplaceArgument(left);
+            .ReplaceArguments(left);
     }
 
     internal static T DistinctNotNull<T>(this IEnumerable<T> enumerable)

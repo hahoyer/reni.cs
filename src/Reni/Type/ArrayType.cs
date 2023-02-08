@@ -247,7 +247,7 @@ sealed class ArrayType
             .GetResult
                 (category | Category.Type, () => CodeBase.GetBitsConst(indexType.Size, BitsConst.Convert(i)));
         return elementConstructorResult
-                .ReplaceArgument(resultForArg)
+                .ReplaceArguments(resultForArg)
                 .GetConversion(ElementAccessType)
                 .GetConversion(ElementType)
             & category;

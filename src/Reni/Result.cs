@@ -213,8 +213,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
     }
 
-    bool HasArg
-        => HasClosures? Closures.HasArgument : HasCode && Code.HasArgument;
+    bool HasArguments
+        => HasClosures? Closures.HasArguments : HasCode && Code.HasArguments;
 
     [DisableDump]
     internal Result Align
@@ -254,7 +254,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             var weakType = Type?.Weaken;
             return weakType == null
                 ? this
-                : (Type.GetMutation(weakType) & CompleteCategory).ReplaceArgument(this);
+                : (Type.GetMutation(weakType) & CompleteCategory).ReplaceArguments(this);
         }
     }
 
@@ -288,7 +288,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             var converter = referenceType.Converter;
             var result = converter.GetResult(CompleteCategory);
             return result
-                .ReplaceArgument(this);
+                .ReplaceArguments(this);
         }
     }
 
@@ -301,7 +301,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             HasType.Assert(() => "UnalignedResult requires type category:\n " + Dump());
             return ((AlignType)Type)
                 .UnalignedResult(CompleteCategory)
-                .ReplaceArgument(this);
+                .ReplaceArguments(this);
         }
     }
 
@@ -320,7 +320,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 return this;
             return Type
                 .GetLocalReferenceResult(CompleteCategory)
-                .ReplaceArgument(this);
+                .ReplaceArguments(this);
         }
     }
 
@@ -349,7 +349,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             return Type
                 .GetConversion(CompleteCategory, destinationType)
-                .ReplaceArgument(this);
+                .ReplaceArguments(this);
         }
     }
 
@@ -442,8 +442,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         AssertValid();
 
-        //if(Closures == null && Code != null)
-        //    Closures = Code.Closures;
+        if(false && Closures == null && Code != null)
+            Closures = Code.Closures;
 
         if(Size == null && Type != null)
             Size = Type.SmartSize;
@@ -616,23 +616,23 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    internal Result ReplaceArgument(ResultCache resultCache)
-        => HasArg? InternalReplaceArgument(resultCache) : this;
+    internal Result ReplaceArguments(ResultCache resultCache)
+        => HasArguments? InternalReplaceArguments(resultCache) : this;
 
     [PublicAPI]
-    internal Result ReplaceArgument(ResultCache.IResultProvider provider)
-        => HasArg? InternalReplaceArgument(new(provider)) : this;
+    internal Result ReplaceArguments(ResultCache.IResultProvider provider)
+        => HasArguments? InternalReplaceArguments(new(provider)) : this;
 
-    internal Result ReplaceArgument(Func<Category, Result> getArgs)
-        => HasArg? InternalReplaceArgument(new(getArgs)) : this;
+    internal Result ReplaceArguments(Func<Category, Result> getArguments)
+        => HasArguments? InternalReplaceArguments(new(getArguments)) : this;
 
-    Result InternalReplaceArgument(ResultCache getResultForArgument)
+    Result InternalReplaceArguments(ResultCache getResultForArguments)
     {
         var categoryForArgument = CompleteCategory & (Category.Code | Category.Closures);
         if(HasCode)
             categoryForArgument |= Category.Type;
 
-        var resultForArgument = getResultForArgument & categoryForArgument;
+        var resultForArgument = getResultForArguments & categoryForArgument;
         if(resultForArgument == null)
             return this;
 
@@ -748,7 +748,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result GetConversion(TypeBase target)
     {
         var conversion = Type.GetConversion(CompleteCategory, target);
-        return conversion.ReplaceArgument(this);
+        return conversion.ReplaceArguments(this);
     }
 
     internal BitsConst GetValue(IExecutionContext context)
@@ -834,7 +834,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     Result Un()
     {
         var result = ((IConversion)Type).GetResult(CompleteCategory);
-        return result.ReplaceArgument(this);
+        return result.ReplaceArguments(this);
     }
 
     internal Result GetSmartUn<T>()

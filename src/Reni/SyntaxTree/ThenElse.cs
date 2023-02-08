@@ -69,7 +69,7 @@ sealed class CondSyntax : ValueSyntax
         var commonType = CommonType(context);
         return branchResult.Type
                 .GetConversion(category | Category.Type, commonType)
-                .ReplaceArgument(branchResult)
+                .ReplaceArguments(branchResult)
             & category;
     }
 

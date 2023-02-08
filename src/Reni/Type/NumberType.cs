@@ -125,7 +125,7 @@ sealed class NumberType
         (
             ZeroResult.Value.Type.ForcedReference,
             c => ZeroResult.Value.LocalReferenceResult & c)
-        .ReplaceArgument(GetObjectResult);
+        .ReplaceArguments(GetObjectResult);
 
     Result EnableCutTokenResult(Category category)
         => EnableCut
@@ -141,7 +141,7 @@ sealed class NumberType
         var destination = enumerable.SingleOrDefault();
         if(destination != null)
             return OperationResult(category, operation, destination)
-                .ReplaceArgument(c => right.GetConversion(c, destination.Pointer));
+                .ReplaceArguments(c => right.GetConversion(c, destination.Pointer));
 
         NotImplementedMethod(category, right, operation);
         return null;
@@ -169,7 +169,7 @@ sealed class NumberType
             .GetConversion(Align);
         var rightResult = right.Pointer.GetArgumentResult(category | Category.Type).GetConversion(right.Align);
         var pair = leftResult + rightResult;
-        return result.ReplaceArgument(pair);
+        return result.ReplaceArguments(pair);
     }
 
     CodeBase OperationCode(Size resultSize, string token, TypeBase right)

@@ -17,7 +17,7 @@ sealed class Fiber : CodeBase
     internal readonly FiberItem[] FiberItems;
 
     [DisableDump]
-    internal new bool HasArgument => FiberHead.HasArgument || FiberItems.Any(x => x.HasArgument);
+    internal new bool HasArgument => FiberHead.HasArguments || FiberItems.Any(x => x.HasArgument);
 
     internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
         : this(fiberHead, null, fiberItem) { }

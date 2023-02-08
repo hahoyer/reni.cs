@@ -67,7 +67,7 @@ sealed class TypeType
         var constructorResult = Value
             .GetConstructorResult(category, getRightResult(Category.Type).Type);
         return constructorResult
-            .ReplaceArgument(getRightResult);
+            .ReplaceArguments(getRightResult);
     }
 
     new Result GetDumpPrintTokenResult(Category category)
