@@ -175,8 +175,8 @@ public class UtilDiff
         for(var j = 0; j < file2.Length; j++)
         {
             var line = file2[j];
-            if(equivalenceClasses.ContainsKey(line))
-                equivalenceClasses[line].Add(j);
+            if(equivalenceClasses.TryGetValue(line, out var @class))
+                @class.Add(j);
             else
                 equivalenceClasses.Add(line, new() { j });
         }
