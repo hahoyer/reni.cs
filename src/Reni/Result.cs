@@ -69,8 +69,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             if(IsHollow == value)
                 return;
 
-            (value != null).Assert();
-
             Set(Category.IsHollow, value);
 
             if(value == true)
@@ -89,8 +87,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         {
             if(Size == value)
                 return;
-            (value != null).Assert();
-
+            
             Set(Category.Size, value);
             IsHollow = value == Size.Zero;
 
@@ -417,8 +414,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             , getIsHollow, ToString
         );
 
-        AssertValid();
-        Replenish();
+        //AssertValid();
+        //Replenish();
         AssertValid();
         StopByObjectIds();
     }
@@ -562,7 +559,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 .Assert(() => "Code and Closures differ: " + Dump());
     }
 
-    void Add(Result other) => Add(other, CompleteCategory);
+    void Add(Result other) => Add(other, CompleteCategory & other.CompleteCategory);
 
     void Add(Result other, Category category)
     {
@@ -585,7 +582,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             if(category.HasIsHollow())
                 IsHollow = SmartIsHollow && other.SmartIsHollow;
-            else if(HasIsHollow)
+            else if(HasIsHollow && IsHollow == true)
                 IsHollow = null;
 
             if(category.HasSize())
