@@ -66,7 +66,16 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         get => IssueData.IsHollow ?? Data.IsHollow;
         set
         {
+            if(IsHollow == value)
+                return;
+
+            (value != null).Assert();
+
             Set(Category.IsHollow, value);
+
+            if(value == true)
+                Size = Size.Zero;
+            
             AssertValid();
         }
     }
@@ -78,7 +87,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         get => IssueData.Size ?? Data.Size;
         set
         {
+            if(Size == value)
+                return;
+            (value != null).Assert();
+
             Set(Category.Size, value);
+            IsHollow = value == Size.Zero;
+
             AssertValid();
         }
     }
@@ -90,7 +105,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         get => IssueData.Type ?? Data.Type;
         set
         {
+            if(Type == value)
+                return;
+            (value != null).Assert();
+
             Set(Category.Type, value);
+            Size = Type.Size;
+
             AssertValid();
         }
     }
@@ -102,6 +123,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         get => IssueData.Code ?? Data.Code;
         set
         {
+            if(Code == value)
+                return;
+            (value != null).Assert();
             Set(Category.Code, value);
             AssertValid();
         }
@@ -114,6 +138,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         get => IssueData.Closure ?? Data.Closures;
         set
         {
+            if(Closures == value)
+                return;
+            (value != null).Assert();
             Set(Category.Closures, value);
             AssertValid();
         }
@@ -391,6 +418,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         );
 
         AssertValid();
+        Replenish();
+        AssertValid();
         StopByObjectIds();
     }
 
@@ -418,6 +447,20 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(result == "")
             return "";
         return result.Substring(1);
+    }
+
+    void Replenish()
+    {
+        if(Closures == null && Code != null)
+            Closures = Code.Closures;
+
+        if(Size == null && Type != null)
+            Size = Type.SmartSize;
+        if(Size == null && Code != null)
+            Size = Code.Size;
+
+        if(IsHollow == null && Size != null)
+            IsHollow = Size.IsZero;
     }
 
     void Set(Category category, object value)
