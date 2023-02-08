@@ -31,7 +31,7 @@ namespace Reni.Code
         internal CodeBase AlignedValueCode => ValueCode.GetAlign();
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        protected override Closures GetRefsImplementation() => ValueCode.Closures;
+        protected override Closures GetClosures() => ValueCode.Closures;
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.LocalReference(this);

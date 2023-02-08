@@ -67,7 +67,7 @@ sealed class List : FiberHead
         => Data
             .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
 
-    protected override Closures GetRefsImplementation() => GetClosures(Data);
+    protected override Closures GetClosures() => GetClosures(Data);
     internal override void Visit(IVisitor visitor) => visitor.List(Data);
 
     internal static CodeBase Create(params CodeBase[] data)

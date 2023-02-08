@@ -56,7 +56,7 @@ sealed class Fiber : CodeBase
 
     protected override Size GetSize() => FiberItems.Last().OutputSize;
 
-    protected override Closures GetRefsImplementation()
+    protected override Closures GetClosures()
         => FiberItems
             .Aggregate
                 (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));

@@ -18,7 +18,7 @@ abstract class Visitor<TCode, TFiber> : DumpableObject
         return default;
     }
 
-    internal virtual TCode ContextRef(ReferenceCode visitedObject)
+    internal virtual TCode ContextReference(ReferenceCode visitedObject)
     {
         NotImplementedMethod(visitedObject);
         return default;

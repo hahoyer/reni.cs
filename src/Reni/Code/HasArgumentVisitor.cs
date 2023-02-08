@@ -4,7 +4,7 @@ sealed class HasArgumentVisitor : Visitor<bool, bool>
 {
     internal override bool Argument(Argument visitedObject) => true;
     internal override bool BitArray(BitArray visitedObject) => false;
-    internal override bool ContextRef(ReferenceCode visitedObject) => false;
+    internal override bool ContextReference(ReferenceCode visitedObject) => false;
     internal override bool Fiber(Fiber visitedObject) => visitedObject.HasArgument;
 
     internal override bool List(List visitedObject)

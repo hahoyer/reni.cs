@@ -20,7 +20,7 @@ abstract class CodeBase
     internal Size TemporarySize => GetTemporarySize();
 
     [DisableDump]
-    internal Closures Closures => GetRefsImplementation();
+    internal Closures Closures => GetClosures();
 
 
     [DisableDump]
@@ -61,7 +61,7 @@ abstract class CodeBase
 
     protected virtual Size GetTemporarySize() => Size;
 
-    protected virtual Closures GetRefsImplementation() => Closures.GetVoid();
+    protected virtual Closures GetClosures() => Closures.GetVoid();
 
     protected virtual IEnumerable<CodeBase> ToList() => new[] { this };
 
@@ -167,7 +167,7 @@ abstract class CodeBase
     internal CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement)
         where TContext : IContextReference
     {
-        var result = Visit(new ReplaceRelativeContextRef<TContext>(context, replacement));
+        var result = Visit(new ReplaceRelativeContextReference<TContext>(context, replacement));
         if(result != null)
             return result;
         return this;
@@ -184,7 +184,7 @@ abstract class CodeBase
     internal CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement)
         where TContext : IContextReference
     {
-        var result = Visit(new ReplaceAbsoluteContextRef<TContext>(context, replacement));
+        var result = Visit(new ReplaceAbsoluteContextReference<TContext>(context, replacement));
         if(result != null)
             return result;
         return this;

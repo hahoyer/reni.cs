@@ -6,7 +6,7 @@ namespace Reni.Code
     {
         internal override TypeBase Argument(Argument visitedObject) => visitedObject.Type;
         internal override TypeBase BitArray(BitArray visitedObject) => null;
-        internal override TypeBase ContextRef(ReferenceCode visitedObject) => null;
+        internal override TypeBase ContextReference(ReferenceCode visitedObject) => null;
 
         internal override TypeBase Fiber(Fiber visitedObject)
             => visitedObject.Visit(this);

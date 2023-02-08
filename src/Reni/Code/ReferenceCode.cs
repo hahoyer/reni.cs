@@ -20,12 +20,12 @@ namespace Reni.Code
             StopByObjectIds();
         }
 
-        protected override Closures GetRefsImplementation() => Closures.Create(Target);
+        protected override Closures GetClosures() => Closures.Create(Target);
 
         protected override Size GetSize() => Target.Size();
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
-            => actual.ContextRef(this);
+            => actual.ContextReference(this);
 
         internal override void Visit(IVisitor visitor) => throw new UnexpectedContextReference(Target);
 
