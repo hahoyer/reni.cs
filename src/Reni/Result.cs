@@ -413,7 +413,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         : base(NextObjectId++)
     {
         IssueData = new() { Category = category, Issues = issues };
-        Data = new
+        Data = ResultExtension.CreateInstance
         (
             issues?.Any() == true? Category.None : category
             , getType
