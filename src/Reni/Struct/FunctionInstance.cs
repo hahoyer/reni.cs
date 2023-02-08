@@ -32,7 +32,7 @@ abstract class FunctionInstance
     internal CodeBase AlignedBodyCode => BodyCode?.GetAlign();
 
     [DisableDump]
-    Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
+    Size ArgsPartSize => Parent.ArgumentsType.Size + RelevantValueSize;
 
     string Description => Body.Anchor.SourceParts.Combine().Id ?? "";
 
@@ -167,7 +167,7 @@ abstract class FunctionInstance
 
     Result ReplaceArgsReference(Result result)
     {
-        var reference = Parent.ArgsType as IContextReference;
+        var reference = Parent.ArgumentsType as IContextReference;
         if(reference == null)
             return result;
 
@@ -194,7 +194,7 @@ abstract class FunctionInstance
             var result = visitResult
                 .ReplaceRefsForFunctionBody(foreignRefsRef)
                 .Code;
-            if(Parent.ArgsType.IsHollow)
+            if(Parent.ArgumentsType.IsHollow)
                 return result.TryReplacePrimitiveRecursivity(FunctionId);
             return result;
         }

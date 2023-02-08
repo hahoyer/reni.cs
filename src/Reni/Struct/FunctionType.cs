@@ -14,7 +14,7 @@ namespace Reni.Struct;
 sealed class FunctionType : SetterTargetType
 {
     [Node]
-    internal readonly TypeBase ArgsType;
+    internal readonly TypeBase ArgumentsType;
 
     [DisableDump]
     internal readonly FunctionSyntax Body;
@@ -34,6 +34,8 @@ sealed class FunctionType : SetterTargetType
     [Node]
     [EnableDump]
     readonly CompoundView CompoundView;
+
+    Closures ClosureValue;
 
     IEnumerable<string> InternalDeclarationOptions
     {
@@ -76,14 +78,14 @@ sealed class FunctionType : SetterTargetType
     }
 
     internal FunctionType
-        (int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)
+        (int index, FunctionSyntax body, CompoundView compoundView, TypeBase argumentsType)
     {
         Getter = new(this, index, body.Getter);
         Setter = body.Setter == null? null : new SetterFunction(this, index, body.Setter);
         Index = index;
         Body = body;
         CompoundView = compoundView;
-        ArgsType = argsType;
+        ArgumentsType = argumentsType;
         StopByObjectIds();
     }
 
@@ -93,7 +95,7 @@ sealed class FunctionType : SetterTargetType
     internal override TypeBase ValueType => Getter.ReturnType;
 
     [DisableDump]
-    internal override bool IsHollow => Closures.IsNone && ArgsType.IsHollow;
+    internal override bool IsHollow => Closures.IsNone && ArgumentsType.IsHollow;
 
     [DisableDump]
     internal override CompoundView FindRecentCompoundView => CompoundView;
@@ -116,7 +118,7 @@ sealed class FunctionType : SetterTargetType
         {
             var valueType = ValueType;
             var result = "@(";
-            result += ArgsType.DumpPrintText;
+            result += ArgumentsType.DumpPrintText;
             result += ")=>";
             result += valueType?.DumpPrintText ?? "<unknown>";
             return result;
@@ -126,17 +128,17 @@ sealed class FunctionType : SetterTargetType
     protected override Result SetterResult(Category category) => Setter.GetCallResult(category);
 
     protected override Result GetterResult(Category category) => Getter.GetCallResult(category);
-    protected override Size GetSize() => ArgsType.Size + Closures.Size;
+    protected override Size GetSize() => ArgumentsType.Size + Closures.Size;
 
     internal ContextBase CreateSubContext(bool useValue)
-        => new Context.Function(CompoundView.Context, ArgsType, useValue? ValueType : null);
+        => new Context.Function(CompoundView.Context, ArgumentsType, useValue? ValueType : null);
 
     public string DumpFunction()
     {
         var result = "\n";
         result += "index=" + Index;
         result += "\n";
-        result += "argsType=" + ArgsType.Dump();
+        result += "argsType=" + ArgumentsType.Dump();
         result += "\n";
         result += "context=" + CompoundView.Dump();
         result += "\n";
@@ -165,10 +167,10 @@ sealed class FunctionType : SetterTargetType
             var result = GetResult
             (
                 category,
-                () => Closures.ToCode() + ArgsType.ArgumentCode,
+                () => Closures.ToCode() + ArgumentsType.ArgumentCode,
                 () => Closures + Closures.Argument()
             );
-            (category == result.CompleteCategory).Assert();
+            (result.CompleteCategory.Contains(category)).Assert();
             return ReturnMethodDump(result);
         }
         finally
@@ -183,9 +185,17 @@ sealed class FunctionType : SetterTargetType
         (result != null).Assert();
         if(Setter != null)
             result += Setter.Closures;
-        var argsExt = ArgsType as IContextReference;
-        if(argsExt != null)
-            (!result.Contains(argsExt)).Assert();
+        if(ArgumentsType is IContextReference arguments)
+            (!result.Contains(arguments)).Assert();
+        //CheckClosureValue(result);
         return result;
+    }
+
+    void CheckClosureValue(Closures result)
+    {
+        if(ClosureValue == null)
+            ClosureValue = result;
+        else
+            (ClosureValue == result).Assert();
     }
 }
