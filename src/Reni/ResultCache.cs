@@ -159,17 +159,17 @@ sealed class ResultCache : DumpableObject
     void Update(Category category)
     {
         var availableCategory = category.Without(Data.PendingCategory);
-        var pendingCategory = category & Data.PendingCategory;
 
         SimpleUpdate(availableCategory.Without(Data.CompleteCategory));
         // Watch out! Data.CompleteCategory may have changed by SimpleUpdate
-        SmartUpdate(availableCategory.Without(Data.CompleteCategory) | pendingCategory, pendingCategory == Category.None);
+
+        LinearUpdate(availableCategory.Without(Data.CompleteCategory));
+        RecursiveUpdate(category & Data.PendingCategory);
     }
 
     /// <summary>
     ///     Try to update simple cases that provider independent.
-    ///     For instance <see cref="IsHollow" /> may be obvious since it is a function.
-    ///     This is essential to avoid recursion.
+    ///     For instance <see cref="IsHollow" /> may be obvious if size has been obtained already.
     /// </summary>
     /// <param name="category"></param>
     void SimpleUpdate(Category category)
@@ -186,24 +186,22 @@ sealed class ResultCache : DumpableObject
 
     /// <summary>
     ///     Update anything that is hasn't been obtained yet.
+    /// Pending categories are not treated here
     ///     Since it may cause recursion, pending categories are temporarily extended during call.
-    ///     It executes in two variants: linear or recursive mode.
     /// </summary>
     /// <param name="category"></param>
-    /// <param name="isLinear"></param>
-    void SmartUpdate(Category category, bool isLinear)
+    void LinearUpdate(Category category)
     {
         if(category == Category.None)
             return;
+
         var oldPendingCategory = Data.PendingCategory;
         Data.HasIssue.ConditionalBreak();
         Data.PendingCategory |= category;
 
         try
         {
-            var result = isLinear
-                ? Provider.Execute(category)
-                : ((IRecursiveResultProvider)Provider).Execute(category);
+            var result = Provider.Execute(category);
 
             (result != null).Assert(() => Tracer.Dump(Provider));
             result.IsValidOrIssue(category).Assert();
@@ -215,12 +213,29 @@ sealed class ResultCache : DumpableObject
         }
     }
 
+    /// <summary>
+    ///     Try to update categories that are already pending.
+    ///     It uses recursion handlers that must not be recursive.
+    /// </summary>
+    /// <param name="category"></param>
+    void RecursiveUpdate(Category category)
+    {
+        if(category == Category.None)
+            return;
+
+        var result = ((IRecursiveResultProvider)Provider).Execute(category);
+
+        (result != null).Assert(() => Tracer.Dump(Provider));
+        result.IsValidOrIssue(category).Assert();
+        Data.Update(result);
+    }
+
     public static Result operator &(ResultCache resultCache, Category category)
         => resultCache.Get(category);
 
     /// <summary>
     ///     Obtain the categories requested.
-    ///     This will try to obtain categories that are not yet obtained.
+    ///     This will also try to obtain categories that are not yet obtained.
     /// </summary>
     /// <param name="category"></param>
     /// <returns></returns>
@@ -245,7 +260,7 @@ sealed class ResultCache : DumpableObject
 
     /// <summary>
     ///     Obtain the categories requested.
-    /// Internal function that collects some information for debugging purposes
+    ///     Internal function that collects some information for debugging purposes
     /// </summary>
     /// <param name="category"></param>
     /// <returns></returns>
