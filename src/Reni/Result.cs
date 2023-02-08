@@ -121,9 +121,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     internal bool? FindIsHollow => HasIsHollow? Data.IsHollow : FindSize?.IsZero;
 
-    [PublicAPI]
-    bool? QuickFindIsHollow => HasIsHollow? Data.IsHollow : QuickFindSize?.IsZero;
-
     bool SmartIsHollow
     {
         get
@@ -144,36 +141,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         => HasSize? Size :
             HasCode? Code.Size :
             HasType? Type.Size : null;
-
-    Size QuickFindSize
-    {
-        get
-        {
-            if(HasSize)
-                return Size;
-            if(HasCode)
-                return Code.Size;
-            if(HasType && Type.HasQuickSize)
-                return Type.Size;
-            return null;
-        }
-    }
-
-    [PublicAPI]
-    internal Size SmartSize
-    {
-        get
-        {
-            var result = FindSize;
-            if(result == null)
-            {
-                DumpMethodWithBreak("No appropriate result property defined");
-                Debugger.Break();
-            }
-
-            return result;
-        }
-    }
 
     internal Closures FindClosures
         => HasClosures? Closures :
