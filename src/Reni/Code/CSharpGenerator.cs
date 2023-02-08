@@ -124,20 +124,20 @@ sealed class CSharpGenerator : DumpableObject, IVisitor
     void IVisitor.TopData(Size offset, Size size, Size dataSize)
         => AddCode
         (
-            $"data.Push(data.Get({dataSize.ByteCount}, {offset.SaveByteCount}){BitCast(size, dataSize)})"
+            $"data.Push(data.Get({dataSize.ByteCount}, offset:{offset.SaveByteCount}){BitCast(size, dataSize)})"
         );
 
     void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         => AddCode
         (
-            $"data.Push(frame.Get({dataSize.ByteCount}, {offset.SaveByteCount}){BitCast(size, dataSize)})"
+            $"data.Push(frame.Get({dataSize.ByteCount}, offset:{offset.SaveByteCount}){BitCast(size, dataSize)})"
         );
 
     void IVisitor.TopFrameRef(Size offset)
-        => AddCode($"data.Push(frame.Pointer({offset.SaveByteCount}))");
+        => AddCode($"data.Push(frame.Pointer(offset:{offset.SaveByteCount}))");
 
     void IVisitor.TopRef(Size offset)
-        => AddCode($"data.Push(data.Pointer({offset.SaveByteCount}))");
+        => AddCode($"data.Push(data.Pointer(offset:{offset.SaveByteCount}))");
 
     [StringFormatMethod("pattern")]
     void AddCode(string pattern, params object[] data)
