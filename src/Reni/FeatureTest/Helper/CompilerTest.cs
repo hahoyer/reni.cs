@@ -128,13 +128,12 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
 
             if(outStream.Data != targetSet.Output)
             {
-                ("---------------------\n" + outStream.Data + "\n---------------------").Log
-                    ();
+                ("---------------------\n" + outStream.Data + "\n---------------------").Log();
                 Tracer.ThrowAssertionFailed
                 (
                     "outStream.Data != targetSet.Output",
-                    () =>
-                        "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);
+                    () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output
+                );
             }
 
             foreach(var issue in compiler.Issues)
@@ -146,8 +145,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
             }
             catch(Exception)
             {
-                ("---------------------\n" + compiler.Issues + "\n---------------------").Log
-                    ();
+                ("---------------------\n" + compiler.Issues + "\n---------------------").Log();
                 throw;
             }
 
