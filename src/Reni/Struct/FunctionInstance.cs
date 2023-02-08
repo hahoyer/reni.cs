@@ -11,7 +11,9 @@ using Reni.Validation;
 namespace Reni.Struct;
 
 abstract class FunctionInstance
-    : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer
+    : DumpableObject
+        , ResultCache.IResultProvider
+        , ValueCache.IContainer
 {
     [DisableDump]
     protected readonly FunctionType Parent;
@@ -147,8 +149,7 @@ abstract class FunctionInstance
             var argReferenceReplaced = ReplaceArgsReference(postProcessedResult);
 
             var result = argReferenceReplaced
-                .ReplaceAbsolute
-                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, Closures.GetVoid)
+                .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, Closures.GetVoid)
                 .Weaken;
 
             return ReturnMethodDump(result);
@@ -167,7 +168,11 @@ abstract class FunctionInstance
 
         return result
             .ReplaceAbsolute
-                (reference, () => CodeBase.GetFrameRef().GetDePointer(reference.Size()), Closures.GetVoid);
+            (
+                reference
+                , () => CodeBase.GetFrameRef().GetDePointer(reference.Size())
+                , Closures.GetVoid
+            );
     }
 
     CodeBase CreateContextRefCode()
