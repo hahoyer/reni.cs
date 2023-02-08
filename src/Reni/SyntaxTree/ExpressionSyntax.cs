@@ -81,7 +81,7 @@ sealed class ExpressionSyntax : ValueSyntax
             if(Left == null)
             {
                 var (prefixResult, declaration) = context.GetPrefixResult(category, Definable, Token, Right);
-                (Definable.Id == "repeat").ConditionalBreak();
+                //(Definable.Id == "repeat").ConditionalBreak();
                 Semantics.Declaration[context] = declaration;
                 return prefixResult;
             }

@@ -58,7 +58,7 @@ sealed class TypeType
     protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
     internal override Result GetInstanceResult(Category category, Func<Category, Result> getRightResult)
-        => RawInstanceResult(category.SmartTyped(), getRightResult).LocalReferenceResult;
+        => RawInstanceResult(category | Category.Type, getRightResult).LocalReferenceResult;
 
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
