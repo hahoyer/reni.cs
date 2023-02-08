@@ -72,7 +72,7 @@ sealed class Closures : DumpableObject
 
     public override string DumpData()
     {
-        var result = IsRecursive? "recursive/":"";
+        var result = IsRecursive? "recursive/" : "";
         for(var i = 0; i < Count; i++)
         {
             if(i > 0)
@@ -125,17 +125,17 @@ sealed class Closures : DumpableObject
         return new(r);
     }
 
-    IContextReference[] ObtainSortedData() 
+    IContextReference[] ObtainSortedData()
         => Data
-        .OrderBy(codeArg => codeArg.Order)
-        .ToArray();
+            .OrderBy(codeArg => codeArg.Order)
+            .ToArray();
 
     public Closures WithoutArgument() => Without(Closure.Instance);
 
-    Closures Without(Closures other) 
+    Closures Without(Closures other)
         => other
-        .Data
-        .Aggregate(this, (current, refInCode) => current.Without(refInCode));
+            .Data
+            .Aggregate(this, (current, refInCode) => current.Without(refInCode));
 
     public bool Contains(IContextReference context) => Data.Contains(context);
 
@@ -176,27 +176,26 @@ sealed class Closures : DumpableObject
         return true;
     }
 
-    internal CodeBase ToCode() 
+    internal CodeBase ToCode()
         => Data
-        .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
+            .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
 
-    internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closure)
+    internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closureBase)
     {
         (!IsRecursive).Assert();
-        var trace = ObjectId == -1;
-        StartMethodDump(trace, code, closure);
+        var trace = ObjectId != 5245;
+        StartMethodDump(trace, code, closureBase);
         try
         {
             var size = Root.DefaultRefAlignParam.RefSize;
-            var reference = closure.GetReferenceWithOffset(size * Data.Count);
+            var closurePosition = closureBase.GetReferenceWithOffset(size * Data.Count);
             var result = code;
-            foreach(var referenceInCode in Data)
+            foreach(var closure in Data)
             {
-                Dump("reference", reference);
+                Dump("closurePosition", closurePosition);
                 BreakExecution();
-                reference = reference.GetReferenceWithOffset(size * -1);
-                result = result.ReplaceAbsolute
-                    (referenceInCode, () => reference.GetDePointer(size));
+                closurePosition = closurePosition.GetReferenceWithOffset(size * -1);
+                result = result.ReplaceAbsolute(closure, () => closurePosition.GetDePointer(size));
                 Dump("result", result);
             }
 
