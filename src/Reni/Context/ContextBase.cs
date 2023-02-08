@@ -19,7 +19,10 @@ namespace Reni.Context;
 abstract class ContextBase
     : DumpableObject, ResultCache.IResultProvider, IIconKeyProvider, ValueCache.IContainer, IRootProvider
 {
-    internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider, ResultCache.IRecursiveResultProvider
+    internal sealed class ResultProvider
+        : DumpableObject
+            , ResultCache.IResultProvider
+            , ResultCache.IRecursiveResultProvider
     {
         static int NextObjectId;
 
@@ -35,8 +38,7 @@ abstract class ContextBase
         [EnableDump]
         int SyntaxObjectId => Syntax.ObjectId;
 
-        internal ResultProvider
-            (ContextBase context, ValueSyntax syntax, bool asReference = false)
+        internal ResultProvider(ContextBase context, ValueSyntax syntax, bool asReference = false)
             : base(NextObjectId++)
         {
             Context = context;
@@ -44,11 +46,6 @@ abstract class ContextBase
             AsReference = asReference;
             StopByObjectIds();
         }
-
-        Result ResultCache.IResultProvider.Execute(Category category)
-            => AsReference
-                ? Context.GetResultAsReference(category, Syntax)
-                : Context.GetResultForCache(category, Syntax);
 
         Result ResultCache.IRecursiveResultProvider.Execute(Category category)
         {
@@ -60,6 +57,11 @@ abstract class ContextBase
             NotImplementedMethod(category);
             return null;
         }
+
+        Result ResultCache.IResultProvider.Execute(Category category)
+            => AsReference
+                ? Context.GetResultAsReference(category, Syntax)
+                : Context.GetResultForCache(category, Syntax);
     }
 
     internal sealed class Cache : DumpableObject, IIconKeyProvider
@@ -126,6 +128,10 @@ abstract class ContextBase
 
     string IIconKeyProvider.IconKey => "Context";
 
+
+    Result ResultCache.IResultProvider.Execute(Category category)
+        => FindRecentCompoundView.ObjectPointerViaContext(category);
+
     Root IRootProvider.Value => RootContext;
 
     [DisableDump]
@@ -181,10 +187,6 @@ abstract class ContextBase
         => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
 
-    Result ResultCache.IResultProvider.Execute(Category category) 
-        => FindRecentCompoundView.ObjectPointerViaContext(category);
-
-
     [UsedImplicitly]
     internal int GetPacketCount(Size size)
         => size.GetPacketCount(Root.DefaultRefAlignParam.AlignBits);
@@ -199,7 +201,7 @@ abstract class ContextBase
 
     //[DebuggerHidden]
     internal Result GetResult(Category category, ValueSyntax syntax)
-        => GetResultCache(syntax).GetCategories(category);
+        => GetResultCache(syntax).Get(category);
 
     internal ResultCache GetResultCache(ValueSyntax syntax)
         => CacheObject.ResultCache[syntax];
