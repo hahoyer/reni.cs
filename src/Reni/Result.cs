@@ -330,7 +330,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         private set
         {
             IssueData.Issues = value
-                .Distinct(Extension.Comparer<Issue>((x, y) => x==y))
+                .Distinct(Extension.Comparer<Issue>((x, y) => x == y))
                 .ToArray();
             IssueData.AssertValid();
         }
@@ -442,7 +442,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         AssertValid();
 
-        if(false && Closures == null && Code != null)
+        if(Closures == null && Code != null)
             Closures = Code.Closures;
 
         if(Size == null && Type != null)
@@ -470,7 +470,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         Issues = T(Issues, result.Issues).ConcatMany().ToArray();
         if(HasIssue)
         {
-            IssueData.Set(CompleteCategory|result.CompleteCategory);
+            IssueData.Set(CompleteCategory | result.CompleteCategory);
             Data.Reset(Category.All);
         }
         else
@@ -489,7 +489,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             if(result.HasClosures)
                 Data.Closures = result.Closures;
-        }
+            }
 
         AssertValid();
     }

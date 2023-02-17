@@ -50,11 +50,6 @@ sealed class FunctionType : SetterTargetType
         }
     }
 
-
-    [Node]
-    [DisableDump]
-    internal Closures Closures => GetClosures();
-
     [DisableDump]
     internal FunctionContainer Container
     {
@@ -77,6 +72,8 @@ sealed class FunctionType : SetterTargetType
         }
     }
 
+    Closures GetterClosures => Getter.Closures;//CheckClosureValue(Getter.Closures);
+
     internal FunctionType
         (int index, FunctionSyntax body, CompoundView compoundView, TypeBase argumentsType)
     {
@@ -95,7 +92,7 @@ sealed class FunctionType : SetterTargetType
     internal override TypeBase ValueType => Getter.ReturnType;
 
     [DisableDump]
-    internal override bool IsHollow => Closures.IsNone && ArgumentsType.IsHollow;
+    internal override bool IsHollow => GetterClosures.IsNone && ArgumentsType.IsHollow;
 
     [DisableDump]
     internal override CompoundView FindRecentCompoundView => CompoundView;
@@ -125,10 +122,10 @@ sealed class FunctionType : SetterTargetType
         }
     }
 
-    protected override Result SetterResult(Category category) => Setter.GetCallResult(category);
+    protected override Result GetSetterResult(Category category) => Setter.GetCallResult(category);
 
-    protected override Result GetterResult(Category category) => Getter.GetCallResult(category);
-    protected override Size GetSize() => ArgumentsType.Size + Closures.Size;
+    protected override Result GetGetterResult(Category category) => Getter.GetCallResult(category);
+    protected override Size GetSize() => ArgumentsType.Size + GetterClosures.Size;
 
     internal ContextBase CreateSubContext(bool useValue)
         => new Context.Function(CompoundView.Context, ArgumentsType, useValue? ValueType : null);
@@ -167,10 +164,10 @@ sealed class FunctionType : SetterTargetType
             var result = GetResult
             (
                 category,
-                () => Closures.GetCode() + ArgumentsType.ArgumentCode,
-                () => Closures + Closures.GetArgument()
+                () => GetterClosures.GetCode() + ArgumentsType.ArgumentCode,
+                () => GetterClosures + Closures.GetArgument()
             );
-            (result.CompleteCategory.Contains(category)).Assert();
+            result.CompleteCategory.Contains(category).Assert();
             return ReturnMethodDump(result);
         }
         finally
@@ -179,23 +176,22 @@ sealed class FunctionType : SetterTargetType
         }
     }
 
-    Closures GetClosures()
+    Closures CheckClosureValue(Closures result)
     {
-        var result = Getter.Closures;
+        //return result;
+        if(ObjectId == -25)
+            $"{NodeDump}: {result.LogDump()}".Log();
+        
         (result != null).Assert();
-        if(Setter != null)
-            result += Setter.Closures;
+
         if(ArgumentsType is IContextReference arguments)
             (!result.Contains(arguments)).Assert();
-        //CheckClosureValue(result);
-        return result;
-    }
 
-    void CheckClosureValue(Closures result)
-    {
         if(ClosureValue == null)
             ClosureValue = result;
         else
             (ClosureValue == result).Assert();
+
+        return result;
     }
 }

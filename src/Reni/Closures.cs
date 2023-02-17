@@ -11,7 +11,7 @@ namespace Reni;
 /// <summary>
 ///     Contains list of references to compiler environments.
 /// </summary>
-sealed class Closures : DumpableObject
+sealed class Closures : DumpableObject, IEquatable<Closures>
 {
     sealed class Closure : Singleton<Closure>, IContextReference
     {
@@ -50,7 +50,7 @@ sealed class Closures : DumpableObject
     {
         IsRecursive = isRecursive;
         SortedDataCache = new(ObtainSortedData);
-        StopByObjectIds(-10);
+        StopByObjectIds(-497, -509);
     }
 
     Closures(IContextReference context)
@@ -94,10 +94,15 @@ sealed class Closures : DumpableObject
             Add(e);
     }
 
-    void Add(IContextReference e)
+    void Add(IContextReference newItem)
     {
-        if(!Data.Contains(e))
-            Data.Add(e);
+        var index = 0;
+        for(; index < Data.Count && Data[index].Order < newItem.Order; index++)
+            if(Data[index] == newItem)
+                return;
+
+        (index == Data.Count || Data[index].Order > newItem.Order).Assert();
+        Data.Insert(index, newItem);
     }
 
 
@@ -183,7 +188,7 @@ sealed class Closures : DumpableObject
     internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closureBase)
     {
         (!IsRecursive).Assert();
-        var trace = ObjectId.In(59,509);
+        var trace = ObjectId.In(-59, -509);
         StartMethodDump(trace, code, closureBase);
         try
         {
@@ -210,4 +215,14 @@ sealed class Closures : DumpableObject
     public static Closures operator +(Closures x, Closures y) => x.Sequence(y);
     public static Closures operator -(Closures x, Closures y) => x.Without(y);
     public static Closures operator -(Closures x, IContextReference y) => x.Without(y);
+
+    public bool Equals(Closures other) 
+        => other!= null && Data.SequenceEqual(other.Data);
+
+    public override bool Equals(object obj) 
+        => ReferenceEquals(this, obj) || (obj is Closures other && Equals(other));
+
+    public override int GetHashCode() => Data.Sum(item=>item.Order);
+    public static bool operator ==(Closures left, Closures right) => Equals(left, right);
+    public static bool operator !=(Closures left, Closures right) => !Equals(left, right);
 }

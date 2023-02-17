@@ -17,7 +17,7 @@ abstract class SetterTargetType
     int IContextReference.Order => Order;
 
     Result IConversion.Execute(Category category)
-        => GetterResult(category).ConvertToConverter(this);
+        => GetGetterResult(category).ConvertToConverter(this);
 
     TypeBase IConversion.Source => this;
 
@@ -28,7 +28,7 @@ abstract class SetterTargetType
     IImplementation ISymbolProvider<ReassignToken>.GetFeature(ReassignToken tokenClass)
         => IsMutable? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
-    Result IValue.Execute(Category category) => GetterResult(category);
+    Result IValue.Execute(Category category) => GetGetterResult(category);
 
     [EnableDumpExcept(false)]
     protected abstract bool IsMutable { get; }
@@ -36,8 +36,8 @@ abstract class SetterTargetType
     [DisableDump]
     internal abstract TypeBase ValueType { get; }
 
-    protected abstract Result SetterResult(Category category);
-    protected abstract Result GetterResult(Category category);
+    protected abstract Result GetSetterResult(Category category);
+    protected abstract Result GetGetterResult(Category category);
 
     internal virtual Result DestinationResult(Category category) => GetArgumentResult(category);
 
@@ -64,7 +64,7 @@ abstract class SetterTargetType
     [DisableDump]
     protected override IEnumerable<IConversion> StripConversions
     {
-        get { yield return Feature.Extension.Conversion(GetterResult); }
+        get { yield return Feature.Extension.Conversion(GetGetterResult); }
     }
 
     Result ReassignResult(Category category, TypeBase right)
@@ -90,7 +90,7 @@ abstract class SetterTargetType
             var resultForArg = destinationResult + sourceResult;
             Dump("resultForArg", resultForArg);
 
-            var result = SetterResult(category);
+            var result = GetSetterResult(category);
             Dump("result", result);
             BreakExecution();
 
