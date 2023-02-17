@@ -22,7 +22,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     public static int NextOrder;
     static int NextId;
 
-    internal readonly bool IsRecursive;
+    readonly bool IsRecursive;
 
     [SmartNode]
     [DisableDump]
@@ -45,7 +45,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     public bool IsNone => Count == 0;
     IContextReference[] SortedData => SortedDataCache.Value;
 
-    Closures(bool isRecursive)
+    Closures(bool isRecursive = false)
         : base(NextId++)
     {
         IsRecursive = isRecursive;
@@ -54,18 +54,18 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     }
 
     Closures(IContextReference context)
-        : this(false)
+        : this()
         => Add(context);
 
     Closures(IEnumerable<IContextReference> a, IEnumerable<IContextReference> b)
-        : this(false)
+        : this()
     {
         AddRange(a);
         AddRange(b);
     }
 
     Closures(IEnumerable<IContextReference> a)
-        : this(false)
+        : this()
         => AddRange(a);
 
     public bool Equals(Closures other)
@@ -92,7 +92,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     public override int GetHashCode() => Data.Sum(item => item.Order);
 
     internal static Closures GetRecursivity() => new(true);
-    internal static Closures GetVoid() => new(false);
+    internal static Closures GetVoid() => new();
     internal static Closures GetArgument() => new(Closure.Instance);
 
 
