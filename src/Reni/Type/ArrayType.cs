@@ -201,7 +201,7 @@ sealed class ArrayType
             return null;
 
         if(argumentsType == Root.VoidType)
-            return GetResult(category, () => CodeBase.GetBitsConst(Size, BitsConst.Convert(0)));
+            return GetResult(category, () => BitsConst.Convert(0).GetCode(Size));
 
         if(argumentsType is IFunction function)
             return ConstructorResult(category, function);
@@ -245,7 +245,7 @@ sealed class ArrayType
     {
         var resultForArg = indexType
             .GetResult
-                (category | Category.Type, () => CodeBase.GetBitsConst(indexType.Size, BitsConst.Convert(i)));
+                (category | Category.Type, () => BitsConst.Convert(i).GetCode(indexType.Size));
         return elementConstructorResult
                 .ReplaceArguments(resultForArg)
                 .GetConversion(ElementAccessType)
@@ -282,8 +282,8 @@ sealed class ArrayType
     {
         var result = Root.ConcatPrintResult(category, Count, DumpPrintResult);
         if(category.HasCode())
-            result.Code = CodeBase.GetDumpPrintText
-                    ("<<" + (OptionsValue.IsMutable.Value? ":=" : ""))
+            result.Code = ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")).GetDumpPrintTextCode
+                    ()
                 + result.Code;
         return result;
     }
@@ -316,7 +316,7 @@ sealed class ArrayType
     {
         (right == null).Assert();
         return IndexType.GetResult
-            (category, () => CodeBase.GetBitsConst(IndexSize, BitsConst.Convert(Count)));
+            (category, () => BitsConst.Convert(Count).GetCode(IndexSize));
     }
 
     IConversion ForcedConversion(ArrayReferenceType destination)

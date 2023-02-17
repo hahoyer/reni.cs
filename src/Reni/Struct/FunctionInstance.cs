@@ -118,7 +118,7 @@ abstract class FunctionInstance
         if(IsStopByObjectIdActive)
             return null;
 
-        var trace = FunctionId.Index.In() && category.HasClosures() && category.HasCode();
+        var trace = FunctionId.Index.In(1) && category.HasCode();
         StartMethodDump(trace, category);
         try
         {

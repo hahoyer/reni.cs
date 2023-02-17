@@ -118,7 +118,7 @@ sealed class Root
         try
         {
             if(category.HasCode())
-                result.Code = CodeBase.GetDumpPrintText("(");
+                result.Code = "(".GetDumpPrintTextCode();
 
             for(var i = 0; i < count; i++)
             {
@@ -133,7 +133,7 @@ sealed class Root
                 if(category.HasCode())
                 {
                     if(i > 0)
-                        result.Code = result.Code + CodeBase.GetDumpPrintText(", ");
+                        result.Code = result.Code + ", ".GetDumpPrintTextCode();
                     result.Code = result.Code + elemResult.Code;
                 }
 
@@ -146,7 +146,7 @@ sealed class Root
             }
 
             if(category.HasCode())
-                result.Code = result.Code + CodeBase.GetDumpPrintText(")");
+                result.Code = result.Code + ")".GetDumpPrintTextCode();
             return ReturnMethodDump(result);
         }
         finally

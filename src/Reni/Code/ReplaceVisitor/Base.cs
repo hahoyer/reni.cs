@@ -41,7 +41,7 @@ abstract class Base : Visitor<CodeBase, FiberItem>
                 return newListCompleted[0];
         }
 
-        return CodeBase.GetList(newListCompleted);
+        return newListCompleted.GetCode();
     }
 
     protected override FiberItem ThenElse

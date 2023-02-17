@@ -66,7 +66,7 @@ abstract class CodeBase
 
     protected virtual Closures GetClosures() => Closures.GetVoid();
 
-    protected virtual IEnumerable<CodeBase> ToList() => new[] { this };
+    internal virtual IEnumerable<CodeBase> ToList() => new[] { this };
 
     protected virtual TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => actual.Default(this);
@@ -76,31 +76,6 @@ abstract class CodeBase
     internal virtual CodeBase ArrangeCleanupCode() => null;
 
     protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
-
-    internal static CodeBase GetBitsConst(Size size, BitsConst t) => new BitArray(size, t);
-    internal static CodeBase GetBitsConst(BitsConst t) => GetBitsConst(t.Size, t);
-
-    internal static CodeBase GetDumpPrintText(string dumpPrintText)
-        => new DumpPrintText(dumpPrintText);
-
-    internal static CodeBase GetFrameRef() => new TopFrameRef();
-
-    internal static FiberItem GetRecursiveCall(Size refsSize)
-        => new RecursiveCallCandidate(refsSize);
-
-    internal static CodeBase GetReferenceCode(IContextReference reference)
-        => new ReferenceCode(reference);
-
-    internal static CodeBase GetTopRef() => new TopRef();
-
-    internal static CodeBase GetList(IEnumerable<CodeBase> data)
-    {
-        var allData = data
-            .SelectMany(item => item.ToList())
-            .ToArray();
-
-        return List.Create(allData);
-    }
 
     internal CodeBase GetAssignment(Size size)
     {
@@ -141,7 +116,7 @@ abstract class CodeBase
         return Concat(new BitCast(size, Size, Size));
     }
 
-    CodeBase GetSequence(params CodeBase[] data) => GetList(this.Plus(data));
+    CodeBase GetSequence(params CodeBase[] data) => this.Plus(data).GetCode();
 
     internal CodeBase ReplaceArgument(ResultCache argument)
     {
@@ -268,14 +243,6 @@ abstract class CodeBase
         }
     }
 
-    protected static Closures GetClosures(CodeBase[] codeBases)
-    {
-        var closures = codeBases.Select(code => code.Closures).ToArray();
-        return closures.Aggregate(Closures.GetVoid(), (r1, r2) => r1.Sequence(r2));
-    }
-
-    internal static CodeBase GetArgument(TypeBase type) => new Argument(type);
-
     internal Container GetContainer(string description, FunctionId functionId = null)
         => new(GetAlign(), null, description, functionId);
 
@@ -284,12 +251,8 @@ abstract class CodeBase
     internal CodeBase GetWithCleanupAdded(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
 
     internal CodeBase GetInvalidConversion(Size size) => Concat(new InvalidConversionCode(Size, size));
+    internal static CodeBase GetFrameRef() => new TopFrameRef();
+    internal static CodeBase GetTopRef() => new TopRef();
 }
 
 abstract class UnexpectedVisitOfPending : Exception { }
-
-static class CodeBaseExtender
-{
-    internal static CodeBase ToSequence
-        (this IEnumerable<CodeBase> x) => x.Aggregate(CodeBase.Void, (code, result) => code + result);
-}

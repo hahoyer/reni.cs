@@ -20,7 +20,7 @@ sealed class List : FiberHead
         StopByObjectIds();
     }
 
-    protected override IEnumerable<CodeBase> ToList() => Data;
+    internal override IEnumerable<CodeBase> ToList() => Data;
 
     protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => actual.List(this);
@@ -34,7 +34,7 @@ sealed class List : FiberHead
         for(; i < Data.Length - 1; i++)
             newData[i] = Data[i];
         newData[i] = Data[i].Concat(subsequentElement);
-        return GetList(newData);
+        return newData.GetCode();
     }
 
     [DisableDump]
@@ -67,7 +67,7 @@ sealed class List : FiberHead
         => Data
             .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
 
-    protected override Closures GetClosures() => GetClosures(Data);
+    protected override Closures GetClosures() => Data.GetClosures();
     internal override void Visit(IVisitor visitor) => visitor.List(Data);
 
     internal static CodeBase Create(params CodeBase[] data)

@@ -176,9 +176,9 @@ sealed class Closures : DumpableObject
         return true;
     }
 
-    internal CodeBase ToCode()
+    internal CodeBase GetCode()
         => Data
-            .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.GetReferenceCode(t));
+            .Aggregate(CodeBase.Void, (current, t) => current + t.GetCode());
 
     internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closureBase)
     {

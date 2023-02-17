@@ -1,6 +1,5 @@
 using hw.Scanner;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.DeclarationOptions;
 using Reni.Parser;
@@ -23,6 +22,6 @@ sealed class Text : TerminalSyntaxToken
             .GetArray(data.Length)
             .TextItem
             .GetResult
-                (category, () => CodeBase.GetBitsConst(BitsConst.ConvertAsText(data)), Closures.GetVoid);
+                (category, () => Code.Extension.GetCode(BitsConst.ConvertAsText(data)), Closures.GetVoid);
     }
 }

@@ -119,7 +119,7 @@ abstract class TypeBase
     internal IReference ForcedReference => Cache.ForcedReference.Value;
 
     [DisableDump]
-    internal CodeBase ArgumentCode => CodeBase.GetArgument(this);
+    internal CodeBase ArgumentCode => this.GetArgumentCode();
 
     [DisableDump]
     internal TypeBase AutomaticDereferenceType
@@ -484,7 +484,7 @@ abstract class TypeBase
         return GetResult
         (
             category,
-            () => CodeBase.GetReferenceCode(target)
+            target.GetCode
         );
     }
 
@@ -579,7 +579,7 @@ abstract class TypeBase
         return GetResult
         (
             category,
-            () => CodeBase.GetReferenceCode(target).GetReferenceWithOffset(getOffset()).GetDePointer(Size)
+            () => target.GetCode().GetReferenceWithOffset(getOffset()).GetDePointer(Size)
         );
     }
 
@@ -627,7 +627,7 @@ abstract class TypeBase
         .GetResult
         (
             category,
-            () => CodeBase.GetDumpPrintText(DumpPrintText),
+            () => DumpPrintText.GetDumpPrintTextCode(),
             Closures.GetVoid
         );
 
@@ -768,7 +768,7 @@ abstract class TypeBase
         return Root.BitType.GetResult
         (
             category,
-            () => CodeBase.GetBitsConst(BitsConst.Convert(isEqual))
+            () => Code.Extension.GetCode(BitsConst.Convert(isEqual))
         );
     }
 

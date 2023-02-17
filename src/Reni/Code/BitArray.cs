@@ -26,11 +26,11 @@ sealed class BitArray : FiberHead
 
     protected override Size GetSize() => SizeValue;
 
-    protected override IEnumerable<CodeBase> ToList()
+    internal override IEnumerable<CodeBase> ToList()
     {
         if(IsHollow)
             return new CodeBase[0];
-        return new[] { this };
+        return base.ToList();
     }
 
     protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)

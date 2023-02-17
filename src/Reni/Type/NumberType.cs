@@ -107,7 +107,7 @@ sealed class NumberType
     Result GetZeroResult() => Root
         .BitType
         .Number(1)
-        .GetResult(Category.All, () => CodeBase.GetBitsConst(BitsConst.Convert(0)));
+        .GetResult(Category.All, () => Code.Extension.GetCode(BitsConst.Convert(0)));
 
     Result TextItemResult(Category category) => Parent
         .TextItem
