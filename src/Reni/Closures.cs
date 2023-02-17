@@ -13,7 +13,7 @@ namespace Reni;
 /// </summary>
 sealed class Closures : DumpableObject, IEquatable<Closures>
 {
-    sealed class Closure : Singleton<Closure>, IContextReference
+    sealed class ArgumentsClosure : Singleton<ArgumentsClosure>, IContextReference
     {
         int IContextReference.Order => -1;
         protected override string GetNodeDump() => "Closure";
@@ -35,7 +35,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     [DisableDump]
     SizeArray Sizes => SizesCache ??= CalculateSizes();
 
-    internal bool HasArguments => Contains(Closure.Instance);
+    internal bool HasArguments => Contains(ArgumentsClosure.Instance);
     public int Count => Data.Count;
 
     [UsedImplicitly]
@@ -93,7 +93,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
 
     internal static Closures GetRecursivity() => new(true);
     internal static Closures GetVoid() => new();
-    internal static Closures GetArgument() => new(Closure.Instance);
+    internal static Closures GetArgument() => new(ArgumentsClosure.Instance);
 
 
     void AddRange(IEnumerable<IContextReference> a)
@@ -151,7 +151,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
             .OrderBy(codeArg => codeArg.Order)
             .ToArray();
 
-    public Closures WithoutArgument() => Without(Closure.Instance);
+    public Closures WithoutArgument() => Without(ArgumentsClosure.Instance);
 
     Closures Without(Closures other)
         => other
