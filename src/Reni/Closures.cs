@@ -68,6 +68,9 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
         : this(false)
         => AddRange(a);
 
+    public bool Equals(Closures other)
+        => other != null && Data.SequenceEqual(other.Data);
+
     protected override string GetNodeDump() => $"{base.GetNodeDump()}{(IsRecursive? "r" : "")}#{Count}";
 
     public override string DumpData()
@@ -83,6 +86,11 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
         return result;
     }
 
+    public override bool Equals(object obj)
+        => ReferenceEquals(this, obj) || (obj is Closures other && Equals(other));
+
+    public override int GetHashCode() => Data.Sum(item => item.Order);
+
     internal static Closures GetRecursivity() => new(true);
     internal static Closures GetVoid() => new(false);
     internal static Closures GetArgument() => new(Closure.Instance);
@@ -96,13 +104,21 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
 
     void Add(IContextReference newItem)
     {
-        var index = 0;
-        for(; index < Data.Count && Data[index].Order < newItem.Order; index++)
-            if(Data[index] == newItem)
-                return;
+        var index = Data.IndexWhere(item=>item.Order >= newItem.Order);
 
-        (index == Data.Count || Data[index].Order > newItem.Order).Assert();
-        Data.Insert(index, newItem);
+        if(index == null)
+        {
+            Data.Add(newItem);
+            return;
+        }
+
+        index.AssertIsNotNull();
+        if(Data[index.Value] == newItem)
+            return;
+
+        (index == Data.Count || Data[index.Value].Order > newItem.Order)
+            .Assert(()=>$"{Data[index.Value].NodeDump()}=={newItem.NodeDump()}:{Data[index.Value].Order}");
+        Data.Insert(index.Value, newItem);
     }
 
 
@@ -215,14 +231,6 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     public static Closures operator +(Closures x, Closures y) => x.Sequence(y);
     public static Closures operator -(Closures x, Closures y) => x.Without(y);
     public static Closures operator -(Closures x, IContextReference y) => x.Without(y);
-
-    public bool Equals(Closures other) 
-        => other!= null && Data.SequenceEqual(other.Data);
-
-    public override bool Equals(object obj) 
-        => ReferenceEquals(this, obj) || (obj is Closures other && Equals(other));
-
-    public override int GetHashCode() => Data.Sum(item=>item.Order);
     public static bool operator ==(Closures left, Closures right) => Equals(left, right);
     public static bool operator !=(Closures left, Closures right) => !Equals(left, right);
 }
