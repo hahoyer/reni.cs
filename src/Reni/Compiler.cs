@@ -46,6 +46,7 @@ public sealed class Compiler
     readonly MainTokenFactory MainTokenFactory;
     readonly string ModuleName;
     readonly ValueCache<ValueSyntax> ValueSyntaxCache;
+    readonly ValueCache<MethodInfo> CSharpMethodCache;
 
     bool IsInExecutionPhase;
 
@@ -88,28 +89,7 @@ public sealed class Compiler
     bool IsTraceEnabled
         => IsInExecutionPhase && Parameters.TraceOptions.Functions;
 
-    MethodInfo CSharpMethod
-    {
-        get
-        {
-            try
-            {
-                var includeDebugInformation = Parameters.DebuggableGeneratedCode ?? Debugger.IsAttached;
-                return CSharpString?
-                    .CodeToAssembly
-                        (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)
-                    .GetExportedTypes()[0]
-                    .GetMethod(Generator.MainFunctionName);
-            }
-            catch(CSharpCompilerErrorException e)
-            {
-                foreach(var error in e.Errors)
-                    Parameters.OutStream.AddLog(error + "\n");
-
-                return null;
-            }
-        }
-    }
+    MethodInfo CSharpMethod => CSharpMethodCache.Value;
 
     [DisableDump]
     internal IEnumerable<Issue> Issues
@@ -261,6 +241,7 @@ public sealed class Compiler
         CodeContainerCache = new(GetCodeContainer);
         BinaryTreeCache = new(() => Parse(Source));
         ValueSyntaxCache = new(GetSyntax);
+        CSharpMethodCache = new(GetCSharpMethod);
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -279,6 +260,26 @@ public sealed class Compiler
 
     bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
     bool Root.IParent.Semantics => Parameters.Semantics;
+
+    MethodInfo GetCSharpMethod()
+    {
+        try
+        {
+            var includeDebugInformation = Parameters.DebuggableGeneratedCode ?? Debugger.IsAttached;
+            return CSharpString?
+                .CodeToAssembly
+                    (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)
+                .GetExportedTypes()[0]
+                .GetMethod(Generator.MainFunctionName);
+        }
+        catch(CSharpCompilerErrorException e)
+        {
+            foreach(var error in e.Errors)
+                Parameters.OutStream.AddLog(error + "\n");
+
+            return null;
+        }
+    }
 
     public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
     {
@@ -303,7 +304,7 @@ public sealed class Compiler
             return null;
         var result = GetSyntax(BinaryTree);
         if(Parameters.Semantics)
-            result.Semantics.Result = Root.GetResult(Category.Type,result).Type;
+            result.Semantics.Result = Root.GetResult(Category.Type, result).Type;
         return result;
     }
 
@@ -369,16 +370,12 @@ public sealed class Compiler
             foreach(var t in Issues)
                 Parameters.OutStream.AddLog(t.LogDump + "\n");
 
-        var method = CSharpMethod;
-
-        if(method == null)
-            return;
-        if(!Parameters.IsRunRequired)
+        if(CSharpMethod == null || !Parameters.IsRunRequired)
             return;
 
         Data.OutStream = Parameters.OutStream;
         IsInExecutionPhase = true;
-        method.Invoke(null, new object[0]);
+        CSharpMethod.Invoke(null, new object[0]);
         IsInExecutionPhase = false;
         Data.OutStream = null;
     }
