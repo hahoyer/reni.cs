@@ -53,4 +53,7 @@ public sealed class Text1 : TextStruct { }
 [AutomaticDereferencing]
 [ContextOperator]
 [ComplexContext]
-public sealed class TextConcat : TextStruct { }
+public sealed class TextConcat : TextStruct
+{
+    public TextConcat() => Parameters.Semantics = true;
+}
