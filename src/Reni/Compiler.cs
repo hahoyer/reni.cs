@@ -5,7 +5,6 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
-using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Helper;
@@ -298,15 +297,7 @@ public sealed class Compiler
             parameters);
     }
 
-    ValueSyntax GetSyntax()
-    {
-        if(!Parameters.IsSyntaxRequired)
-            return null;
-        var result = GetSyntax(BinaryTree);
-        if(Parameters.Semantics)
-            result.Semantics.Result = Root.GetResult(Category.Type, result).Type;
-        return result;
-    }
+    ValueSyntax GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
 
     static ValueSyntax GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
 
