@@ -5,7 +5,7 @@ using Reni.Type;
 
 namespace Reni.TokenClasses;
 
-sealed class Semantic : DumpableObject
+sealed class Semantics : DumpableObject
 {
     internal readonly Dictionary<ContextBase, IImplementation> Declaration = new ();
     public TypeBase Result;

@@ -1,3 +1,4 @@
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
@@ -56,4 +57,10 @@ public sealed class Text1 : TextStruct { }
 public sealed class TextConcat : TextStruct
 {
     public TextConcat() => Parameters.Semantics = true;
+
+    protected override void AssertValid(Compiler compiler)
+    {
+        compiler.Syntax.Semantics.LogDump().Log();
+        true.ConditionalBreak();
+    }
 }

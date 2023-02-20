@@ -150,7 +150,7 @@ static class Extension
         var (result, found) = valueResult
             .Type
             .GetResult(category, valueResult, currentTarget, definable: null, context, right);
-        right.Anchor.Items.Single(item=>item.TokenClass is LeftParenthesis).Semantic.Declaration[context]= found;
+        right.Anchor.Items.Single(item=>item.TokenClass is LeftParenthesis).Semantics.Declaration[context]= found;
         return result;
     }
 
