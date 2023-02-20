@@ -98,14 +98,14 @@ sealed class Root
         return result.Target;
     }
 
-    internal FunctionType FunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
+    internal FunctionType GetFunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
     {
         var alignedArgsType = argsType.Align;
         var functionInstance = Functions.Find(body, compoundView, alignedArgsType);
         return functionInstance;
     }
 
-    internal IEnumerable<FunctionType> FunctionInstances(CompoundView compoundView, FunctionSyntax body)
+    internal IEnumerable<FunctionType> GetFunctionInstances(CompoundView compoundView, FunctionSyntax body)
         => Functions.Find(body, compoundView);
 
     internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
@@ -155,10 +155,10 @@ sealed class Root
         }
     }
 
-    internal FunctionContainer FunctionContainer(int index) => Functions.Container(index);
-    internal FunctionType Function(int index) => Functions.Item(index);
+    internal FunctionContainer GetFunctionContainer(int index) => Functions.Container(index);
+    internal FunctionType GetFunction(int index) => Functions.Item(index);
 
-    internal Container MainContainer(ValueSyntax syntax, string description)
+    internal Container GetMainContainer(ValueSyntax syntax, string description)
     {
         var rawResult = syntax.GetResultForAll(this);
 

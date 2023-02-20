@@ -45,9 +45,9 @@ public sealed class CodeContainer : DumpableObject, ValueCache.IContainer
     {
         ModuleName = moduleName;
         Root = root;
-        MainCache = new(() => root.MainContainer(syntax, description));
+        MainCache = new(() => root.GetMainContainer(syntax, description));
         CSharpStringCache = new(GetCSharpStringForCache);
-        FunctionsCache = new(Root.FunctionContainer);
+        FunctionsCache = new(Root.GetFunctionContainer);
     }
 
     ValueCache ValueCache.IContainer.Cache => new();

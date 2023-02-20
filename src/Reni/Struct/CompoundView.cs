@@ -304,12 +304,12 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
         => Compound
             .Root
-            .FunctionInstance(this, body, argsType.AssertNotNull());
+            .GetFunctionInstance(this, body, argsType.AssertNotNull());
 
     internal IEnumerable<FunctionType> Functions(FunctionSyntax body)
         => Compound
             .Root
-            .FunctionInstances(this, body);
+            .GetFunctionInstances(this, body);
 
     internal Result ObjectPointerViaContext(Category category)
     {

@@ -134,7 +134,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         => Item.Locate(Compiler.BinaryTree, span);
 
     internal FunctionType Function(int index)
-        => Compiler.Root.Function(index);
+        => Compiler.Root.GetFunction(index);
 
 
     internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
