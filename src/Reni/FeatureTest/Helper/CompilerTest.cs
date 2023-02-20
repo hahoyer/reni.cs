@@ -89,32 +89,21 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
         string expectedOutput = null,
         Action<Compiler> expectedResult = null
     )
-        =>
-            CreateFileAndRunCompiler
-                (name, new(text, expectedOutput), expectedResult);
+        => CreateFileAndRunCompiler(name, new(text, expectedOutput), expectedResult);
 
     Compiler CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
     {
         var fileName = name + ".reni";
         var f = fileName.ToSmbFile();
         f.String = targetSetData.Target;
-        return InternalRunCompiler(fileName, expectedResult, targetSetData);
+        return RunCompiler(fileName, expectedResult, targetSetData);
     }
 
-    Compiler InternalRunCompiler(string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
-        => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
-
-    Compiler InternalRunCompiler
-    (
-        CompilerParameters compilerParameters,
-        string fileName,
-        Action<Compiler> expectedResult,
-        TargetSetData targetSet
-    )
+    Compiler RunCompiler(string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
     {
         var outStream = new OutStream();
-        compilerParameters.OutStream = outStream;
-        var compiler = Compiler.FromFile(fileName, compilerParameters);
+        Parameters.OutStream = outStream;
+        var compiler = Compiler.FromFile(fileName, Parameters);
 
         try
         {
@@ -158,8 +147,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     }
 
     protected IEnumerable<Compiler> BaseRun() => TargetSet
-        .Select
-            (tuple => CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid));
+        .Select(tuple => CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid));
 
     public IEnumerable<Compiler> Inspect() => BaseRun();
 
