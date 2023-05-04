@@ -79,10 +79,8 @@ sealed class CompoundSyntax : ValueSyntax
         AssertValid();
     }
 
-
     [DisableDump]
     internal override bool? IsHollow => PureStatements.All(syntax => syntax.IsHollow == true);
-
 
     [DisableDump]
     protected override int DirectChildCount => Statements.Length + 1;
