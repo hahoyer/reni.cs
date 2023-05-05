@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
-using Reni.Feature;
 using Reni.Parser;
 
 namespace Reni.SyntaxTree;
@@ -61,12 +60,8 @@ sealed class PrefixSyntax : ValueSyntax
 
     protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
-    internal override Result GetResultForCache(ContextBase context, Category category)
-    {
-        var (result, declaration) = Prefix.GetResult(context, category, Right, Token);
-        Semantics.Declaration[context] = declaration;
-        return result;
-    }
+    internal override Result GetResultForCache(ContextBase context, Category category) 
+        => Prefix.GetResult(context, category, Right, Token);
 
     public static Result<ValueSyntax> Create
         (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
@@ -169,7 +164,7 @@ interface ITerminal
 
 interface IPrefix
 {
-    (Result, IImplementation) GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
+    Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
 }
 
 interface IInfix

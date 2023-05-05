@@ -80,9 +80,8 @@ sealed class ExpressionSyntax : ValueSyntax
             CurrentResultDepth++;
             if(Left == null)
             {
-                var (prefixResult, declaration) = context.GetPrefixResult(category, Definable, Token, Right);
+                var prefixResult = context.GetPrefixResult(category, Definable, Token, Right);
                 //(Definable.Id == "repeat").ConditionalBreak();
-                Semantics.Declaration[context] = declaration;
                 return prefixResult;
             }
 
@@ -95,9 +94,8 @@ sealed class ExpressionSyntax : ValueSyntax
             if(leftType.HasIssues)
                 return leftType.Issues.GetResult(category, context.RootContext);
 
-            var (result, found) = leftType
+            var result = leftType
                 .GetResult(category, left, Token, Definable, context, Right);
-            Semantics.Declaration[context] = found;
             return result;
         }
         finally
@@ -115,6 +113,8 @@ sealed class ExpressionSyntax : ValueSyntax
 
         return Create(left ?? Left, Definable, Token, right ?? Right, Anchor);
     }
+
+    internal override Semantics Semantics => Semantics.Create(this);
 
     internal static ExpressionSyntax Create
         (ValueSyntax left, Definable definable, SourcePart token, ValueSyntax right, Anchor frameItems)

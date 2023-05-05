@@ -720,7 +720,7 @@ abstract class TypeBase
         => issueId
             .GetResult(category, token, this, declarations, leftIssues);
 
-    internal(Result, IImplementation) GetResult
+    internal Result GetResult
     (
         Category category,
         ResultCache left,
@@ -736,7 +736,7 @@ abstract class TypeBase
             (issueId, declarations) => GetIssueResult(category, issueId, currentTarget, declarations, left.Issues)
         );
 
-    (Result, IImplementation) FindDeclarationAndExecute
+    Result FindDeclarationAndExecute
     (
         Definable definable,
         Func<SearchResult, Result> execute,
@@ -751,11 +751,11 @@ abstract class TypeBase
         switch(searchResults.Length)
         {
             case 0:
-                return (onError(IssueId.MissingDeclarationForType, null), null);
+                return onError(IssueId.MissingDeclarationForType, null);
             case 1:
-                return (execute(searchResults.First()), searchResults.First());
+                return execute(searchResults.First());
             default:
-                return (onError(IssueId.AmbiguousSymbol, searchResults), null);
+                return onError(IssueId.AmbiguousSymbol, searchResults);
         }
     }
 

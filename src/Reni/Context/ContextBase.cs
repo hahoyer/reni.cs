@@ -245,7 +245,7 @@ abstract class ContextBase
     /// <param name="right"> the expression of the argument of the call. Must not be null </param>
     /// <param name="token"></param>
     /// <returns> </returns>
-    internal(Result, IImplementation) GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
+    internal Result GetFunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
     {
         var argsType = FindRecentFunctionContextObject.ArgumentsType;
         return argsType
@@ -280,19 +280,19 @@ abstract class ContextBase
         return null;
     }
 
-    internal(Result, IImplementation) GetPrefixResult
+    internal Result GetPrefixResult
         (Category category, Definable definable, SourcePart token, ValueSyntax right)
     {
         var searchResult = GetDeclaration(definable);
         if(searchResult == null)
-            return (IssueId
+            return IssueId
                 .MissingDeclarationInContext
-                .GetResult(category, token, this), null);
+                .GetResult(category, token, this);
 
         var result = searchResult.GetResult(category, CacheObject.AsObject, token, this, right);
 
         (result.HasIssue || result.CompleteCategory.Contains(category)).Assert();
-        return (result, searchResult);
+        return result;
     }
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)

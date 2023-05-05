@@ -147,11 +147,9 @@ static class Extension
                 .ReplaceArguments(argsResult);
         }
 
-        var (result, found) = valueResult
+        return valueResult
             .Type
             .GetResult(category, valueResult, currentTarget, definable: null, context, right);
-        right.Anchor.Items.Single(item=>item.TokenClass is LeftParenthesis).Semantics.Declaration[context]= found;
-        return result;
     }
 
     static Result ValueResult

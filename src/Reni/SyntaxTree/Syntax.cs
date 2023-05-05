@@ -35,13 +35,13 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 
     internal readonly Anchor Anchor;
 
-    [DisableDump]
-    internal readonly Semantics Semantics = new();
-
     [EnableDumpExcept(null)]
     internal Issue[] Issues => this.CachedValue(() => GetIssues()?.ToArray() ?? new Issue[0]);
 
     internal BinaryTree MainAnchor => Anchor.Main;
+
+    [DisableDump]
+    internal virtual Semantics Semantics => null;
 
     [EnableDump]
     [EnableDumpExcept(null)]

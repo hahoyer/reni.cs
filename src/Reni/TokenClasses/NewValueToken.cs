@@ -3,7 +3,6 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.SyntaxTree;
 
@@ -23,7 +22,7 @@ sealed class NewValueToken : NonSuffixSyntaxToken
             .FindRecentFunctionContextObject
             .CreateValueReferenceResult(category);
 
-    protected override(Result, IImplementation) GetResult
+    protected override Result GetResult
         (ContextBase context, Category category, ValueSyntax right, SourcePart token)
     {
         NotImplementedMethod(context, category, token, right);
