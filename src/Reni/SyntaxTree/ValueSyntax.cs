@@ -97,7 +97,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     //[DebuggerHidden]
     internal TypeBase GetType(ContextBase context) => context.GetResult(Category.Type, this)?.Type;
 
-    internal bool IsHollowStructureElement(ContextBase context)
+    internal bool GetIsHollowStructureElement(ContextBase context)
     {
         var result = IsHollow;
         if(result != null)

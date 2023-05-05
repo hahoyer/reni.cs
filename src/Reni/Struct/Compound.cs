@@ -251,7 +251,7 @@ sealed class Compound
             .GetCompoundPositionContext(Syntax, position);
         return Syntax
             .PureStatements[position]
-            .IsHollowStructureElement(uniqueChildContext);
+            .GetIsHollowStructureElement(uniqueChildContext);
     }
 
     bool? InnerIsHollowStatic(int position)
