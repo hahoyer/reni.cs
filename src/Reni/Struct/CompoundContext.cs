@@ -30,8 +30,7 @@ sealed class CompoundContext : Child, ISymbolProviderForPointer<Definable>, ICon
     IImplementation ISymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, false);
 
-    protected override string GetContextChildIdentificationDump()
-        => GetCompoundIdentificationDump();
+    protected override string ContextChildIdentificationDump => GetCompoundIdentificationDump();
 
     internal override CompoundView GetRecentCompoundView() => View;
 

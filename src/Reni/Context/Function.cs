@@ -45,8 +45,7 @@ sealed class Function : Child, IFunctionContext
             & category;
     }
 
-    protected override string GetContextChildIdentificationDump()
-        => "@(." + ArgumentsType.ObjectId + "i)";
+    protected override string ContextChildIdentificationDump => "@(." + ArgumentsType.ObjectId + "i)";
 
     internal override IFunctionContext GetRecentFunctionContext() => this;
 

@@ -16,9 +16,11 @@ abstract class Child : ContextBase
         Parent.AssertIsNotNull();
     }
 
-    protected abstract string GetContextChildIdentificationDump();
+    [DisableDump]
+    protected abstract string ContextChildIdentificationDump { get; }
 
-    internal override string ContextIdentificationDump => Parent.ContextIdentificationDump + GetContextChildIdentificationDump();
+    [DisableDump]
+    internal override string ContextIdentificationDump => Parent.ContextIdentificationDump + ContextChildIdentificationDump;
 
     [DisableDump]
     internal override bool IsRecursionMode => Parent.IsRecursionMode;
