@@ -17,7 +17,7 @@ sealed class TypeOperator : SuffixSyntaxToken
     {
         if(category.HasType())
         {
-            var leftType = left.Type(context);
+            var leftType = left.GetType(context);
             if(leftType.HasIssues)
                 return new(category, leftType.Issues);
 

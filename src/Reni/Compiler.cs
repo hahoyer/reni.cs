@@ -208,7 +208,7 @@ public sealed class Compiler
     }
 
     [DisableDump]
-    internal TypeBase MainType => this.CachedValue(() => Syntax.Type(Root));
+    internal TypeBase MainType => this.CachedValue(() => Syntax.GetType(Root));
 
     Compiler(Source source, string moduleName, CompilerParameters parameters)
     {

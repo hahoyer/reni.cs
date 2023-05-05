@@ -27,7 +27,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
-        var leftType = left.Type(context);
+        var leftType = left.GetType(context);
         (leftType != null).Assert();
         return leftType
             .GetInstanceResult(category, c => context.GetResultAsReference(c, right));

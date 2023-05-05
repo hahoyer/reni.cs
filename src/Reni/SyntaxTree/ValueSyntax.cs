@@ -95,7 +95,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
         => GetResultForAll(context).GetValue(context.RootContext.ExecutionContext);
 
     //[DebuggerHidden]
-    internal TypeBase Type(ContextBase context) => context.GetResult(Category.Type, this)?.Type;
+    internal TypeBase GetType(ContextBase context) => context.GetResult(Category.Type, this)?.Type;
 
     internal bool IsHollowStructureElement(ContextBase context)
     {
@@ -104,14 +104,14 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
             return result.Value;
 
         var type = context.GetTypeIfKnown(this);
-        return (type ?? Type(context)).GetSmartUn<FunctionType>().IsHollow;
+        return (type ?? GetType(context)).GetSmartUn<FunctionType>().IsHollow;
     }
 
     internal ValueSyntax ReplaceArg(ValueSyntax syntax)
         => Visit(new ReplaceArgVisitor(syntax)) ?? this;
 
     internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
-        => Type(context).DeclarationOptions;
+        => GetType(context).DeclarationOptions;
 
 }
 
