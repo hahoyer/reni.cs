@@ -91,7 +91,7 @@ sealed class TypeType
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         var rightType = right
-            .GetType(context)
+            .GetTypeBase(context)
             .GetSmartUn<FunctionType>()
             .GetSmartUn<PointerType>();
         var rightTypeType = rightType as TypeType;

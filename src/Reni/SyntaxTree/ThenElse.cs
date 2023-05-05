@@ -102,8 +102,8 @@ sealed class CondSyntax : ValueSyntax
         if(Else == null)
             return Root.VoidType;
 
-        var thenType = Then.GetType(context);
-        var elseType = Else.GetType(context);
+        var thenType = Then.GetTypeBase(context);
+        var elseType = Else.GetTypeBase(context);
         if(thenType == null)
             return elseType?.Align;
         if(elseType == null)
