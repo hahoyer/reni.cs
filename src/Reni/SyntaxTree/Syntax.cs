@@ -112,6 +112,9 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 
     protected abstract Syntax GetDirectChild(int index);
 
+    [DisableDump]
+    internal Syntax Parent => MainAnchor.Parent?.Syntax;
+
     protected virtual IEnumerable<Issue> GetIssues() => null;
 
     internal virtual Result<ValueSyntax> ToValueSyntax()
