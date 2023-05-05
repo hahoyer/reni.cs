@@ -18,8 +18,7 @@ abstract class Child : ContextBase
 
     protected abstract string GetContextChildIdentificationDump();
 
-    public sealed override string GetContextIdentificationDump()
-        => Parent.GetContextIdentificationDump() + GetContextChildIdentificationDump();
+    internal override string ContextIdentificationDump => Parent.ContextIdentificationDump + GetContextChildIdentificationDump();
 
     [DisableDump]
     internal override bool IsRecursionMode => Parent.IsRecursionMode;

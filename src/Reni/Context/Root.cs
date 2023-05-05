@@ -78,7 +78,7 @@ sealed class Root
     [DisableDump]
     protected override string LevelFormat => "root context";
 
-    public override string GetContextIdentificationDump() => "r";
+    internal override string ContextIdentificationDump => "r";
 
     static ContextMetaFunction GetCreateArrayFeature(bool isMutable) => new(
         (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)

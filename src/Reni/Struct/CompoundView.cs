@@ -184,7 +184,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     protected override string GetNodeDump()
     {
         var result = base.GetNodeDump();
-        result += "(" + (Context?.GetContextIdentificationDump() ?? "?") + ")";
+        result += "(" + (Context?.ContextIdentificationDump ?? "?") + ")";
         if(HasIssues)
             result += ".AllIssues[" + Issues.Length + "]";
         return result;
@@ -213,7 +213,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     }
 
     public string GetCompoundIdentificationDump()
-        => Context.GetContextIdentificationDump();
+        => Context.ContextIdentificationDump;
 
     internal TypeBase FunctionalType(FunctionSyntax syntax) => FunctionBodyTypeCache[syntax];
 

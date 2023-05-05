@@ -132,7 +132,7 @@ abstract class ContextBase
     [DisableDump]
     protected abstract string LevelFormat { get; }
 
-    public abstract string GetContextIdentificationDump();
+    internal abstract string ContextIdentificationDump { get; }
 
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
@@ -172,7 +172,7 @@ abstract class ContextBase
     }
 
     protected override string GetNodeDump()
-        => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
+        => base.GetNodeDump() + "(" + ContextIdentificationDump + ")";
 
 
     [UsedImplicitly]
