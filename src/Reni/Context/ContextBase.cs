@@ -226,8 +226,8 @@ abstract class ContextBase
         return result;
     }
 
-    ResultCache GetResultAsReferenceCacheForCache
-        (ValueSyntax syntax) => new(new ResultProvider(this, syntax, true));
+    ResultCache GetResultAsReferenceCacheForCache(ValueSyntax syntax) 
+        => new(new ResultProvider(this, syntax, true));
 
     internal Result GetResultAsReference(Category category, ValueSyntax syntax)
         => GetResult(category | Category.Type, syntax)
