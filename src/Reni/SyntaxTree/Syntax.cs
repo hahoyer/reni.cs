@@ -41,7 +41,13 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     internal BinaryTree MainAnchor => Anchor.Main;
 
     [DisableDump]
-    internal virtual Semantics Semantics => null;
+    internal virtual Semantics Semantics
+    {
+        get {
+            NotImplementedMethod();
+            return default;
+        }
+    }
 
     [EnableDump]
     [EnableDumpExcept(null)]
