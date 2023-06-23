@@ -185,8 +185,8 @@ public class UtilDiff
         {
             var line = file1[i];
             //MATTHIEU ADDED NULL_CHECK FOR LINE
-            if(line != null && equivalenceClasses.ContainsKey(line))
-                file2indices = equivalenceClasses[line];
+            if(line != null && equivalenceClasses.TryGetValue(line, out var @class))
+                file2indices = @class;
             else
                 file2indices = new();
 
