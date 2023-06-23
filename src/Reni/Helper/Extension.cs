@@ -6,6 +6,18 @@ namespace Reni.Helper
     static class Extension
     {
         [PublicAPI]
+        internal static IEnumerable<TTarget> GetDirectChildren<TTarget>(this ITree<TTarget> target)
+            where TTarget : ITree<TTarget>
+            => target?.GetDirectChildrenInternal();
+
+        static IEnumerable<TTarget> GetDirectChildrenInternal<TTarget>([NotNull]this ITree<TTarget> target)
+            where TTarget : ITree<TTarget>
+        {
+            for(var index = 0; index < target.DirectChildCount; index++)
+                yield return target.GetDirectChild(index);
+        }
+
+        [PublicAPI]
         internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
             (this ITree<TTarget> target, Func<TTarget, bool> predicate = null)
             where TTarget : ITree<TTarget>
