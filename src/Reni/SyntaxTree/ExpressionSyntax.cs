@@ -114,8 +114,6 @@ sealed class ExpressionSyntax : ValueSyntax
         return Create(left ?? Left, Definable, Token, right ?? Right, Anchor);
     }
 
-    internal override Semantics Semantics => Semantics.Create(this);
-
     internal static ExpressionSyntax Create
         (ValueSyntax left, Definable definable, SourcePart token, ValueSyntax right, Anchor frameItems)
         => new(left, definable, token, right, frameItems);

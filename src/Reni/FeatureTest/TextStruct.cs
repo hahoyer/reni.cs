@@ -60,7 +60,7 @@ public sealed class TextConcat : TextStruct
 
     protected override void AssertValid(Compiler compiler)
     {
-        compiler.Syntax.Semantics.LogDump().Log();
+        compiler.Syntax.Semantics.Information.Log();
         true.ConditionalBreak();
     }
 }
