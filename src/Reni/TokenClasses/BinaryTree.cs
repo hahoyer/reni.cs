@@ -21,7 +21,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         bool HasComplexDeclaration(BinaryTree target);
     }
 
-    internal interface IPositionTarget { }
+    internal interface IPositionTarget;
 
     internal sealed class BracketNodes
     {

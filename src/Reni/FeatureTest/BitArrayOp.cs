@@ -38,82 +38,71 @@ namespace Reni.FeatureTest.BitArrayOp
     [Output("-1")]
     [Number]
     [ConversionService.Closure]
-    public sealed class Negate : CompilerTest
-    {}
+    public sealed class Negate : CompilerTest;
 
     [UnitTest]
     [Target(@"(1, 12)dump_print")]
     [Output("(1, 12)")]
     [Number]
     [ConversionService.Closure]
-    public sealed class TwoPositiveNumbers : CompilerTest
-    {}
+    public sealed class TwoPositiveNumbers : CompilerTest;
 
     [UnitTest]
     [TwoPositiveNumbers]
     [Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print")]
     [Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
-    public sealed class PositiveNumbers : CompilerTest
-    {}
+    public sealed class PositiveNumbers : CompilerTest;
 
     [UnitTest]
     [TwoPositiveNumbers]
     [Target(@"(-1, -12)dump_print")]
     [Output("(-1, -12)")]
-    public sealed class TwoNegativeNumbers : CompilerTest
-    {}
+    public sealed class TwoNegativeNumbers : CompilerTest;
 
     [UnitTest]
     [TwoNegativeNumbers]
     [Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print")]
     [Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
-    public sealed class NegativeNumbers : CompilerTest
-    {}
+    public sealed class NegativeNumbers : CompilerTest;
 
     [UnitTest]
     [Target(@"3 dump_print")]
     [Output("3")]
     [DumpPrint]
-    public sealed class Number : CompilerTest
-    {}
+    public sealed class Number : CompilerTest;
 
     [UnitTest]
     [Target(@"(2+4) dump_print")]
     [Output("6")]
     [Number]
     [ConversionService.Closure]
-    public sealed class Add2Numbers : CompilerTest
-    {}
+    public sealed class Add2Numbers : CompilerTest;
 
     [UnitTest]
     [Target(@"(40000 - 1  )dump_print")]
     [Output("39999")]
     [Number]
     [ConversionService.Closure]
-    public sealed class SubtractOddSizedNumber : CompilerTest
-    {}
+    public sealed class SubtractOddSizedNumber : CompilerTest;
 
     [UnitTest]
     [Target(@"(40000 + 1  )dump_print")]
     [Output("40001")]
     [Number]
     [ConversionService.Closure]
-    public sealed class AddOddSizedNumber : CompilerTest
-    {}
+    public sealed class AddOddSizedNumber : CompilerTest;
 
     [UnitTest]
     [Target(@"(40000 - 43210)dump_print")]
     [Output("-3210")]
     [Number]
     [ConversionService.Closure]
-    public sealed class SubtractLargeEqualSizedNumber : CompilerTest
-    {}
+    public sealed class SubtractLargeEqualSizedNumber : CompilerTest;
 
     [UnitTest]
     [Target(@"(400 - 43210)dump_print")]
     [Output("-42810")]
     [Number]
     [ConversionService.Closure]
-    public sealed class SubtractLargerSizedNumber : CompilerTest
-    {}
+    public sealed class SubtractLargerSizedNumber : CompilerTest;
 }

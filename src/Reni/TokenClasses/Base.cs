@@ -7,11 +7,11 @@ using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses;
 
-abstract class TerminalToken : TokenClass { }
-abstract class InfixPrefixToken : TokenClass { }
-abstract class NonSuffixToken : TokenClass { }
-abstract class SuffixToken : TokenClass { }
-abstract class InfixToken : TokenClass { }
+abstract class TerminalToken : TokenClass;
+abstract class InfixPrefixToken : TokenClass;
+abstract class NonSuffixToken : TokenClass;
+abstract class SuffixToken : TokenClass;
+abstract class InfixToken : TokenClass;
 
 abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
 {
