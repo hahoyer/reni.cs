@@ -24,5 +24,5 @@ Text('Hallo') AfterCopy() result dump_print
 ")]
     [Output("((bit)*8[text_item])reference[force_mutable][mutable]")]
     [TypeOfElementOfSimpleArrayFromPiece]
-    public sealed class ArrayElementType1 : CompilerTest {}
+    public sealed class ArrayElementType1 : CompilerTest;
 }

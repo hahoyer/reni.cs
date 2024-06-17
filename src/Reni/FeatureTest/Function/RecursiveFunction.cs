@@ -35,7 +35,5 @@ f: @
 f(4)dump_print"
         )]
     [Output("24")]
-    public sealed class RecursiveFunction : CompilerTest
-    {
-    }
+    public sealed class RecursiveFunction : CompilerTest;
 }

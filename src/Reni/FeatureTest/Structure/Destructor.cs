@@ -21,4 +21,4 @@ xx this xxx := 2;
 xx dump_print
 
 ", "(12345, @!, 12345678901, 2, 12345678901234567890123456789)")]
-public sealed class Destructor : CompilerTest { }
+public sealed class Destructor : CompilerTest;

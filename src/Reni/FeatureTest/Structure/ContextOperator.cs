@@ -17,7 +17,7 @@ x: @
 x() dump_print
 
 ", "(256, ^^, 257, 258)")]
-    public sealed class ContextOperatorPrint : CompilerTest {}
+    public sealed class ContextOperatorPrint : CompilerTest;
 
     [UnitTest]
     [Access]
@@ -36,7 +36,7 @@ xx : x();
 xxx : xx this;
 xxx xxx dump_print
 ", "257")]
-    public sealed class ContextOperatorAccess : CompilerTest {}
+    public sealed class ContextOperatorAccess : CompilerTest;
 
     [UnitTest]
     [Access]
@@ -56,7 +56,7 @@ xx : x();
 xx this() xxx dump_print
 
 ", "257")]
-    public sealed class ContextOperatorFunctionAccess : CompilerTest {}
+    public sealed class ContextOperatorFunctionAccess : CompilerTest;
 
     [UnitTest]
     [Access]
@@ -77,7 +77,7 @@ xx : x();
 xx this xxx dump_print
 
 ", "257")]
-    public sealed class ContextOperatorPropertyAccess : CompilerTest {}
+    public sealed class ContextOperatorPropertyAccess : CompilerTest;
 
     [UnitTest]
     [Access]
@@ -98,7 +98,7 @@ xx this xxx := 2;
 xx dump_print
 
 ", "(12345, @!, 12345678901, 2, 12345678901234567890123456789)")]
-    public sealed class ContextOperatorAssign : CompilerTest {}
+    public sealed class ContextOperatorAssign : CompilerTest;
 
     [UnitTest]
     [ContextOperatorPrint]
@@ -106,5 +106,5 @@ xx dump_print
     [ContextOperatorAssign]
     [ContextOperatorPropertyAccess]
     [ContextOperatorFunctionAccess]
-    public sealed class ContextOperator : CompilerTest {}
+    public sealed class ContextOperator : CompilerTest;
 }

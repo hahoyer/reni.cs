@@ -15,6 +15,5 @@ namespace Reni.FeatureTest.Structure
     [TargetSet(@"(!mutable:10, !mutable:2000, !mutable:30, (_A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
     [SimpleAssignment]
     [SimpleAssignment1]
-    public sealed class Assignments : CompilerTest
-    {}
+    public sealed class Assignments : CompilerTest;
 }

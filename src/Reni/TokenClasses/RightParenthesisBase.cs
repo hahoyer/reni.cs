@@ -29,11 +29,7 @@ namespace Reni.TokenClasses
         int Level { get; }
     }
 
-    interface IRightBracket: IBracket
-    {
-    }
+    interface IRightBracket: IBracket;
 
-    interface ILeftBracket: IBracket
-    {
-    }
+    interface ILeftBracket: IBracket;
 }

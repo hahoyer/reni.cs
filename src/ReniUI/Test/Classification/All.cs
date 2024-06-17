@@ -5,4 +5,4 @@ namespace ReniUI.Test.Classification;
 [UnitTest]
 [Basics]
 [Comments]
-public sealed class All : DependenceProvider { }
+public sealed class All : DependenceProvider;

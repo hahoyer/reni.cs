@@ -11,24 +11,24 @@ namespace Reni.FeatureTest;
 [UnitTest]
 [Target(@"!public x: 1")]
 [Output("")]
-public sealed class ScopeHandlingPublic : CompilerTest { }
+public sealed class ScopeHandlingPublic : CompilerTest;
 
 [UnitTest]
 [Target(@"!non_public x: 1")]
 [Output("")]
-public sealed class ScopeHandlingNonPublic : CompilerTest { }
+public sealed class ScopeHandlingNonPublic : CompilerTest;
 
 [UnitTest]
 [Target(@"!(public mutable) x: 1")]
 [ScopeHandlingPublic]
 [Output("")]
-public sealed class ScopeHandlingGroup : CompilerTest { }
+public sealed class ScopeHandlingGroup : CompilerTest;
 
 [UnitTest]
 [Target(@"!public !mutable x: 1")]
 [ScopeHandlingPublic]
 [Output("")]
-public sealed class ScopeHandlingMultiple : CompilerTest { }
+public sealed class ScopeHandlingMultiple : CompilerTest;
 
 [UnitTest]
 [Target(@"!unkown x: 1")]
@@ -77,7 +77,7 @@ public sealed class PublicNonPublic1 : CompilerTest
 [ScopeHandlingPublic]
 [ScopeHandlingNonPublic]
 [Output("2")]
-public sealed class PublicNonPublic2 : CompilerTest { }
+public sealed class PublicNonPublic2 : CompilerTest;
 
 [UnitTest]
 [ScopeHandlingPublic]
@@ -87,4 +87,4 @@ public sealed class PublicNonPublic2 : CompilerTest { }
 [ScopeHandlingGroup]
 [ScopeHandlingError]
 [ScopeHandlingMultiple]
-public sealed class AllScopeHandling : CompilerTest { }
+public sealed class AllScopeHandling : CompilerTest;

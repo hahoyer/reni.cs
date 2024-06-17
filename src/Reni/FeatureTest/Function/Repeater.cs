@@ -31,15 +31,14 @@ repeat
     [BitArrayOp.BitArrayOp]
     [UseThen]
     [FunctionOfFunction]
-    public sealed class SimpleRepeater : CompilerTest
-    {}
+    public sealed class SimpleRepeater : CompilerTest;
 
     [UnitTest]
     [Target(@"
 repeat: @ ^ while() then(^ body(), repeat(^));
 
 count: 10;
-!mutable index: count type instance(0);
+index!mutable : count type instance(0);
 repeat
 (
     while: @ index < count, 
@@ -47,12 +46,11 @@ repeat
     (
         index dump_print, 
         ' ' dump_print, 
-        index := (index + 1)enable_cut
+        index := (index + 1) enable_cut
     )
 )
 ")]
     [Output("0 1 2 3 4 5 6 7 8 9 ")]
     [SimpleRepeater]
-    public sealed class Repeater : CompilerTest
-    {}
+    public sealed class Repeater : CompilerTest;
 }

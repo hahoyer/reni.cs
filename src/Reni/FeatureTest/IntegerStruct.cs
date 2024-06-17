@@ -35,7 +35,7 @@ Integer8:
     [InstanceCode("(Integer8(1)+Integer8(2))")]
     [IntegerPlusNumber]
     [ConversionService.Closure]
-    public sealed class IntegerPlusInteger : IntegerStruct {}
+    public sealed class IntegerPlusInteger : IntegerStruct;
 
     [UnitTest]
     [Output("3")]
@@ -44,14 +44,14 @@ Integer8:
     [ObjectFunction]
     [TwoFunctions1]
     //[LowPriority]
-    public sealed class IntegerPlusNumber : IntegerStruct {}
+    public sealed class IntegerPlusNumber : IntegerStruct;
 
     [UnitTest]
     [Output("23")]
     [InstanceCode("Integer8(23) clone")]
     [Create]
     [TwoFunctions1]
-    public sealed class Clone : IntegerStruct {}
+    public sealed class Clone : IntegerStruct;
 
     [UnitTest]
     [Output("23")]
@@ -59,7 +59,7 @@ Integer8:
     [Integer1]
     [Integer2]
     [Integer127]
-    public sealed class Create : IntegerStruct {}
+    public sealed class Create : IntegerStruct;
 
     [UnitTest]
     [PropertyVariable]
@@ -68,17 +68,17 @@ Integer8:
     [ObjectProperty]
     [Output("1")]
     [InstanceCode("Integer8(1)")]
-    public sealed class Integer1 : IntegerStruct {}
+    public sealed class Integer1 : IntegerStruct;
 
     [UnitTest]
     [Output("2")]
     [Integer1]
     [InstanceCode("Integer8(2)")]
-    public sealed class Integer2 : IntegerStruct {}
+    public sealed class Integer2 : IntegerStruct;
 
     [UnitTest]
     [Integer2]
     [Output("127")]
     [InstanceCode("Integer8(127)")]
-    public sealed class Integer127 : IntegerStruct {}
+    public sealed class Integer127 : IntegerStruct;
 }

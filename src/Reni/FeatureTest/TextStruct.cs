@@ -43,7 +43,7 @@ public abstract class TextStruct : CompilerTest
 [ArrayReferenceAll]
 [Simple]
 [MixIn.Function]
-public sealed class Text1 : TextStruct { }
+public sealed class Text1 : TextStruct;
 
 [UnitTest]
 [Output("Hallo")]

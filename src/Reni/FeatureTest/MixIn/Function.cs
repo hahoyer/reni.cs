@@ -17,5 +17,5 @@ This: @
 
 This() (1) := 3
 ", "13")]
-    public sealed class Function : CompilerTest {}
+    public sealed class Function : CompilerTest;
 }

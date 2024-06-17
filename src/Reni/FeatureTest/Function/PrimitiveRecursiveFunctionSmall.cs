@@ -10,6 +10,5 @@ namespace Reni.FeatureTest.Function
     [Target(@"!mutable i: 400000 type instance(400); f: @i > 0 then (i := (i - 1)enable_cut; f());f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionByteWithDump]
-    public sealed class PrimitiveRecursiveFunctionSmall : CompilerTest
-    {}
+    public sealed class PrimitiveRecursiveFunctionSmall : CompilerTest;
 }

@@ -14,7 +14,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         protected override void SetupPositions(BinaryTreeProxy[] target) { }
     }
 
-    interface ITrainWreckPart { }
+    interface ITrainWreckPart;
 
     sealed class TrainWreck : Formatter, ITrainWreckPart
     {
@@ -121,7 +121,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             => target is not TerminalSyntax;
     }
 
-    abstract class CompoundWithCleanup : Formatter { }
+    abstract class CompoundWithCleanup : Formatter;
 
     sealed class Declaration : Formatter
     {

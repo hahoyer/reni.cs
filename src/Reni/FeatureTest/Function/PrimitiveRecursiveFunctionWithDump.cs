@@ -10,6 +10,5 @@ namespace Reni.FeatureTest.Function
     [PrimitiveRecursiveFunctionByteWithDump]
     [UseThen]
     [UseElse]
-    public sealed class PrimitiveRecursiveFunctionWithDump : CompilerTest
-    {}
+    public sealed class PrimitiveRecursiveFunctionWithDump : CompilerTest;
 }

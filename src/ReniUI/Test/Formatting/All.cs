@@ -10,5 +10,5 @@ namespace ReniUI.Test.Formatting
     [Lists]
     [ThenElse]
     [WithComments]
-    public sealed class All : DependenceProvider {}
+    public sealed class All : DependenceProvider;
 }

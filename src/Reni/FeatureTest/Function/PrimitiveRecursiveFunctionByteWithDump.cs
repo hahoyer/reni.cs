@@ -17,6 +17,5 @@ namespace Reni.FeatureTest.Function
     [NamedSimpleAssignment]
     [Target(@"!mutable i: 10; f: @ i > 0 then (i := (i - 1)enable_cut; i dump_print; f());f()")]
     [Output("9876543210")]
-    public sealed class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
-    {}
+    public sealed class PrimitiveRecursiveFunctionByteWithDump : CompilerTest;
 }

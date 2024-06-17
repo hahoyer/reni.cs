@@ -6,7 +6,7 @@ namespace ReniUI.RestFul;
 
 public sealed class Channel
 {
-    sealed class ExecutionProhibitedException : Exception { }
+    sealed class ExecutionProhibitedException : Exception;
 
     readonly ValueCache<CompilerBrowser> CompilerCache;
     readonly ValueCache<StringStream> ResultCache;

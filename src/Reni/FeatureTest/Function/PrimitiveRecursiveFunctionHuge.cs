@@ -8,7 +8,5 @@ namespace Reni.FeatureTest.Function
     [Output("")]
     [PrimitiveRecursiveFunctionSmall]
     //[LowPriority]
-    public sealed class PrimitiveRecursiveFunctionHuge : CompilerTest
-    {
-    }
+    public sealed class PrimitiveRecursiveFunctionHuge : CompilerTest;
 }

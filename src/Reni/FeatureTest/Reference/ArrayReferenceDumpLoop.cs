@@ -32,5 +32,5 @@ o:
 o('abcdef') dump_print
 ")]
     [Output("abcdef")]
-    public sealed class ArrayReferenceDumpLoop : CompilerTest {}
+    public sealed class ArrayReferenceDumpLoop : CompilerTest;
 }

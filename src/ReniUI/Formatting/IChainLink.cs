@@ -1,4 +1,4 @@
 namespace ReniUI.Formatting
 {
-    interface IChainLink {}
+    interface IChainLink;
 }

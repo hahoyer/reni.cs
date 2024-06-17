@@ -10,5 +10,5 @@ namespace ReniTest
         public void Run() {NotImplementedMethod();}
     }
 
-    abstract class TreeItem : DumpableObject{}
+    abstract class TreeItem : DumpableObject;
 }

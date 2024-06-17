@@ -7,8 +7,7 @@ namespace Reni.FeatureTest.Text
 {
     [UnitTest]
     [TargetSet(@"'Hallo' dump_print", "Hallo")]
-    public sealed class Hallo : CompilerTest
-    {}
+    public sealed class Hallo : CompilerTest;
 
     [UnitTest]
     [TargetSet(@"
@@ -22,39 +21,33 @@ x (4) dump_print;
     [Hallo]
     [ElementAccessVariable]
     [ArrayVariable]
-    public sealed class Hallo01234 : CompilerTest
-    {}
+    public sealed class Hallo01234 : CompilerTest;
 
     [UnitTest]
     [TargetSet("'Hal''lo' dump_print", "Hal'lo")]
     [Hallo]
-    public sealed class HalloApo : CompilerTest
-    {}
+    public sealed class HalloApo : CompilerTest;
 
     [UnitTest]
     [TargetSet("\"Hal''lo\" dump_print", "Hal''lo")]
     [HalloApo]
-    public sealed class HalloApoApo : CompilerTest
-    {}
+    public sealed class HalloApoApo : CompilerTest;
 
     [UnitTest]
     [TargetSet("\"Hal'\"\"'lo\" dump_print", "Hal'\"'lo")]
     [HalloApoApo]
-    public sealed class HalloApoQuoApo : CompilerTest
-    {}
+    public sealed class HalloApoQuoApo : CompilerTest;
 
     [UnitTest]
     [TargetSet("('Hallo' << ' Welt!') dump_print", "Hallo Welt!")]
     [Hallo]
     [CombineArraysFromPieces]
-    public sealed class HalloWelt : CompilerTest
-    {}
+    public sealed class HalloWelt : CompilerTest;
 
     [UnitTest]
     [Hallo]
     [TargetSet("108 text_item dump_print", "l")]
-    public sealed class ConvertFromNumber : CompilerTest
-    {}
+    public sealed class ConvertFromNumber : CompilerTest;
 
     [UnitTest]
     [ConvertFromNumber]
@@ -62,8 +55,7 @@ x (4) dump_print;
     [TargetSet("(<< (108)text_item<< (109)text_item)text_item dump_print", "lm")]
     [ArrayFromPieces]
     [Hallo]
-    public sealed class ConvertFromNumbers : CompilerTest
-    {}
+    public sealed class ConvertFromNumbers : CompilerTest;
 
     [UnitTest]
     [Hallo]
@@ -71,6 +63,5 @@ x (4) dump_print;
     [ConvertFromNumber]
     [ConversionService.Closure]
     [TargetSet("('80' to_number_of_base 16) dump_print", "128")]
-    public sealed class ConvertHexadecimal : CompilerTest
-    {}
+    public sealed class ConvertHexadecimal : CompilerTest;
 }

@@ -100,4 +100,4 @@ x: Auswahl Ja;
 x == Auswahl Ja then ""Match"" dump_print;
 x == Auswahl Nein then ""No match"" dump_print",
     "MatchNo match")]
-public sealed class EnumExample : CompilerTest { }
+public sealed class EnumExample : CompilerTest;
