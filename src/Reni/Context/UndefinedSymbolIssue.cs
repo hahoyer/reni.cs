@@ -1,3 +1,3 @@
 namespace Reni.Context;
 
-class UndefinedSymbolIssue { }
+class UndefinedSymbolIssue;

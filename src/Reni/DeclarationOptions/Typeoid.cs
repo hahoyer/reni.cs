@@ -2,5 +2,5 @@ using hw.DebugFormatter;
 
 namespace Reni.DeclarationOptions
 {
-    public class Typeoid : DumpableObject { }
+    public class Typeoid : DumpableObject;
 }

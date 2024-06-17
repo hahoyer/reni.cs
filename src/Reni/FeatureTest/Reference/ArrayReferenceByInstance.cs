@@ -15,5 +15,5 @@ pointer(11) dump_print;
 pointer(11) dump_print;
 pointer(14) dump_print;
 ", "hallo")]
-    public sealed class ArrayReferenceByInstance : CompilerTest {}
+    public sealed class ArrayReferenceByInstance : CompilerTest;
 }

@@ -1,16 +1,16 @@
 namespace Reni.TokenClasses.Whitespace
 {
-    interface ISpace : IItemType { }
+    interface ISpace : IItemType;
 
-    interface IComment : IItemType { }
+    interface IComment : IItemType;
 
-    interface ILineBreak : IItemType { }
+    interface ILineBreak : IItemType;
 
-    interface IStable : IItemType { }
+    interface IStable : IItemType;
 
-    interface IStableLineBreak : IStable, ILineBreak { }
+    interface IStableLineBreak : IStable, ILineBreak;
 
-    interface IVolatileLineBreak : ILineBreak { }
+    interface IVolatileLineBreak : ILineBreak;
 
     interface IParent
     {
@@ -23,34 +23,34 @@ namespace Reni.TokenClasses.Whitespace
 
     namespace Comment
     {
-        interface ILine : IComment { }
+        interface ILine : IComment;
 
-        interface IInline : IComment { }
+        interface IInline : IComment;
 
         namespace Line
         {
-            interface IHead : IStable { }
+            interface IHead : IStable;
 
-            interface IText : IStable { }
+            interface IText : IStable;
 
-            interface ITail : IStableLineBreak { }
+            interface ITail : IStableLineBreak;
         }
 
         namespace Inline
         {
-            interface IHead : IStable { }
+            interface IHead : IStable;
 
-            interface IIdentifier : IStable { }
+            interface IIdentifier : IStable;
 
-            interface IText : IItemType { }
+            interface IText : IItemType;
 
-            interface ITail : IStable { }
+            interface ITail : IStable;
 
             namespace Text
             {
-                interface IText : IStable { }
+                interface IText : IStable;
 
-                interface ILineBreak : IStableLineBreak { }
+                interface ILineBreak : IStableLineBreak;
             }
         }
     }

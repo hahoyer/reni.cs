@@ -25,7 +25,7 @@ o:
 o('abcdef') dump_print1
 ")]
     [Output("abcdef")]
-    public sealed class FunctionalDumpSimple : CompilerTest { }
+    public sealed class FunctionalDumpSimple : CompilerTest;
 
     [UnitTest]
     [FunctionalDumpSimple]
@@ -46,5 +46,5 @@ o:
 o('abcdef') dump_print1
 ")]
     [Output("adf")]
-    public sealed class ArrayReferenceDumpSimple : CompilerTest { }
+    public sealed class ArrayReferenceDumpSimple : CompilerTest;
 }

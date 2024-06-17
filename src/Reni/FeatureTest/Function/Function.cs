@@ -9,6 +9,5 @@ namespace Reni.FeatureTest.Function
     [Output("2")]
     [InnerAccess]
     [SomeVariables]
-    public sealed class Function : CompilerTest
-    {}
+    public sealed class Function : CompilerTest;
 }

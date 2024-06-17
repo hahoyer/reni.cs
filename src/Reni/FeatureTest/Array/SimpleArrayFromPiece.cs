@@ -7,4 +7,4 @@ namespace Reni.FeatureTest.Array;
 [Target("(<<5) dump_print")]
 [Output("<<(5)")]
 [ParserTest.ParserTest]
-public sealed class SimpleArrayFromPiece : CompilerTest { }
+public sealed class SimpleArrayFromPiece : CompilerTest;

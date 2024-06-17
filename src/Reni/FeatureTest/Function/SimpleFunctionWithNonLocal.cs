@@ -11,5 +11,5 @@ namespace Reni.FeatureTest.Function
     [SomeVariables]
     [ConstantFunction]
     [SimpleFunction]
-    public sealed class SimpleFunctionWithNonLocal : CompilerTest {}
+    public sealed class SimpleFunctionWithNonLocal : CompilerTest;
 }

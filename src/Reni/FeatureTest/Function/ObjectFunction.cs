@@ -8,5 +8,5 @@ namespace Reni.FeatureTest.Function
     [ObjectFunction2]
     [Target(@"f: @(value: ^, x: @ ^ + value);f(2) x(100) dump_print")]
     [Output("102")]
-    public sealed class ObjectFunction : CompilerTest {}
+    public sealed class ObjectFunction : CompilerTest;
 }

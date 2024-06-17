@@ -10,7 +10,5 @@ namespace Reni.FeatureTest.Function
     [InnerAccess]
     [Add2Numbers]
     [Function]
-    public sealed class SimpleFunction : CompilerTest
-    {
-    }
+    public sealed class SimpleFunction : CompilerTest;
 }

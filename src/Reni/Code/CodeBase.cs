@@ -255,4 +255,4 @@ abstract class CodeBase
     internal static CodeBase GetTopRef() => new TopRef();
 }
 
-abstract class UnexpectedVisitOfPending : Exception { }
+abstract class UnexpectedVisitOfPending : Exception;

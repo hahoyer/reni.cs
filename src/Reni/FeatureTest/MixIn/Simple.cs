@@ -21,5 +21,5 @@ This: @
 
 This()a dump_print
 ", "3")]
-    public sealed class Simple : CompilerTest {}
+    public sealed class Simple : CompilerTest;
 }

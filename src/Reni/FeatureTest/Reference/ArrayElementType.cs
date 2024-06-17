@@ -11,5 +11,5 @@ t: a() type;
 t dump_print
 ")]
     [Output("(bit)*8[text_item]")]
-    public sealed class ArrayElementType : CompilerTest {}
+    public sealed class ArrayElementType : CompilerTest;
 }

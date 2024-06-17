@@ -307,4 +307,4 @@ abstract class ContextBase
     }
 }
 
-sealed class SmartNodeAttribute : Attribute { }
+sealed class SmartNodeAttribute : Attribute;

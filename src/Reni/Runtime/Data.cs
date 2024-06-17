@@ -9,7 +9,7 @@ namespace Reni.Runtime;
 [DebuggerDisplay("{Dump}")]
 public sealed class Data
 {
-    public interface IView { }
+    public interface IView;
 
     [PublicAPI]
     public sealed class View : DumpableObject, IView

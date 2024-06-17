@@ -19,7 +19,7 @@ interface IMetaImplementation
     IMeta Function { get; }
 }
 
-interface IImplementation : IEvalImplementation, IMetaImplementation { }
+interface IImplementation : IEvalImplementation, IMetaImplementation;
 
 abstract class FunctionFeatureImplementation
     : DumpableObject, IImplementation, IFunction
@@ -97,7 +97,7 @@ interface IMeta
     Result GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
 }
 
-interface ISearchTarget { }
+interface ISearchTarget;
 
 // ReSharper disable once TypeParameterCanBeVariant
 // Exact match for TDefinable is required here.

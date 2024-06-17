@@ -8,10 +8,10 @@ namespace Reni.FeatureTest.Function
     [Function]
     [TwoFunctions]
     [SimpleFunctionWithNonLocal]
-    public sealed class FunctionOfFunction : CompilerTest {}
+    public sealed class FunctionOfFunction : CompilerTest;
 
     [UnitTest]
     [FunctionOfFunction]
     [TargetSet(@"f: @ ^ + 2; g: @ ^(10); g(f)dump_print", "12")]
-    public sealed class FunctionArgument : CompilerTest { }
+    public sealed class FunctionArgument : CompilerTest;
 }

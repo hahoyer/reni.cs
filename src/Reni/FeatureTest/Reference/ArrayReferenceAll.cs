@@ -8,5 +8,5 @@ namespace Reni.FeatureTest.Reference
     [ArrayReferenceCopy]
     [ArrayReferenceDumpLoop]
     [ArrayReferenceByInstance]
-    public sealed class ArrayReferenceAll : CompilerTest {}
+    public sealed class ArrayReferenceAll : CompilerTest;
 }

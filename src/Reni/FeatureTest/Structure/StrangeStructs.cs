@@ -11,5 +11,5 @@ namespace Reni.FeatureTest.Structure
     [TargetSet(@"((one: 1,) one) dump_print;", "1")]
     [TargetSet(@"((0,one: 1) one) dump_print;", "1")]
     [TargetSet(@"((0,one: 1,) one) dump_print;", "1")]
-    public sealed class StrangeStructs : CompilerTest {}
+    public sealed class StrangeStructs : CompilerTest;
 }

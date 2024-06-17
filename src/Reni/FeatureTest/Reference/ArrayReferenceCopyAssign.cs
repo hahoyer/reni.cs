@@ -16,5 +16,5 @@ ref(1) dump_print;
 ref(2) dump_print;
 ")]
     [Output("123")]
-    public sealed class ArrayReferenceCopyAssign : CompilerTest {}
+    public sealed class ArrayReferenceCopyAssign : CompilerTest;
 }

@@ -48,4 +48,4 @@ public sealed class UnMatchedRightParenthesis : CompilerTest
 [UnitTest]
 [UnMatchedLeftParenthesis]
 [UnMatchedRightParenthesis]
-public sealed class UnMatchedBrackets : CompilerTest { }
+public sealed class UnMatchedBrackets : CompilerTest;

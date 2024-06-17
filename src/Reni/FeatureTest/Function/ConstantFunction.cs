@@ -7,5 +7,5 @@ namespace Reni.FeatureTest.Function
     [Target(@"f: @100;f() dump_print;")]
     [Output("100")]
     [Function]
-    public sealed class ConstantFunction : CompilerTest {}
+    public sealed class ConstantFunction : CompilerTest;
 }

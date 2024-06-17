@@ -1,4 +1,4 @@
 namespace Reni.TokenClasses
 {
-    abstract class PreType {}
+    abstract class PreType;
 }

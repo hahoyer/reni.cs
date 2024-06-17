@@ -96,4 +96,4 @@ public enum CompilationLevel
     , Run = 4
 }
 
-public class NodeAttribute : Attribute { }
+public sealed class NodeAttribute : Attribute;

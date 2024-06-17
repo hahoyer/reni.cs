@@ -16,5 +16,5 @@ f1()dump_print;
     [Output("3")]
     [SimpleFunctionWithNonLocal]
     [ObjectFunction]
-    public sealed class TwoFunctions1 : CompilerTest {}
+    public sealed class TwoFunctions1 : CompilerTest;
 }

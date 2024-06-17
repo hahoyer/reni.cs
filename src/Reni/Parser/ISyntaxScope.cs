@@ -1,5 +1,4 @@
 namespace Reni.Parser
 {
-    interface ISyntaxScope
-    { }
+    interface ISyntaxScope;
 }

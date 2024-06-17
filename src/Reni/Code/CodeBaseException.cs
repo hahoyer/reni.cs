@@ -15,4 +15,4 @@ sealed class UnexpectedContextReference : CodeBaseException
         : base(container) { }
 }
 
-sealed class UnexpectedRecursiveCallCandidate : Exception { }
+sealed class UnexpectedRecursiveCallCandidate : Exception;

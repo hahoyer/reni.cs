@@ -41,5 +41,5 @@ complex FromReal(2) dump_print;
 (complex Create(0,1) * complex Create(0,1)) dump_print
 ",
             "2+0i -1+0i")]
-    public sealed class UserObjects : CompilerTest {}
+    public sealed class UserObjects : CompilerTest;
 }

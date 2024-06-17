@@ -1,6 +1,4 @@
 namespace Reni.SyntaxFactory
 {
-    interface IDeclarationTagToken
-    {
-    }
+    interface IDeclarationTagToken;
 }

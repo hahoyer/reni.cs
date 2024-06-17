@@ -9,5 +9,5 @@ namespace Reni.FeatureTest.Function
     [PropertyVariable]
     [Target(@"f: @(value: ^, x: @!value);f(2) x dump_print")]
     [Output("2")]
-    public sealed class ObjectProperty : CompilerTest {}
+    public sealed class ObjectProperty : CompilerTest;
 }

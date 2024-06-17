@@ -9,6 +9,5 @@ namespace Reni.FeatureTest.TypeType
     [SomeVariables]
     [TypeOperator]
     [TargetSet("x: 0; x type dump_print", "number(bits:1)")]
-    public sealed class TypeOperatorWithVariable : CompilerTest
-    {}
+    public sealed class TypeOperatorWithVariable : CompilerTest;
 }

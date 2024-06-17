@@ -53,7 +53,7 @@ sealed class Function : Child, IFunctionContext
     protected override string LevelFormat => "function";
 }
 
-sealed class ValueCannotBeUsedHereException : Exception { }
+sealed class ValueCannotBeUsedHereException : Exception;
 
 interface IFunctionContext : IContextReference
 {
