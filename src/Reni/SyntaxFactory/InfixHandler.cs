@@ -7,6 +7,7 @@ using Reni.DeclarationOptions;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.SyntaxFactory;
@@ -37,6 +38,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
                 return $"(actual: {types.Stringify(",")})";
             }
         }
+
         IEnumerable<string> Types
         {
             get
@@ -84,6 +86,12 @@ sealed class InfixHandler : DumpableObject, IValueProvider
 
         Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
             => new(category, GetIssue(left.Anchor.SourcePart));
+
+        TypeBase ISuffix.TryGetTypeBase(ValueSyntax left)
+        {
+            NotImplementedMethod(left);
+            return default;
+        }
     }
 
     sealed class PrefixErrorTokenClass : InfixTypeErrorTokenClass, IPrefix
@@ -113,6 +121,12 @@ sealed class InfixHandler : DumpableObject, IValueProvider
             NotImplementedMethod(visitor);
             return default;
         }
+        TypeBase ITerminal.TryGetTypeBase(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return default;
+        }
+
     }
 
     static readonly FunctionCache<System.Type, FunctionCache<ITokenClass, InfixTypeErrorTokenClass>>

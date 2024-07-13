@@ -4,6 +4,7 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Feature;
 
@@ -29,4 +30,7 @@ sealed class TypeOperator : SuffixSyntaxToken
 
         return Root.VoidType.GetResult(category);
     }
+
+    protected override TypeBase TryGetTypeBase(ValueSyntax left) 
+        => left.TryGetTypeBase()?.TypeForTypeOperator.TypeType;
 }

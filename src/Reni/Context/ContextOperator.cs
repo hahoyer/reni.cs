@@ -4,6 +4,7 @@ using Reni.Basics;
 using Reni.DeclarationOptions;
 using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Context;
 
@@ -18,4 +19,9 @@ sealed class ContextOperator : TerminalSyntaxToken
         => context
             .FindRecentCompoundView
             .ContextOperatorResult(category);
+    protected override TypeBase TryGetTypeBase(SourcePart token)
+    {
+        NotImplementedMethod(token);
+        return default;
+    }
 }
