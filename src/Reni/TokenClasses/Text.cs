@@ -3,6 +3,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
 using Reni.Parser;
+using Reni.Type;
 
 namespace Reni.TokenClasses;
 
@@ -23,5 +24,11 @@ sealed class Text : TerminalSyntaxToken
             .TextItem
             .GetResult
                 (category, () => Code.Extension.GetCode(BitsConst.ConvertAsText(data)), Closures.GetVoid);
+    }
+
+    protected override TypeBase TryGetTypeBase(SourcePart token)
+    {
+        NotImplementedMethod(token);
+        return default;
     }
 }

@@ -12,7 +12,7 @@ namespace Reni.FeatureTest.Function
 repeat: @ ^() while then repeat(^);
 
 count: 10;
-!mutable index: count type instance(0);
+index!mutable : count type instance(0);
 repeat
 (@(
     while: index < count, 
@@ -20,7 +20,7 @@ repeat
     (
         index dump_print, 
         ' ' dump_print, 
-        index := (index + 1)enable_cut
+        index := (index + 1) enable_cut
     )
 ))
 ")]

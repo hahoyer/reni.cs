@@ -10,7 +10,7 @@ x: @
   '12345';
   this: @! ^^;
   '12345678901';
-  !mutable xxx: 257;
+  xxx!mutable: 257;
   '12345678901234567890123456789';
 ~~~
 'GetCleanup' dump_print

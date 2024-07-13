@@ -14,7 +14,7 @@ NewMemory: @
 
 Text: @
 ( 
-    !mutable data: ^ array_reference;
+    data!mutable : ^ array_reference;
     _elementType: ^() type;
     _count: ^ count;
     AfterCopy: @ NewMemory(elementType: _elementType, count: _count);

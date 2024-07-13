@@ -4,6 +4,7 @@ using Reni.Context;
 using Reni.DeclarationOptions;
 using Reni.SyntaxFactory;
 using Reni.SyntaxTree;
+using Reni.Type;
 
 namespace Reni.TokenClasses;
 
@@ -20,12 +21,15 @@ abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
     Result ITerminal.GetResult(ContextBase context, Category category, SourcePart token)
         => GetResult(context, category, token);
 
+    TypeBase ITerminal.TryGetTypeBase(SourcePart token) => TryGetTypeBase(token);
+
     ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
     protected abstract Declaration[] Declarations { get; }
 
     protected abstract Result GetResult(ContextBase context, Category category, SourcePart token);
+    protected abstract TypeBase TryGetTypeBase(SourcePart token);
 
     protected ValueSyntax Visit(ISyntaxVisitor visitor)
     {
@@ -59,6 +63,12 @@ abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValue
     Result ITerminal.GetResult(ContextBase context, Category category, SourcePart token)
         => GetResult(context, category);
 
+    TypeBase ITerminal.TryGetTypeBase(SourcePart token)
+    {
+        NotImplementedMethod(token);
+        return default;
+    }
+
     ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
@@ -81,9 +91,12 @@ abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueToken
     Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
         => GetResult(context, category, left);
 
+    TypeBase ISuffix.TryGetTypeBase(ValueSyntax left) => TryGetTypeBase(left);
+
     IValueProvider IValueToken.Provider => Factory.Infix;
 
     protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax left);
+    protected abstract TypeBase TryGetTypeBase(ValueSyntax left);
 }
 
 abstract class InfixSyntaxToken : InfixToken, IInfix, IValueToken

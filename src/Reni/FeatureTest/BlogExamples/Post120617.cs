@@ -12,7 +12,7 @@ EinsDazu: @ ^ + 1 ;
 Konstrukt: 
 @(
     Simpel: ^; 
-    !mutable Pelsim: EinsDazu(^) ; 
+    Pelsim !mutable : EinsDazu(^) ; 
     Fun: @ Simpel+ EinsDazu(^)
 );
 lorum: Konstrukt(23);

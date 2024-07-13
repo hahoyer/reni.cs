@@ -5,7 +5,6 @@ namespace Reni.FeatureTest.Structure
 {
     [UnitTest]
     [SimpleAssignment]
-    [TargetSet(@"(!mutable x: 10 , x := 4) dump_print", "(4, )")]
-    public sealed class NamedSimpleAssignment : CompilerTest
-    {}
+    [TargetSet(@"(x!mutable : 10 , x := 4) dump_print", "(4, )")]
+    public sealed class NamedSimpleAssignment : CompilerTest;
 }

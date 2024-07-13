@@ -83,9 +83,6 @@ sealed class CompoundSyntax : ValueSyntax
     internal override bool? IsHollow => PureStatements.All(syntax => syntax.IsHollow == true);
 
     [DisableDump]
-    internal override Semantics Semantics => Semantics.From(this);
-
-    [DisableDump]
     protected override int DirectChildCount => Statements.Length + 1;
 
     public override string DumpData()

@@ -16,14 +16,14 @@ o:
     dump_print: 
     @! 
     (
-        !mutable position: count type instance (0) ;
+        position!mutable : count type instance (0) ;
         repeat
         (
             while: @ position < count,
             body: @ 
             ( 
                 data (position) dump_print, 
-                position := (position + 1) enable_cut
+                position := (position + 1) !enable_cut
             ) 
         )
     )
