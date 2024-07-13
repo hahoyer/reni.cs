@@ -1,16 +1,14 @@
 using hw.DebugFormatter;
 
-namespace Reni.Helper
+namespace Reni.Helper;
+
+public interface ITree<out TTarget>
 {
-    public interface ITree<out TTarget>
-    {
-        [DisableDump]
-        int LeftDirectChildCount { get; }
+    [DisableDump]
+    int LeftDirectChildCount { get; }
 
-        [DisableDump]
-        int DirectChildCount { get; }
+    [DisableDump]
+    int DirectChildCount { get; }
 
-        TTarget GetDirectChild(int index);
-    }
-
+    TTarget GetDirectChild(int index);
 }

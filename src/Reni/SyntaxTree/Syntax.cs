@@ -40,15 +40,6 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 
     internal BinaryTree MainAnchor => Anchor.Main;
 
-    [DisableDump]
-    internal virtual Semantics Semantics
-    {
-        get {
-            NotImplementedMethod();
-            return default;
-        }
-    }
-
     [EnableDump]
     [EnableDumpExcept(null)]
     internal string Position => Anchor.SourceParts.DumpSource();
@@ -89,6 +80,9 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     public SourcePart ChildSourcePart => LeftMostAnchor.SourcePart.Start.Span(RightMostAnchor.SourcePart.End);
     internal SourcePart[] Anchors => Anchor.SourceParts;
 
+    [DisableDump]
+    internal Syntax Parent => MainAnchor.Parent?.Syntax;
+
     protected Syntax(Anchor anchor, int? objectId = null)
         : base(objectId)
     {
@@ -117,9 +111,6 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     protected abstract int DirectChildCount { get; }
 
     protected abstract Syntax GetDirectChild(int index);
-
-    [DisableDump]
-    internal Syntax Parent => MainAnchor.Parent?.Syntax;
 
     protected virtual IEnumerable<Issue> GetIssues() => null;
 
