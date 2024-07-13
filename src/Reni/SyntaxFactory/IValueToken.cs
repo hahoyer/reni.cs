@@ -1,7 +1,6 @@
-namespace Reni.SyntaxFactory
+namespace Reni.SyntaxFactory;
+
+interface IValueToken
 {
-    interface IValueToken
-    {
-        IValueProvider Provider { get; }
-    }
+    IValueProvider Provider { get; }
 }

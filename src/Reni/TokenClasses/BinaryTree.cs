@@ -31,6 +31,9 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
         [DisableDump]
         internal Anchor ToAnchor => Anchor.Create(Left, Right);
+
+        [DisableDump]
+        internal BinaryTree[] Anchors => T(Left, Right);
     }
 
     static int NextObjectId;
@@ -56,6 +59,8 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     internal BinaryTree Parent;
 
     [PublicAPI]
+    [EnableDump]
+    [EnableDumpExcept(null)]
     internal IFormatter Formatter;
 
     [DisableDump]
@@ -73,43 +78,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     int Depth;
 
-    BinaryTree
-    (
-        BinaryTree left
-        , ITokenClass tokenClass
-        , IToken token
-        , BinaryTree right
-    )
-        : base(NextObjectId++)
-    {
-        Token = token.Characters;
-        WhiteSpaces = new(token.GetPrefixSourcePart());
-        Left = left;
-        InnerTokenClass = tokenClass;
-        Right = right;
-        FlatFormatCache = new(GetFlatStringValue);
-        FindItemCache = new(position => FindItemForCache(Token.Source + position));
-
-        SetLinks();
-        StopByObjectIds();
-    }
-
-    ValueCache ValueCache.IContainer.Cache { get; } = new();
-
-    SourcePart ISyntax.All => SourcePart;
-    SourcePart ISyntax.Main => Token;
-    int ITree<BinaryTree>.DirectChildCount => 2;
-
-    BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
-        => index switch
-        {
-            0 => Left, 1 => Right, _ => null
-        };
-
-    int ITree<BinaryTree>.LeftDirectChildCount => 1;
-
-    protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id}{InnerTokenClassPart})";
-
+    [DisableDump]
     internal SourcePart FullToken => WhiteSpaces.SourcePart.Start.Span(Token.End);
 
     string InnerTokenClassPart => InnerTokenClass == TokenClass? "" : $"/{InnerTokenClass.Id}";
@@ -222,7 +191,46 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         }
     }
 
+    [DisableDumpExcept(true)]
     internal bool HasComplexDeclaration => Formatter?.HasComplexDeclaration(this) ?? false;
+
+    BinaryTree
+    (
+        BinaryTree left
+        , ITokenClass tokenClass
+        , WhiteSpaceItem whiteSpaces
+        , SourcePart token
+        , BinaryTree right
+    )
+        : base(NextObjectId++)
+    {
+        Token = token;
+        WhiteSpaces = whiteSpaces;
+        Left = left;
+        InnerTokenClass = tokenClass;
+        Right = right;
+        FlatFormatCache = new(GetFlatStringValue);
+        FindItemCache = new(position => FindItemForCache(Token.Source + position));
+
+        SetLinks();
+        StopByObjectIds();
+    }
+
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+    SourcePart ISyntax.All => SourcePart;
+    SourcePart ISyntax.Main => Token;
+    int ITree<BinaryTree>.DirectChildCount => 2;
+
+    BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
+        => index switch
+        {
+            0 => Left, 1 => Right, _ => null
+        };
+
+    int ITree<BinaryTree>.LeftDirectChildCount => 1;
+
+    protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id}{InnerTokenClassPart})";
 
 
     Issue GetIssue()
@@ -324,7 +332,17 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         var linked = token as ILinked<BinaryTree>;
         linked.AssertIsNotNull();
         linked.Container.AssertIsNull();
-        return new(left, tokenClass, token, right);
+        return new(left, tokenClass, new(token.GetPrefixSourcePart()), token.Characters, right);
+    }
+
+    internal BinaryTree ReCreate(BinaryTree[] left = null, BinaryTree[] right = null)
+    {
+        (left == null || left.Length <= 1).Assert();
+        (right == null || right.Length <= 1).Assert();
+        if((left == null || left[0] == Left) && (right == null || right[0] == Right))
+            return this;
+
+        return new(left == null? Left : left[0], TokenClass, WhiteSpaces, Token, right == null? Right : right[0]);
     }
 
     internal int? GetBracketLevel()

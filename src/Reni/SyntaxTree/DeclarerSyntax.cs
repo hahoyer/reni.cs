@@ -23,9 +23,9 @@ sealed class DeclarerSyntax : DumpableObject
 
     internal sealed class TagSyntax : Syntax.NoChildren
     {
-        internal readonly IDeclarationTagToken Value;
+        internal readonly IDeclarationTag Value;
 
-        internal TagSyntax(IDeclarationTagToken value, Anchor anchor)
+        internal TagSyntax(IDeclarationTag value, Anchor anchor)
             : base(anchor)
         {
             Value = value;
@@ -95,7 +95,7 @@ sealed class DeclarerSyntax : DumpableObject
     internal bool IsConverterSyntax => Tags.Any(item => item.Value is ConverterToken);
 
     [DisableDump]
-    internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
+    internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableAnnotation);
 
     [DisableDump]
     internal int DirectChildCount => Tags.Length + 1 + (Issue == null? 0 : 1);
@@ -139,18 +139,18 @@ sealed class DeclarerSyntax : DumpableObject
 
     internal static DeclarerSyntax Create
     (
-        (BinaryTree[] anchors, BinaryTree tag)[] tags
-        , BinaryTree name
+        BinaryTree name
+        , (BinaryTree annotation, BinaryTree[] anchors)[] tags
         , bool meansPublic
     )
     {
         var nameSyntax = GetNameSyntax(name);
 
-        if(!tags.Any())
+        if(tags == null || !tags.Any())
             return new(new TagSyntax[0], nameSyntax, null, meansPublic);
 
         var issueAnchors = tags
-            .Where(i => i.tag == null)
+            .Where(i => i.annotation == null)
             .SelectMany(tuple => tuple.anchors)
             .Distinct()
             .ToArray();
@@ -176,9 +176,9 @@ sealed class DeclarerSyntax : DumpableObject
     static NameSyntax GetNameSyntax(BinaryTree name)
         => name == null? null : new NameSyntax(name.Token.Id, Anchor.Create(name));
 
-    static TagSyntax GetTagSyntax((BinaryTree[] anchors, BinaryTree tag) target)
+    static TagSyntax GetTagSyntax((BinaryTree annotation, BinaryTree[] anchors) target)
     {
-        var tag = target.tag;
+        var tag = target.annotation;
         if(tag == null)
             return null;
 

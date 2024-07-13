@@ -13,7 +13,7 @@ namespace Reni.Type;
 sealed class ArrayReferenceType
     : TypeBase
         , ISymbolProviderForPointer<DumpPrintToken>
-        , ISymbolProviderForPointer<Mutable>
+        , IAnnotationProviderForPointer<MutableAnnotation>
         , ISymbolProviderForPointer<EnableReinterpretation>
         , ISymbolProviderForPointer<Plus>
         , ISymbolProviderForPointer<Minus>
@@ -66,7 +66,7 @@ sealed class ArrayReferenceType
         get
         {
             yield return DumpPrintToken.TokenId;
-            yield return TokenClasses.Mutable.TokenId;
+            yield return MutableAnnotation.TokenId;
             yield return TokenClasses.EnableReinterpretation.TokenId;
             yield return Plus.TokenId;
             yield return Minus.TokenId;
@@ -96,6 +96,10 @@ sealed class ArrayReferenceType
         StopByObjectIds(-10);
     }
 
+    IImplementation IAnnotationProviderForPointer<MutableAnnotation>.GetFeature
+        (MutableAnnotation tokenClass)
+        => Feature.Extension.Value(MutableResult);
+
     TypeBase IChild<TypeBase>.Parent => ValueType;
 
     IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.GetResult
@@ -117,10 +121,6 @@ sealed class ArrayReferenceType
     IImplementation ISymbolProviderForPointer<Minus>.GetFeature
         (Minus tokenClass)
         => Feature.Extension.FunctionFeature(MinusResult);
-
-    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature
-        (Mutable tokenClass)
-        => Feature.Extension.Value(MutableResult);
 
     IImplementation ISymbolProviderForPointer<Plus>.GetFeature
         (Plus tokenClass)

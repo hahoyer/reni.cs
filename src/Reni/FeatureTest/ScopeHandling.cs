@@ -9,29 +9,41 @@ using Reni.Validation;
 namespace Reni.FeatureTest;
 
 [UnitTest]
-[Target(@"!public x: 1")]
+[Target(@"x!public : 1")]
 [Output("")]
 public sealed class ScopeHandlingPublic : CompilerTest;
 
 [UnitTest]
-[Target(@"!non_public x: 1")]
+[Target(@"x!non_public : 1")]
 [Output("")]
 public sealed class ScopeHandlingNonPublic : CompilerTest;
 
 [UnitTest]
-[Target(@"!(public mutable) x: 1")]
+[Target(@"x!(public, mutable) : 1")]
 [ScopeHandlingPublic]
 [Output("")]
 public sealed class ScopeHandlingGroup : CompilerTest;
 
 [UnitTest]
-[Target(@"!public !mutable x: 1")]
+[Target(@"x!(public, mutable, converter, mix_in) : 1")]
+[ScopeHandlingPublic]
+[Output("")]
+public sealed class ScopeHandlingGroup4 : CompilerTest;
+
+[UnitTest]
+[Target(@"<< !public : 1")]
+[Output("")]
+[ScopeHandlingPublic]
+public sealed class ConcatDeclaration : CompilerTest;
+
+[UnitTest]
+[Target(@"x!public !mutable: 1")]
 [ScopeHandlingPublic]
 [Output("")]
 public sealed class ScopeHandlingMultiple : CompilerTest;
 
 [UnitTest]
-[Target(@"!unkown x: 1")]
+[Target(@"x!unkown: 1")]
 [Output("")]
 public sealed class ScopeHandlingError : CompilerTest
 {
@@ -45,7 +57,7 @@ public sealed class ScopeHandlingError : CompilerTest
 }
 
 [UnitTest]
-[Target(@"a:(!non_public x: 1; !public y: 2); a x dump_print")]
+[Target(@"a:(x!non_public : 1; y!public: 2); a x dump_print")]
 [ScopeHandlingPublic]
 [UndefinedSymbol]
 [DumpPrint]
@@ -71,7 +83,7 @@ public sealed class PublicNonPublic1 : CompilerTest
 }
 
 [UnitTest]
-[Target(@"a: (!non_public x: 1; !public y: 2); a y dump_print")]
+[Target(@"a: (x!non_public: 1; y!public: 2); a y dump_print")]
 [DumpPrint]
 [UndefinedSymbol]
 [ScopeHandlingPublic]
@@ -85,6 +97,7 @@ public sealed class PublicNonPublic2 : CompilerTest;
 [PublicNonPublic1]
 [PublicNonPublic2]
 [ScopeHandlingGroup]
+[ScopeHandlingGroup4]
 [ScopeHandlingError]
 [ScopeHandlingMultiple]
 public sealed class AllScopeHandling : CompilerTest;

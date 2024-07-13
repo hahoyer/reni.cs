@@ -27,6 +27,7 @@ sealed class ForceMutabilityToken : Definable
         => this.GenericListFromDefinable(base.MakeGeneric);
 }
 
+[Obsolete("Use mutable as annotation",true)]
 [BelongsTo(typeof(MainTokenFactory))]
 sealed class Mutable : Definable
 {

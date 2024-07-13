@@ -1,7 +1,9 @@
 using hw.DebugFormatter;
 using hw.Parser;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.SyntaxFactory;
+using Reni.Type;
 
 namespace Reni.TokenClasses;
 
@@ -39,14 +41,14 @@ sealed class Exclamation : ParserTokenType<BinaryTree>, PrioParser<BinaryTree>.I
 
 [BelongsTo(typeof(DeclarationTokenFactory))]
 abstract class DeclarationTagToken
-    : TerminalToken, IDeclarationTagToken
+    : TerminalToken, IDeclarationTag
 {
     public static IEnumerable<string> DeclarationOptions
     {
         get
         {
             yield return ConverterToken.TokenId;
-            yield return MutableDeclarationToken.TokenId;
+            yield return MutableAnnotation.TokenId;
             yield return MixInDeclarationToken.TokenId;
             yield return NonPositionalDeclarationToken.TokenId;
             yield return NonPublicDeclarationToken.TokenId;
@@ -62,16 +64,21 @@ sealed class ConverterToken : DeclarationTagToken
     public override string Id => TokenId;
 }
 
-sealed class MutableDeclarationToken : DeclarationTagToken
+sealed class MutableAnnotation : DeclarationTagToken, IValueAnnotation
 {
     internal const string TokenId = "mutable";
+
     [DisableDump]
     public override string Id => TokenId;
+
+    IImplementation IValueAnnotation.GetFeature(TypeBase type) 
+        => ((IAnnotationProvider<MutableAnnotation>)type).GetFeature(this);
 }
 
 sealed class MixInDeclarationToken : DeclarationTagToken
 {
     internal const string TokenId = "mix_in";
+
     [DisableDump]
     public override string Id => TokenId;
 }
@@ -79,6 +86,7 @@ sealed class MixInDeclarationToken : DeclarationTagToken
 sealed class PublicDeclarationToken : DeclarationTagToken
 {
     internal const string TokenId = "public";
+
     [DisableDump]
     public override string Id => TokenId;
 }
@@ -86,6 +94,7 @@ sealed class PublicDeclarationToken : DeclarationTagToken
 sealed class NonPublicDeclarationToken : DeclarationTagToken
 {
     internal const string TokenId = "non_public";
+
     [DisableDump]
     public override string Id => TokenId;
 }
@@ -93,6 +102,7 @@ sealed class NonPublicDeclarationToken : DeclarationTagToken
 sealed class PositionalDeclarationToken : DeclarationTagToken
 {
     internal const string TokenId = "positional";
+
     [DisableDump]
     public override string Id => TokenId;
 }
@@ -100,6 +110,7 @@ sealed class PositionalDeclarationToken : DeclarationTagToken
 sealed class NonPositionalDeclarationToken : DeclarationTagToken
 {
     internal const string TokenId = "non_positional";
+
     [DisableDump]
     public override string Id => TokenId;
 }

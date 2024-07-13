@@ -13,14 +13,17 @@ using Reni.Type;
 namespace Reni.Context;
 
 sealed class Root
-    : ContextBase, ISymbolProviderForPointer<Minus>, ISymbolProviderForPointer<ConcatArrays>
+    : ContextBase
+        , ISymbolProviderForPointer<Minus>
+        , ISymbolProviderForPointer<ConcatArrays>
+        , ISymbolProviderForPointer<MutableConcatArrays>
 {
     internal interface IParent
     {
         bool ProcessErrors { get; }
         IExecutionContext ExecutionContext { get; }
         IEnumerable<Definable> DefinedNames { get; }
-        bool Semantics { get; }
+        bool HasSemantics { get; }
         Result<ValueSyntax> ParsePredefinedItem(string source);
     }
 
@@ -54,7 +57,7 @@ sealed class Root
     public bool ProcessErrors => Parent.ProcessErrors;
 
     [DisableDump]
-    public bool Semantics => Parent.Semantics;
+    public bool HasSemantics => Parent.HasSemantics;
 
     [DisableDump]
     internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
@@ -62,12 +65,13 @@ sealed class Root
     internal Root(IParent parent) => Parent = parent;
 
     IImplementation ISymbolProviderForPointer<ConcatArrays>.GetFeature(ConcatArrays tokenClass)
-        => tokenClass.IsMutable
-            ? this.CachedValue(() => GetCreateArrayFeature(true))
-            : this.CachedValue(() => GetCreateArrayFeature(false));
+        => this.CachedValue(() => GetCreateArrayFeature(false));
 
     IImplementation ISymbolProviderForPointer<Minus>.GetFeature(Minus tokenClass)
         => this.CachedValue(GetMinusFeature);
+
+    IImplementation ISymbolProviderForPointer<MutableConcatArrays>.GetFeature(MutableConcatArrays tokenClass)
+        => this.CachedValue(() => GetCreateArrayFeature(true));
 
     [DisableDump]
     internal override Root RootContext => this;
@@ -169,5 +173,4 @@ sealed class Root
 
         return new(result, rawResult.Issues.ToArray(), description);
     }
-
 }

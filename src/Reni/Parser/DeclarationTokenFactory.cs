@@ -14,7 +14,7 @@ namespace Reni.Parser
             => new InvalidDeclarationError(name);
     }
 
-    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarationTagToken
+    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarationTag
     {
         readonly string Name;
         public InvalidDeclarationError(string name) => Name = name;

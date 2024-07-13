@@ -22,6 +22,8 @@ sealed class Factory : DumpableObject
     internal static readonly IStatementsProvider List = new ListHandler();
     internal static readonly IStatementProvider Colon = new ColonHandler();
 
+    internal static readonly IValueProvider Annotations = new AnnotationHandler();
+
 
     internal static readonly Factory Root = new(false);
 
@@ -74,6 +76,9 @@ sealed class Factory : DumpableObject
 
         switch(target.TokenClass)
         {
+            case ExclamationBoxToken:
+                var (item, annotations) = target.CheckForAnnotations();
+                return GetAnnotatedValueSyntax(GetValueSyntax(item, anchor), annotations);
             case IValueToken valueToken:
                 return valueToken.Provider.Get(target, factory, anchor);
             case IDeclarationToken declarationToken:
@@ -90,6 +95,20 @@ sealed class Factory : DumpableObject
                     , IssueId.InvalidExpression.GetIssue(target.Token)
                 );
         }
+    }
+
+    static ValueSyntax GetAnnotatedValueSyntax
+        (ValueSyntax target, (BinaryTree annotation, BinaryTree[] anchors)[] annotations)
+    {
+        var result = target;
+        foreach(var (annotation, anchors) in annotations)
+            result = AnnotationSyntax.Create
+            (
+                result
+                , (IValueAnnotation)annotation.TokenClass
+                , anchors.Concat(T(annotation)).ToArray()
+            );
+        return result;
     }
 
     ValueSyntax GetStatementsSyntax(BinaryTree target, Anchor anchor, IStatementsToken tokenClass)
@@ -133,8 +152,8 @@ sealed class Factory : DumpableObject
         return level switch
             {
                 0 => true, 3 => true, _ => false
-            } ==
-            MeansPublic
+            }
+            == MeansPublic
                 ? this
                 : new(!MeansPublic);
     }

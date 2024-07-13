@@ -2,6 +2,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.SyntaxFactory;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -98,6 +99,22 @@ interface IMeta
 }
 
 interface ISearchTarget;
+
+// ReSharper disable once TypeParameterCanBeVariant
+// Exact match for TDefinable is required here.
+interface IAnnotationProviderForPointer<TToken>
+    where TToken : IValueAnnotation
+{
+    IImplementation GetFeature(TToken tokenClass);
+}
+
+// ReSharper disable once TypeParameterCanBeVariant
+// Exact match for TDefinable is required here.
+interface IAnnotationProvider<TToken>
+    where TToken : IValueAnnotation
+{
+    IImplementation GetFeature(TToken tokenClass);
+}
 
 // ReSharper disable once TypeParameterCanBeVariant
 // Exact match for TDefinable is required here.

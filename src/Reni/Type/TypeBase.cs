@@ -190,6 +190,9 @@ abstract class TypeBase
 
     internal bool HasIssues => Issues?.Any() ?? false;
 
+    [CanBeNull]
+    public Size SmartSize => Cache.Size.IsBusy? null : Size;
+
     protected TypeBase()
         : base(NextObjectId++) => Cache = new(this);
 
@@ -441,9 +444,6 @@ abstract class TypeBase
         }
     }
 
-    [CanBeNull]
-    public Size SmartSize => Cache.Size.IsBusy? null : Size;
-
     [NotNull]
     Size GetSizeForCache()
     {
@@ -472,7 +472,8 @@ abstract class TypeBase
         return GetVoidCodeAndRefs(category);
     }
 
-    internal Result GetArgumentResult(Category category) => GetResult(category, () => ArgumentCode, Closures.GetArgument);
+    internal Result GetArgumentResult
+        (Category category) => GetResult(category, () => ArgumentCode, Closures.GetArgument);
 
     Result GetPointerArgumentResult(Category category) => Pointer.GetArgumentResult(category);
 

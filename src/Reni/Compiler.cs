@@ -115,7 +115,7 @@ public sealed class Compiler
                 ToNumberOfBase.TokenId
             );
 
-            result += PrioTable.Left(ConcatArrays.TokenId, ConcatArrays.MutableId);
+            result += PrioTable.Left(ConcatArrays.TokenId, MutableConcatArrays.TokenId);
 
             result += PrioTable.Left(Star.TokenId, Slash.TokenId, "\\");
             result += PrioTable.Left(Plus.TokenId, Minus.TokenId);
@@ -145,7 +145,7 @@ public sealed class Compiler
             result += PrioTable.Right(ThenToken.TokenId);
             result += PrioTable.Right(ElseToken.TokenId);
 
-            result += PrioTable.Right(Exclamation.TokenId);
+            result += PrioTable.Right(Exclamation.TokenId, ExclamationBoxToken.TokenId);
             result += PrioTable.Left
             (
                 TokenClasses.Function.TokenId(),
@@ -187,6 +187,9 @@ public sealed class Compiler
         get
         {
             var result = PrioTable.Left(PrioTable.Any);
+            result += PrioTable.Right(TokenClasses.List.TokenId(0));
+            result += PrioTable.Right(TokenClasses.List.TokenId(1));
+            result += PrioTable.Right(TokenClasses.List.TokenId(2));
             result += PrioTable.BracketParallels
             (
                 new[]
@@ -258,7 +261,7 @@ public sealed class Compiler
     Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
 
     bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
-    bool Root.IParent.Semantics => Parameters.Semantics;
+    bool Root.IParent.HasSemantics => Parameters.Semantics;
 
     MethodInfo GetCSharpMethod()
     {
@@ -387,6 +390,8 @@ public sealed class Compiler
         if(Parameters.IsCodeRequired)
             CodeContainerCache.IsValid = true;
     }
+
+    internal Semantics Semantics => Semantics.From(Root, Syntax);
 }
 
 public sealed class TraceCollector : DumpableObject, ITraceCollector

@@ -81,6 +81,12 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
         return null;
     }
 
+    internal virtual TypeBase TryGetTypeBase()
+    {
+        NotImplementedMethod();
+        return default;
+    }
+
     Issue[] GetAllIssues() => this
         .GetNodesFromLeftToRight()
         .SelectMany(node => node?.Issues)
@@ -112,6 +118,4 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 
     internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
         => GetTypeBase(context).DeclarationOptions;
-
 }
-

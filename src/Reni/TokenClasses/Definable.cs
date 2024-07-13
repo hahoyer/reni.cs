@@ -7,7 +7,7 @@ using Reni.SyntaxFactory;
 namespace Reni.TokenClasses;
 
 abstract class Definable
-    : TokenClass, IDeclarationTagToken, IValueToken
+    : TokenClass, IDeclarationTag, IValueToken
 {
     [DisableDump]
     protected string DataFunctionName => Id.Symbolize();
@@ -20,21 +20,27 @@ abstract class Definable
 }
 
 [BelongsTo(typeof(MainTokenFactory))]
-[Variant(false)]
-[Variant(true)]
 sealed class ConcatArrays : Definable
 {
     public const string TokenId = "<<";
-    public const string MutableId = "<<:=";
-    internal bool IsMutable { get; }
-
-    public ConcatArrays(bool isMutable) => IsMutable = isMutable;
 
     [DisableDump]
     internal override IEnumerable<IDeclarationProvider> MakeGeneric
         => this.GenericListFromDefinable(base.MakeGeneric);
 
-    public override string Id => IsMutable? MutableId : TokenId;
+    public override string Id => TokenId;
+}
+
+[BelongsTo(typeof(MainTokenFactory))]
+sealed class MutableConcatArrays : Definable
+{
+    public const string TokenId = "<<:";
+
+    [DisableDump]
+    internal override IEnumerable<IDeclarationProvider> MakeGeneric
+        => this.GenericListFromDefinable(base.MakeGeneric);
+
+    public override string Id => TokenId;
 }
 
 [BelongsTo(typeof(MainTokenFactory))]

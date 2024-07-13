@@ -6,6 +6,7 @@ using Reni.SyntaxFactory;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
+    [BelongsTo(typeof(DeclarationTokenFactory))]
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]

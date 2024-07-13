@@ -5,6 +5,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.DeclarationOptions;
 using Reni.Parser;
+using Reni.Type;
 
 namespace Reni.SyntaxTree;
 
@@ -35,6 +36,7 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
         => Terminal.GetResult(context, category, Token);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
+    internal override TypeBase TryGetTypeBase() => Terminal.TryGetTypeBase(Token);
 }
 
 sealed class PrefixSyntax : ValueSyntax
@@ -60,7 +62,7 @@ sealed class PrefixSyntax : ValueSyntax
 
     protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
-    internal override Result GetResultForCache(ContextBase context, Category category) 
+    internal override Result GetResultForCache(ContextBase context, Category category)
         => Prefix.GetResult(context, category, Right, Token);
 
     public static Result<ValueSyntax> Create
@@ -77,10 +79,10 @@ sealed class InfixSyntax : ValueSyntax
     internal readonly ValueSyntax Right;
 
     [Node]
-    readonly IInfix Infix;
+    internal readonly IInfix Infix;
 
     [PublicAPI]
-    readonly SourcePart Token;
+    internal readonly SourcePart Token;
 
     public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, SourcePart token, Anchor brackets)
         : base(brackets)
@@ -90,7 +92,7 @@ sealed class InfixSyntax : ValueSyntax
         Right = right;
         Token = token;
         Token.AssertIsNotNull();
-        StopByObjectIds();
+        StopByObjectIds(476);
     }
 
     protected override int DirectChildCount => 2;
@@ -129,6 +131,7 @@ sealed class SuffixSyntax : ValueSyntax
     readonly ISuffix Suffix;
 
     [PublicAPI]
+    [EnableDump]
     readonly SourcePart Token;
 
     internal SuffixSyntax(ValueSyntax left, ISuffix suffix, SourcePart token, Anchor brackets)
@@ -140,12 +143,15 @@ sealed class SuffixSyntax : ValueSyntax
         Token.AssertIsNotNull();
     }
 
+    [DisableDump]
     protected override int DirectChildCount => 1;
 
     protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
     internal override Result GetResultForCache(ContextBase context, Category category)
         => Suffix.GetResult(context, category, Left);
+
+    internal override TypeBase TryGetTypeBase() => Suffix.TryGetTypeBase(Left);
 
     public static Result<ValueSyntax> Create
         (Result<ValueSyntax> left, ISuffix suffix, SourcePart token, Anchor brackets)
@@ -160,6 +166,7 @@ interface ITerminal
     Result GetResult(ContextBase context, Category category, SourcePart token);
     ValueSyntax Visit(ISyntaxVisitor visitor);
     Declaration[] Declarations { get; }
+    TypeBase TryGetTypeBase(SourcePart token);
 }
 
 interface IPrefix
@@ -175,4 +182,5 @@ interface IInfix
 interface ISuffix
 {
     Result GetResult(ContextBase context, Category category, ValueSyntax left);
+    TypeBase TryGetTypeBase(ValueSyntax left);
 }

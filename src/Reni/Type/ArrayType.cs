@@ -13,9 +13,10 @@ sealed class ArrayType
     : TypeBase
         , ISymbolProviderForPointer<DumpPrintToken>
         , ISymbolProviderForPointer<ConcatArrays>
+        , ISymbolProviderForPointer<MutableConcatArrays>
         , ISymbolProviderForPointer<TextItem>
         , ISymbolProviderForPointer<ToNumberOfBase>
-        , ISymbolProviderForPointer<Mutable>
+        , IAnnotationProviderForPointer<MutableAnnotation>
         , ISymbolProviderForPointer<ArrayReference>
         , ISymbolProviderForPointer<Count>
         , IForcedConversionProviderForPointer<ArrayReferenceType>
@@ -134,7 +135,20 @@ sealed class ArrayType
                     category,
                     objectReference,
                     argumentsType,
-                    OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
+                    OptionsValue.IsMutable.SetTo(false)),
+            this);
+
+    IImplementation ISymbolProviderForPointer<MutableConcatArrays>
+        .GetFeature(MutableConcatArrays tokenClass)
+        => Feature.Extension.FunctionFeature
+        (
+            (category, objectReference, argumentsType) =>
+                ConcatArraysResult
+                (
+                    category,
+                    objectReference,
+                    argumentsType,
+                    OptionsValue.IsMutable.SetTo(true)),
             this);
 
     IImplementation ISymbolProviderForPointer<Count>.GetFeature(Count tokenClass)
@@ -145,7 +159,7 @@ sealed class ArrayType
             ? Feature.Extension.Value(GetDumpPrintTokenResult)
             : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
-    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature(Mutable tokenClass)
+    IImplementation IAnnotationProviderForPointer<MutableAnnotation>.GetFeature(MutableAnnotation tokenClass)
         => Feature.Extension.Value(MutableResult);
 
     IImplementation ISymbolProviderForPointer<TextItem>.GetFeature(TextItem tokenClass)
