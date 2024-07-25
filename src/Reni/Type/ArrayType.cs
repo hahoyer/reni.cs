@@ -16,7 +16,7 @@ sealed class ArrayType
         , ISymbolProviderForPointer<MutableConcatArrays>
         , ISymbolProviderForPointer<TextItem>
         , ISymbolProviderForPointer<ToNumberOfBase>
-        , IAnnotationProviderForPointer<MutableAnnotation>
+        , ISymbolProviderForPointer<Mutable>
         , ISymbolProviderForPointer<ArrayReference>
         , ISymbolProviderForPointer<Count>
         , IForcedConversionProviderForPointer<ArrayReferenceType>
@@ -159,7 +159,7 @@ sealed class ArrayType
             ? Feature.Extension.Value(GetDumpPrintTokenResult)
             : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
-    IImplementation IAnnotationProviderForPointer<MutableAnnotation>.GetFeature(MutableAnnotation tokenClass)
+    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature(Mutable tokenClass)
         => Feature.Extension.Value(MutableResult);
 
     IImplementation ISymbolProviderForPointer<TextItem>.GetFeature(TextItem tokenClass)

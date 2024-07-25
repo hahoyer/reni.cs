@@ -1,7 +1,7 @@
 ﻿systemdata:
     {
     Memory: 
-        ((0 type *(125)) !mutable) instance();
+        ((0 type *(125)) mutable) instance();
 
     FreePointer !(mutable, public) : 
         Memory array_reference mutable;
@@ -33,8 +33,8 @@ Text:
 
     result!public :
         {
-        
-        (	data(^) := new_value @ data(^))!mix_in.
+        !mix_in:   
+        	data(^) := new_value @ data(^).
 
         this: 
             @! ^^.
@@ -73,11 +73,11 @@ Text:
             count: 
                 this count + other count;
 
-             
-                (@ ^ < this count
-                then this data(^ !enable_cut)
-                else other data((^ - this count)enable_cut))!mix_in;        
-            )
+            !mix_in:           
+                @ ^ < this count
+                then this data(^ enable_cut)
+                else other data((^ - this count)enable_cut);
+            )       
         }
     }
     result;

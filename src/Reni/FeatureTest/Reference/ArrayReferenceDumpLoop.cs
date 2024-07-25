@@ -23,7 +23,7 @@ o:
             body: @ 
             ( 
                 data (position) dump_print, 
-                position := (position + 1) !enable_cut
+                position := (position + 1) enable_cut
             ) 
         )
     )

@@ -43,6 +43,7 @@ public abstract class TextStruct : CompilerTest
 [ArrayReferenceAll]
 [Simple]
 [MixIn.Function]
+[ComplexContext]
 public sealed class Text1 : TextStruct;
 
 [UnitTest]
@@ -53,13 +54,13 @@ public sealed class Text1 : TextStruct;
 [UnMatchedBrackets]
 [AutomaticDereferencing]
 [ContextOperator]
-[ComplexContext]
 public sealed class TextConcat : TextStruct
 {
     public TextConcat() => Parameters.Semantics = true;
 
     protected override void AssertValid(Compiler compiler)
     {
+        return;
         compiler.Semantics.Information.Log();
         true.ConditionalBreak();
     }

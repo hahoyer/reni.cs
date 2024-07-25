@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.MixIn
     [TargetSet(@"
 This: @ 
 {
-    ((^ dump_print, new_value dump_print)@ 100 type instance(^ enable_cut))!mix_in;
+    !mix_in:(^ dump_print, new_value dump_print)@ 100 type instance(^ enable_cut);
     aa: 2;
 }; 
 

@@ -2,6 +2,7 @@ using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Type;
 
 namespace Reni.Validation;
@@ -89,7 +90,6 @@ enum IssueId
     , [Setup(Stage.Semantic)]
     MissingRightExpression
 
-    , [Setup(Stage.Unexpected)]
-    [PublicAPI]
-    StrangeDeclaration
+    , [Setup(Stage.Syntax, typeof(ITokenClass))]
+    InvalidAnnotation
 }

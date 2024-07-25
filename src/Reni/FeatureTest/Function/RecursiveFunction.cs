@@ -27,9 +27,9 @@ f: @
         {
             ^ = 1 
             then 1 
-            else ^ * f[^ type instance((^ - 1)!enable_cut)]
+            else ^ * f[^ type instance((^ - 1)enable_cut)]
         }
-        !enable_cut
+        enable_cut
     )
 };
 f(4)dump_print"

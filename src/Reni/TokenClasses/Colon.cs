@@ -1,9 +1,7 @@
 using hw.DebugFormatter;
 using hw.Parser;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.SyntaxFactory;
-using Reni.Type;
 
 namespace Reni.TokenClasses;
 
@@ -64,15 +62,12 @@ sealed class ConverterToken : DeclarationTagToken
     public override string Id => TokenId;
 }
 
-sealed class MutableAnnotation : DeclarationTagToken, IValueAnnotation
+sealed class MutableAnnotation : DeclarationTagToken
 {
     internal const string TokenId = "mutable";
 
     [DisableDump]
     public override string Id => TokenId;
-
-    IImplementation IValueAnnotation.GetFeature(TypeBase type) 
-        => ((IAnnotationProvider<MutableAnnotation>)type).GetFeature(this);
 }
 
 sealed class MixInDeclarationToken : DeclarationTagToken

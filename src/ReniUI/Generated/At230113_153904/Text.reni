@@ -8,7 +8,7 @@ doc)#
 
 systemdata:
 {
-  !public Memory: ((0 type *(125)) mutable) instance();
+  !public Memory: ((0 type *(125)) !mutable) instance();
   !(mutable public) FreePointer: Memory array_reference mutable;
 };
 

@@ -26,6 +26,16 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
             => throw new($"Unexpected call: {nameof(GetDirectChild)}({index})");
     }
 
+    internal sealed class IssueSyntax : NoChildren
+    {
+        readonly Issue Issue;
+
+        internal IssueSyntax(Issue issue, Anchor anchor)
+            : base(anchor)
+            => Issue = issue;
+
+        protected override IEnumerable<Issue> GetIssues() => T(Issue);
+    }
 
     internal class Level
     {

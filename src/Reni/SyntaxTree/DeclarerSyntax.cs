@@ -1,26 +1,17 @@
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using Reni.Helper;
+using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree;
 
+using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
+
 sealed class DeclarerSyntax : DumpableObject
 {
-    internal sealed class IssueSyntax : Syntax.NoChildren
-    {
-        readonly Issue Issue;
-
-        internal IssueSyntax(Issue issue, Anchor anchor)
-            : base(anchor)
-            => Issue = issue;
-
-        protected override IEnumerable<Issue> GetIssues() => T(Issue);
-    }
-
     internal sealed class TagSyntax : Syntax.NoChildren
     {
         internal readonly IDeclarationTag Value;
@@ -56,9 +47,12 @@ sealed class DeclarerSyntax : DumpableObject
 
     [EnableDumpExcept(null)]
     internal readonly NameSyntax Name;
+
     internal readonly TagSyntax[] Tags;
+
     [EnableDumpExcept(null)]
-    internal readonly IssueSyntax Issue;
+    internal readonly Syntax.IssueSyntax Issue;
+
     readonly bool? MeansPublic;
 
     readonly ValueCache<Syntax[]> DirectChildrenCache;
@@ -104,7 +98,7 @@ sealed class DeclarerSyntax : DumpableObject
     (
         TagSyntax[] tags
         , NameSyntax name
-        , IssueSyntax issue
+        , Syntax.IssueSyntax issue
         , bool? meansPublic
     )
     {
@@ -140,7 +134,7 @@ sealed class DeclarerSyntax : DumpableObject
     internal static DeclarerSyntax Create
     (
         BinaryTree name
-        , (BinaryTree annotation, BinaryTree[] anchors)[] tags
+        , Annotation[] tags
         , bool meansPublic
     )
     {
@@ -152,16 +146,17 @@ sealed class DeclarerSyntax : DumpableObject
         var issueAnchors = tags
             .Where(i => i.annotation == null)
             .SelectMany(tuple => tuple.anchors)
+            .Where(a => a != null)
             .Distinct()
             .ToArray();
 
-        var issueAnchor = issueAnchors.SingleOrDefault();
+        var issueAnchor = issueAnchors.SourceParts().Combine();
         var issueSyntax = issueAnchor == null
             ? null
-            : new IssueSyntax
+            : new Syntax.IssueSyntax
             (
-                IssueId.InvalidDeclaration.GetIssue(issueAnchor.SourcePart)
-                , Anchor.Create(issueAnchor.GetNodesFromLeftToRight().ToArray())
+                IssueId.InvalidDeclaration.GetIssue(issueAnchor)
+                , Anchor.Create(issueAnchors)
             );
 
         return new
@@ -176,7 +171,7 @@ sealed class DeclarerSyntax : DumpableObject
     static NameSyntax GetNameSyntax(BinaryTree name)
         => name == null? null : new NameSyntax(name.Token.Id, Anchor.Create(name));
 
-    static TagSyntax GetTagSyntax((BinaryTree annotation, BinaryTree[] anchors) target)
+    static TagSyntax GetTagSyntax(Annotation target)
     {
         var tag = target.annotation;
         if(tag == null)

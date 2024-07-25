@@ -25,6 +25,22 @@ public sealed class ScopeHandlingNonPublic : CompilerTest;
 public sealed class ScopeHandlingGroup : CompilerTest;
 
 [UnitTest]
+[Target(@"x!(public mutable) : 1")]
+[ScopeHandlingPublic]
+[Output("")]
+public sealed class ScopeHandlingBadGroup : CompilerTest
+{
+    protected override void Verify(IEnumerable<Issue> issues)
+    {
+        var issue = issues.Single();
+        (issue.IssueId == IssueId.InvalidDeclaration).Assert(()
+            => $"Issue of type {IssueId.InvalidDeclaration} expected. \n"
+            + $"Found: {issues.Select(issue => issue.LogDump).Stringify("\n")}");
+    }
+}
+
+
+[UnitTest]
 [Target(@"x!(public, mutable, converter, mix_in) : 1")]
 [ScopeHandlingPublic]
 [Output("")]
@@ -97,6 +113,7 @@ public sealed class PublicNonPublic2 : CompilerTest;
 [PublicNonPublic1]
 [PublicNonPublic2]
 [ScopeHandlingGroup]
+[ScopeHandlingBadGroup]
 [ScopeHandlingGroup4]
 [ScopeHandlingError]
 [ScopeHandlingMultiple]

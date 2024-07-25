@@ -119,7 +119,8 @@ sealed class Semantics : DumpableObject
         }
 
         var type = target.Left.GetTypeBase(context);
-        NotImplementedMethod(context, target);
+
+        NotImplementedMethod(context, target, "type", type);
         return;
     }
 

@@ -5,10 +5,11 @@ using Reni.TokenClasses;
 
 namespace Reni.SyntaxFactory;
 
+using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
+
 static class AnnotationParser
 {
-    internal static(BinaryTree item, (BinaryTree annotation, BinaryTree[] anchors)[] annotations) 
-        CheckForAnnotations(this BinaryTree target)
+    internal static(BinaryTree item, Annotation[] annotations) CheckForAnnotations(this BinaryTree target)
     {
         if(target == null)
             return (item: null, annotations: null);
@@ -23,8 +24,11 @@ static class AnnotationParser
         return (item, annotations);
     }
 
-    static(BinaryTree annotation, BinaryTree[] anchors)[] ParseAnnotations(BinaryTree target)
+    static Annotation[] ParseAnnotations(BinaryTree target)
     {
+        if(target == null)
+            return T(((BinaryTree)null, T((BinaryTree)null)));
+
         if(target.BracketKernel is { } bracketKernel)
         {
             var annotations = ParseAnnotations(bracketKernel.Center);
@@ -41,11 +45,16 @@ static class AnnotationParser
             return annotations;
         }
 
-        return T((target,(BinaryTree[])null));
+        target.Right.AssertIsNull();
+        if(target.Left == null)
+            return T((target, (BinaryTree[])null));
+
+        return T(((BinaryTree)null, T(target.Left, target)));
+
     }
 
     static void AddAnchors
-        ((BinaryTree annotation, BinaryTree[] anchors)[] target, params BinaryTree[][] anchorsList)
+        (Annotation[] target, params BinaryTree[][] anchorsList)
     {
         if(anchorsList.Length == 0)
             return;

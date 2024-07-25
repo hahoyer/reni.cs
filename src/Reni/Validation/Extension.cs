@@ -54,6 +54,9 @@ static class Extension
             case IssueId.MissingDeclarationValue:
                 return "Missing value part in declaration.";
 
+            case IssueId.InvalidAnnotation:
+                return $"Invalid annotation: {additionalInformation[0]}";
+
             case IssueId.ExtraLeftBracket:
                 return $"No closing bracket found until {PositionFormatter(additionalInformation[0])}.";
 

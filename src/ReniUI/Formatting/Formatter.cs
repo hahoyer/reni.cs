@@ -298,7 +298,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 return Conditional.Instance;
             case FunctionSyntax:
                 return Function.Instance;
-            case DeclarerSyntax.IssueSyntax:
+            case Syntax.IssueSyntax:
                 return DeclarerIssue.Instance;
             case EmptyList:
             case DeclarerSyntax.NameSyntax:

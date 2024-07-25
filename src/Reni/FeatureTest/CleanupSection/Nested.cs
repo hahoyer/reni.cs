@@ -15,7 +15,7 @@ Base: @
 
 This: @ 
 {
-    !mix_in: Base();
+    !mix_in:Base();
     a: 3;
 ~~~
 '(this cleanup)' dump_print

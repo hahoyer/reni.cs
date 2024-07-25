@@ -14,7 +14,7 @@ sealed class TypeType
         , ISymbolProvider<DumpPrintToken>
         , ISymbolProvider<Star>
         , ISymbolProvider<Slash>
-        , IAnnotationProvider<MutableAnnotation>
+        , ISymbolProvider<Mutable>
         , ISymbolProvider<ArrayReference>
 {
     [DisableDump]
@@ -34,8 +34,8 @@ sealed class TypeType
         (DumpPrintToken tokenClass)
         => Feature.Extension.Value(GetDumpPrintTokenResult);
 
-    IImplementation IAnnotationProvider<MutableAnnotation>.GetFeature
-        (MutableAnnotation tokenClass)
+    IImplementation ISymbolProvider<Mutable>.GetFeature
+        (Mutable tokenClass)
         => Value is ArrayType? Feature.Extension.Value(MutableArrayResult) :
             Value is ArrayReferenceType? Feature.Extension.Value(MutableReferenceResult) : null;
 

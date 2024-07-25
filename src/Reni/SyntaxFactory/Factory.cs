@@ -6,6 +6,8 @@ using Reni.Validation;
 
 namespace Reni.SyntaxFactory;
 
+using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
+
 sealed class Factory : DumpableObject
 {
     internal static readonly IValueProvider Bracket = new BracketHandler();
@@ -49,7 +51,7 @@ sealed class Factory : DumpableObject
         if(target == null)
         {
             (anchor == null || anchor.IsEmpty).Assert();
-            return new IStatementSyntax[0];
+            return [];
         }
 
         var factory = GetCurrentFactory(target);
@@ -98,17 +100,10 @@ sealed class Factory : DumpableObject
     }
 
     static ValueSyntax GetAnnotatedValueSyntax
-        (ValueSyntax target, (BinaryTree annotation, BinaryTree[] anchors)[] annotations)
+        (ValueSyntax target, Annotation[] annotations)
     {
-        var result = target;
-        foreach(var (annotation, anchors) in annotations)
-            result = AnnotationSyntax.Create
-            (
-                result
-                , (IValueAnnotation)annotation.TokenClass
-                , anchors.Concat(T(annotation)).ToArray()
-            );
-        return result;
+        NotImplementedFunction(target, annotations);
+        return default;
     }
 
     ValueSyntax GetStatementsSyntax(BinaryTree target, Anchor anchor, IStatementsToken tokenClass)

@@ -34,7 +34,7 @@ sealed class ConcatArrays : Definable
 [BelongsTo(typeof(MainTokenFactory))]
 sealed class MutableConcatArrays : Definable
 {
-    public const string TokenId = "<<:";
+    public const string TokenId = "<<:=";
 
     [DisableDump]
     internal override IEnumerable<IDeclarationProvider> MakeGeneric
