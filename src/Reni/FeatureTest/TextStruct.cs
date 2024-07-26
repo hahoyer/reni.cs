@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
@@ -60,8 +59,7 @@ public sealed class TextConcat : TextStruct
 
     protected override void AssertValid(Compiler compiler)
     {
-        return;
-        compiler.Semantics.Information.Log();
-        true.ConditionalBreak();
+        //compiler.Semantics.Information.Log();
+        //true.ConditionalBreak();
     }
 }

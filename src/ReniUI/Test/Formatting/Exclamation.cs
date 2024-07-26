@@ -11,7 +11,7 @@ public sealed class Exclamation : DependenceProvider
     [UnitTest]
     public void Simple()
     {
-        const string text = @"!public nnnn: vvvv";
+        const string text = @"nnnn!public: vvvv";
 
         text.SimpleFormattingTest();
     }
@@ -20,8 +20,8 @@ public sealed class Exclamation : DependenceProvider
     [UnitTest]
     public void OneSpace()
     {
-        const string text = @"! public nnnn: vvvv";
-        const string expectedText = @"!public nnnn: vvvv";
+        const string text = @"nnnn! public : vvvv";
+        const string expectedText = @"nnnn!public: vvvv";
 
         text.SimpleFormattingTest(expectedText);
     }
@@ -29,8 +29,8 @@ public sealed class Exclamation : DependenceProvider
     [UnitTest]
     public void MultipleTags()
     {
-        const string text = @"! (  mutable     public      )nnnn: vvvv";
-        const string expectedText = @"!(mutable public) nnnn: vvvv";
+        const string text = @"nnnn ! (  mutable,     public      ): vvvv";
+        const string expectedText = @"nnnn!(mutable, public): vvvv";
 
         text.SimpleFormattingTest(expectedText);
     }

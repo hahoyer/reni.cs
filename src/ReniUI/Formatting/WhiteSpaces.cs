@@ -43,7 +43,7 @@ sealed class WhiteSpaces
         SeparatorRequests = separatorRequests;
         WhiteSpaceView = CreateView(target, this);
         AnchorForDebug = anchorForDebug;
-        StopByObjectIds();
+        StopByObjectIds(423);
     }
 
     int? LineGroup.IConfiguration.EmptyLineLimit => Configuration.EmptyLineLimit;
@@ -59,7 +59,7 @@ sealed class WhiteSpaces
     /// <returns></returns>
     IEnumerable<Edit> IEditPieces.Get(IEditPiecesConfiguration parameter)
     {
-        StopByObjectIds();
+        StopByObjectIds(423);
         if(!SeparatorRequests.Head
            && !SeparatorRequests.Tail
            && !SeparatorRequests.Inner

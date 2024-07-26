@@ -47,7 +47,7 @@ repeat: @
     public void Reformat()
     {
         const string text =
-            @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: @ ^ while() then
+            @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); FreePointer!mutable : Memory array_reference mutable; repeat: @ ^ while() then
     (
         ^ body(),
         repeat(^)
@@ -58,7 +58,7 @@ repeat: @
 {
     1 type instance();
     Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
+    FreePointer!mutable: Memory array_reference mutable;
 
     repeat: @
         ^ while()
@@ -83,7 +83,7 @@ repeat: @
     public void Reformat1_120()
     {
         const string text =
-            @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: @ ^ while() then
+            @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); FreePointer!mutable : Memory array_reference mutable; repeat: @ ^ while() then
     (
         ^ body(),
         repeat(^)
@@ -94,7 +94,7 @@ repeat: @
 {
     1 type instance();
     Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
+    FreePointer!mutable: Memory array_reference mutable;
 
     repeat: @
         ^ while()
@@ -154,7 +154,7 @@ repeat: @
             @"systemdata:
 {
     Memory:((0 type *(125)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
+    FreePointer!mutable : Memory array_reference mutable;
 };
 
 ";
@@ -163,7 +163,7 @@ repeat: @
             @"systemdata:
 {
     Memory: ((0 type *(125)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
+    FreePointer!mutable: Memory array_reference mutable;
 };";
 
         text.SimpleFormattingTest(expectedText, 60, 0, 4, lineBreaksAtComplexDeclaration: true);

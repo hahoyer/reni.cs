@@ -21,7 +21,7 @@ namespace ReniUI.Formatting
             Remove = remove;
             Insert = insert;
             Flag = flag;
-            StopByObjectIds();
+            StopByObjectIds(440);
         }
 
         bool ISourcePartEdit.IsIndentTarget => Insert.Contains("\n");

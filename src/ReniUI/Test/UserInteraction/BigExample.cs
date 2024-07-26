@@ -17,8 +17,8 @@ doc)#
 
 systemdata:
 {
-    !public Memory:((0 type *(125)) mutable) instance();
-    ! (mutable public) FreePointer: Memory array_reference mutable;
+    Memory!public :((0 type *(125)) mutable) instance();
+    FreePointer! (mutable ,public) : Memory array_reference mutable;
 };
 
 repeat: @ ^ while() then(^ body(), repeat(^));
@@ -31,9 +31,9 @@ system:
     MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16.
     TextItemType: @! MaxNumber8 text_item type.
 
-    !    public NewMemory: @
+    NewMemory!    public : @
     {
-        ! public result:
+        result! public :
         (
             ((^ elementType) * 1)
             array_reference
@@ -43,7 +43,7 @@ system:
 
         initializer: ^ initializer.
         count: ^ count.
-        !mutable position: count type instance(0).
+        position!mutable : count type instance(0).
 
         repeat
         (
@@ -68,13 +68,13 @@ Text: @
 {
     value: ^.
 
-    !public result:
+    result!public :
     {
         !mix_in: data(^) := new_value @ data(^).
         this: @! ^^.
-        !public count: ^ count.
+        count!public : ^ count.
 
-        !public data:
+        data!public :
              system
                  NewMemory
                  (
@@ -83,9 +83,9 @@ Text: @
                      initializer: @ value(^)
                  ).
 
-        !public dump_print: @!
+        dump_print!public : @!
         {
-            !mutable position: count type instance(0);
+            position!mutable : count type instance(0);
 
             repeat
             (
@@ -99,7 +99,7 @@ Text: @
             )
         }.
 
-        !public << : @ concat(count: ^ count, data: ^).
+        << !public : @ concat(count: ^ count, data: ^).
 
         concat: @
            Text
@@ -126,8 +126,8 @@ doc)#
 
 systemdata:
 {
-    !public Memory: ((0 type *(125)) mutable) instance();
-    !(mutable public) FreePointer: Memory array_reference mutable;
+    Memory!public: ((0 type *(125)) mutable) instance();
+    FreePointer!(mutable, public): Memory array_reference mutable;
 };
 
 repeat: @ ^ while() then(^ body(), repeat(^));
@@ -140,9 +140,9 @@ system:
     MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16.
     TextItemType: @! MaxNumber8 text_item type.
 
-    !public NewMemory: @
+    NewMemory!public: @
         {
-            !public result:
+            result!public:
                 (
                     ((^ elementType) * 1)
                     array_reference
@@ -152,7 +152,7 @@ system:
 
             initializer: ^ initializer.
             count: ^ count.
-            !mutable position: count type instance(0).
+            position!mutable: count type instance(0).
 
             repeat
             (
@@ -178,13 +178,13 @@ Text: @
     {
         value: ^.
 
-        !public result:
+        result!public:
         {
             !mix_in: data(^) := new_value @ data(^).
             this: @! ^^.
-            !public count: ^ count.
+            count!public: ^ count.
 
-            !public data:
+            data!public:
                 system
                 NewMemory
                 (
@@ -193,9 +193,9 @@ Text: @
                     initializer: @ value(^)
                 ).
 
-            !public dump_print: @!
+            dump_print!public: @!
             {
-                !mutable position: count type instance(0);
+                position!mutable: count type instance(0);
 
                 repeat
                 (
@@ -209,7 +209,7 @@ Text: @
                 )
             }.
 
-            !public << : @ concat(count: ^ count, data: ^).
+            <<!public: @ concat(count: ^ count, data: ^).
 
             concat: @
                 Text

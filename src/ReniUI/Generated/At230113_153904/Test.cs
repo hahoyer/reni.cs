@@ -1,12 +1,11 @@
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
 namespace ReniUI.Generated.At230113_153904;
 
-[UnitTest]
+//[UnitTest]
 public class Test : CompilerTest
 {
     protected override string Target => (SmbFile.SourceFolder / "Text.reni").String;

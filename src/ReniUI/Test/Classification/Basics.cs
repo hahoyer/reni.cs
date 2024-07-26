@@ -9,8 +9,8 @@ public sealed class Basics : DependenceProvider
     [UnitTest]
     public void GetTokenForPosition()
     {
-        const string text = @"   !mutable FreePointer: Memory array_reference mutable;";
-        const string type = @"wwwkkkkkkkkwiiiiiiiiiiikwiiiiiiwiiiiiiiiiiiiiiiwiiiiiiik";
+        const string text = @"   FreePointer!mutable: Memory array_reference mutable;";
+        const string type = @"wwwiiiiiiiiiiikkkkkkkkkwiiiiiiwiiiiiiiiiiiiiiiwiiiiiiik";
 
         text.GetTokenForPosition(type);
     }

@@ -12,7 +12,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
     IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
     {
         var (item, annotations) = target.Left.CheckForAnnotations();
-        var declarer = DeclarerSyntax.Create(item, annotations, factory.MeansPublic);
+        var declarer = DeclarerSyntax.Create(item, annotations??[], factory.MeansPublic);
         var value = factory.GetValueSyntax(target.Right);
 
         var result = DeclarationSyntax

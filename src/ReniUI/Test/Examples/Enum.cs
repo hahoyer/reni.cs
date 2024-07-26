@@ -70,9 +70,9 @@ x = Auswahl Nein then ""No match"" dump_print
     {
         const string text = @"Auswahl: @!
   {
-!public Ja: (Type: ^^, Value: ""Ja""),
-!public  Nein: (Type: ^^, Value: ""Nein""),
-!public  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
+Ja!public : (Type: ^^, Value: ""Ja""),
+Nein!public  : (Type: ^^, Value: ""Nein""),
+Vielleicht!public  : (Type: ^^, Value: ""Vielleicht"")
 };
 
 x: Auswahl Ja;
@@ -91,9 +91,9 @@ x == Auswahl Nein then ""No match"" dump_print
 [UnitTest]
 [TargetSet(@"Auswahl: @!
   {
-!public Ja: (Type: ^^, Value: ""Ja""),
-!public  Nein: (Type: ^^, Value: ""Nein""),
-!public  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
+Ja!public : (Type: ^^, Value: ""Ja""),
+Nein!public  : (Type: ^^, Value: ""Nein""),
+Vielleicht!public  : (Type: ^^, Value: ""Vielleicht"")
 };
 
 x: Auswahl Ja;

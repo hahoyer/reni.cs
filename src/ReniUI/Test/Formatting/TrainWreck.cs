@@ -162,7 +162,7 @@ public sealed class TrainWreck : DependenceProvider
         const string text = @"(
   first.
 
-  !public data:
+  data!public:
     system
     NewMemory
     (

@@ -17,7 +17,7 @@ public sealed class BadUserInterAction : DependenceProvider
 
 #  #(aa  Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
    
-   !mutable FreePointer: Memory array_reference mutable;
+   FreePointer!mutable : Memory array_reference mutable;
 repeat: @ ^ while() then(^ body(), repeat(^));
 
   aa)#

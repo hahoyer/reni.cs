@@ -1,6 +1,7 @@
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
@@ -39,7 +40,10 @@ sealed class DeclarerSyntax : DumpableObject
 
         internal NameSyntax(string name, Anchor anchor)
             : base(anchor)
-            => Value = name;
+        {
+            Value = name;
+            StopByObjectIds();
+        }
 
         internal override void AssertValid(Level level, BinaryTree target = null)
             => base.AssertValid(level == null? null : new Level { IsCorrectOrder = level.IsCorrectOrder }, target);
@@ -108,14 +112,14 @@ sealed class DeclarerSyntax : DumpableObject
         MeansPublic = meansPublic;
         Issue = issue;
         DirectChildrenCache = new(() => DirectChildCount.Select(GetDirectChild).ToArray());
-        StopByObjectIds();
+        StopByObjectIds(713);
     }
 
     protected override string GetNodeDump()
         => base.GetNodeDump()
             + "["
-            + Tags.Select(tag => ((tag?.Value as TokenClass)?.Id ?? "?") + "!").Stringify("")
             + (Name?.Value ?? "")
+            + Tags.Select(tag => "!" + ((tag?.Value as TokenClass)?.Id ?? "?")).Stringify("")
             + "]";
 
     internal Syntax GetDirectChild(int index)
@@ -138,14 +142,17 @@ sealed class DeclarerSyntax : DumpableObject
         , bool meansPublic
     )
     {
+        var nameIssueAnchors = name.GetNodesFromLeftToRight().Where(a => a != name).ToArray();
+
         var nameSyntax = GetNameSyntax(name);
 
-        if(tags == null || !tags.Any())
-            return new(new TagSyntax[0], nameSyntax, null, meansPublic);
+        if(nameIssueAnchors.Length == 0 && tags.Length == 0)
+            return new([], nameSyntax, null, meansPublic);
 
         var issueAnchors = tags
             .Where(i => i.annotation == null)
             .SelectMany(tuple => tuple.anchors)
+            .Union(nameIssueAnchors)
             .Where(a => a != null)
             .Distinct()
             .ToArray();
