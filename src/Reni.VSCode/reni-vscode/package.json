@@ -1,0 +1,34 @@
+{
+  "name": "reni-vscode",
+  "displayName": "reni-vscode",
+  "description": "Reni Language support",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.92.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "reni-vscode.start-lsp",
+        "title": "Reni LSP"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "edge-js": "^22.1.2",
+    "eslint": "^8.57.0",
+    "vscode-languageclient": "^9.0.1"
+  }
+}
