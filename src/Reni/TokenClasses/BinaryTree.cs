@@ -67,7 +67,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     readonly ITokenClass InnerTokenClass;
 
     readonly FunctionCache<bool, string> FlatFormatCache;
-    readonly FunctionCache<int, BinaryTree> FindItemCache;
+    readonly FunctionCache<int, BinaryTree> ContainingTreeItemCache;
 
     [DisableDump]
     BinaryTree LeftNeighbor;
@@ -210,7 +210,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         InnerTokenClass = tokenClass;
         Right = right;
         FlatFormatCache = new(GetFlatStringValue);
-        FindItemCache = new(position => FindItemForCache(Token.Source + position));
+        ContainingTreeItemCache = new(position => GetContainingTreeItemForCache(Token.Source + position));
 
         SetLinks();
         StopByObjectIds();
@@ -256,15 +256,15 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         return issueId == default? InnerTokenClass : IssueTokenClass.From[issueId];
     }
 
-    BinaryTree FindItemForCache(SourcePosition position)
+    BinaryTree GetContainingTreeItemForCache(SourcePosition position)
     {
         if(position < WhiteSpaces.SourcePart.Start)
-            return Left?.FindItemCache[position.Position];
+            return Left?.ContainingTreeItemCache[position.Position];
 
         if(position < Token.End || (position == Token.End && TokenClass is EndOfText))
             return this;
 
-        return Right?.FindItemCache[position.Position];
+        return Right?.ContainingTreeItemCache[position.Position];
     }
 
     void SetLinks()
@@ -423,10 +423,10 @@ New: {syntax.Dump()}");
         Syntax = syntax;
     }
 
-    internal BinaryTree FindItem(SourcePosition offset)
+    internal BinaryTree GetContainingTreeItem(SourcePosition offset)
     {
         (Token.Source == offset.Source).Assert();
-        return FindItemCache[offset.Position];
+        return ContainingTreeItemCache[offset.Position];
     }
 
     internal BinaryTree CommonRoot(BinaryTree end)
@@ -444,5 +444,13 @@ New: {syntax.Dump()}");
         }
 
         return result;
+    }
+
+    internal (BinaryTree token, WhiteSpaceItem item) GetContainingItem(SourcePosition offset)
+    {
+        var result = GetContainingTreeItem(offset);
+        result.AssertIsNotNull();
+        var item = result.WhiteSpaces.GetItem(offset);
+        return (result, item);
     }
 }

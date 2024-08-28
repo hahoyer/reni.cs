@@ -64,7 +64,7 @@ complex FromReal(2) dump_print;
             var compiler = CompilerBrowser.FromText(Text);
             for(var offset = 0; offset < Text.Length; offset++)
             {
-                var t = compiler.Locate(offset);
+                var t = compiler.GetToken(offset);
                 (t != null).Assert(() => (new Source(Text) + offset).Dump());
             }
         }

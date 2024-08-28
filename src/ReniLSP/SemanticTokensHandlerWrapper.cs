@@ -6,26 +6,83 @@ namespace ReniLSP;
 
 sealed class SemanticTokensHandlerWrapper : SemanticTokensHandlerBase
 {
+    static readonly Container<SemanticTokenType> TokenTypes = new(
+        "comment"
+        , "keyword"
+        , "number"
+        , "string"
+        , "variable"
+        , "function"
+        , "property"
+    );
+
+    public static readonly SemanticTokensRegistrationOptions.StaticOptions Capabilities = new()
+    {
+        Legend = new()
+        {
+            TokenModifiers = new("readonly")
+            , TokenTypes = TokenTypes
+        }
+        , Full = new SemanticTokensCapabilityRequestFull
+        {
+            Delta = true
+        }
+        , Range = true
+        , WorkDoneProgress = true
+    };
+
+
     readonly Handler Handler;
 
     public SemanticTokensHandlerWrapper(Handler handler) => Handler = handler;
 
-    protected override SemanticTokensRegistrationOptions CreateRegistrationOptions
-        (SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
-        => Handler.SemanticTokensOptions;
+    protected override SemanticTokensRegistrationOptions
+        CreateRegistrationOptions(SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
+    {
+        var c = clientCapabilities.TextDocument?.SemanticTokens;
+        var cw = clientCapabilities.Workspace?.SemanticTokens;
+        return new()
+        {
+            Legend = Capabilities.Legend
+            , Full = Capabilities.Full
+            , Range = Capabilities.Range
+            , WorkDoneProgress = Capabilities.WorkDoneProgress
+        }
+            ;
+    }
 
     protected override async Task Tokenize
     (
         SemanticTokensBuilder builder,
         ITextDocumentIdentifierParams identifier,
-        CancellationToken cancellationToken
+        CancellationToken token
     )
     {
         Handler.Tokenize(builder, identifier);
         await Task.CompletedTask;
     }
 
-    protected override async Task<SemanticTokensDocument> GetSemanticTokensDocument
-        (ITextDocumentIdentifierParams @params, CancellationToken cancellationToken)
+    protected override async Task<SemanticTokensDocument>
+        GetSemanticTokensDocument(ITextDocumentIdentifierParams @params, CancellationToken token)
         => await Task.FromResult(new SemanticTokensDocument(RegistrationOptions.Legend));
+
+
+    public override async Task<SemanticTokens> Handle(SemanticTokensParams request, CancellationToken token)
+    {
+        var result = await base.Handle(request, token).ConfigureAwait(false);
+        return result;
+    }
+
+    public override async Task<SemanticTokens> Handle(SemanticTokensRangeParams request, CancellationToken token)
+    {
+        var result = await base.Handle(request, token).ConfigureAwait(false);
+        return result;
+    }
+
+    public override async Task<SemanticTokensFullOrDelta>
+        Handle(SemanticTokensDeltaParams request, CancellationToken token)
+    {
+        var result = await base.Handle(request, token).ConfigureAwait(false);
+        return result;
+    }
 }

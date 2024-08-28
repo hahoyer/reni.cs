@@ -14,7 +14,7 @@ static class Extension
         (
             text
                 .Length
-                .Select(item => compiler.Locate(item).TypeCharacter)
+                .Select(item => compiler.GetToken(item).TypeCharacter)
                 .ToArray()
         );
         (expected == typeCharacters).Assert

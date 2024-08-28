@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using hw.DebugFormatter;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol;
+using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
@@ -13,35 +13,16 @@ namespace ReniLSP;
 
 sealed class Handler : DumpableObject
 {
-    static readonly Container<SemanticTokenType> TokenTypes = new(
-        "comment"
-        , "keyword"
-        , "number"
-        , "string"
-        , "variable"
-        , "function"
-        , "property"
-    );
-
     internal readonly ITextDocumentLanguageServer Server;
 
     readonly ConcurrentDictionary<string, Buffer> Buffers = new();
     readonly ILogger<MainWrapper> Logger;
     ReniUI.Formatting.Configuration FormatOptions;
 
-    public static TextDocumentSyncRegistrationOptions DocumentOptions => new() { Change = TextDocumentSyncKind.Full };
+    public static DocumentHighlightRegistrationOptions HighlightOptions
+        => new() { WorkDoneProgress = true };
 
-    public static SemanticTokensRegistrationOptions SemanticTokensOptions
-        => new()
-        {
-            Legend = new()
-            {
-                TokenModifiers = new("readonly")
-                , TokenTypes = TokenTypes
-            }
-            , Full = true
-            , Range = true
-        };
+    public static TextDocumentSyncRegistrationOptions DocumentOptions => new() { Change = TextDocumentSyncKind.Full };
 
     public static DocumentFormattingRegistrationOptions FormattingOptions
         => new()
@@ -85,6 +66,8 @@ sealed class Handler : DumpableObject
 
     void SetFormattingOptions(FormattingOptions options)
     {
+        FormatOptions ??= CreateFormatOptions(null);
+
         if(options.TrimFinalNewlines)
             FormatOptions.LineBreakAtEndOfText = false;
         else if(options.InsertFinalNewline)
@@ -104,22 +87,36 @@ sealed class Handler : DumpableObject
 
     public void DidChangeConfigurationHandlerImplementation(DidChangeConfigurationParams request)
     {
-        var settingsValues = request.Settings?["reni"]?["formatting"];
-        if(settingsValues?["list"] == null)
-            return;
-
-        FormatOptions = new()
-        {
-            EmptyLineLimit = settingsValues["EmptyLineLimit"].Value<int?>()
-            , MaxLineLength = settingsValues["MaxLineLength"].Value<int?>()
-            , AdditionalLineBreaksForMultilineItems
-                = settingsValues["list"]["AdditionalLineBreaksForMultilineItems"].Value<bool>()
-            , LineBreaksBeforeListToken = settingsValues["list"]["LineBreaksBeforeListToken"].Value<bool>()
-            , LineBreaksBeforeDeclarationToken
-                = settingsValues["list"]["LineBreaksBeforeDeclarationToken"].Value<bool>()
-            , LineBreaksAtComplexDeclaration = settingsValues["list"]["LineBreaksAtComplexDeclaration"].Value<bool>()
-        };
+        FormatOptions = CreateFormatOptions(request);
         return;
+    }
+
+    static ReniUI.Formatting.Configuration CreateFormatOptions(DidChangeConfigurationParams request)
+    {
+        var settingsValues = request?.Settings?["reni"]?["formatting"];
+        if(settingsValues?["list"] == null)
+            return new()
+            {
+                EmptyLineLimit = null
+                , MaxLineLength = null
+                , AdditionalLineBreaksForMultilineItems = true
+                , LineBreaksBeforeListToken = false
+                , LineBreaksBeforeDeclarationToken = false
+                , LineBreaksAtComplexDeclaration = true
+            };
+
+
+        return new()
+        {
+            EmptyLineLimit = settingsValues["EmptyLineLimit"]?.Value<int?>()
+            , MaxLineLength = settingsValues["MaxLineLength"]?.Value<int?>()
+            , AdditionalLineBreaksForMultilineItems
+                = settingsValues["list"]!["AdditionalLineBreaksForMultilineItems"]!.Value<bool>()
+            , LineBreaksBeforeListToken = settingsValues["list"]!["LineBreaksBeforeListToken"]!.Value<bool>()
+            , LineBreaksBeforeDeclarationToken
+                = settingsValues["list"]!["LineBreaksBeforeDeclarationToken"]!.Value<bool>()
+            , LineBreaksAtComplexDeclaration = settingsValues["list"]!["LineBreaksAtComplexDeclaration"]!.Value<bool>()
+        };
     }
 
     public void PublishDiagnostics(string fileName, IEnumerable<Issue> issues)
@@ -140,4 +137,7 @@ sealed class Handler : DumpableObject
         , Range = issue.Position.GetRange()
         , Severity = DiagnosticSeverity.Error
     };
+
+    public void SetDocumentCapability
+        (DidChangeConfigurationCapability capability, ClientCapabilities clientCapabilities) { }
 }

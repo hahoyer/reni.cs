@@ -1,9 +1,8 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using ReniUI;
 using ReniUI.Formatting;
+using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 
 namespace ReniLSP;
 
@@ -14,7 +13,9 @@ sealed class Buffer : DumpableObject
 
     readonly Handler Parent;
     readonly ValueCache<CompilerBrowser> CompilerCache;
-    readonly ValueCache<IEnumerable<(Range Range, string Type)>> ItemsCache;
+
+    readonly ValueCache<IEnumerable<(Range Range, string Type)>>
+        ItemsCache;
 
     internal bool IsValid
     {
@@ -32,7 +33,7 @@ sealed class Buffer : DumpableObject
     {
         Parent = parent;
         CompilerCache = new(() => CompilerBrowser.FromText(Text
-            , new() { ProcessErrors = true , Semantics = true}
+            , new() { ProcessErrors = true, Semantics = true }
             , FileName));
         ItemsCache = new(() => GetItems().ToArray());
     }
@@ -59,15 +60,16 @@ sealed class Buffer : DumpableObject
     public void Tokenize(SemanticTokensBuilder builder)
     {
         var items = ItemsCache.Value;
-        foreach(var item in items)
+        foreach(var item in items.Where(item => item.Range.Start.Line == item.Range.End.Line))
             builder.Push(item.Range, item.Type);
+        builder.Commit();
     }
 
     IEnumerable<(Range Range, string Type)> GetItems()
     {
         var nodes = CompilerCache
             .Value
-            .Locate()
+            .GetTokens()
             .Where(item => item.IsComment || !item.IsWhiteSpace);
 
         foreach(var node in nodes)

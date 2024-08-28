@@ -96,26 +96,26 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
         => new(() => Compiler.FromFile(fileName, parameters));
 
-    public Item Locate(SourcePosition offset)
+    public Item GetToken(SourcePosition offset)
     {
         SyntaxCache.IsValid = true;
-        return Item.LocateByPosition(Compiler.BinaryTree, offset);
+        return Compiler.BinaryTree.GetContainingItem(offset);
     }
 
-    public IEnumerable<Item> Locate(SourcePart target = null)
+    public IEnumerable<Item> GetTokens(SourcePart target = null)
     {
         if(target == null)
             target = Source.All;
 
-        return Locate(target.Position, target.EndPosition);
+        return GetTokens(target.Position, target.EndPosition);
     }
 
-    public IEnumerable<Item> Locate(int start, int end)
+    public IEnumerable<Item> GetTokens(int start, int end)
     {
         var current = start;
         do
         {
-            var result = Locate(current);
+            var result = GetToken(current);
             yield return result;
             if(result.SourcePart.Length > 0)
                 current = result.EndPosition;
@@ -128,10 +128,10 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     public string FlatFormat(bool areEmptyLinesPossible)
         => Compiler.BinaryTree.GetFlatString(areEmptyLinesPossible);
 
-    public Item Locate(int offset) => Locate(Source + offset);
+    public Item GetToken(int offset) => GetToken(Source + offset);
 
     internal BinaryTree LocateTreeItem(SourcePart span)
-        => Item.Locate(Compiler.BinaryTree, span);
+        => Item.GetEnclosingTreeRoot(Compiler.BinaryTree, span);
 
     internal FunctionType Function(int index)
         => Compiler.Root.GetFunction(index);
@@ -201,8 +201,8 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         if(targetPart.Length == 0)
             return true;
 
-        var start = Locate(targetPart.Start);
-        var end = Locate(targetPart.End - 1);
+        var start = GetToken(targetPart.Start);
+        var end = GetToken(targetPart.End - 1);
         if(start != null && end != null)
             return start.Anchor == end.Anchor && IsTooSmall(start.SourcePart, targetPart);
 
@@ -219,8 +219,8 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         var beforeEndPosition = target.End - 1;
         if(!startPosition.IsValid || !beforeEndPosition.IsValid)
             return false;
-        var startItem = Locate(startPosition);
-        var beforeEndItem = Locate(beforeEndPosition);
+        var startItem = GetToken(startPosition);
+        var beforeEndItem = GetToken(beforeEndPosition);
         return startItem != beforeEndItem && !beforeEndItem.IsWhiteSpace;
     }
 
@@ -228,7 +228,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
         if(IsCompletionMode(target))
         {
-            var location = (Classification.Syntax)Locate(target.Start - 1);
+            var location = (Classification.Syntax)GetToken(target.Start - 1);
             var syntax = location.Master;
             if(syntax is ExpressionSyntax expressionSyntax)
             {

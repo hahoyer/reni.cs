@@ -18,8 +18,8 @@ public sealed class PairedSyntaxTree : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var open = compiler.Locate(0);
-        var close = compiler.Locate(text.IndexOf(")"));
+        var open = compiler.GetToken(0);
+        var close = compiler.GetToken(text.IndexOf(")"));
 
         var matchOpen = open.ParserLevelGroup;
         var matchClose = close.ParserLevelGroup;
@@ -36,7 +36,7 @@ public sealed class PairedSyntaxTree : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var list = compiler.Locate(text.IndexOf(","));
+        var list = compiler.GetToken(text.IndexOf(","));
 
         var matchList = list.ParserLevelGroup.ToArray();
         (matchList.Length == 1).Assert();
@@ -50,8 +50,8 @@ public sealed class PairedSyntaxTree : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var open = compiler.Locate(0);
-        var close = compiler.Locate(text.IndexOf(")"));
+        var open = compiler.GetToken(0);
+        var close = compiler.GetToken(text.IndexOf(")"));
 
         var matchOpen = open.ParserLevelGroup;
         var matchClose = close.ParserLevelGroup;
@@ -68,8 +68,8 @@ public sealed class PairedSyntaxTree : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var open = compiler.Locate(0);
-        var close = compiler.Locate(text.IndexOf(")"));
+        var open = compiler.GetToken(0);
+        var close = compiler.GetToken(text.IndexOf(")"));
 
         var matchOpen = open.ParserLevelGroup;
         var matchClose = close.ParserLevelGroup;

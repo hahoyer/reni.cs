@@ -12,7 +12,10 @@ sealed class TextDocumentSyncHandlerWrapper : TextDocumentSyncHandlerBase
     public TextDocumentSyncHandlerWrapper(Handler handler) => Handler = handler;
 
     public override TextDocumentAttributes GetTextDocumentAttributes(DocumentUri uri)
-        => Handler.GetTextDocumentAttributes(uri);
+    {
+        var result = Handler.GetTextDocumentAttributes(uri);
+        return result;
+    }
 
     public override async Task<Unit> Handle(DidOpenTextDocumentParams request, CancellationToken cancellationToken)
     {
@@ -37,6 +40,11 @@ sealed class TextDocumentSyncHandlerWrapper : TextDocumentSyncHandlerBase
     }
 
     protected override TextDocumentSyncRegistrationOptions CreateRegistrationOptions
-        (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
+        (TextSynchronizationCapability capability, ClientCapabilities clientCapabilities)
         => Handler.DocumentOptions;
+
+    public void SetCapability(DidChangeConfigurationCapability capability, ClientCapabilities clientCapabilities)
+    {
+        Handler.SetDocumentCapability(capability, clientCapabilities);
+    }
 }

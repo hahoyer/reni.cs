@@ -18,8 +18,8 @@ public sealed class BracketMatching : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var open = compiler.Locate(0);
-        var close = compiler.Locate(text.IndexOf(")"));
+        var open = compiler.GetToken(0);
+        var close = compiler.GetToken(text.IndexOf(")"));
 
         var matchOpen = open.ParserLevelGroup;
         var matchClose = close.ParserLevelGroup;
@@ -36,8 +36,8 @@ public sealed class BracketMatching : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var open = compiler.Locate(0);
-        var close = compiler.Locate(text.IndexOf(")"));
+        var open = compiler.GetToken(0);
+        var close = compiler.GetToken(text.IndexOf(")"));
 
         var matchOpen = open.ParserLevelGroup.ToArray();
         var matchClose = close.ParserLevelGroup.ToArray();
@@ -56,7 +56,7 @@ public sealed class BracketMatching : DependenceProvider
 
         var compiler = CompilerBrowser.FromText(text);
 
-        var close = compiler.Locate(text.IndexOf(")", text.IndexOf(")") + 1));
+        var close = compiler.GetToken(text.IndexOf(")", text.IndexOf(")") + 1));
 
         var matchClose = close.ParserLevelGroup;
 

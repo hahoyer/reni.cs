@@ -22,7 +22,7 @@ public sealed class UserInterAction2 : DependenceProvider
         (
             Text
                 .Length
-                .Select(item => compiler.Locate(item).TypeCharacter)
+                .Select(item => compiler.GetToken(item).TypeCharacter)
                 .ToArray()
         );
         (Type == typeCharacters).Assert

@@ -23,9 +23,9 @@ namespace ReniUI.Test
             (issue.IssueId == IssueId.InvalidSuffixExpression).Assert();
             (issue.Message == "Using terminal as suffix is invalid.").Assert();
 
-            var x = compiler.Locate(text.IndexOf("som"));
+            var x = compiler.GetToken(text.IndexOf("som"));
             x.AssertNotNull();
-            var y = compiler.Locate(text.IndexOf("'"));
+            var y = compiler.GetToken(text.IndexOf("'"));
             y.AssertNotNull();
         }
     }

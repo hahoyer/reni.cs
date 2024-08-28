@@ -49,7 +49,7 @@ complex FromReal(2) dump_print;
             var compiler = CompilerBrowser.FromText(Text);
             var syntax = compiler.Syntax;
             syntax.AssertIsNotNull();
-            var item = compiler.Locate(compiler.Source.Length);
+            var item = compiler.GetToken(compiler.Source.Length);
             (item.TokenClass is EndOfText).Assert();
         }
     }

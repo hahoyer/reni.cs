@@ -203,24 +203,24 @@ public abstract class Item : DumpableObject
 
     bool Equals(Item other) => SourcePart == other.SourcePart;
 
-    internal static Item LocateByPosition(BinaryTree target, SourcePosition offset)
+    internal static BinaryTree GetEnclosingTreeRoot(BinaryTree target, SourcePart span)
     {
-        var result = target.FindItem(offset);
-        result.AssertIsNotNull();
-        var item = result.WhiteSpaces.LocateItem(offset);
-        if(item == null)
-            return new Syntax(result);
-        return new WhiteSpaceItem(item, result);
-    }
-
-    internal static BinaryTree Locate(BinaryTree target, SourcePart span)
-    {
-        var start = LocateByPosition(target, span.Start);
-        var end = LocateByPosition(target, span.End);
+        var start = GetContainingItem(target, span.Start);
+        var end = GetContainingItem(target, span.End);
         var result = start.Anchor.CommonRoot(end.Anchor);
         result.AssertIsNotNull();
         return result;
     }
+
+    internal static Item GetContainingItem(BinaryTree target, SourcePosition offset)
+    {
+        var (token, item) = target.GetContainingItem(offset);
+        token.AssertIsNotNull();
+        if(item == null)
+            return new Syntax(token);
+        return new WhiteSpaceItem(item, token);
+    }
+
 
     internal static Item GetRightNeighbor(Helper.Syntax target, int current)
     {

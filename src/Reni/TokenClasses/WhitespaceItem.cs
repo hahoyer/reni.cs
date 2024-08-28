@@ -61,7 +61,7 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
     WhiteSpaceItem[] GetItems()
         => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhiteSpaceItem[0];
 
-    internal WhiteSpaceItem LocateItem(SourcePosition offset)
+    internal WhiteSpaceItem GetItem(SourcePosition offset)
     {
         (SourcePart.Start <= offset).Assert();
 
@@ -72,7 +72,7 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
             return this;
 
         return Items
-            .Select(item1 => item1.LocateItem(offset))
+            .Select(item1 => item1.GetItem(offset))
             .FirstOrDefault(item => item != null);
     }
 
