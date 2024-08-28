@@ -263,7 +263,7 @@ abstract class Position : DumpableObject
     }
 
     protected override string GetNodeDump()
-        => $"{Tag}({LineBreaks:d}" + $"{(ForceLineBreak == default? "" : "!")}" + $"{(Indent == default? "" : ">")}";
+        => $"{Tag}({LineBreaks:d}" + $"{(ForceLineBreak == default? "" : "!")}" + $"{(Indent == default? "" : ">")})";
 
     public static Position operator +(Position first, Position other)
         => first == null? other :

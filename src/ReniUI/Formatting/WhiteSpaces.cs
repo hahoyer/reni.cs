@@ -39,7 +39,7 @@ sealed class WhiteSpaces
 
         SourcePart = target.SourcePart;
         MinimalLineBreakCount = minimalLineBreakCount;
-        Configuration = configuration;
+        Configuration = configuration;                    
         SeparatorRequests = separatorRequests;
         WhiteSpaceView = CreateView(target, this);
         AnchorForDebug = anchorForDebug;
