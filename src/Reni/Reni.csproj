@@ -8,9 +8,9 @@
         <PackageReference Include="hw.CompilerTools" Version="23.0.0" />
         <PackageReference Include="hw.Helper.Core" Version="23.0.7" />
         <PackageReference Include="hw.UnitTest" Version="23.0.3" />
-        <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
         <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.11.0" Version="17.0.32112.339" />
-        <PackageReference Include="System.CodeDom" Version="7.0.0" />
+        <PackageReference Include="System.CodeDom" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>
       <None Update="AssemblyInfo.tt">
@@ -24,9 +24,6 @@
       <None Update="FeatureTest\ComplexContext.reni">
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-    <ItemGroup>
-      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     </ItemGroup>
     <ItemGroup>
       <Compile Update="AssemblyInfo.cs">

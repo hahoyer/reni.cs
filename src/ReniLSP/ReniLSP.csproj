@@ -4,7 +4,7 @@
     </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>
-      <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.7" />
+      <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="1.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ReniUI\ReniUI.csproj" />

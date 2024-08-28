@@ -1,35 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+    </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>
-      <None Update="AssemblyInfo.tt">
-        <Generator>TextTemplatingFileGenerator</Generator>
-        <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-      </None>
+        <None Update="AssemblyInfo.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+        </None>
     </ItemGroup>
     <ItemGroup>
-      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+        <Compile Update="AssemblyInfo.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>AssemblyInfo.tt</DependentUpon>
+        </Compile>
+        <Compile Update="Template1.cs.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Template1.tt</DependentUpon>
+        </Compile>
+        <None Update="Template1.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>Template1.cs</LastGenOutput>
+        </None>
     </ItemGroup>
     <ItemGroup>
-      <Compile Update="AssemblyInfo.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>AssemblyInfo.tt</DependentUpon>
-      </Compile>
-      <Compile Update="Template1.cs.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Template1.tt</DependentUpon>
-      </Compile>
-      <None Update="Template1.tt">
-        <Generator>TextTemplatingFileGenerator</Generator>
-        <LastGenOutput>Template1.cs</LastGenOutput>
-      </None>
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\ReniUI\ReniUI.csproj" />
+        <ProjectReference Include="..\ReniUI\ReniUI.csproj" />
     </ItemGroup>
 </Project>
