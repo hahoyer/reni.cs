@@ -6,7 +6,7 @@ abstract class CodeBaseException : Exception
     readonly IContextReference Container;
 
     protected CodeBaseException(IContextReference container) => Container = container;
-    public override string Message => Container.ToString();
+    public override string Message => Container.ToString().AssertNotNull();
 }
 
 sealed class UnexpectedContextReference : CodeBaseException
