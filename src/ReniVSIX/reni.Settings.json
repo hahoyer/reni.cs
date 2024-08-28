@@ -1,8 +1,0 @@
-{
-    "reni.formatting.EmptyLineLimit": 2,
-    "reni.formatting.MaxLineLength": 150,
-    "reni.formatting.list.LineBreaksAtComplexDeclaration": true,
-    "reni.formatting.list.LineBreaksBeforeDeclarationToken": false,
-    "reni.formatting.list.AdditionalLineBreaksForMultilineItems": true,
-    "reni.formatting.list.LineBreaksBeforeListToken": false
-}
