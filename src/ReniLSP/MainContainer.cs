@@ -45,19 +45,6 @@ public static class MainContainer
         await RunOmniServer(reader, writer);
     }
 
-    //await RunMyServer(reader, writer);
-    static async Task RunMyServer(PipeReader reader, PipeWriter writer)
-    {
-        try
-        {
-            await Implementation.LanguageServer.Run(reader, writer);
-        }
-        catch(Exception)
-        {
-            Tracer.TraceBreak();
-        }
-    }
-
     static async Task RunOmniServer(PipeReader reader, PipeWriter writer)
     {
         try

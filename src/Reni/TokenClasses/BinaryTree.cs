@@ -1,9 +1,6 @@
 using System.ComponentModel;
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
@@ -429,7 +426,7 @@ New: {syntax.Dump()}");
         return ContainingTreeItemCache[offset.Position];
     }
 
-    internal BinaryTree CommonRoot(BinaryTree end)
+    internal BinaryTree GetCommonRoot(BinaryTree end)
     {
         var startParents = this.Chain(node => node.Parent).Reverse().ToArray();
         var endParents = end.Chain(node => node.Parent).Reverse().ToArray();
@@ -446,7 +443,7 @@ New: {syntax.Dump()}");
         return result;
     }
 
-    internal (BinaryTree token, WhiteSpaceItem item) GetContainingItem(SourcePosition offset)
+    internal(BinaryTree token, WhiteSpaceItem item) GetContainingItem(SourcePosition offset)
     {
         var result = GetContainingTreeItem(offset);
         result.AssertIsNotNull();

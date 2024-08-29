@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.TokenClasses.Whitespace;
@@ -207,7 +205,7 @@ public abstract class Item : DumpableObject
     {
         var start = GetContainingItem(target, span.Start);
         var end = GetContainingItem(target, span.End);
-        var result = start.Anchor.CommonRoot(end.Anchor);
+        var result = start.Anchor.GetCommonRoot(end.Anchor);
         result.AssertIsNotNull();
         return result;
     }

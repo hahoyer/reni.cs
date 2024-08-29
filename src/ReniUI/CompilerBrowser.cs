@@ -99,7 +99,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     public Item GetToken(SourcePosition offset)
     {
         SyntaxCache.IsValid = true;
-        return Compiler.BinaryTree.GetContainingItem(offset);
+        return Item.GetContainingItem(Compiler.BinaryTree, offset);
     }
 
     public IEnumerable<Item> GetTokens(SourcePart target = null)
