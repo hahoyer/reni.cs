@@ -45,6 +45,5 @@ sealed class TextDocumentSyncHandlerWrapper : TextDocumentSyncHandlerBase
 
     public void SetCapability(DidChangeConfigurationCapability capability, ClientCapabilities clientCapabilities)
     {
-        Handler.SetDocumentCapability(capability, clientCapabilities);
     }
 }

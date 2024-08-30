@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol;
-using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
@@ -137,7 +136,4 @@ sealed class Handler : DumpableObject
         , Range = issue.Position.GetRange()
         , Severity = DiagnosticSeverity.Error
     };
-
-    public void SetDocumentCapability
-        (DidChangeConfigurationCapability capability, ClientCapabilities clientCapabilities) { }
 }

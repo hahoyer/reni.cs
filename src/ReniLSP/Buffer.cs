@@ -60,9 +60,11 @@ sealed class Buffer : DumpableObject
     public void Tokenize(SemanticTokensBuilder builder)
     {
         var items = ItemsCache.Value;
-        foreach(var item in items.Where(item => item.Range.Start.Line == item.Range.End.Line))
-            builder.Push(item.Range, item.Type);
-        builder.Commit();
+        foreach(var (range, type) in items)
+        {
+            (range.Start.Line != range.End.Line).ConditionalBreak();
+            builder.Push(range, type);
+        }
     }
 
     IEnumerable<(Range Range, string Type)> GetItems()
