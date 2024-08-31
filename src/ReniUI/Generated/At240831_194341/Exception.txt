@@ -1,0 +1,35 @@
+Tracer.AssertionFailedException: Assertion Failed: 
+Data: 
+   at hw.DebugFormatter.Tracer.AssertionBreak(String result) in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\DebugFormatter\Tracer.cs:line 512
+   at hw.DebugFormatter.Tracer.AssertionFailed(String cond, Func`1 getText, Int32 stackFrameDepth) in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\DebugFormatter\Tracer.cs:line 367
+   at hw.DebugFormatter.Tracer.AssertIsNotNull(Object b, Func`1 getText, Int32 stackFrameDepth) in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\DebugFormatter\Tracer.cs:line 416
+   at Reni.Validation.Extension.Validate(IssueId issueId, Object[] additionalInformation) in A:\develop\Reni\dev\src\Reni\Validation\Extension.cs:line 101
+   at Reni.Validation.Extension.GetIssue(IssueId issueId, SourcePart position, Object[] additionalInformation) in A:\develop\Reni\dev\src\Reni\Validation\Extension.cs:line 89
+   at Reni.TokenClasses.BinaryTree.GetIssue() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 243
+   at hw.Helper.ValueCache`1.Ensure() in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 53
+   at hw.Helper.ValueCache`1.get_Value() in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 27
+   at hw.Helper.ValueCacheExtension.CachedValue[TValueType](IContainer container, Func`1 target) in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\Helper\ValueCacheExtension.cs:line 16
+   at Reni.TokenClasses.BinaryTree.get_Issues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 107
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.TokenClasses.BinaryTree.get_AllIssues() in A:\develop\Reni\dev\src\Reni\TokenClasses\BinaryTree.cs:line 102
+   at Reni.Compiler.get_Issues() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 98
+   at ReniUI.CompilerBrowser.get_Issues() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 50
+   at ReniUI.CompilerBrowser.<get_GuardedIssues>b__15_0() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 47
+   at ReniUI.CompilerBrowser.ExceptionGuard[TResult](Func`1 getResult, GuiExceptionGuard`1 guard) in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 76

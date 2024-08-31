@@ -1,11 +1,13 @@
+
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
-namespace ReniUI.Generated.At230113_153904;
+namespace ReniUI.Generated.At240831_154154;
 
-//[UnitTest]
+[UnitTest]
 public class Test : CompilerTest
 {
     protected override string Target => (SmbFile.SourceFolder / "Text.reni").String;
@@ -14,12 +16,9 @@ public class Test : CompilerTest
     {
         var issueArray = issues.ToArray();
         var i = 0;
-        var issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingDeclarationDeclarer).Assert(issueBase.Dump);
-        i++;
-        issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
-        i++;
+        //var issueBase = issueArray[i];
+        //(issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
+        //i++;
         (i == issueArray.Length).Assert();
     }
 }

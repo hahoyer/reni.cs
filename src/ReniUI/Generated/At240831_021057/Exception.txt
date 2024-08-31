@@ -1,0 +1,17 @@
+Expectations.ExpectationFailedException: 
+   at Reni.Helper.Expectations.ExpectationFailed(String cond, Func`1 getText, Int32 stackFrameDepth) in A:\develop\Reni\dev\src\Reni\Helper\Expectations.cs:line 95
+   at Reni.Helper.Expectations.Expect(Boolean b, Func`1 getText, Int32 stackFrameDepth) in A:\develop\Reni\dev\src\Reni\Helper\Expectations.cs:line 72
+   at Reni.Parser.ExclamationBoxToken.hw.Parser.IParserTokenType<Reni.TokenClasses.BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right) in A:\develop\Reni\dev\src\Reni\Parser\ExclamationBoxToken.cs:line 22
+   at hw.Parser.OpenItem`1.Create(TTreeItem right) in C:\Users\hh\.nuget\packages\hw.compilertools\23.0.0\contentFiles\any\any\hw\CompilerTools\Parser\OpenItem.cs:line 34
+   at hw.Parser.PrioParser`1.PrioParserWorker.Step(Boolean canPush) in C:\Users\hh\.nuget\packages\hw.compilertools\23.0.0\contentFiles\any\any\hw\CompilerTools\Parser\PrioParserWorker.cs:line 125
+   at hw.Parser.PrioParser`1.PrioParserWorker.Execute() in C:\Users\hh\.nuget\packages\hw.compilertools\23.0.0\contentFiles\any\any\hw\CompilerTools\Parser\PrioParserWorker.cs:line 59
+   at hw.Parser.PrioParser`1.hw.Parser.IParser<TSourcePart>.Execute(Source source) in C:\Users\hh\.nuget\packages\hw.compilertools\23.0.0\contentFiles\any\any\hw\CompilerTools\Parser\PrioParser.cs:line 44
+   at Reni.Compiler.Parse(Source source) in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 384
+   at Reni.Compiler.<.ctor>b__36_1() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 244
+   at hw.Helper.ValueCache`1.Ensure() in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 53
+   at hw.Helper.ValueCache`1.get_Value() in C:\Users\hh\.nuget\packages\hw.helper.core\23.0.7\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 27
+   at Reni.Compiler.get_BinaryTree() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 54
+   at Reni.Compiler.get_Issues() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 98
+   at ReniUI.CompilerBrowser.get_Issues() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 52
+   at ReniUI.CompilerBrowser.<get_GuardedIssues>b__15_0() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 49
+   at ReniUI.CompilerBrowser.ExceptionGuard[TResult](Func`1 getResult, GuiExceptionGuard guard) in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 78
