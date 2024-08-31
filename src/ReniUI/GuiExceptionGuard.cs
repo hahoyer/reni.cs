@@ -1,29 +1,44 @@
-using hw.DebugFormatter;
-using hw.Helper;
-
 namespace ReniUI;
 
-abstract class GuiExceptionGuard : DumpableObject
+abstract class GuiExceptionGuard<TResult> : DumpableObject
 {
+    const string ExceptionTextFileName = "Exception.txt";
+    const string SourceFileName = "Test.reni";
     protected readonly CompilerBrowser Parent;
     protected GuiExceptionGuard(CompilerBrowser parent) => Parent = parent;
 
     protected abstract string GetTestCode(string folderName);
 
-    public TResult Run<TResult>(Exception exception, CompilerBrowser compiler)
-    {
-        var sourceFolder = SmbFile.SourceFolder ?? ".".ToSmbFile();
-        var folderName = $"At{DateTime.Now:yyMMdd_HHmmss}";
-        var issueFolder = sourceFolder / "Generated" / folderName;
+    public abstract TResult OnException(Exception exception);
 
-        SaveExceptionInformationFile(issueFolder, "Exception.txt", Dump(exception), "Exception Data");
-        SaveExceptionInformationFile(issueFolder, "Test.reni", @$"#( Source: {Parent.Source.Identifier} )#
-{Parent.Source.Data}", "Source file ");
-        SaveExceptionInformationFile(issueFolder, "Text.cs", GetTestCode(folderName), "Test code");
-        return default;
+    protected void CreateDiscriminatingTest(Exception exception)
+    {
+        var generatedFolder = (SmbFile.SourceFolder ?? ".".ToSmbFile()) / "Generated";
+        var sourceCode = @$"#( Source: {Parent.Source.Identifier} )#
+{Parent.Source.Data}";
+
+        var lastReading = generatedFolder.Items.Top(file => HasSourceCode(file, sourceCode));
+        if(lastReading == null)
+        {
+            var folderName = $"At{DateTime.Now:yyMMdd_HHmmss}";
+            var issueFolder = generatedFolder / folderName;
+
+            SaveExceptionInformationFile(issueFolder, ExceptionTextFileName, Dump(exception), "Exception Data");
+            SaveExceptionInformationFile(issueFolder, SourceFileName, sourceCode, "Source file ");
+            SaveExceptionInformationFile(issueFolder, "Text.cs", GetTestCode(folderName), "Test code");
+        }
+        else
+            $"Exception already saved to: {Tracer.FilePosition(lastReading.FullName, 1, 1, FilePositionTag.Output)}"
+                .Log();
     }
 
-    public static string Dump(Exception exception)
+    static bool HasContent(SmbFile target, string content) 
+        => (target / ExceptionTextFileName).String == content;
+
+    static bool HasSourceCode(SmbFile target, string sourceCode)
+        => (target / SourceFileName).String == sourceCode;
+
+    static string Dump(Exception exception)
     {
         if(exception == null)
             return "";
@@ -42,62 +57,4 @@ InnerException: {innerExceptionDump}".Indent();
         file.String = content;
         $"{title} saved to :\n{Tracer.FilePosition(file.FullName, 1, 1, FilePositionTag.Output)}".Log();
     }
-}
-
-sealed class SyntaxExceptionGuard : GuiExceptionGuard
-{
-    public SyntaxExceptionGuard(CompilerBrowser parent)
-        : base(parent) { }
-
-    protected override string GetTestCode(string folderName) => @$"
-using hw.DebugFormatter;
-using hw.Helper;
-using hw.UnitTest;
-using Reni.FeatureTest.Helper;
-using Reni.Validation;
-
-namespace ReniUI.Generated.{folderName};
-
-[UnitTest]
-public class Test : CompilerTest
-{{
-    protected override string Target => (SmbFile.SourceFolder / ""Text.reni"").String;
-
-    protected override void Run()
-    {{
-        base.Run<()>()
-}}
-";
-}
-
-sealed class IssuesExceptionGuard : GuiExceptionGuard
-{
-    public IssuesExceptionGuard(CompilerBrowser parent)
-        : base(parent) { }
-
-    protected override string GetTestCode(string folderName) => @$"
-using hw.DebugFormatter;
-using hw.Helper;
-using hw.UnitTest;
-using Reni.FeatureTest.Helper;
-using Reni.Validation;
-
-namespace ReniUI.Generated.{folderName};
-
-[UnitTest]
-public class Test : CompilerTest
-{{
-    protected override string Target => (SmbFile.SourceFolder / ""Text.reni"").String;
-
-    protected override void Verify(IEnumerable<Issue> issues)
-    {{
-        var issueArray = issues.ToArray();
-        var i = 0;
-        //var issueBase = issueArray[i];
-        //(issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
-        //i++;
-        (i == issueArray.Length).Assert();
-    }}
-}}
-";
 }

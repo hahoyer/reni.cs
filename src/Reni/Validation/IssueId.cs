@@ -1,5 +1,4 @@
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -9,87 +8,93 @@ namespace Reni.Validation;
 
 enum Stage
 {
-    Unexpected
-    , Parsing
-    , Syntax
-    , Semantic
+	Unexpected
+	, Parsing
+	, Syntax
+	, Semantic
 }
 
 [AttributeUsage(AttributeTargets.Field)]
 public sealed class Setup : Attribute
 {
-    internal readonly System.Type[] AdditionalInformation;
-    readonly Stage Stage;
+	internal readonly System.Type[] AdditionalInformation;
+	readonly Stage Stage;
 
-    internal Setup(Stage stage, params System.Type[] additionalInformation)
-    {
-        Stage = stage;
-        AdditionalInformation = additionalInformation;
-    }
+	internal Setup(Stage stage, params System.Type[] additionalInformation)
+	{
+		Stage = stage;
+		AdditionalInformation = additionalInformation;
+	}
 }
 
 enum IssueId
 {
-    [UsedImplicitly]
-    None
+	[UsedImplicitly]
+	None
 
-    , [Setup(Stage.Semantic, typeof(TypeBase), typeof(SearchResult[]))]
-    AmbiguousSymbol
+	, [Setup(Stage.Semantic, typeof(TypeBase), typeof(SearchResult[]))]
+	AmbiguousSymbol
 
-    , [Setup(Stage.Parsing)]
-    EOFInComment
+	, [Setup(Stage.Parsing)]
+	EOFInComment
 
-    , [Setup(Stage.Parsing)]
-    EOLInString
+	, [Setup(Stage.Parsing)]
+	EOLInString
 
-    , [Setup(Stage.Syntax, typeof(SourcePart))]
-    ExtraLeftBracket
+	, [Setup(Stage.Syntax, typeof(SourcePart))]
+	ExtraLeftBracket
 
-    , [Setup(Stage.Syntax, typeof(SourcePart))]
-    ExtraRightBracket
+	, [Setup(Stage.Syntax, typeof(SourcePart))]
+	ExtraRightBracket
 
-    , [Setup(Stage.Parsing)]
-    InvalidCharacter
+	, [Setup(Stage.Parsing)]
+	InvalidCharacter
 
-    , [Setup(Stage.Syntax)]
-    InvalidDeclaration
+	, [Setup(Stage.Syntax)]
+	InvalidDeclaration
 
-    , [Setup(Stage.Syntax)]
-    InvalidDeclarationTag
+	, [Setup(Stage.Syntax)]
+	InvalidDeclarationTag
 
-    , [Setup(Stage.Syntax)]
-    InvalidExpression
+	, [Setup(Stage.Syntax)]
+	InvalidExpression
 
-    , [Setup(Stage.Syntax)]
-    InvalidInfixExpression
+	, [Setup(Stage.Syntax)]
+	InvalidInfixExpression
 
-    , [Setup(Stage.Syntax)]
-    InvalidPrefixExpression
+	, [Setup(Stage.Syntax)]
+	InvalidPrefixExpression
 
-    , [Setup(Stage.Syntax, typeof(string))]
-    InvalidSuffixExpression
+	, [Setup(Stage.Syntax, typeof(string))]
+	InvalidSuffixExpression
 
-    , [Setup(Stage.Syntax)]
-    InvalidTerminalExpression
+	, [Setup(Stage.Syntax)]
+	InvalidTerminalExpression
 
-    , [Setup(Stage.Syntax)]
-    MissingDeclarationDeclarer
+	, [Setup(Stage.Syntax)]
+	MissingDeclarationDeclarer
 
-    , [Setup(Stage.Semantic, typeof(TypeBase))]
-    MissingDeclarationForType
+	, [Setup(Stage.Semantic, typeof(TypeBase))]
+	MissingDeclarationForType
 
-    , [Setup(Stage.Semantic, typeof(ContextBase))]
-    MissingDeclarationInContext
+	, [Setup(Stage.Semantic, typeof(ContextBase))]
+	MissingDeclarationInContext
 
-    , [Setup(Stage.Syntax)]
-    MissingDeclarationValue
+	, [Setup(Stage.Syntax)]
+	MissingDeclarationValue
 
-    , [Setup(Stage.Syntax)]
-    MissingMatchingRightBracket
+	, [Setup(Stage.Syntax, typeof(SourcePart))]
+	MissingMatchingRightBracket
 
-    , [Setup(Stage.Semantic)]
-    MissingRightExpression
+	, [Setup(Stage.Semantic)]
+	MissingRightExpression
 
-    , [Setup(Stage.Syntax, typeof(ITokenClass))]
-    InvalidAnnotation
+	, [Setup(Stage.Syntax, typeof(ITokenClass))]
+	InvalidAnnotation
+
+	, [Setup(Stage.Unexpected, typeof(string), typeof(string))]
+	UnexpectedException
+
+	, [Setup(Stage.Unexpected, typeof(string))]
+	ExpectationFailedException
 }

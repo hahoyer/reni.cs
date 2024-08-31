@@ -62,6 +62,17 @@ static class Extension
 
             case IssueId.ExtraRightBracket:
                 return $"No opening bracket found until {PositionFormatter(additionalInformation[0], true)}.";
+
+            case IssueId.MissingMatchingRightBracket:
+	            return $"No closing bracket found until {PositionFormatter(additionalInformation[0])}.";
+
+            case IssueId.UnexpectedException:
+	            return $"Exception {additionalInformation[0]}: {additionalInformation[1]}.";
+
+            case IssueId.ExpectationFailedException:
+
+	            return $"Expected {((string)(additionalInformation[0])).Quote()}.";
+
         }
 
         Dumpable.NotImplementedFunction(issueId, additionalInformation.Dump());

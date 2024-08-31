@@ -240,7 +240,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         if(errorToken.IssueId == ExtraRightBracket)
             return errorToken.IssueId.GetIssue(Token, Left.SourcePart);
         if(errorToken.IssueId == MissingMatchingRightBracket)
-            return errorToken.IssueId.GetIssue(Left.Right.SourcePart);
+            return errorToken.IssueId.GetIssue(Token, LeftMost.SourcePart);
         if(errorToken.IssueId == EOFInComment || errorToken.IssueId == EOLInString)
             return errorToken.IssueId.GetIssue(Token);
 
