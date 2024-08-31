@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.IO.Pipelines;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nerdbank.Streams;
-using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Server;
+using Reni.Helper;
 
 namespace ReniLSP;
 
@@ -39,16 +40,16 @@ public static class MainContainer
         await RunServer(reader.UsePipeReader(), writer.UsePipeWriter());
     }
 
-    public static async Task RunServer(PipeReader reader, PipeWriter writer)
-    {
+    public static async Task RunServer(PipeReader reader, PipeWriter writer) =>
         //var pipeReader = new MyReader("reader", reader);
         await RunOmniServer(reader, writer);
-    }
 
     static async Task RunOmniServer(PipeReader reader, PipeWriter writer)
     {
         try
         {
+            Expectations.BreakMode = Expectations.BreakModeType.UseException; 
+
             void ConfigureOptions(LanguageServerOptions options) => options
                 .WithInput(reader)
                 .WithOutput(writer)
@@ -56,7 +57,7 @@ public static class MainContainer
                 .AddDefaultLoggingProvider()
                 .OnInitialized(Initialized)
                 .WithHandler<MainWrapper>()
-                .WithServices(x => x.AddLogging(b => b.SetMinimumLevel(LogLevel.Debug)))
+                .WithServices(x => x.AddLogging(b => b.SetMinimumLevel(LogLevel.Information)))
             ;
 
             await LanguageServer.From(ConfigureOptions);

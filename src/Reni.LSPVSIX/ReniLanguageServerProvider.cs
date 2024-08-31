@@ -3,7 +3,6 @@ using System.IO.Pipelines;
 using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Extensibility.Editor;
 using Microsoft.VisualStudio.Extensibility.LanguageServer;
-using Microsoft.VisualStudio.RpcContracts.LanguageServerProvider;
 using Nerdbank.Streams;
 using ReniLSP;
 
@@ -15,7 +14,7 @@ namespace Reni.LSPVSIX;
 public sealed class ReniLanguageServerProvider : LanguageServerProvider
 {
     [UsedImplicitly]
-    Task? ServerPipeTask;
+    Task ServerPipeTask;
 
     [VisualStudioContribution]
     internal static DocumentTypeConfiguration ReniDocumentType => new("reni")
@@ -28,13 +27,13 @@ public sealed class ReniLanguageServerProvider : LanguageServerProvider
         : base(container, extensibilityObject) { }
 
     public override LanguageServerProviderConfiguration LanguageServerProviderConfiguration =>
-        new("Reni Language Server",
+        new("%Reni Language Server%",
             new[]
             {
                 DocumentFilter.FromDocumentType("reni"),
             });
 
-    public override Task<IDuplexPipe?> CreateServerConnectionAsync(CancellationToken token)
+    public override Task<IDuplexPipe> CreateServerConnectionAsync(CancellationToken token)
     {
         var (pipeToLSP, pipeToVS) = FullDuplexStream.CreatePair();
         var reader = pipeToLSP.UsePipeReader();
@@ -42,6 +41,6 @@ public sealed class ReniLanguageServerProvider : LanguageServerProvider
         ServerPipeTask = Task.Run(() => MainContainer.RunServer(reader, writer), token);
         var duplexPipe = new DuplexPipe(pipeToVS.UsePipeReader(), pipeToVS.UsePipeWriter());
 
-        return Task.FromResult<IDuplexPipe?>(duplexPipe);
+        return Task.FromResult<IDuplexPipe>(duplexPipe);
     }
 }

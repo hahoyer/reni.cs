@@ -66,23 +66,4 @@ sealed class SemanticTokensHandlerWrapper : SemanticTokensHandlerBase
         GetSemanticTokensDocument(ITextDocumentIdentifierParams @params, CancellationToken token)
         => await Task.FromResult(new SemanticTokensDocument(RegistrationOptions.Legend));
 
-
-    public override async Task<SemanticTokens> Handle(SemanticTokensParams request, CancellationToken token)
-    {
-        var result = await base.Handle(request, token).ConfigureAwait(false);
-        return result;
-    }
-
-    public override async Task<SemanticTokens> Handle(SemanticTokensRangeParams request, CancellationToken token)
-    {
-        var result = await base.Handle(request, token).ConfigureAwait(false);
-        return result;
-    }
-
-    public override async Task<SemanticTokensFullOrDelta>
-        Handle(SemanticTokensDeltaParams request, CancellationToken token)
-    {
-        var result = await base.Handle(request, token).ConfigureAwait(false);
-        return result;
-    }
 }
