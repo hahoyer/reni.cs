@@ -22,8 +22,6 @@ sealed class LoggerFactory : DumpableObject, ILoggerFactory
             , Func<TState, Exception, string> formatter
         )
         {
-            //if(logLevel.In(LogLevel.Debug, LogLevel.Trace))
-            //    return;
             $"{CategoryName}: [{logLevel}] {formatter(state, exception)}".LogLinePart();
             TraceException("Exception", exception).Log();
         }
@@ -43,28 +41,3 @@ sealed class LoggerFactory : DumpableObject, ILoggerFactory
 
     ILogger ILoggerFactory.CreateLogger(string categoryName) => new Logger(categoryName);
 }
-
-/*
-    $/setTrace:OmniSharp.Extensions.LanguageServer.Server.Logging.LanguageServerLoggingManager,
-    $/progress:OmniSharp.Extensions.LanguageServer.Protocol.Progress.ProgressManager,
-
-
-    initialize:OmniSharp.Extensions.LanguageServer.Server.LanguageServer,
-    initialized:OmniSharp.Extensions.LanguageServer.Server.LanguageServer
-    textDocument/didOpen:ReniLSP.MainWrapper,
-    textDocument/didChange:ReniLSP.MainWrapper,
-    textDocument/didClose:ReniLSP.MainWrapper,
-    textDocument/formatting:ReniLSP.MainWrapper,
-    textDocument/semanticTokens/range:ReniLSP.MainWrapper,
-    textDocument/semanticTokens/full/delta:ReniLSP.MainWrapper,
-    textDocument/semanticTokens/full:ReniLSP.MainWrapper,
-    window/workDoneProgress/cancel:OmniSharp.Extensions.LanguageServer.Protocol.Server.WorkDone.LanguageServerWorkDoneManager,
-    workspace/configuration:ReniLSP.MainWrapper,
-    workspace/didChangeWorkspaceFolders:OmniSharp.Extensions.LanguageServer.Server.LanguageServerWorkspaceFolderManager,
-    workspace/didChangeConfiguration:ReniLSP.MainWrapper,
-    shutdown:OmniSharp.Extensions.LanguageServer.Server.LanguageServer,
-    exit:OmniSharp.Extensions.LanguageServer.Server.LanguageServer,
-
-OmniSharp.Extensions.JsonRpc.InputHandler: [Debug] Notification handler was not found (or not setup) NotificationReceived
-
-*/
