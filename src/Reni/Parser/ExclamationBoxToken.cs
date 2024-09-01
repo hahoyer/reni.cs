@@ -1,5 +1,5 @@
-﻿using hw.DebugFormatter;
-using hw.Parser;
+﻿using hw.Parser;
+using Reni.Helper;
 using Reni.TokenClasses;
 
 namespace Reni.Parser;
@@ -18,9 +18,9 @@ sealed class ExclamationBoxToken
         if(right == null)
             return leftleft;
 
-        right.Left.AssertIsNull();
-        (right.TokenClass is ExclamationBoxToken).Assert();
-        return right.ReCreate(T(leftleft));
+        (right.TokenClass is ExclamationBoxToken).Expect(() => right.Token);
+        right.Left.ExpectIsNull(() => right.SourcePart);
+        return right.ReCreate([leftleft]);
     }
 
     string IParserTokenType<BinaryTree>.PrioTableId => TokenId;
