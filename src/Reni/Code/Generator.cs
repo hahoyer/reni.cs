@@ -1,9 +1,11 @@
-using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
-using hw.DebugFormatter;
-using hw.Helper;
+using System.Runtime.Loader;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CSharp;
+using Reni.Runtime;
 using Reni.Struct;
 
 namespace Reni.Code;
@@ -29,14 +31,15 @@ static class Generator
     {
         var streamWriter = new StreamWriter(name);
         if(traceFilePosn)
-            Tracer.FilePosition(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug).Log
-                ();
+            Tracer
+                .FilePosition(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug)
+                .Log();
         streamWriter.Write(result);
         streamWriter.Close();
     }
 
     internal static Assembly CodeToAssembly
-        (this string codeToString, bool traceFilePosition, bool includeDebugInformation)
+        (this string cSharpString, bool traceFilePosition, bool includeDebugInformation)
     {
         var directoryName
             = Environment.GetEnvironmentVariable
@@ -46,58 +49,93 @@ static class Generator
             + "."
             + Thread.CurrentThread.ManagedThreadId;
         directoryName.ToSmbFile().EnsureIsExistentDirectory();
-        //nameof(directoryName).IsSetTo(directoryName).WriteLine();
         var name = directoryName + ".reni.cs";
         name.ToSmbFile().CheckedEnsureDirectoryOfFileExists();
 
-        CodeToFile(name, codeToString, traceFilePosition);
+        CodeToFile(name, cSharpString, traceFilePosition);
 
-        // Build the parameters for source compilation.
-        var cp = new System.CodeDom.Compiler.CompilerParameters
-        {
-            GenerateInMemory = true
-            , CompilerOptions = "/unsafe"
-            , IncludeDebugInformation = includeDebugInformation
-            , TempFiles = new(directoryName, false)
-        };
+        MetadataReferenceResolver resolver = new MyResolver();
+        var cp = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            .WithAllowUnsafe(true)
+            .WithPlatform(Platform.X64)
+            ;
+
+        System.Type[] types =
+        [
+            typeof(Generator)
+            , typeof(SmbFile)
+            , typeof(Data)
+            , typeof(object)
+        ];
+
+        var runtime = Assembly
+            .GetExecutingAssembly()
+            .GetAssemblies()
+            .Top( a=>a.FullName.AssertNotNull().Contains("System.Runtime"));
+
         var referencedAssemblies
-            = T
-            (
-                Assembly.GetAssembly(typeof(Generator)).AssertNotNull().Location,
-                Assembly.GetAssembly(typeof(SmbFile)).AssertNotNull().Location
-            );
-        cp.ReferencedAssemblies.AddRange(referencedAssemblies);
-        var cr = Provider.CompileAssemblyFromFile(cp, name);
+            = types
+                .Select(type => Assembly.GetAssembly(type).AssertNotNull().Location)
+                .Union([runtime.Location])
+                .Distinct()
+                .Select(location => MetadataReference.CreateFromFile(location))
+                .ToArray();
+
+        var cr = CSharpCompilation.Create(Guid.NewGuid().ToString()
+            , [CSharpSyntaxTree.ParseText(cSharpString)]
+            , referencedAssemblies
+            , cp
+        );
+
+        using var ms = new MemoryStream();
+        var emitResult = cr.Emit(ms);
+
+        if(!emitResult.Success)
+        {
+            var diagnostics = emitResult.Diagnostics.ToArray();
+            HandleErrors(diagnostics);
+            throw new CSharpCompilerErrorException(diagnostics);
+        }
 
         if(!includeDebugInformation)
             directoryName.ToSmbFile().Delete(true);
 
-        if(cr.Errors.Count > 0)
-            HandleErrors(cr.Errors);
+        ms.Seek(0, SeekOrigin.Begin);
 
-        return cr.CompiledAssembly;
+        return AssemblyLoadContext.Default.LoadFromStream(ms);
     }
 
-    internal static void HandleErrors(CompilerErrorCollection cr)
+    internal static void HandleErrors(Diagnostic[] diagnostics)
     {
-        for(var i = 0; i < cr.Count; i++)
-            cr[i].ToString().Log();
-
-        throw new CSharpCompilerErrorException(cr);
+        foreach(var diagnostic in diagnostics)
+            diagnostic.ToString().Log();
     }
 
     static TValue[] T<TValue>(params TValue[] value) => value;
+}
+
+sealed class MyResolver : MetadataReferenceResolver
+{
+    public override bool Equals(object other) => other == this;
+    public override int GetHashCode() => 1;
+
+    public override ImmutableArray<PortableExecutableReference> ResolveReference
+        (string reference, string baseFilePath, MetadataReferenceProperties properties)
+    {
+        Dumpable.NotImplementedFunction(reference, baseFilePath, properties);
+        return default;
+    }
 }
 
 sealed class CSharpCompilerErrorException : Exception
 {
     public string[] Errors { get; }
 
-    public CSharpCompilerErrorException(CompilerErrorCollection errorCollection)
+    public CSharpCompilerErrorException(Diagnostic[] diagnostics)
     {
         var errors = new List<string>();
-        for(var i = 0; i < errorCollection.Count; i++)
-            errors.Add(errorCollection[i].ToString());
+        foreach(var diagnostic in diagnostics)
+            errors.Add(diagnostic.ToString());
 
         Errors = errors.ToArray();
     }
