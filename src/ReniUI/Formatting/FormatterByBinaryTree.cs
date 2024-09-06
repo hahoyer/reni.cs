@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.Scanner;
 
 namespace ReniUI.Formatting;

@@ -57,7 +57,7 @@ public static class MainContainer
                 .AddDefaultLoggingProvider()
                 .OnInitialized(Initialized)
                 .WithHandler<MainWrapper>()
-                .WithServices(x => x.AddLogging(b => b.SetMinimumLevel(LogLevel.Information)))
+                .WithServices(x => x.AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information)))
             ;
 
             await LanguageServer.From(ConfigureOptions);

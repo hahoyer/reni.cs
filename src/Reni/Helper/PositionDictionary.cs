@@ -48,7 +48,7 @@ public sealed class PositionDictionary<TResult> : DumpableObject
                     => $@"Tree-item is anchor in more than one {typeof(TResult).PrettyName()}-item: 
 key = {key.DebuggerDump()}
 value = {value.LogDump()}
-oldValue = {oldValue.LogDump()}"
+oldValue = {oldValue!.LogDump()}"
             );
         values[key] = value;
     }

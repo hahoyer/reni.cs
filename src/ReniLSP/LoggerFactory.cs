@@ -14,11 +14,11 @@ sealed class LoggerFactory : DumpableObject, ILoggerFactory
 
         IDisposable ILogger.BeginScope<TState>(TState state) => new CompositeDisposable();
 
-        bool ILogger.IsEnabled(LogLevel logLevel) => true;
+        bool ILogger.IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel) => true;
 
         void ILogger.Log<TState>
         (
-            LogLevel logLevel, EventId eventId, TState state, Exception exception
+            Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception
             , Func<TState, Exception, string> formatter
         )
         {

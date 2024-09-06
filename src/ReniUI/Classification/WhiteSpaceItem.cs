@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.TokenClasses.Whitespace;

@@ -73,7 +73,7 @@ static class Extension
         {
             case MemberTypes.Method:
                 return member
-                    .DeclaringType
+                    .DeclaringType!
                     .GetAttributes<VariantAttribute>(false)
                     .Select
                         (item => (string)((MethodInfo)member).Invoke(null, item.CreationParameter));

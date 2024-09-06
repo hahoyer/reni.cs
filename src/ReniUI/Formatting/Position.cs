@@ -1,6 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using hw.DebugFormatter;
-using JetBrains.Annotations;
 
 namespace ReniUI.Formatting;
 

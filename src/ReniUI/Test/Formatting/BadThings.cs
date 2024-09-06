@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.UnitTest;
 
 namespace ReniUI.Test.Formatting

@@ -1,9 +1,3 @@
-using hw.Parser;
-using hw.Scanner;
-using Reni.SyntaxTree;
-using Reni.TokenClasses;
-using Reni.Validation;
-
 namespace ReniUI;
 
 sealed class SyntaxExceptionGuard : GuiExceptionGuard<Helper.Syntax>

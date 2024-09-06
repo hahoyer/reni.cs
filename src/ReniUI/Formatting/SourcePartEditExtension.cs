@@ -1,6 +1,3 @@
-using hw.DebugFormatter;
-using JetBrains.Annotations;
-
 namespace ReniUI.Formatting;
 
 static class SourcePartEditExtension

@@ -1,6 +1,4 @@
-﻿using hw.DebugFormatter;
-
-namespace ReniUI.Formatting;
+﻿namespace ReniUI.Formatting;
 
 sealed class Configuration : DumpableObject
 {

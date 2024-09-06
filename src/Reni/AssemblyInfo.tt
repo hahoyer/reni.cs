@@ -23,4 +23,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCopyright("Copyright © Harald Hoyer <#=DateTime.Today.ToString("yyyy") #>")]
 [assembly: InternalsVisibleTo("ReniUI")]
 [assembly: InternalsVisibleTo("ReniLSP")]
-[assembly: InternalsVisibleTo("ReniVSIX")]
+

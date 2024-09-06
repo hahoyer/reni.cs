@@ -1,6 +1,4 @@
-using hw.DebugFormatter;
 using hw.Scanner;
-using JetBrains.Annotations;
 
 namespace ReniUI.Formatting;
 

@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.9.2092" />
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.9.2092" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.11.40261" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.11.40261" />
   </ItemGroup>
 
   <ItemGroup>
