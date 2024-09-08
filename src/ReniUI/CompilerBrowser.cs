@@ -15,243 +15,244 @@ namespace ReniUI;
 
 public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 {
-	readonly ValueCache<Compiler> ParentCache;
+    readonly ValueCache<Compiler> ParentCache;
 
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
 
-	readonly ValueCache<Helper.Syntax> SyntaxCache;
-	readonly ValueCache<Helper.Syntax> GuardedSyntaxCache;
+    readonly ValueCache<Helper.Syntax> SyntaxCache;
+    readonly ValueCache<Helper.Syntax> GuardedSyntaxCache;
 
-	public Source Source => Compiler.Source;
+    public Source Source => Compiler.Source;
 
-	internal Compiler Compiler => ParentCache.Value;
+    internal Compiler Compiler => ParentCache.Value;
 
-	[DisableDump]
-	public StringStream Result
-	{
-		get
-		{
-			var result = new StringStream();
-			Compiler.Parameters.OutStream = result;
-			Compiler.Execute();
-			return result;
-		}
-	}
+    [DisableDump]
+    public StringStream Result
+    {
+        get
+        {
+            var result = new StringStream();
+            Compiler.Parameters.OutStream = result;
+            Compiler.Execute();
+            return result;
+        }
+    }
 
-	internal IExecutionContext ExecutionContext => Compiler;
-	public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
-
-
-	internal IEnumerable<Issue> GuardedIssues
-		=> ExceptionGuard(() => Issues, new IssuesExceptionGuard(this)) ?? new Issue[0];
+    internal IExecutionContext ExecutionContext => Compiler;
+    public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
 
-	internal IEnumerable<Issue> Issues => Compiler.Issues;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	internal Helper.Syntax Syntax
-	{
-		get
-		{
-			if(IsInDump && !SyntaxCache.IsValid)
-				return null;
-			return SyntaxCache.Value;
-		}
-	}
-
-	CompilerBrowser(Func<Compiler> parent)
-	{
-		ParentCache = new(parent);
-		SyntaxCache = new(GetSyntax);
-		GuardedSyntaxCache = new(() => ExceptionGuard(() => SyntaxCache.Value, new SyntaxExceptionGuard(this)));
-	}
-
-	ValueCache ValueCache.IContainer.Cache { get; } = new();
-
-	static TResult ExceptionGuard<TResult>(Func<TResult> getResult, GuiExceptionGuard<TResult> guard)
-	{
-		try
-		{
-			return getResult();
-		}
-		catch(Exception exception)
-		{
-			return guard.OnException(exception);
-		}
-	}
-
-	public static CompilerBrowser FromText
-		(string text, CompilerParameters parameters, string sourceIdentifier = null)
-		=> new(() => Compiler.FromText(text, parameters, sourceIdentifier));
-
-	public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
-	{
-		text.AssertNotNull();
-		return new(() => Compiler.FromText(text, null, sourceIdentifier));
-	}
-
-	public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
-		=> new(() => Compiler.FromFile(fileName, parameters));
-
-	public Item GetToken(SourcePosition offset)
-	{
-		SyntaxCache.IsValid = true;
-		return Item.GetContainingItem(Compiler.BinaryTree, offset);
-	}
-
-	public IEnumerable<Item> GuardedGetTokens() 
-		=> GuardedSyntaxCache.Value == null? [] : GetTokens();
-
-	IEnumerable<Item> GetTokens(SourcePart target = null)
-	{
-		if(target == null)
-			target = Source.All;
-
-		return GetTokens(target.Position, target.EndPosition);
-	}
-
-	IEnumerable<Item> GetTokens(int start, int end)
-	{
-		var current = start;
-		do
-		{
-			var result = GetToken(current);
-			yield return result;
-			if(result.SourcePart.Length > 0)
-				current = result.EndPosition;
-			else
-				current++;
-		}
-		while(current < end);
-	}
-
-	public string FlatFormat(bool areEmptyLinesPossible)
-		=> Compiler.BinaryTree.GetFlatString(areEmptyLinesPossible);
-
-	public Item GetToken(int offset) => GetToken(Source + offset);
-
-	internal BinaryTree LocateTreeItem(SourcePart span)
-		=> Item.GetEnclosingTreeRoot(Compiler.BinaryTree, span);
-
-	internal FunctionType Function(int index)
-		=> Compiler.Root.GetFunction(index);
+    internal IEnumerable<Issue> GuardedIssues
+        => ExceptionGuard(() => Issues, new IssuesExceptionGuard(this)) ?? new Issue[0];
 
 
-	internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
-		=> (formatter ?? new Formatting.Configuration().Create())
-			.GetEditPieces(this, targetPart)
-			.Combine(Compiler.Source.All);
+    internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-	internal void Ensure() => Compiler.Execute();
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    internal Helper.Syntax Syntax
+    {
+        get
+        {
+            if(IsInDump && !SyntaxCache.IsValid)
+                return null;
+            return SyntaxCache.Value;
+        }
+    }
 
-	internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
+    CompilerBrowser(Func<Compiler> parent)
+    {
+        ParentCache = new(parent);
+        SyntaxCache = new(GetSyntax);
+        GuardedSyntaxCache = new(() => ExceptionGuard(() => SyntaxCache.Value, new SyntaxExceptionGuard(this)));
+    }
 
-	internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
-		=> (formatter ?? new Formatting.Configuration().Create())
-			.GetEditPieces(this, sourcePart);
+    ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+    static TResult ExceptionGuard<TResult>(Func<TResult> getResult, GuiExceptionGuard<TResult> guard)
+    {
+        try
+        {
+            return getResult();
+        }
+        catch(Exception exception)
+        {
+            return guard.OnException(exception);
+        }
+    }
+
+    public static CompilerBrowser FromText
+        (string text, CompilerParameters parameters, string sourceIdentifier = null)
+        => new(() => Compiler.FromText(text, parameters, sourceIdentifier));
+
+    public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
+    {
+        text.AssertNotNull();
+        return new(() => Compiler.FromText(text, null, sourceIdentifier));
+    }
+
+    public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
+        => new(() => Compiler.FromFile(fileName, parameters));
+
+    public Item GetToken(SourcePosition offset)
+    {
+        SyntaxCache.IsValid = true;
+        return Item.GetContainingItem(Compiler.BinaryTree, offset);
+    }
+
+    public IEnumerable<Item> GuardedGetTokens()
+        => GuardedSyntaxCache.Value == null? [] : GetTokens();
+
+    IEnumerable<Item> GetTokens(SourcePart target = null)
+    {
+        if(target == null)
+            target = Source.All;
+
+        return GetTokens(target.Position, target.EndPosition);
+    }
+
+    IEnumerable<Item> GetTokens(int start, int end)
+    {
+        var current = start;
+        do
+        {
+            var result = GetToken(current);
+            yield return result;
+            if(result.SourcePart.Length > 0)
+                current = result.EndPosition;
+            else
+                current++;
+        }
+        while(current < end);
+    }
+
+    public string FlatFormat(bool areEmptyLinesPossible)
+        => Compiler.BinaryTree.GetFlatString(areEmptyLinesPossible);
+
+    public Item GetToken(int offset) => GetToken(Source + offset);
+
+    internal BinaryTree LocateTreeItem(SourcePart span)
+        => Item.GetEnclosingTreeRoot(Compiler.BinaryTree, span);
+
+    internal FunctionType Function(int index)
+        => Compiler.Root.GetFunction(index);
 
 
-	Helper.Syntax GetSyntax()
-	{
-		if(IsInDump)
-			return null;
-		var trace = Debugger.IsAttached && DateTime.Today.Year < 2020;
+    internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
+        => (formatter ?? new Formatting.Configuration().Create())
+            .GetEditPieces(this, targetPart)
+            .Combine(Compiler.Source.All);
 
-		var compilerSyntax = Compiler.Syntax;
-		if(trace)
-		{
-			compilerSyntax.Dump().FlaggedLine();
-			compilerSyntax.Anchor.Dump().FlaggedLine();
-		}
+    internal void Ensure() => Compiler.Execute();
 
-		var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
+    internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
 
-		syntax.GetNodesFromLeftToRight().ToArray().AssertNotNull();
-		PositionDictionary.AssertValid(Compiler.BinaryTree);
-		if(trace)
-			syntax.Dump().FlaggedLine();
+    internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
+        => (formatter ?? new Formatting.Configuration().Create())
+            .GetEditPieces(this, sourcePart);
 
-		return syntax;
-	}
 
-	internal string[] DeclarationOptions(int offset)
-	{
-		NotImplementedMethod(offset);
-		return default;
-	}
+    Helper.Syntax GetSyntax()
+    {
+        if(IsInDump)
+            return null;
+        var trace = Debugger.IsAttached && DateTime.Today.Year < 2020;
 
-	internal(string Text, SourcePart Span ) GetDataTipText(int line, int column)
-	{
-		NotImplementedMethod(line, column);
-		return default;
-	}
+        var compilerSyntax = Compiler.Syntax;
+        if(trace)
+        {
+            compilerSyntax.Dump().FlaggedLine();
+            compilerSyntax.Anchor.Dump().FlaggedLine();
+        }
 
-	internal bool IsTooSmall(SourcePart targetPart)
-	{
-		if(targetPart == null)
-			return false;
-		if(targetPart.Length == 0)
-			return true;
+        var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
 
-		var start = GetToken(targetPart.Start);
-		var end = GetToken(targetPart.End - 1);
-		if(start != null && end != null)
-			return start.Anchor == end.Anchor && IsTooSmall(start.SourcePart, targetPart);
+        syntax.GetNodesFromLeftToRight().ToArray().AssertNotNull();
+        PositionDictionary.AssertValid(Compiler.BinaryTree);
+        if(trace)
+            syntax.Dump().FlaggedLine();
 
-		NotImplementedFunction(this, targetPart);
-		return default;
-	}
+        return syntax;
+    }
 
-	static bool IsTooSmall(SourcePart fullToken, SourcePart targetPart)
-		=> fullToken.Contains(targetPart);
+    internal string[] DeclarationOptions(int offset)
+    {
+        NotImplementedMethod(offset);
+        return default;
+    }
 
-	bool IsCompletionMode(SourcePart target)
-	{
-		var startPosition = target.Start;
-		var beforeEndPosition = target.End - 1;
-		if(!startPosition.IsValid || !beforeEndPosition.IsValid)
-			return false;
-		var startItem = GetToken(startPosition);
-		var beforeEndItem = GetToken(beforeEndPosition);
-		return startItem != beforeEndItem && !beforeEndItem.IsWhiteSpace;
-	}
+    internal(string Text, SourcePart Span ) GetDataTipText(int line, int column)
+    {
+        NotImplementedMethod(line, column);
+        return default;
+    }
 
-	internal Declaration[] GetDeclarations(SourcePart target)
-	{
-		if(IsCompletionMode(target))
-		{
-			var location = (Classification.Syntax)GetToken(target.Start - 1);
-			var syntax = location.Master;
-			if(syntax is ExpressionSyntax expressionSyntax)
-			{
-				var targetObject = expressionSyntax.Left;
-				if(targetObject is TerminalSyntax terminalSyntax)
-					return terminalSyntax.Terminal.Declarations.Filter(expressionSyntax.Definable.Id);
+    internal bool IsTooSmall(SourcePart targetPart)
+    {
+        if(targetPart == null)
+            return false;
+        if(targetPart.Length == 0)
+            return true;
 
-				NotImplementedFunction(target);
-				return default;
-			}
+        var start = GetToken(targetPart.Start);
+        var end = GetToken(targetPart.End - 1);
+        if(start != null && end != null)
+            return start.Anchor == end.Anchor && IsTooSmall(start.SourcePart, targetPart);
 
-			NotImplementedFunction(target);
-			return default;
-		}
+        NotImplementedFunction(this, targetPart);
+        return default;
+    }
 
-		NotImplementedFunction(target);
-		return default;
-	}
+    static bool IsTooSmall(SourcePart fullToken, SourcePart targetPart)
+        => fullToken.Contains(targetPart);
 
-	internal IEnumerable<Edit> GetEditsForFormatting(Formatting.Configuration options)
-		=> options.Create()
-			.GetEditPieces(this, Source.All);
+    bool IsCompletionMode(SourcePart target)
+    {
+        var startPosition = target.Start;
+        var beforeEndPosition = target.End - 1;
+        if(!startPosition.IsValid || !beforeEndPosition.IsValid)
+            return false;
+        var startItem = GetToken(startPosition);
+        var beforeEndItem = GetToken(beforeEndPosition);
+        return startItem != beforeEndItem && !beforeEndItem.IsWhiteSpace;
+    }
 
-	public Issue CreateIssue(Exception exception)
-	{
-		var (issueId, position)
-			= exception is Expectations.ExpectationFailedException efe
-				? (IssueId.ExpectationFailedException, efe.Position)
-				: (IssueId.UnexpectedException, Compiler.Source.All);
+    internal Declaration[] GetDeclarations(SourcePart target)
+    {
+        if(IsCompletionMode(target))
+        {
+            var location = (Classification.Syntax)GetToken(target.Start - 1);
+            var syntax = location.Master;
+            if(syntax is ExpressionSyntax expressionSyntax)
+            {
+                var targetObject = expressionSyntax.Left;
+                if(targetObject is TerminalSyntax terminalSyntax)
+                    return terminalSyntax.Terminal.Declarations.Filter(expressionSyntax.Definable.Id);
 
-		return issueId.GetIssue(position, exception.Message);
-	}
+                NotImplementedFunction(target);
+                return default;
+            }
+
+            NotImplementedFunction(target);
+            return default;
+        }
+
+        NotImplementedFunction(target);
+        return default;
+    }
+
+    internal IEnumerable<Edit> GetEditsForFormatting(Formatting.Configuration options)
+        => options.Create()
+            .GetEditPieces(this, Source.All);
+
+    public Issue CreateIssue(Exception exception)
+    {
+        if(exception is Expectations.ExpectationFailedException efe)
+            return IssueId
+                .ExpectationFailedException
+                .GetIssue(efe.Position, exception.Message);
+        return IssueId
+            .UnexpectedException
+            .GetIssue(Compiler.Source.All, exception.GetType().PrettyName(), exception.Message);
+    }
 }
