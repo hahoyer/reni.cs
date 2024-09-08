@@ -34,6 +34,8 @@ static class Extension
             case IssueId.InvalidSuffixExpression:
                 return $"Using {additionalInformation[0]} as suffix is invalid.";
 
+            case IssueId.InvalidTerminalExpression:
+                return $"Invalid termainal expression.";
             case IssueId.InvalidExpression:
                 return "Invalid expression.";
 

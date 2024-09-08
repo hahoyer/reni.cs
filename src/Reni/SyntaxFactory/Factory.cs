@@ -1,12 +1,9 @@
-using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxFactory;
-
-using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
 
 sealed class Factory : DumpableObject
 {
