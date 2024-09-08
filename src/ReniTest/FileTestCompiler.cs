@@ -1,14 +1,12 @@
-using hw.DebugFormatter;
 using hw.Scanner;
 
-namespace ReniTest
+namespace ReniTest;
+
+sealed class FileTestCompiler : DumpableObject
 {
-    sealed class FileTestCompiler : DumpableObject
-    {
-        internal FileTestCompiler(Source file) {}
+    internal FileTestCompiler(Source file) { }
 
-        public void Run() {NotImplementedMethod();}
-    }
-
-    abstract class TreeItem : DumpableObject;
+    public void Run() => NotImplementedMethod();
 }
+
+abstract class TreeItem : DumpableObject;
