@@ -67,7 +67,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         IssueId IIssueTokenClass.IssueId => IssueId;
         string ITokenClass.Id => $"<error:{IssueId}/{ActualTokenClass}>";
 
-        protected Issue GetIssue(SourcePart sourcePart) => IssueId.GetIssue(sourcePart, Types.Stringify("/"));
+        protected Issue GetIssue(SourcePart sourcePart) => IssueId.GetIssue(sourcePart, Types.ToArray());
     }
 
     sealed class InfixErrorTokenClass : InfixTypeErrorTokenClass, IInfix

@@ -147,7 +147,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
             if(leftBracket != null)
             {
-                if(Parent is { IsBracketLevel: true })
+                if(Parent == null || Parent.IsBracketLevel)
                     return default;
                 left.AssertIsNull();
                 rightBracket.AssertIsNull();
@@ -211,6 +211,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
         SetLinks();
         StopByObjectIds();
+        Issues.Any().ConditionalBreak(() => Issues.ToArray().LogDump());
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
