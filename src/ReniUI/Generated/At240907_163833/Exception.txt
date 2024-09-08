@@ -1,0 +1,52 @@
+ArgumentNullException: Value cannot be null. (Parameter 'key')
+   at System.Collections.Generic.Dictionary`2.FindValue(TKey key)
+   at System.Collections.Generic.Dictionary`2.ContainsKey(TKey key)
+   at hw.Helper.FunctionCache`2.Ensure(TKey key) in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.0.1\contentFiles\any\any\hw\Helper.Core\Helper\FunctionCache.cs:line 115
+   at hw.Helper.FunctionCache`2.get_Item(TKey key) in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.0.1\contentFiles\any\any\hw\Helper.Core\Helper\FunctionCache.cs:line 82
+   at Reni.Context.ContextBase.GetResultCache(ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 195
+   at Reni.Context.ContextBase.GetResult(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 192
+   at Reni.SyntaxTree.CondSyntax.BranchResult(ContextBase context, Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 61
+   at Reni.SyntaxTree.CondSyntax.ThenResult(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 57
+   at Reni.SyntaxTree.CondSyntax.InternalResult(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 84
+   at Reni.SyntaxTree.CondSyntax.GetResultForCache(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 40
+   at Reni.Context.ContextBase.GetResultForCache(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 211
+   at Reni.Context.ContextBase.ResultProvider.Reni.ResultCache.IResultProvider.Execute(Category category) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 50
+   at Reni.ResultCache.LinearUpdate(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 218
+   at Reni.ResultCache.Update(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 181
+   at Reni.ResultCache.Get(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 269
+   at Reni.Context.ContextBase.GetResult(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 192
+   at Reni.SyntaxTree.CondSyntax.BranchResult(ContextBase context, Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 61
+   at Reni.SyntaxTree.CondSyntax.ThenResult(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 57
+   at Reni.SyntaxTree.CondSyntax.InternalResult(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 84
+   at Reni.SyntaxTree.CondSyntax.GetResultForCache(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ThenElse.cs:line 40
+   at Reni.Context.ContextBase.GetResultForCache(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 211
+   at Reni.Context.ContextBase.ResultProvider.Reni.ResultCache.IResultProvider.Execute(Category category) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 50
+   at Reni.ResultCache.LinearUpdate(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 218
+   at Reni.ResultCache.Update(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 181
+   at Reni.ResultCache.Get(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 269
+   at Reni.Context.ContextBase.GetResult(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 192
+   at Reni.Struct.Compound.AccessResult(Category category, Int32 accessPosition, Int32 position) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 199
+   at Reni.Struct.Compound.AccessResult(Category category, Int32 position) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 182
+   at Reni.Struct.Compound.<>c__DisplayClass37_0.<ResultsOfStatements>b__2(Int32 position) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 111
+   at System.Linq.Enumerable.SelectArrayIterator`2.Fill(ReadOnlySpan`1 source, Span`1 destination, Func`2 func)
+   at System.Linq.Enumerable.SelectArrayIterator`2.ToArray()
+   at Reni.Struct.Compound.ResultsOfStatements(Category category, Int32 fromPosition, Nullable`1 fromNotPosition) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 110
+   at Reni.Struct.Compound.GetResult(Category category) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 140
+   at Reni.SyntaxTree.CompoundSyntax.GetResultForCache(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\CompoundSyntax.cs:line 108
+   at Reni.Context.ContextBase.GetResultForCache(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 211
+   at Reni.Context.ContextBase.ResultProvider.Reni.ResultCache.IResultProvider.Execute(Category category) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 50
+   at Reni.ResultCache.LinearUpdate(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 218
+   at Reni.ResultCache.Update(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 181
+   at Reni.ResultCache.Get(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 269
+   at Reni.Context.ContextBase.GetResult(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 192
+   at Reni.SyntaxTree.ValueSyntax.GetResultForAll(ContextBase context) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ValueSyntax.cs:line 98
+   at Reni.Context.Root.GetMainContainer(ValueSyntax syntax, String description) in A:\develop\Reni\dev\src\Reni\Context\Root.cs:line 167
+   at Reni.Code.CodeContainer.<>c__DisplayClass13_0.<.ctor>b__0() in A:\develop\Reni\dev\src\Reni\Code\CodeContainer.cs:line 48
+   at hw.Helper.ValueCache`1.Ensure() in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.0.1\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 53
+   at hw.Helper.ValueCache`1.get_Value() in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.0.1\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 27
+   at Reni.Code.CodeContainer.get_Main() in A:\develop\Reni\dev\src\Reni\Code\CodeContainer.cs:line 29
+   at Reni.Code.CodeContainer.get_Issues() in A:\develop\Reni\dev\src\Reni\Code\CodeContainer.cs:line 25
+   at Reni.Compiler.get_Issues() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 100
+   at ReniUI.CompilerBrowser.get_Issues() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 50
+   at ReniUI.CompilerBrowser.<get_GuardedIssues>b__15_0() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 47
+   at ReniUI.CompilerBrowser.ExceptionGuard[TResult](Func`1 getResult, GuiExceptionGuard`1 guard) in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 76
