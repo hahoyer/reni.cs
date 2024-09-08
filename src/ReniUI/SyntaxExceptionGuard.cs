@@ -6,8 +6,6 @@ sealed class SyntaxExceptionGuard : GuiExceptionGuard<Helper.Syntax>
 		: base(parent) { }
 
 	protected override string GetTestCode(string folderName) => @$"
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.Validation;
@@ -15,9 +13,9 @@ using Reni.Validation;
 namespace ReniUI.Generated.{folderName};
 
 [UnitTest]
-public class Test : CompilerTest
+public sealed class Test : CompilerTest
 {{
-    protected override string Target => (SmbFile.SourceFolder / ""Text.reni"").String;
+    protected override string Target => (SmbFile.SourceFolder / ""Test.reni"").String;
 
     protected override void Run()
     {{
