@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
@@ -54,9 +52,6 @@ static class Extension
             case IssueId.MissingDeclarationValue:
                 return "Missing value part in declaration.";
 
-            case IssueId.InvalidAnnotation:
-                return $"Invalid annotation: {additionalInformation[0]}";
-
             case IssueId.ExtraLeftBracket:
                 return $"No closing bracket found until {PositionFormatter(additionalInformation[0])}.";
 
@@ -64,15 +59,14 @@ static class Extension
                 return $"No opening bracket found until {PositionFormatter(additionalInformation[0], true)}.";
 
             case IssueId.MissingMatchingRightBracket:
-	            return $"No closing bracket found until {PositionFormatter(additionalInformation[0])}.";
+                return $"No closing bracket found until {PositionFormatter(additionalInformation[0])}.";
 
             case IssueId.UnexpectedException:
-	            return $"Exception {additionalInformation[0]}: {additionalInformation[1]}.";
+                return $"Exception {additionalInformation[0]}: {additionalInformation[1]}.";
 
             case IssueId.ExpectationFailedException:
 
-	            return $"Expected {((string)(additionalInformation[0])).Quote()}.";
-
+                return $"Expected {((string)additionalInformation[0]).Quote()}.";
         }
 
         Dumpable.NotImplementedFunction(issueId, additionalInformation.Dump());
@@ -93,15 +87,15 @@ static class Extension
         return new(issueId, position, additionalInformation);
     }
 
-    static void Validate(IssueId issueId, object[] additionalInformation)
+    static void Validate(IssueId issueId, object[] currentInformation)
     {
-        var setup = issueId.GetAttribute<Setup>().AssertNotNull();
-        (setup.AdditionalInformation.Length == additionalInformation.Length).Assert();
-        additionalInformation
-            .Select((value, index) => value.GetType().Is(setup.AdditionalInformation[index]))
+        var information = issueId.GetAttribute<Setup>()?.AdditionalInformation ?? [];
+        (information.Length == currentInformation.Length).Assert();
+        currentInformation
+            .Select((value, index) => value.GetType().Is(information[index]))
             .All(value => value)
             .Assert();
-        GetMessage(issueId, additionalInformation).AssertIsNotNull();
+        GetMessage(issueId, currentInformation).AssertIsNotNull();
     }
 
     internal static Issue GetIssue(this IssueId issueId, BinaryTree[] anchors)
