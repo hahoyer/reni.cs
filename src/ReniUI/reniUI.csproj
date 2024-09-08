@@ -5,6 +5,11 @@
   </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>
+      <Content Include="Generated\**\*.reni">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+    <ItemGroup>
       <None Update="AssemblyInfo.tt">
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
