@@ -104,9 +104,9 @@ sealed class ArrayType
         ElementType = elementType;
         Count = count;
         OptionsValue = Options.Create(optionsId);
-        (count > 0).Assert();
+        //(count > 0).Assert();
         (elementType.CheckedReference == null).Assert();
-        (!elementType.IsHollow).Assert();
+        //(!elementType.IsHollow).Assert();
         RepeaterAccessTypeCache = new(() => new(this));
         NumberCache = new(() => new(this));
     }
@@ -235,7 +235,11 @@ sealed class ArrayType
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
 
-    Result NoTextItemResult(Category category) => GetResultFromPointer(category, NoTextItem);
+    Result NoTextItemResult(Category category) 
+        => IsHollow
+            ? NoTextItem.GetResult(category) 
+            : GetResultFromPointer(category, NoTextItem);
+
     Result TextItemResult(Category category) => GetResultFromPointer(category, TextItem);
     Result MutableResult(Category category) => GetResultFromPointer(category, Mutable);
 
