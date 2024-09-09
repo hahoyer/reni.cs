@@ -26,25 +26,19 @@ sealed class TypeType
         StopByObjectIds(-61);
     }
 
-    IImplementation ISymbolProvider<ArrayReference>.GetFeature
-        (ArrayReference tokenClass)
+    IImplementation ISymbolProvider<ArrayReference>.Feature
         => Value is ArrayType? Feature.Extension.Value(ArrayReferenceResult) : null;
 
-    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature
-        (DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult);
+    IImplementation ISymbolProvider<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
 
-    IImplementation ISymbolProvider<Mutable>.GetFeature
-        (Mutable tokenClass)
+    IImplementation ISymbolProvider<Mutable>.Feature
         => Value is ArrayType? Feature.Extension.Value(MutableArrayResult) :
             Value is ArrayReferenceType? Feature.Extension.Value(MutableReferenceResult) : null;
 
-    IImplementation ISymbolProvider<Slash>.GetFeature
-        (Slash tokenClass)
+    IImplementation ISymbolProvider<Slash>.Feature
         => Feature.Extension.MetaFeature(SlashResult);
 
-    IImplementation ISymbolProvider<Star>.GetFeature
-        (Star tokenClass)
+    IImplementation ISymbolProvider<Star>.Feature
         => Feature.Extension.MetaFeature(StarResult);
 
     [DisableDump]
@@ -66,17 +60,17 @@ sealed class TypeType
             return Value.GetResult(category | Category.Type);
         var constructorResult = Value
             .GetConstructorResult(category, getRightResult(Category.Type).Type);
-        return constructorResult
-            .ReplaceArguments(getRightResult);
+        return constructorResult?.ReplaceArguments(getRightResult);
     }
 
     new Result GetDumpPrintTokenResult(Category category)
         => Value.GetDumpPrintTypeNameResult(category);
 
-    Result StarResult
-        (Category category, ResultCache left, ContextBase context, ValueSyntax right)
+    Result StarResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
-        var countResult = right.GetResultForAll(context).AutomaticDereferenceResult;
+        var countResult = right.GetResultForAll(context)?.AutomaticDereferenceResult;
+        if(countResult == null)
+            return null;
         var count = countResult
             .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();
@@ -91,11 +85,11 @@ sealed class TypeType
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         var rightType = right
-            .GetTypeBase(context)
+            .GetTypeBase(context)?
             .GetSmartUn<FunctionType>()
             .GetSmartUn<PointerType>();
-        var rightTypeType = rightType as TypeType;
-        if(rightTypeType == null)
+
+        if(rightType is not TypeType rightTypeType)
         {
             NotImplementedMethod(context, category, left, right, "rightType", rightType);
             return null;

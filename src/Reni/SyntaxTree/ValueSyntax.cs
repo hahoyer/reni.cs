@@ -1,7 +1,5 @@
-using hw.DebugFormatter;
-using hw.Helper;
+#nullable enable
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Helper;
@@ -46,7 +44,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     protected ValueSyntax(int objectId, Anchor anchor)
         : base(anchor, objectId) { }
 
-    DeclarerSyntax IStatementSyntax.Declarer => null;
+    DeclarerSyntax? IStatementSyntax.Declarer => null;
 
     SourcePart IStatementSyntax.SourcePart => Anchor.SourceParts.Combine();
 
@@ -54,12 +52,12 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 
     ValueSyntax IStatementSyntax.Value => this;
 
-    IStatementSyntax IStatementSyntax.With(Anchor frameItems)
+    IStatementSyntax IStatementSyntax.With(Anchor? frameItems)
     {
         if(frameItems == null || !frameItems.Items.Any())
             return this;
         NotImplementedMethod(frameItems);
-        return default;
+        return default!;
     }
 
     [DisableDump]
@@ -69,39 +67,33 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     internal virtual bool? IsHollow => IsLambda? true : null;
 
     //[DebuggerHidden]
-    internal virtual Result GetResultForCache(ContextBase context, Category category)
+    internal virtual Result? GetResultForCache(ContextBase context, Category category)
     {
         NotImplementedMethod(context, category);
-        return null;
+        return null!;
     }
 
-    internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
+    internal virtual ValueSyntax? Visit(ISyntaxVisitor visitor)
     {
         NotImplementedMethod(visitor);
-        return null;
-    }
-
-    internal virtual TypeBase TryGetTypeBase()
-    {
-        NotImplementedMethod();
-        return default;
+        return null!;
     }
 
     Issue[] GetAllIssues() => this
         .GetNodesFromLeftToRight()
-        .SelectMany(node => node?.Issues)
+        .SelectMany(node => node.Issues)
         .ToArray();
 
     internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
         => ResultCache.Add(context, cacheItem);
 
-    internal Result GetResultForAll(ContextBase context) => context.GetResult(Category.All, this);
+    internal Result? GetResultForAll(ContextBase context) => context.GetResult(Category.All, this);
 
-    internal BitsConst Evaluate(ContextBase context)
-        => GetResultForAll(context).GetValue(context.RootContext.ExecutionContext);
+    internal BitsConst? Evaluate(ContextBase context)
+        => GetResultForAll(context)?.GetValue(context.RootContext.ExecutionContext);
 
     //[DebuggerHidden]
-    internal TypeBase GetTypeBase(ContextBase context) => context.GetResult(Category.Type, this)?.Type;
+    internal TypeBase? GetTypeBase(ContextBase context) => context.GetResult(Category.Type, this)?.Type;
 
     internal bool GetIsHollowStructureElement(ContextBase context)
     {
@@ -109,13 +101,14 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
         if(result != null)
             return result.Value;
 
-        var type = context.GetTypeIfKnown(this);
-        return (type ?? GetTypeBase(context)).GetSmartUn<FunctionType>().IsHollow;
+        var type = context.GetTypeIfKnown(this) ?? GetTypeBase(context);
+        type.ExpectIsNotNull();
+        return type!.GetSmartUn<FunctionType>().IsHollow;
     }
 
     internal ValueSyntax ReplaceArg(ValueSyntax syntax)
         => Visit(new ReplaceArgVisitor(syntax)) ?? this;
 
-    internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
-        => GetTypeBase(context).DeclarationOptions;
+    internal IEnumerable<string>? GetDeclarationOptions(ContextBase context)
+        => GetTypeBase(context)?.DeclarationOptions;
 }

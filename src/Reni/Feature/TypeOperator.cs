@@ -1,6 +1,7 @@
 ﻿using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -19,6 +20,7 @@ sealed class TypeOperator : SuffixSyntaxToken
         if(category.HasType())
         {
             var leftType = left.GetTypeBase(context);
+            leftType.ExpectIsNotNull(()=>(left.Anchor.SourcePart, null));
             if(leftType.HasIssues)
                 return new(category, leftType.Issues);
 
@@ -30,7 +32,4 @@ sealed class TypeOperator : SuffixSyntaxToken
 
         return Root.VoidType.GetResult(category);
     }
-
-    protected override TypeBase TryGetTypeBase(ValueSyntax left) 
-        => left.TryGetTypeBase()?.TypeForTypeOperator.TypeType;
 }

@@ -16,7 +16,7 @@ sealed class IssueData : DumpableObject
         int IContextReference.Order => default;
 
         [DisableDump]
-        internal override Root Root => null;
+        internal override Root Root => null!;
 
         [DisableDump]
         internal override bool IsHollow => true;

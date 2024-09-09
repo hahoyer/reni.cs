@@ -1,5 +1,4 @@
-using hw.DebugFormatter;
-using hw.Helper;
+#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -32,7 +31,7 @@ sealed class ArrayType
         Flags Data { get; }
         public string DumpPrintText => Data.DumpPrintText;
 
-        Options(string optionsId)
+        Options(string? optionsId)
         {
             Data = new(optionsId);
             IsMutable = Data.Register("mutable");
@@ -43,12 +42,14 @@ sealed class ArrayType
 
         protected override string GetNodeDump() => DumpPrintText;
 
-        public static Options Create(string optionsId = null) => new(optionsId);
+        public static Options Create(string? optionsId = null) => new(optionsId);
     }
 
     [DisableDump]
+    [UsedImplicitly]
     internal TypeBase ElementType { get; }
 
+    [UsedImplicitly]
     internal int Count { get; }
 
     [Node]
@@ -65,6 +66,7 @@ sealed class ArrayType
     RepeaterAccessType AccessType => RepeaterAccessTypeCache.Value;
 
     [DisableDump]
+    [UsedImplicitly]
     internal bool IsMutable => OptionsValue.IsMutable.Value;
 
     [DisableDump]
@@ -88,7 +90,7 @@ sealed class ArrayType
         get
         {
             NotImplementedMethod();
-            return null;
+            return null!;
         }
     }
 
@@ -113,7 +115,7 @@ sealed class ArrayType
 
     TypeBase IChild<TypeBase>.Parent => ElementType;
 
-    IEnumerable<IConversion> IForcedConversionProviderForPointer<ArrayReferenceType>
+    IEnumerable<IConversion?> IForcedConversionProviderForPointer<ArrayReferenceType>
         .GetResult(ArrayReferenceType destination)
         => ForcedConversion(destination).NullableToArray();
 
@@ -121,12 +123,10 @@ sealed class ArrayType
     TypeBase IRepeaterType.IndexType => Root.BitType.Number(IndexSize.ToInt());
     bool IRepeaterType.IsMutable => IsMutable;
 
-    IImplementation ISymbolProviderForPointer<ArrayReference>
-        .GetFeature(ArrayReference tokenClass)
+    IImplementation ISymbolProviderForPointer<ArrayReference>.Feature
         => Feature.Extension.Value(ReferenceResult);
 
-    IImplementation ISymbolProviderForPointer<ConcatArrays>
-        .GetFeature(ConcatArrays tokenClass)
+    IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature
         => Feature.Extension.FunctionFeature
         (
             (category, objectReference, argumentsType) =>
@@ -138,8 +138,17 @@ sealed class ArrayType
                     OptionsValue.IsMutable.SetTo(false)),
             this);
 
-    IImplementation ISymbolProviderForPointer<MutableConcatArrays>
-        .GetFeature(MutableConcatArrays tokenClass)
+    IImplementation ISymbolProviderForPointer<Count>.Feature
+        => Feature.Extension.MetaFeature(CountResult);
+
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => OptionsValue.IsTextItem.Value
+        ? Feature.Extension.Value(GetDumpPrintTokenResult)
+        : Feature.Extension.Value(DumpPrintTokenArrayResult);
+
+    IImplementation ISymbolProviderForPointer<Mutable>.Feature
+        => Feature.Extension.Value(MutableResult);
+
+    IImplementation ISymbolProviderForPointer<MutableConcatArrays>.Feature
         => Feature.Extension.FunctionFeature
         (
             (category, objectReference, argumentsType) =>
@@ -151,22 +160,11 @@ sealed class ArrayType
                     OptionsValue.IsMutable.SetTo(true)),
             this);
 
-    IImplementation ISymbolProviderForPointer<Count>.GetFeature(Count tokenClass)
-        => Feature.Extension.MetaFeature(CountResult);
-
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
-        => OptionsValue.IsTextItem.Value
-            ? Feature.Extension.Value(GetDumpPrintTokenResult)
-            : Feature.Extension.Value(DumpPrintTokenArrayResult);
-
-    IImplementation ISymbolProviderForPointer<Mutable>.GetFeature(Mutable tokenClass)
-        => Feature.Extension.Value(MutableResult);
-
-    IImplementation ISymbolProviderForPointer<TextItem>.GetFeature(TextItem tokenClass)
+    IImplementation ISymbolProviderForPointer<TextItem>.Feature
         => Feature.Extension.Value(TextItemResult);
 
 
-    IImplementation ISymbolProviderForPointer<ToNumberOfBase>.GetFeature(ToNumberOfBase tokenClass)
+    IImplementation? ISymbolProviderForPointer<ToNumberOfBase>.Feature
         => OptionsValue.IsTextItem.Value
             ? Feature.Extension.MetaFeature(ToNumberOfBaseResult)
             : null;
@@ -178,14 +176,14 @@ sealed class ArrayType
         => "(" + ElementType.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;
 
     [DisableDump]
-    internal override Size SimpleItemSize
+    internal override Size? SimpleItemSize
         =>
             OptionsValue.IsTextItem.Value
                 ? ElementType.SimpleItemSize ?? Size
                 : base.SimpleItemSize;
 
     [DisableDump]
-    internal override IImplementation FunctionDeclarationForPointerType
+    internal override IImplementation? FunctionDeclarationForPointerType
         => Feature.Extension.FunctionFeature(ElementAccessResult);
 
     [DisableDump]
@@ -209,10 +207,10 @@ sealed class ArrayType
         get { yield return Feature.Extension.Conversion(NoTextItemResult); }
     }
 
-    internal override Result GetConstructorResult(Category category, TypeBase argumentsType)
+    internal override Result? GetConstructorResult(Category category, TypeBase argumentsType)
     {
         if(category == Category.None)
-            return null;
+            return new(Category.None);
 
         if(argumentsType == Root.VoidType)
             return GetResult(category, () => BitsConst.Convert(0).GetCode(Size));
@@ -235,9 +233,9 @@ sealed class ArrayType
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
 
-    Result NoTextItemResult(Category category) 
+    Result NoTextItemResult(Category category)
         => IsHollow
-            ? NoTextItem.GetResult(category) 
+            ? NoTextItem.GetResult(category)
             : GetResultFromPointer(category, NoTextItem);
 
     Result TextItemResult(Category category) => GetResultFromPointer(category, TextItem);
@@ -280,7 +278,8 @@ sealed class ArrayType
     )
     {
         var oldElementsResult = Pointer
-            .GetResult(category | Category.Type, objectReference).DereferenceResult;
+            .GetResult(category | Category.Type, objectReference)
+            .DereferenceResult;
 
         var isElementArgument = argumentsType.IsConvertible(ElementAccessType);
         var newCount = isElementArgument? 1 : argumentsType.GetArrayLength(ElementAccessType);
@@ -289,7 +288,7 @@ sealed class ArrayType
                 ? argumentsType.GetConversion(category | Category.Type, ElementAccessType)
                 : argumentsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, options));
 
-        var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult;
+        var newElementsResult = newElementsResultRaw?.AutomaticDereferencedAlignedResult;
         var result = ElementType
             .GetArray(Count + newCount, options)
             .GetResult(category, newElementsResult + oldElementsResult);
@@ -324,20 +323,16 @@ sealed class ArrayType
         var target = (left & Category.All).AutomaticDereferencedAlignedResult
             .GetValue(context.RootContext.ExecutionContext)
             .ToString(ElementType.Size);
-        var conversionBase = right.Evaluate(context).ToInt32();
+        var conversionBase = right.Evaluate(context).AssertNotNull()!.ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);
         var result = BitsConst.Convert(target, conversionBase);
         return Root.BitType.GetResult(category, result).Align;
     }
 
     Result CountResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
-    {
-        (right == null).Assert();
-        return IndexType.GetResult
-            (category, () => BitsConst.Convert(Count).GetCode(IndexSize));
-    }
+        => IndexType.GetResult(category, () => BitsConst.Convert(Count).GetCode(IndexSize));
 
-    IConversion ForcedConversion(ArrayReferenceType destination)
+    IConversion? ForcedConversion(ArrayReferenceType destination)
     {
         if(!HasForcedConversion(destination))
             return null;

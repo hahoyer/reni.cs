@@ -1,5 +1,4 @@
-using hw.DebugFormatter;
-using hw.Helper;
+#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -40,12 +39,12 @@ sealed class PointerType
     int IContextReference.Order => Order;
     Result IConversion.Execute(Category category) => DereferenceResult(category);
     TypeBase IConversion.Source => this;
+
     IConversion IProxyType.Converter => this;
     IConversion IReference.Converter => this;
     bool IReference.IsWeak => true;
 
-    IImplementation ISymbolProvider<StableReference>.GetFeature
-        (StableReference tokenClass)
+    IImplementation? ISymbolProvider<StableReference>.Feature
         => Feature.Extension.Value(GetConversionToStableReference);
 
     [DisableDump]
@@ -57,7 +56,7 @@ sealed class PointerType
     internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
 
     [DisableDump]
-    internal override IImplementation CheckedFeature => ValueType.CheckedFeature;
+    internal override IImplementation? CheckedFeature => ValueType.CheckedFeature;
 
     [DisableDump]
     internal override bool IsHollow => false;
@@ -84,13 +83,11 @@ sealed class PointerType
     protected override ArrayType GetArrayForCache(int count, string optionsId)
         => ValueType.GetArray(count, optionsId);
 
-    internal override IEnumerable<IConversion> GetForcedConversions<TDestination>
-        (TDestination destination)
+    internal override IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination)
     {
-        var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;
-        if(provider != null)
+        if(ValueType is IForcedConversionProviderForPointer<TDestination> provider)
             foreach(var feature in provider.GetResult(destination))
-                yield return feature;
+                yield return feature ?? throw new InvalidOperationException();
 
         foreach(var feature in base.GetForcedConversions(destination))
             yield return feature;
@@ -101,19 +98,20 @@ sealed class PointerType
         => ValueType.StripConversionsFromPointer;
 
     [DisableDump]
-    internal override IImplementation FunctionDeclarationForType
+    internal override IImplementation? FunctionDeclarationForType
         => ValueType.FunctionDeclarationForPointerType ?? base.FunctionDeclarationForType;
 
-    internal override IEnumerable<SearchResult> GetDeclarations<TDefinable>(TDefinable tokenClass)
+    internal override IEnumerable<SearchResult> GetDeclarations<TDefinable>(TDefinable? tokenClass)
+        where TDefinable : class
     {
-        var feature = (ValueType as ISymbolProviderForPointer<TDefinable>)?.GetFeature(tokenClass);
-        if(feature == null)
-            return base.GetDeclarations(tokenClass);
+        if((ValueType as ISymbolProviderForPointer<TDefinable>)?.Feature is { } feature)
+            return [SearchResult.Create(feature, this)];
 
-        return new[]
-        {
-            SearchResult.Create(feature, this)
-        };
+        if(tokenClass != null 
+           && (ValueType as IMultiSymbolProviderForPointer<TDefinable>)?.GetFeature(tokenClass) is { } multiFeature)
+            return [SearchResult.Create(multiFeature, this)];
+
+        return base.GetDeclarations(tokenClass);
     }
 
     protected override ResultCache GetDePointer(Category category)
@@ -125,7 +123,7 @@ sealed class PointerType
                 Closures.GetArgument
             );
 
-    internal override Result GetConversionToStableReference(Category category)
+    internal override Result? GetConversionToStableReference(Category category)
         => GetMutation(StableReferenceType) & category;
 
     Result DereferenceResult(Category category)

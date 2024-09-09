@@ -70,7 +70,7 @@ sealed class FunctionBodyType
     Result IConversion.Execute(Category category)
     {
         NotImplementedMethod(category);
-        return null;
+        return null!;
     }
 
     TypeBase IConversion.Source => this;
@@ -83,15 +83,14 @@ sealed class FunctionBodyType
 
     IMeta IMetaImplementation.Function => null;
 
-    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+    IImplementation ISymbolProvider<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     Root ITemplateProvider.Root => Root;
 
     Result IValue.Execute(Category category)
     {
         NotImplementedMethod(category);
-        return null;
+        return null!;
     }
 
     [DisableDump]

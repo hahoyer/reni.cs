@@ -1,5 +1,4 @@
-using hw.DebugFormatter;
-using hw.Scanner;
+#nullable enable
 using Reni.Basics;
 using Reni.Context;
 using Reni.SyntaxTree;
@@ -10,13 +9,13 @@ namespace Reni.Feature;
 
 interface IEvalImplementation
 {
-    IFunction Function { get; }
-    IValue Value { get; }
+    IFunction? Function { get; }
+    IValue? Value { get; }
 }
 
 interface IMetaImplementation
 {
-    IMeta Function { get; }
+    IMeta? Function { get; }
 }
 
 interface IImplementation : IEvalImplementation, IMetaImplementation;
@@ -29,14 +28,14 @@ abstract class FunctionFeatureImplementation
 
     protected FunctionFeatureImplementation() { }
     IFunction IEvalImplementation.Function => this;
-    IValue IEvalImplementation.Value => null;
+    IValue? IEvalImplementation.Value => null;
 
     Result IFunction.GetResult(Category category, TypeBase argsType)
         => GetResult(category, argsType);
 
     bool IFunction.IsImplicit => IsImplicit;
 
-    IMeta IMetaImplementation.Function => null;
+    IMeta? IMetaImplementation.Function => null;
 
     protected abstract Result GetResult(Category category, TypeBase argsType);
     protected abstract bool IsImplicit { get; }
@@ -47,15 +46,15 @@ abstract class ContextMetaFeatureImplementation
         , IImplementation
         , IMeta
 {
-    IFunction IEvalImplementation.Function => null;
-    IValue IEvalImplementation.Value => null;
+    IFunction? IEvalImplementation.Function => null;
+    IValue? IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
+    Result? IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
         => GetResult(contextBase, category, right);
 
     IMeta IMetaImplementation.Function => this;
 
-    protected abstract Result GetResult(ContextBase contextBase, Category category, ValueSyntax right);
+    protected abstract Result? GetResult(ContextBase contextBase, Category category, ValueSyntax right);
 }
 
 /// <summary>
@@ -63,7 +62,7 @@ abstract class ContextMetaFeatureImplementation
 /// </summary>
 interface IConversion
 {
-    Result Execute(Category category);
+    Result? Execute(Category category);
     TypeBase Source { get; }
 }
 
@@ -94,25 +93,41 @@ interface IFunction
 
 interface IMeta
 {
-    Result GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
+    Result? GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right);
 }
 
 interface ISearchTarget;
 
 // ReSharper disable once TypeParameterCanBeVariant
 // Exact match for TDefinable is required here.
+interface IMultiSymbolProviderForPointer<TDefinable>
+    where TDefinable : Definable
+{
+    IImplementation? GetFeature(TDefinable tokenClass);
+}
+
+// ReSharper disable once UnusedTypeParameter
+// Exact match for TDefinable is required here.
 interface ISymbolProviderForPointer<TDefinable>
     where TDefinable : Definable
 {
-    IImplementation GetFeature(TDefinable tokenClass);
+    IImplementation? Feature { get; }
 }
 
 // ReSharper disable once TypeParameterCanBeVariant
 // Exact match for TDefinable is required here.
+interface IMultiSymbolProvider<TDefinable>
+    where TDefinable : Definable
+{
+    IImplementation? GetFeature(TDefinable tokenClass);
+}
+
+// ReSharper disable once UnusedTypeParameter
+// Exact match for TDefinable is required here.
 interface ISymbolProvider<TDefinable>
     where TDefinable : Definable
 {
-    IImplementation GetFeature(TDefinable tokenClass);
+    IImplementation? Feature { get; }
 }
 
 interface IGenericProviderForType
@@ -155,8 +170,8 @@ sealed class MetaFunction : DumpableObject, IImplementation, IMeta
     public MetaFunction(Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
         => Function = function;
 
-    IFunction IEvalImplementation.Function => null;
-    IValue IEvalImplementation.Value => null;
+    IFunction? IEvalImplementation.Function => null;
+    IValue? IEvalImplementation.Value => null;
 
     Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
         => Function(category, left, contextBase, right);
@@ -182,10 +197,10 @@ sealed class ContextMetaFunctionFromSyntax
     readonly ValueSyntax Definition;
 
     public ContextMetaFunctionFromSyntax(ValueSyntax definition) => Definition = definition;
-    IFunction IEvalImplementation.Function => null;
-    IValue IEvalImplementation.Value => null;
+    IFunction? IEvalImplementation.Function => null;
+    IValue? IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult(Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
+    Result? IMeta.GetResult(Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
         => callContext.GetResult(category, Definition.ReplaceArg(right));
 
     IMeta IMetaImplementation.Function => this;
@@ -198,15 +213,11 @@ interface IForcedConversionProvider<in TDestination>
 
 interface IForcedConversionProviderForPointer<in TDestination>
 {
-    IEnumerable<IConversion> GetResult(TDestination destination);
+    IEnumerable<IConversion?> GetResult(TDestination destination);
 }
 
 interface IChild<out TParent>
 {
-    TParent Parent { get; }
-}
-
-interface ISourceProvider
-{
-    SourcePart Value { get; }
+    [PublicAPI]
+    TParent? Parent { get; }
 }

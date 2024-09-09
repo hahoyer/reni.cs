@@ -69,7 +69,8 @@ static class Extension
     internal static Result GetResult(this IConversion conversion, Category category)
     {
         var result = conversion.Execute(category);
-        (result != null).Assert();
+        if(result == null)
+            return null;
 
         if(result.HasIssue != true && category.HasCode() && result.Code.ArgumentType != null)
             (result.Code.ArgumentType == conversion.Source).Assert

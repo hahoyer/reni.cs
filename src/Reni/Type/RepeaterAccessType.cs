@@ -40,7 +40,8 @@ sealed class RepeaterAccessType
     internal Result GetResult(Category category, Result leftResult, TypeBase right)
     {
         var rightResult = right
-            .GetConversion(category | Category.Type, IndexType).AutomaticDereferencedAlignedResult;
+            .GetConversion(category | Category.Type, IndexType)
+            ?.AutomaticDereferencedAlignedResult;
 
         return GetResult(category, leftResult + rightResult);
     }

@@ -40,7 +40,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         {
             var innerResult = ((IConversion)Parent).Execute(category);
             var conversion = Type.Pointer.GetMutation(Parent);
-            var result = innerResult.ReplaceArguments(conversion);
+            var result = innerResult?.ReplaceArguments(conversion);
             return result;
         }
 
@@ -89,6 +89,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     TypeBase IndexType => Compound.IndexType;
 
     [DisableDump]
+    [NotNull]
     internal CompoundContext CompoundContext => CompoundContextCache.Value;
 
     [DisableDump]
@@ -132,7 +133,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         => Compound
             .Syntax
             .EndPosition
-            .Select(position => Compound.AccessType(ViewPosition, position)?.DumpPrintText ?? "?")
+            .Select(position => Compound.AccessType(ViewPosition, position).DumpPrintText)
             .Stringify(", ")
             .Surround("(", ")");
 
@@ -282,7 +283,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             return resultType.GetResult(category);
 
         return resultType.GetResult
-            (category, c => Type.GetObjectResult(c).AddToReference(() => FieldOffset(position)));
+            (category, c => Type?.GetObjectResult(c).AddToReference(() => FieldOffset(position)));
     }
 
 

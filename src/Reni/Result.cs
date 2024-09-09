@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics;
-using hw.DebugFormatter;
-using hw.Helper;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Helper;
 using Reni.Type;
 using Reni.Validation;
 
@@ -285,6 +283,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         {
             HasType.Assert(() => "Dereference requires type category:\n " + Dump());
             var referenceType = Type.CheckedReference;
+            referenceType.ExpectIsNotNull(() => (null, $"Type {Type.DumpPrintText} is not a reference type."));
             var converter = referenceType.Converter;
             var result = converter.GetResult(CompleteCategory);
             return result
@@ -348,7 +347,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 return this;
 
             return Type
-                .GetConversion(CompleteCategory, destinationType)
+                .GetConversion(CompleteCategory, destinationType)?
                 .ReplaceArguments(this);
         }
     }
@@ -489,7 +488,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             if(result.HasClosures)
                 Data.Closures = result.Closures;
-            }
+        }
 
         AssertValid();
     }
@@ -739,16 +738,16 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         var result = this & category;
         var copier = Type.GetCopier(category);
         if(category.HasCode())
-            result.Code = Code.GetLocalBlock(copier.Code);
+            result.Code = Code.GetLocalBlock(copier?.Code);
         if(category.HasClosures())
-            result.Closures = Closures.Sequence(copier.Closures);
+            result.Closures = Closures.Sequence(copier?.Closures);
         return result;
     }
 
     internal Result GetConversion(TypeBase target)
     {
         var conversion = Type.GetConversion(CompleteCategory, target);
-        return conversion.ReplaceArguments(this);
+        return conversion?.ReplaceArguments(this);
     }
 
     internal BitsConst GetValue(IExecutionContext context)

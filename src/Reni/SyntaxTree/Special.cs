@@ -36,7 +36,6 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
         => Terminal.GetResult(context, category, Token);
 
     internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
-    internal override TypeBase TryGetTypeBase() => Terminal.TryGetTypeBase(Token);
 }
 
 sealed class PrefixSyntax : ValueSyntax
@@ -151,8 +150,6 @@ sealed class SuffixSyntax : ValueSyntax
     internal override Result GetResultForCache(ContextBase context, Category category)
         => Suffix.GetResult(context, category, Left);
 
-    internal override TypeBase TryGetTypeBase() => Suffix.TryGetTypeBase(Left);
-
     public static Result<ValueSyntax> Create
         (Result<ValueSyntax> left, ISuffix suffix, SourcePart token, Anchor brackets)
     {
@@ -182,5 +179,4 @@ interface IInfix
 interface ISuffix
 {
     Result GetResult(ContextBase context, Category category, ValueSyntax left);
-    TypeBase TryGetTypeBase(ValueSyntax left);
 }

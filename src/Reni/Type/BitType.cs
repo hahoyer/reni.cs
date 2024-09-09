@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -23,9 +21,7 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
 
     internal BitType(Root root) => Root = root;
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature
-        (DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     [DisableDump]
     internal override string DumpPrintText => "bit";

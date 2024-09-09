@@ -91,12 +91,9 @@ abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueToken
     Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
         => GetResult(context, category, left);
 
-    TypeBase ISuffix.TryGetTypeBase(ValueSyntax left) => TryGetTypeBase(left);
-
     IValueProvider IValueToken.Provider => Factory.Infix;
 
     protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax left);
-    protected abstract TypeBase TryGetTypeBase(ValueSyntax left);
 }
 
 abstract class InfixSyntaxToken : InfixToken, IInfix, IValueToken

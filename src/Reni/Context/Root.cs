@@ -3,6 +3,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.Helper;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.Struct;
@@ -64,13 +65,13 @@ sealed class Root
 
     internal Root(IParent parent) => Parent = parent;
 
-    IImplementation ISymbolProviderForPointer<ConcatArrays>.GetFeature(ConcatArrays tokenClass)
+    IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature
         => this.CachedValue(() => GetCreateArrayFeature(false));
 
-    IImplementation ISymbolProviderForPointer<Minus>.GetFeature(Minus tokenClass)
+    IImplementation ISymbolProviderForPointer<Minus>.Feature
         => this.CachedValue(GetMinusFeature);
 
-    IImplementation ISymbolProviderForPointer<MutableConcatArrays>.GetFeature(MutableConcatArrays tokenClass)
+    IImplementation ISymbolProviderForPointer<MutableConcatArrays>.Feature
         => this.CachedValue(() => GetCreateArrayFeature(true));
 
     [DisableDump]
@@ -166,11 +167,13 @@ sealed class Root
     {
         var rawResult = syntax.GetResultForAll(this);
 
-        var result = rawResult
+        rawResult?.Type.ExpectIsNotNull(()=>(syntax.Anchor.SourcePart, "Type is required."));
+
+        var result = rawResult?
             .Code?
-            .GetLocalBlock(rawResult.Type.GetCopier(Category.Code).Code)
+            .GetLocalBlock(rawResult.Type.GetCopier(Category.Code)?.Code)
             .GetAlign();
 
-        return new(result, rawResult.Issues.ToArray(), description);
+        return new(result, rawResult?.Issues.ToArray(), description);
     }
 }

@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -12,7 +10,7 @@ namespace Reni.Type;
 sealed class NumberType
     : Child<ArrayType>
         , ISymbolProviderForPointer<DumpPrintToken>
-        , ISymbolProviderForPointer<Operation>
+        , IMultiSymbolProviderForPointer<Operation>
         , ISymbolProviderForPointer<TokenClasses.EnableCut>
         , ISymbolProviderForPointer<Negate>
         , ISymbolProviderForPointer<TextItem>
@@ -33,7 +31,7 @@ sealed class NumberType
     readonly ValueCache<Result> ZeroResult;
 
     [EnableDump]
-    internal int Bits => IsInDump? -1: Size.ToInt();
+    internal int Bits => IsInDump? -1 : Size.ToInt();
 
     static IEnumerable<string> InternalDeclarationOptions
         => new[]
@@ -54,19 +52,19 @@ sealed class NumberType
                     (category => destination.FlatConversion(category, this), this);
     }
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
-
-    IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.GetFeature
-        (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
-
-    IImplementation ISymbolProviderForPointer<Negate>.GetFeature(Negate tokenClass)
-        => Feature.Extension.Value(NegationResult);
-
-    IImplementation ISymbolProviderForPointer<Operation>.GetFeature(Operation tokenClass)
+    IImplementation IMultiSymbolProviderForPointer<Operation>.GetFeature(Operation tokenClass)
         => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
 
-    IImplementation ISymbolProviderForPointer<TextItem>.GetFeature(TextItem tokenClass)
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+
+    IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
+        => Feature.Extension.Value(EnableCutTokenResult);
+
+    IImplementation ISymbolProviderForPointer<Negate>.Feature
+        => Feature.Extension.Value(NegationResult);
+
+    IImplementation ISymbolProviderForPointer<TextItem>.Feature
         => Feature.Extension.Value(TextItemResult);
 
     [DisableDump]

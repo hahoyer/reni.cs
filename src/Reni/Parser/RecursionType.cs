@@ -34,7 +34,7 @@ sealed class RecursionType
     Result IFunction.GetResult(Category category, TypeBase argsType)
     {
         NotImplementedMethod(category, argsType);
-        return null;
+        return null!;
     }
 
     bool IFunction.IsImplicit => false;
@@ -43,7 +43,7 @@ sealed class RecursionType
         (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
     {
         NotImplementedMethod(contextBase, left, category, right);
-        return null;
+        return null!;
     }
 
 
@@ -52,7 +52,7 @@ sealed class RecursionType
     Result IValue.Execute(Category category)
     {
         NotImplementedMethod(category);
-        return null;
+        return null!;
     }
 
     internal override IEnumerable<string> DeclarationOptions

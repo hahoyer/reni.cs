@@ -87,11 +87,6 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
             => new(category, GetIssue(left.Anchor.SourcePart));
 
-        TypeBase ISuffix.TryGetTypeBase(ValueSyntax left)
-        {
-            NotImplementedMethod(left);
-            return default;
-        }
     }
 
     sealed class PrefixErrorTokenClass : InfixTypeErrorTokenClass, IPrefix

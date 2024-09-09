@@ -1,4 +1,4 @@
-using hw.DebugFormatter;
+#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -18,14 +18,13 @@ sealed class ContextReferenceType
         get
         {
             NotImplementedMethod();
-            return null;
+            return null!;
         }
     }
 
     internal ContextReferenceType(CompoundView parent) => Parent = parent;
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+    IImplementation? ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     [DisableDump]
     internal override Root Root => Parent.Root;
@@ -54,12 +53,17 @@ sealed class ContextReferenceType
 
     new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType
-            .GetResult(category, ()=>DumpPrintCode);
+            .GetResult(category, () => DumpPrintCode);
 
     Result PointerConversion(Category category)
         => Parent
             .Type
             .Pointer
             .GetResult
-                (category, c => GetArgumentResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
+            (
+                category
+                , c => GetArgumentResult(c)
+                        .AddToReference(() => Parent.CompoundViewSize * -1)
+                    ?? throw new InvalidOperationException()
+            );
 }

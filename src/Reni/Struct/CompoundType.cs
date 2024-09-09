@@ -1,4 +1,4 @@
-﻿using hw.DebugFormatter;
+﻿#nullable enable
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -11,9 +11,9 @@ namespace Reni.Struct;
 sealed class CompoundType
     : TypeBase
         , ISymbolProviderForPointer<DumpPrintToken>
-        , ISymbolProviderForPointer<Definable>
+        , IMultiSymbolProviderForPointer<Definable>
         , ISymbolProvider<DumpPrintToken>
-        , ISymbolProvider<Definable>
+        , IMultiSymbolProvider<Definable>
         , IChild<ContextBase>
 {
     [Node]
@@ -29,18 +29,15 @@ sealed class CompoundType
 
     ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
-    IImplementation ISymbolProvider<Definable>.GetFeature(Definable tokenClass)
+    IImplementation? IMultiSymbolProvider<Definable>.GetFeature(Definable tokenClass)
         => IsHollow? View.Find(tokenClass, true) : null;
 
-    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
-        => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
+    IImplementation? ISymbolProvider<DumpPrintToken>.Feature => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
 
-    IImplementation ISymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
+    IImplementation IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable? tokenClass)
         => View.Find(tokenClass, true);
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.GetFeature
-        (DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     [DisableDump]
     internal override Root Root => View.Root;
@@ -89,14 +86,14 @@ sealed class CompoundType
     internal override ContextBase ToContext => View.Context;
 
     [DisableDump]
-    internal override Issue[] Issues => View.Issues;
+    internal override Issue[]? Issues => View.Issues;
 
     protected override Size GetSize() => View.CompoundViewSize;
 
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
-    internal override Result GetCleanup(Category category) => View.Compound.Cleanup(category);
+    internal override Result? GetCleanup(Category category) => View.Compound.Cleanup(category);
 
     Result VoidConversion(Category category) => GetMutation(Root.VoidType) & category;
 

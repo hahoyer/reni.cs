@@ -6,11 +6,10 @@ namespace Reni.Type;
 
 sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
 {
-    IImplementation ISymbolProvider<DumpPrintToken>.GetFeature(DumpPrintToken tokenClass)
-        => Feature.Extension.Value(GetDumpPrintTokenResult);
+    IImplementation ISymbolProvider<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     [DisableDump]
-    internal override Root Root => null;
+    internal override Root Root => null!;
 
     [DisableDump]
     internal override string DumpPrintText => "()";

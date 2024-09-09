@@ -18,8 +18,8 @@ sealed class ExclamationBoxToken
         if(right == null)
             return leftleft;
 
-        (right.TokenClass is ExclamationBoxToken).Expect(() => right.Token);
-        right.Left.ExpectIsNull(() => right.SourcePart);
+        (right.TokenClass is ExclamationBoxToken).Expect(() => (right.Token, "ExclamationBoxToken expected."));
+        right.Left.ExpectIsNull(() => (right.SourcePart, "Right operand must not be empty."));
         return right.ReCreate([leftleft]);
     }
 

@@ -25,7 +25,7 @@ abstract class SetterTargetType
     IConversion IReference.Converter => this;
     bool IReference.IsWeak => true;
 
-    IImplementation ISymbolProvider<ReassignToken>.GetFeature(ReassignToken tokenClass)
+    IImplementation ISymbolProvider<ReassignToken>.Feature
         => IsMutable? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
     Result IValue.Execute(Category category) => GetGetterResult(category);

@@ -113,6 +113,7 @@ abstract class FunctionInstance
         return result;
     }
 
+    [CanBeNull]
     Result GetResult(Category category)
     {
         if(IsStopByObjectIdActive)
@@ -125,6 +126,9 @@ abstract class FunctionInstance
             Dump(nameof(Body), Body.Anchor.SourceParts);
             BreakExecution();
             var rawResult = Context.GetResult(category | Category.Type, Body);
+
+            if (rawResult == null)
+                return ReturnMethodDump(rawResult);
 
             (rawResult.HasIssue || rawResult.CompleteCategory.Contains(category | Category.Type)).Assert();
             if(rawResult.FindClosures != null)

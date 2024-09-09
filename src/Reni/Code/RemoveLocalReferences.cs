@@ -132,7 +132,7 @@ sealed class RemoveLocalReferences : Base
                     var cleanup1 = reference
                         .ValueType
                         .GetCleanup(Category.Code | Category.Closures)
-                        .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.GetTopRef, Closures.GetVoid);
+                        ?.ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.GetTopRef, Closures.GetVoid);
                     cleanup = cleanup1 + cleanup;
                     Dump(nameof(cleanup), cleanup);
                     BreakExecution();

@@ -37,7 +37,7 @@ public static class Extension
         }
     }
 
-    [PublicAPI]
+    [PublicAPI][NotNull]
     internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget> target)
         where TTarget : ITree<TTarget>
     {

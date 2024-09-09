@@ -1,3 +1,4 @@
+#nullable enable
 using hw.DebugFormatter;
 using Reni.Code;
 using Reni.Context;
@@ -7,7 +8,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Struct;
 
-sealed class CompoundContext : Child, ISymbolProviderForPointer<Definable>, IContextReference
+sealed class CompoundContext : Child, IMultiSymbolProviderForPointer<Definable>, IContextReference
 {
     [DisableDump]
     internal CompoundView View { get; }
@@ -27,7 +28,7 @@ sealed class CompoundContext : Child, ISymbolProviderForPointer<Definable>, ICon
 
     int IContextReference.Order => Order;
 
-    IImplementation ISymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
+    IImplementation IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable? tokenClass)
         => View.Find(tokenClass, false);
 
     protected override string ContextChildIdentificationDump => GetCompoundIdentificationDump();

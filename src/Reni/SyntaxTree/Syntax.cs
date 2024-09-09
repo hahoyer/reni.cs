@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 using Reni.Helper;
 using Reni.Parser;
@@ -145,7 +143,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         level ??= new();
 
         foreach(var node in DirectChildren.Where(node => node != this))
-            node?.AssertValid();
+            node?.AssertValid(level, target);
     }
 
     internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
