@@ -1,3 +1,4 @@
+#nullable enable
 using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
@@ -11,7 +12,7 @@ namespace Reni.Validation;
 
 static class Extension
 {
-    internal static string GetMessage(this IssueId issueId, object[] additionalInformation)
+    internal static string? GetMessage(this IssueId issueId, object[] additionalInformation)
     {
         switch(issueId)
         {
@@ -104,20 +105,6 @@ static class Extension
     {
         var sourceParts = anchors.Select(anchor => anchor.SourcePart).ToArray();
         return issueId.GetIssue(sourceParts.First(), sourceParts.Skip(1).ToArray());
-    }
-
-    internal static Result GetResult
-    (
-        this IssueId issueId
-        , Category category
-        , SourcePart token
-        , object target
-        , object[] results = null
-        , Issue[] foundIssues = null
-    )
-    {
-        var additionalInformation = results == null? T(target) : T(target, results);
-        return new(category, T(foundIssues, T(issueId.GetIssue(token, additionalInformation))).ConcatMany().ToArray());
     }
 
     internal static Result<BinaryTree> GetSyntax(this IssueId issueId, BinaryTree binaryTree)

@@ -285,9 +285,7 @@ abstract class ContextBase
     {
         var searchResult = GetDeclaration(definable);
         if(searchResult == null)
-            return IssueId
-                .MissingDeclarationInContext
-                .GetResult(category, token, this);
+            return new(category, IssueId.MissingDeclarationInContext.GetIssue(token, this));
 
         var result = searchResult.GetResult(category, CacheObject.AsObject, token, this, right);
 

@@ -1,7 +1,4 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -716,11 +713,6 @@ abstract class TypeBase
     internal Result GetObjectResult(Category category)
         => IsHollow? GetResult(category) : Pointer.GetResult(category | Category.Type, ForcedReference);
 
-    Result GetIssueResult
-        (Category category, IssueId issueId, SourcePart token, SearchResult[] declarations, Issue[] leftIssues)
-        => issueId
-            .GetResult(category, token, this, declarations, leftIssues);
-
     internal Result GetResult
     (
         Category category,
@@ -730,35 +722,25 @@ abstract class TypeBase
         ContextBase context,
         ValueSyntax right
     )
-        => FindDeclarationAndExecute
-        (
-            definable,
-            result => result.Execute(category, left, currentTarget, context, right),
-            (issueId, declarations) => GetIssueResult(category, issueId, currentTarget, declarations, left.Issues)
-        );
-
-    Result FindDeclarationAndExecute
-    (
-        Definable definable,
-        Func<SearchResult, Result> execute,
-        Func<IssueId, SearchResult[], Result> onError
-    )
     {
         var searchResults
             = GetDeclarationsForTypeAndCloseRelatives(definable)
                 .RemoveLowPriorityResults()
                 .ToArray();
 
-        switch(searchResults.Length)
-        {
-            case 0:
-                return onError(IssueId.MissingDeclarationForType, null);
-            case 1:
-                return execute(searchResults.First());
-            default:
-                return onError(IssueId.AmbiguousSymbol, searchResults);
-        }
+        var count = searchResults.Length;
+        if(count == 1)
+            return searchResults
+                .First()
+                .Execute(category, left, currentTarget, context, right);
+
+        var issue = count == 0
+            ? IssueId.MissingDeclarationForType.GetIssue(currentTarget, this) 
+            : IssueId.AmbiguousSymbol.GetIssue(currentTarget, this, searchResults);
+
+        return new(category, [..left.Issues, issue]);
     }
+
 
     Result GetIdentityOperationResult(Category category, TypeBase right, bool isEqual)
     {

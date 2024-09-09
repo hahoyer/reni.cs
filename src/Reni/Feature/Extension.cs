@@ -1,9 +1,8 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -120,36 +119,29 @@ static class Extension
         var valueResult = feature.ValueResult(context, right, valueCategory);
 
         if(right == null)
-        {
-            if(valueResult != null)
-                return valueResult;
+            return valueResult 
+                ?? new(category, IssueId.MissingRightExpression.GetIssue(currentTarget, context));
 
-            return IssueId
-                .MissingRightExpression
-                .GetResult(category, currentTarget, context);
-        }
+        if(valueResult != null)
+            return valueResult
+                .Type
+                .GetResult(category, valueResult, currentTarget, null, context, right);
+        
+        //Todo: Provide context information like this to "Expect"
+        if(feature.Function == null)
+            Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
+        (feature.Function != null).Expect(null);  
 
-        if(valueResult == null)
-        {
-            if(feature.Function == null)
-                Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
+        var argsResult = context.GetResultAsReferenceCache(right);
+        var argsType = argsResult.Type;
+        if(argsType == null)
+            return argsResult.Get(category);
 
-            (feature.Function != null).Assert();
+        return feature
+            .Function
+            .GetResult(category, argsType)
+            .ReplaceArguments(argsResult);
 
-            var argsResult = context.GetResultAsReferenceCache(right);
-            var argsType = argsResult.Type;
-            if(argsType == null)
-                return argsResult.Get(category);
-
-            return feature
-                .Function
-                .GetResult(category, argsType)
-                .ReplaceArguments(argsResult);
-        }
-
-        return valueResult
-            .Type
-            .GetResult(category, valueResult, currentTarget, definable: null, context, right);
     }
 
     static Result ValueResult
