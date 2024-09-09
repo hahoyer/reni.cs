@@ -210,7 +210,6 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
         SetLinks();
         StopByObjectIds();
-        Issues.Any().ConditionalBreak(() => Issues.ToArray().LogDump());
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -237,10 +236,12 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
         return issueId switch
         {
-            ExtraLeftBracket => issueId.GetIssue(Token, Right?.SourcePart ?? Token.End.Span(0))
-            , ExtraRightBracket => issueId.GetIssue(Token, Left.SourcePart)
-            , MissingMatchingRightBracket => issueId.GetIssue(Token, LeftMost.SourcePart)
-            , EOFInComment or EOLInText or EOFInVerbatimText => issueId.GetIssue(Token)
+            ExtraLeftBracket
+                => issueId.GetIssue(Token, Right?.SourcePart ?? Token.End.Span(0))
+            , ExtraRightBracket or MissingMatchingRightBracket
+                => issueId.GetIssue(Token, LeftMost.SourcePart)
+            , EOFInComment or EOLInText or EOFInVerbatimText
+                => issueId.GetIssue(Token)
             , _ => throw new InvalidEnumArgumentException($"Unexpected issue: {issueId}")
         };
     }
