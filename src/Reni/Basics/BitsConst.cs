@@ -173,7 +173,7 @@ public sealed class BitsConst : DumpableObject
 
     public static BitsConst ConvertAsText(string value)
     {
-        (Marshal.SizeOf(value[0].GetType()) == 1).Assert();
+        (Marshal.SizeOf(value.FirstOrDefault().GetType()) == 1).Assert();
         return new(value.Length, value.Select(c => (byte)c).ToArray(), 0);
     }
 

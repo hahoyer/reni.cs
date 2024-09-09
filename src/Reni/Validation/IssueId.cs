@@ -31,7 +31,8 @@ enum IssueId
     AmbiguousSymbol
 
     , EOFInComment
-    , EOLInString
+    , EOFInVerbatimText
+    , EOLInText
     , [Setup(typeof(string))]
     ExpectationFailedException
 
@@ -65,4 +66,5 @@ enum IssueId
     , MissingRightExpression
     , [Setup(typeof(string), typeof(string))]
     UnexpectedException
+
 }

@@ -43,7 +43,7 @@ static class Extension
                 return "Invalid declaration tag.";
             case IssueId.EOFInComment:
                 return "End of file in comment.";
-            case IssueId.EOLInString:
+            case IssueId.EOLInText:
                 return "End of line in string.";
             case IssueId.InvalidCharacter:
                 return "Invalid character.";

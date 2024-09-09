@@ -25,8 +25,9 @@ static class ConversionService
         {
             var startType = startFeature?.Destination ?? Source;
 
-            var newFeatures = startType
-                .NextConversionStepOptions
+            var startTypeNextConversionStepOptions = startType
+                .NextConversionStepOptions;
+            var newFeatures = startTypeNextConversionStepOptions
                 .Where(IsRelevantForConversionPathExtension)
                 .Select(feature => startFeature + feature)
                 .ToArray();

@@ -4,21 +4,28 @@ using Reni.Context;
 using Reni.DeclarationOptions;
 using Reni.Parser;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.TokenClasses;
 
-sealed class Text : TerminalSyntaxToken
+sealed class Text : TerminalSyntaxToken, IIssueTokenClass
 {
     static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
+    readonly IssueId IssueId;
+
+    public Text(IssueId issueId = IssueId.None) => IssueId = issueId;
+
+    IssueId IIssueTokenClass.IssueId => IssueId;
+
+    public override string Id => "<text>";
 
     protected override Declaration[] Declarations => PredefinedDeclarations;
-    public override string Id => "<text>";
 
     protected override Result GetResult(ContextBase context, Category category, SourcePart token)
     {
-        var data = Lexer.Instance.ExtractText(token);
+        var data = Lexer.Instance.ExtractText(token, IssueId == IssueId.None);
         return context
-            .RootContext.BitType.GetArray(BitsConst.BitSize(data[0].GetType()))
+            .RootContext.BitType.GetArray(BitsConst.BitSize(data.FirstOrDefault().GetType()))
             .TextItem
             .GetArray(data.Length)
             .TextItem

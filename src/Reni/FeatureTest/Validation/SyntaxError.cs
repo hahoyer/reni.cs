@@ -45,8 +45,8 @@ public sealed class SyntaxErrorString : CompilerTest
     {
         var a = issues.ToArray();
         var i = 0;
-        a[i++].IsLogDumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\n\"").Assert();
-        a[i++].IsLogDumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\n\"").Assert();
+        a[i++].IsLogDumpLike(2, 1, 3, 1, IssueId.EOLInText, "\"' hallo\n\"").Assert();
+        a[i++].IsLogDumpLike(3, 6, 4, 1, IssueId.EOLInText, "\"'\n\"").Assert();
         (a.Length == i).Assert();
     }
 }

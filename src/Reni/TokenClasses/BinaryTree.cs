@@ -111,11 +111,10 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     {
         get
         {
-            if(TokenClass is not IIssueTokenClass errorToken)
+            if(TokenClass is not IIssueTokenClass errorToken || errorToken.IssueId == default)
                 return TokenClass is IRightBracket
                     ? new BracketNodes { Left = Left, Center = Left.Right, Right = this }
                     : null;
-
             if(errorToken.IssueId == ExtraLeftBracket)
                 return new() { Left = this, Center = Right, Right = RightMost };
             if(errorToken.IssueId == ExtraRightBracket)
@@ -230,22 +229,20 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id}{InnerTokenClassPart})";
 
-
     Issue GetIssue()
     {
-        if(TokenClass is not IIssueTokenClass errorToken)
+        var issueId = (TokenClass as IIssueTokenClass)?.IssueId ?? default;
+        if(issueId == default)
             return null;
 
-        if(errorToken.IssueId == ExtraLeftBracket)
-            return errorToken.IssueId.GetIssue(Token, Right?.SourcePart ?? Token.End.Span(0));
-        if(errorToken.IssueId == ExtraRightBracket)
-            return errorToken.IssueId.GetIssue(Token, Left.SourcePart);
-        if(errorToken.IssueId == MissingMatchingRightBracket)
-            return errorToken.IssueId.GetIssue(Token, LeftMost.SourcePart);
-        if(errorToken.IssueId == EOFInComment || errorToken.IssueId == EOLInString)
-            return errorToken.IssueId.GetIssue(Token);
-
-        throw new InvalidEnumArgumentException($"Unexpected issue: {errorToken.IssueId}");
+        return issueId switch
+        {
+            ExtraLeftBracket => issueId.GetIssue(Token, Right?.SourcePart ?? Token.End.Span(0))
+            , ExtraRightBracket => issueId.GetIssue(Token, Left.SourcePart)
+            , MissingMatchingRightBracket => issueId.GetIssue(Token, LeftMost.SourcePart)
+            , EOFInComment or EOLInText or EOFInVerbatimText => issueId.GetIssue(Token)
+            , _ => throw new InvalidEnumArgumentException($"Unexpected issue: {issueId}")
+        };
     }
 
     ITokenClass GetTokenClass()

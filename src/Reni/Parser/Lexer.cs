@@ -1,5 +1,5 @@
-using hw.DebugFormatter;
 using hw.Scanner;
+using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.Parser;
@@ -12,9 +12,12 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
         internal Issue(IssueId issueId) => IssueId = issueId;
     }
 
-    const string Symbols = "^!%&/=?\\*@+~><|:-";
+    const string Symbols = "§^!%&/=?\\*@+~><|:-";
     const string SingleCharSymbol = "({[)}];,.";
     internal static readonly Lexer Instance = new();
+    static readonly IScannerTokenType InvalidText = new Text(IssueId.EOLInText);
+    static readonly IScannerTokenType InvalidVerbatimText = new Text(IssueId.EOFInVerbatimText);
+    static readonly IScannerTokenType InvalidCharacter = new InvalidCharacterSymbol(IssueId.InvalidCharacter);
     internal readonly Match LineEnd;
     internal readonly LexerItem InlineCommentItem;
     internal readonly LexerItem WhiteSpacesItem;
@@ -28,7 +31,9 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
 
     readonly IMatch Any;
     readonly Issue InvalidComment = new(IssueId.EOFInComment);
-    readonly Issue InvalidTextEnd = new(IssueId.EOLInString);
+    readonly Issue InvalidTextEnd = new(IssueId.EOLInText);
+    readonly Issue InvalidVerbatimTextEnd = new(IssueId.EOFInVerbatimText);
+
     readonly IMatch Number;
     readonly IMatch Text;
     readonly IMatch VerbatimTextHead;
@@ -38,7 +43,7 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
     readonly IMatch WhiteSpaces;
 
     Lexer()
-        : base(error => new ScannerSyntaxError(((Issue)error).IssueId))
+        : base(error => ConvertError(((Issue)error).IssueId))
     {
         var alpha = Match.Letter.Else("_");
         var symbol1 = SingleCharSymbol.AnyChar();
@@ -78,7 +83,7 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
         var verbatimText = "@("
                 + (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
                 .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
-                .Else(Match.End.Find + InvalidTextEnd)
+                .Else(Match.End.Find + InvalidVerbatimTextEnd)
             ;
 
         VerbatimTextHead = "@(" + Match.WhiteSpace.Else(identifier);
@@ -97,6 +102,23 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
         LineEndItem = new(new WhiteSpaceTokenType("LineEnd"), MatchLineEnd);
         SpaceItem = new(new WhiteSpaceTokenType("Space"), MatchSpace);
         WhiteSpacesItem = new(new WhiteSpaceTokenType("WhiteSpaces"), MatchWhiteSpaces);
+    }
+
+    internal static IScannerTokenType ConvertError(IssueId issueId)
+    {
+        switch(issueId)
+        {
+            case IssueId.EOFInComment:
+                return EndOfText.ErrorInstance;
+            case IssueId.EOFInVerbatimText:
+                return InvalidVerbatimText;
+            case IssueId.EOLInText:
+                return InvalidText;
+            case IssueId.InvalidCharacter:
+                return InvalidCharacter;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public static bool IsSpace(IItem item)
@@ -131,14 +153,14 @@ public sealed class Lexer : Match2TwoLayerScannerGuard
     int? MatchLineComment(SourcePosition sourcePosition) => GuardedMatch(sourcePosition, LineComment);
     int? MatchWhiteSpaces(SourcePosition sourcePosition) => GuardedMatch(sourcePosition, WhiteSpaces);
 
-    internal string ExtractText(SourcePart token)
+    internal string ExtractText(SourcePart token, bool isWellFormed )
     {
         var headLength = token.Start.Match(VerbatimTextHead);
         if(headLength != null)
-            return (token.Start + headLength.Value).Span(token.End + -headLength.Value).Id;
+            return (token.Start + headLength.Value).Span(token.End + (isWellFormed? -headLength.Value : 0)).Id;
 
         var result = "";
-        for(var i = 1; i < token.Length - 1; i++)
+        for(var i = 1; i < token.Length - (isWellFormed? 1 : 0); i++)
         {
             result += (token.Start + i).Current;
             if((token.Start + i).Current == token.Start.Current)

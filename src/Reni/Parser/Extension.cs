@@ -104,6 +104,8 @@ static class Extension
     {
         switch(@char)
         {
+            case '§':
+                return "Paragraph";
             case '&':
                 return "And";
             case '\\':
@@ -141,8 +143,7 @@ static class Extension
                     return "_" + @char;
                 if(char.IsDigit(@char))
                     return @char.ToString();
-
-                throw new NotImplementedException("Symbolize(" + @char + ")");
+                return "Bad" + Convert.ToByte((int)@char).ToString("x2");
         }
     }
 

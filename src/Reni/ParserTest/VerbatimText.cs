@@ -22,7 +22,7 @@ namespace Reni.ParserTest
         {
             var textContainerText = "   @( ertzu )@     ";
             var source = (new Source(textContainerText) + 3).Span(11);
-            var text = Lexer.Instance.ExtractText(source);
+            var text = Lexer.Instance.ExtractText(source, true);
             (text == "ertzu").Assert();
         }
     }
