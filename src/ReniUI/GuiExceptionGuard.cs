@@ -3,7 +3,8 @@ namespace ReniUI;
 abstract class GuiExceptionGuard<TResult> : DumpableObject
 {
     const string ExceptionTextFileName = "Exception.txt";
-    const string SourceFileName = "Test.reni";
+    const string SourceFileName = "source.reni";
+    const string TestFileName = "Test.cs";
     protected readonly CompilerBrowser Parent;
     protected GuiExceptionGuard(CompilerBrowser parent) => Parent = parent;
 
@@ -25,7 +26,7 @@ abstract class GuiExceptionGuard<TResult> : DumpableObject
 
             SaveExceptionInformationFile(issueFolder, ExceptionTextFileName, Dump(exception), "Exception Data");
             SaveExceptionInformationFile(issueFolder, SourceFileName, sourceCode, "Source file ");
-            SaveExceptionInformationFile(issueFolder, "Text.cs", GetTestCode(folderName), "Test code");
+            SaveExceptionInformationFile(issueFolder, TestFileName, GetTestCode(folderName), "Test code");
         }
         else
             $"Exception already saved to: {Tracer.FilePosition(lastReading.FullName, 1, 1, FilePositionTag.Output)}"
