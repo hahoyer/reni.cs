@@ -68,7 +68,7 @@ sealed class CondSyntax : ValueSyntax
     Result? BranchResult(ContextBase context, Category category, ValueSyntax? syntax)
     {
         var result = syntax == null
-            ? Root.VoidType.GetResult(category)
+            ? Root.VoidType.GetResult(category| Category.Type)
             : context.GetResult(category | Category.Type, syntax);
 
         if(result == null)
