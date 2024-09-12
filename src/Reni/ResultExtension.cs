@@ -11,10 +11,10 @@ static class ResultExtension
 {
     static TypeBase GetType
     (
-        ValueCache<bool> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode,
+        ValueCache<bool?> getIsHollow,
+        ValueCache<Size?> getSize,
+        ValueCache<TypeBase?> getType,
+        ValueCache<CodeBase?> getCode,
         Func<string> getObjectDump
     )
     {
@@ -31,7 +31,7 @@ static class ResultExtension
 
     static CodeBase GetCode
     (
-        ValueCache<bool> getIsHollow,
+        ValueCache<bool?> getIsHollow,
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode,
@@ -51,7 +51,7 @@ static class ResultExtension
 
     static Size GetSize
     (
-        ValueCache<bool> getIsHollow,
+        ValueCache<bool?> getIsHollow,
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode,
@@ -65,7 +65,7 @@ static class ResultExtension
 
     static Size TryGetSize
     (
-        ValueCache<bool> getIsHollow,
+        ValueCache<bool?> getIsHollow,
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode
@@ -77,7 +77,7 @@ static class ResultExtension
 
     static bool GetIsHollow
     (
-        ValueCache<bool> getIsHollow,
+        ValueCache<bool?> getIsHollow,
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode,
@@ -93,7 +93,7 @@ static class ResultExtension
 
     static bool? TryGetIsHollow
     (
-        ValueCache<bool> getIsHollow,
+        ValueCache<bool?> getIsHollow,
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode
@@ -102,7 +102,7 @@ static class ResultExtension
 
     static Closures GetClosures
     (
-        ValueCache<bool> getIsHollow,
+        ValueCache<bool?> getIsHollow,
         ValueCache<Size> getSize,
         ValueCache<TypeBase> getType,
         ValueCache<CodeBase> getCode,
@@ -126,11 +126,11 @@ static class ResultExtension
         , Func<CodeBase> getCode
         , Func<Closures> getClosures = null
         , Func<Size> getSize = null
-        , Func<bool> getIsHollow = null
+        , Func<bool?> getIsHollow = null
         , Func<string> getObjectDump = null
     )
     {
-        var isHollow = getIsHollow == null? null : new ValueCache<bool>(getIsHollow);
+        var isHollow = getIsHollow == null? null : new ValueCache<bool?>(getIsHollow);
         var size = getSize == null? null : new ValueCache<Size>(getSize);
         var type = getType == null? null : new ValueCache<TypeBase>(getType);
         var code = getCode == null? null : new ValueCache<CodeBase>(getCode);

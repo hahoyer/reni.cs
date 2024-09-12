@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#nullable enable
+using System.Diagnostics;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -77,7 +78,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [Node]
     [DebuggerHidden]
-    public Size Size
+    public Size? Size
     {
         get => IssueData.Size ?? Data.Size;
         set
@@ -94,7 +95,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [Node]
     [DebuggerHidden]
-    internal TypeBase Type
+    internal TypeBase? Type
     {
         get => IssueData.Type ?? Data.Type;
         set
@@ -112,7 +113,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [Node]
     [DebuggerHidden]
-    internal CodeBase Code
+    internal CodeBase? Code
     {
         get => IssueData.Code ?? Data.Code;
         set
@@ -127,7 +128,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [Node]
     [DebuggerHidden]
-    internal Closures Closures
+    internal Closures? Closures
     {
         get => IssueData.Closure ?? Data.Closures;
         set
@@ -158,17 +159,17 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
     }
 
-    internal Size FindSize
+    internal Size? FindSize
         => HasSize? Size :
-            HasCode? Code.Size :
-            HasType? Type.Size : null;
+            HasCode? Code!.Size :
+            HasType? Type!.Size : null;
 
-    internal Closures FindClosures
+    internal Closures? FindClosures
         => HasClosures? Closures :
-            HasCode? Code.Closures : null;
+            HasCode? Code!.Closures : null;
 
     [DisableDump]
-    internal Closures SmartClosures
+    internal Closures? SmartClosures
     {
         get
         {
@@ -199,20 +200,20 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         {
             if(HasIsHollow && IsHollow == false)
                 return false;
-            if(HasSize && !Size.IsZero)
+            if(HasSize && !Size!.IsZero)
                 return false;
-            if(HasType && !(Type is VoidType))
+            if(HasType && !(Type! is VoidType))
                 return false;
-            if(HasCode && !Code.IsEmpty)
+            if(HasCode && !Code!.IsEmpty)
                 return false;
-            if(HasClosures && !Closures.IsNone)
+            if(HasClosures && !Closures!.IsNone)
                 return false;
             return true;
         }
     }
 
     bool HasArguments
-        => HasClosures? Closures.HasArguments : HasCode && Code.HasArguments;
+        => HasClosures? Closures!.HasArguments : HasCode && Code!.HasArguments;
 
     [DisableDump]
     internal Result Align
@@ -234,8 +235,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             var result = new Result
             (
                 CompleteCategory, () => Closures
-                , () => Code.GetBitCast(alignedSize)
-                , () => Type.Align
+                , () => Code?.GetBitCast(alignedSize)
+                , () => Type?.Align
                 , () => alignedSize
                 , () => IsHollow.AssertValue());
             return result;
@@ -336,7 +337,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     [DisableDump]
-    internal Result AutomaticDereferencedAlignedResult
+    internal Result? AutomaticDereferencedAlignedResult
     {
         get
         {
@@ -369,16 +370,16 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result
     (
         Category category,
-        Func<Closures> getClosures = null,
-        Func<CodeBase> getCode = null,
-        Func<TypeBase> getType = null,
-        Func<Size> getSize = null,
-        Func<bool> getIsHollow = null
+        Func<Closures?>? getClosures = null,
+        Func<CodeBase?>? getCode = null,
+        Func<TypeBase?>? getType = null,
+        Func<Size?>? getSize = null,
+        Func<bool?>? getIsHollow = null
     )
         : this
         (
             category,
-            null,
+            [],
             getIsHollow,
             getSize,
             getType,
@@ -389,18 +390,18 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     (
         Category category,
         Issue[] issues,
-        Func<bool> getIsHollow,
-        Func<Size> getSize,
-        Func<TypeBase> getType,
-        Func<CodeBase> getCode,
-        Func<Closures> getClosures
+        Func<bool?>? getIsHollow,
+        Func<Size?>? getSize,
+        Func<TypeBase?>? getType,
+        Func<CodeBase?>? getCode,
+        Func<Closures?>? getClosures
     )
         : base(NextObjectId++)
     {
-        IssueData = new() { Category = category, Issues = issues };
+        IssueData = new(category, issues);
         Data = ResultExtension.CreateInstance
         (
-            issues?.Any() == true? Category.None : category
+            issues.Any()? Category.None : category
             , getType
             , getCode
             , getClosures
@@ -744,7 +745,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    internal Result GetConversion(TypeBase target)
+    internal Result? GetConversion(TypeBase target)
     {
         var conversion = Type.GetConversion(CompleteCategory, target);
         return conversion?.ReplaceArguments(this);
@@ -770,7 +771,15 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    public static Result operator +(Result aResult, Result bResult) => aResult.GetSequence(bResult);
+    public static Result? operator +(Result? aResult, Result? bResult)
+    {
+        if(aResult == null)
+            return bResult;
+        if(bResult == null)
+            return aResult;
+        return aResult.GetSequence(bResult);
+    }
+
 
     [DebuggerHidden]
     [PublicAPI]

@@ -82,13 +82,13 @@ sealed class Compound
     {
         if(IsHollow(position))
             return Basics.Size.Zero;
-        return ResultsOfStatements(Category.Size, 0, position).AssertNotNull()!.Size;
+        return ResultsOfStatements(Category.Size, 0, position).AssertNotNull().Size;
     }
 
     internal bool IsHollow(int? accessPosition = null) => ObtainIsHollow(accessPosition);
 
     internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
-        => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).AssertNotNull()!.Size;
+        => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).AssertNotNull().Size;
 
     Result? ResultsOfStatements(Category category, int fromPosition, int? fromNotPosition)
     {
@@ -260,7 +260,7 @@ sealed class Compound
         return statement == null? true : statement.IsHollow;
     }
 
-    internal Result? Cleanup(Category category)
+    internal Result Cleanup(Category category)
     {
         var uniqueChildContext = Parent.GetCompoundPositionContext(Syntax);
         var cleanup = Syntax.GetCleanup(uniqueChildContext, category);

@@ -58,7 +58,7 @@ sealed class Syntax : Item
         => TokenClass is List;
 
     [DisableDump]
-    public override string State => Anchor.Token.Id ?? "";
+    public override string State => Anchor.Token.Id;
 
     public override IEnumerable<SourcePart> ParserLevelGroup
         => Master

@@ -54,6 +54,8 @@ static class Extension
                 return "Missing declarer part in declaration.";
             case IssueId.MissingDeclarationValue:
                 return "Missing value part in declaration.";
+            case IssueId.ConsequenceError:
+                return "Consequence error.";
 
             case IssueId.ExtraLeftBracket:
                 return $"No closing bracket found until {PositionFormatter(additionalInformation[0])}.";
@@ -68,7 +70,6 @@ static class Extension
                 return $"Exception {additionalInformation[0]}: {additionalInformation[1]}.";
 
             case IssueId.ExpectationFailedException:
-
                 return $"Expected {((string)additionalInformation[0]).Quote()}.";
         }
 

@@ -1,4 +1,5 @@
-﻿using hw.DebugFormatter;
+﻿#nullable enable
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -41,13 +42,19 @@ sealed class IssueData : DumpableObject
     public Issue[] Issues;
     public Category Category;
 
-    public bool? IsHollow => HasIssue && Category.HasIsHollow()? IssueCode.Instance.IsHollow : null;
-    public CodeBase Code => HasIssue && Category.HasCode()? IssueCode.Instance : null;
-    public Size Size => HasIssue && Category.HasSize()? IssueCode.Instance.Size : null;
-    public TypeBase Type => HasIssue && Category.HasType()? IssueType.Instance : null;
-    public Closures Closure => HasIssue && Category.HasClosures()? IssueCode.Instance.Closures : null;
+    public IssueData(Category category, Issue[]? issues)
+    {
+        Category = category;
+        Issues = issues ?? [];
+    }
 
-    public bool HasIssue => Issues?.Any() ?? false;
+    public bool? IsHollow => HasIssue && Category.HasIsHollow()? IssueCode.Instance.IsHollow : null;
+    public CodeBase? Code => HasIssue && Category.HasCode()? IssueCode.Instance : null;
+    public Size? Size => HasIssue && Category.HasSize()? IssueCode.Instance.Size : null;
+    public TypeBase? Type => HasIssue && Category.HasType()? IssueType.Instance : null;
+    public Closures? Closure => HasIssue && Category.HasClosures()? IssueCode.Instance.Closures : null;
+
+    public bool HasIssue => Issues.Any();
 
     public void Set(Category category, bool value = true)
     {
@@ -62,13 +69,10 @@ sealed class IssueData : DumpableObject
 
     public static void AssertValid(Issue[] issues)
     {
-        if(issues == null)
-            return;
-        for(var first = 0; first < issues.Length-1; first++)
+        for(var first = 0; first < issues.Length - 1; first++)
         for(var other = first + 1; other < issues.Length; other++)
-        {
             (issues[first] != issues[other]).Assert();
-        }
     }
+
     public void AssertValid() => AssertValid(Issues);
 }

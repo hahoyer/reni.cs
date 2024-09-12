@@ -93,7 +93,7 @@ sealed class CompoundType
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
-    internal override Result? GetCleanup(Category category) => View.Compound.Cleanup(category);
+    internal override Result GetCleanup(Category category) => View.Compound.Cleanup(category);
 
     Result VoidConversion(Category category) => GetMutation(Root.VoidType) & category;
 
