@@ -24,7 +24,7 @@ sealed class IssueData : DumpableObject
 
         protected override Size GetSize() => Size.Zero;
 
-        internal override Issue GetMissingDeclarationIssue(SourcePart position)
+        protected override Issue GetMissingDeclarationIssue(SourcePart position)
             => IssueId.ConsequenceError.GetIssue(position);
     }
 

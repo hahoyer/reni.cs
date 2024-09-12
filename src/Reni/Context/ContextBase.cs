@@ -300,7 +300,7 @@ abstract class ContextBase
     {
         var target = GetResult(category | Category.Type, argsType)?.GetSmartUn<PointerType>().Align;
         return target?
-                .Type
+                .Type!
                 .GetArray(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
                 .GetResult(category | Category.Type, target)
                 .LocalReferenceResult

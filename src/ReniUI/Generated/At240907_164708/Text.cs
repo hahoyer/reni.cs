@@ -16,9 +16,12 @@ public sealed class Test : CompilerTest
     {
         var issueArray = issues.ToArray();
         var i = 0;
-        //var issueBase = issueArray[i];
-        //(issueBase.IssueId == IssueId.MissingDeclarationValue).Assert(issueBase.Dump);
-        //i++;
+        var issueBase = issueArray[i];
+        (issueBase.IssueId == IssueId.MissingDeclarationForType).Assert(issueBase.Dump);
+        i++;
+        issueBase = issueArray[i];
+        (issueBase.IssueId == IssueId.ConsequenceError).Assert(issueBase.Dump);
+        i++;
         (i == issueArray.Length).Assert();
     }
 }

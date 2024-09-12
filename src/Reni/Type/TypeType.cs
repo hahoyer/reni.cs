@@ -17,8 +17,8 @@ sealed class TypeType
         , ISymbolProvider<Mutable>
         , ISymbolProvider<ArrayReference>
 {
-    [DisableDump]
-    internal TypeBase Value { get; }
+    
+    TypeBase Value { get; }
 
     public TypeType(TypeBase value)
     {
@@ -59,7 +59,7 @@ sealed class TypeType
         if(Category.Type.Replenished().Contains(category))
             return Value.GetResult(category | Category.Type);
         var constructorResult = Value
-            .GetConstructorResult(category, getRightResult(Category.Type).Type);
+            .GetConstructorResult(category, getRightResult(Category.Type).Type!);
         return constructorResult?.ReplaceArguments(getRightResult);
     }
 

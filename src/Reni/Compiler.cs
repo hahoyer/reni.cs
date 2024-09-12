@@ -261,7 +261,6 @@ public sealed class Compiler
     Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
 
     bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
-    bool Root.IParent.HasSemantics => Parameters.Semantics;
 
     MethodInfo GetCSharpMethod()
     {

@@ -24,7 +24,6 @@ sealed class Root
         bool ProcessErrors { get; }
         IExecutionContext ExecutionContext { get; }
         IEnumerable<Definable> DefinedNames { get; }
-        bool HasSemantics { get; }
         Result<ValueSyntax> ParsePredefinedItem(string source);
     }
 
@@ -46,19 +45,12 @@ sealed class Root
     internal BitType BitType => this.CachedValue(() => new BitType(this));
 
     [DisableDump]
-    [Node]
-    internal RecursionType RecursionType => this.CachedValue(() => new RecursionType(this));
-
-    [DisableDump]
     internal int FunctionCount => Functions.Count;
 
     internal static RefAlignParam DefaultRefAlignParam => new(BitsConst.SegmentAlignBits, Size.Create(64));
 
     [DisableDump]
     public bool ProcessErrors => Parent.ProcessErrors;
-
-    [DisableDump]
-    public bool HasSemantics => Parent.HasSemantics;
 
     [DisableDump]
     internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
@@ -143,7 +135,7 @@ sealed class Root
                 }
 
                 if(category.HasClosures())
-                    result.Closures = result.Closures.Sequence(elemResult.Closures);
+                    result.Closures = result.Closures!.Sequence(elemResult.Closures);
                 result.IsDirty = false;
 
                 Dump("result", result);

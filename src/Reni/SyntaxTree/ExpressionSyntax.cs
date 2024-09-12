@@ -89,10 +89,10 @@ sealed class ExpressionSyntax : ValueSyntax
 
             var leftType = left.Type;
             if(leftType == null)
-                return left.Issues.GetResult(category, context.RootContext);
+                return left.Issues.GetResult(category);
 
             if(leftType.HasIssues)
-                return leftType.Issues.GetResult(category, context.RootContext);
+                return leftType.Issues.GetResult(category);
 
             var result = leftType
                 .GetResult(category, left, Token, Definable, context, Right);

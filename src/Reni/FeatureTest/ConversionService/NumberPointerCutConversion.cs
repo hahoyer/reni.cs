@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.UnitTest;
 using Reni.Basics;
 using Reni.Context;
@@ -20,7 +19,10 @@ public sealed class NumberPointerCutConversion : DependenceProvider
         var calculatedDestination = path.Execute(Category.Type).Type;
         (calculatedDestination == destination).Assert();
 
-        var code = path.Execute(Category.Code | Category.Type).Code
+        var code = path
+            .Execute(Category.Code | Category.Type)
+            .Code
+            .AssertNotNull()
             .ReplaceArgument(source.GetArgumentResult(Category.Code | Category.Type));
         code.AssertIsNotNull();
     }

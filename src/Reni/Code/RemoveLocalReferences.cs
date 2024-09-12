@@ -1,6 +1,4 @@
-﻿using hw.DebugFormatter;
-using hw.Helper;
-using Reni.Basics;
+﻿using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 
 namespace Reni.Code;
@@ -131,9 +129,9 @@ sealed class RemoveLocalReferences : Base
 
                     var cleanup1 = reference
                         .ValueType
-                        .GetCleanup(Category.Code | Category.Closures)
-                        ?.ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.GetTopRef, Closures.GetVoid);
-                    cleanup = cleanup1 + cleanup;
+                        .GetCleanup(Category.Code | Category.Closures)?
+                        .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.GetTopRef, Closures.GetVoid);
+                    cleanup = (cleanup1 + cleanup).AssertNotNull();
                     Dump(nameof(cleanup), cleanup);
                     BreakExecution();
                 }

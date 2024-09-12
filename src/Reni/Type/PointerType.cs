@@ -123,7 +123,7 @@ sealed class PointerType
                 Closures.GetArgument
             );
 
-    internal override Result? GetConversionToStableReference(Category category)
+    internal Result? GetConversionToStableReference(Category category)
         => GetMutation(StableReferenceType) & category;
 
     Result DereferenceResult(Category category)

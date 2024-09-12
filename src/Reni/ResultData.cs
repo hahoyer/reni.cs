@@ -28,7 +28,7 @@ sealed class ResultData
 
     public void Set(Category category, object value)
     {
-        if(Equals(value, default))
+        if(Equals(value, null))
             Reset(category);
         else
         {

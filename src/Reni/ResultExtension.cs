@@ -1,5 +1,4 @@
-using hw.DebugFormatter;
-using hw.Helper;
+#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -9,13 +8,13 @@ namespace Reni;
 
 static class ResultExtension
 {
-    static TypeBase GetType
+    static TypeBase? GetType
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size?> getSize,
-        ValueCache<TypeBase?> getType,
-        ValueCache<CodeBase?> getCode,
-        Func<string> getObjectDump
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode,
+        Func<string>? getObjectDump
     )
     {
         if(getType != null)
@@ -25,17 +24,17 @@ static class ResultExtension
 // ReSharper restore ExpressionIsAlwaysNull
         if(isHollow == true)
             return Root.VoidType;
-        Tracer.AssertionFailed($"Type cannot be determined for {getObjectDump()}");
+        Tracer.AssertionFailed($"Type cannot be determined for {getObjectDump!()}");
         return null;
     }
 
-    static CodeBase GetCode
+    static CodeBase? GetCode
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode,
-        Func<string> getObjectDump
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode,
+        Func<string>? getObjectDump
     )
     {
         if(getCode != null)
@@ -45,74 +44,77 @@ static class ResultExtension
 // ReSharper restore ExpressionIsAlwaysNull
         if(isHollow == true)
             return CodeBase.Void;
-        Tracer.AssertionFailed($"Code cannot be determined for {getObjectDump()}");
+        Tracer.AssertionFailed($"Code cannot be determined for {getObjectDump!()}");
         return null;
     }
 
-    static Size GetSize
+    static Size? GetSize
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode,
-        Func<string> getObjectDump
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode,
+        Func<string>? getObjectDump
     )
     {
         var result = TryGetSize(getIsHollow, getSize, getType, getCode);
-        (result != null).Assert(() => $"Size cannot be determined for {getObjectDump()}");
+        (result != null).Assert(() => $"Size cannot be determined for {getObjectDump!()}");
         return result;
     }
 
-    static Size TryGetSize
+    static Size? TryGetSize
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode
     )
         => getSize?.Value
-            ?? getType?.Value.Size
-            ?? getCode?.Value.Size
+            ?? getType?.Value?.Size
+            ?? getCode?.Value?.Size
             ?? (getIsHollow?.Value == true? Size.Zero : null);
 
     static bool GetIsHollow
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode,
-        Func<string> getObjectDump
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode,
+        Func<string>? getObjectDump
     )
     {
         var result = TryGetIsHollow(getIsHollow, getSize, getType, getCode);
         if(result != null)
             return result.Value;
-        Tracer.AssertionFailed($"It cannot be obtained if it is hollow for {getObjectDump()}");
+        Tracer.AssertionFailed($"It cannot be obtained if it is hollow for {getObjectDump!()}");
         return false;
     }
 
     static bool? TryGetIsHollow
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode
     ) =>
-        getIsHollow?.Value ?? getSize?.Value.IsZero ?? getType?.Value.IsHollow ?? getCode?.Value.IsEmpty;
+        getIsHollow?.Value
+        ?? getSize?.Value?.IsZero
+        ?? getType?.Value?.IsHollow
+        ?? getCode?.Value?.IsEmpty;
 
-    static Closures GetClosures
+    static Closures? GetClosures
     (
-        ValueCache<bool?> getIsHollow,
-        ValueCache<Size> getSize,
-        ValueCache<TypeBase> getType,
-        ValueCache<CodeBase> getCode,
-        ValueCache<Closures> getClosures
+        ValueCache<bool?>? getIsHollow,
+        ValueCache<Size?>? getSize,
+        ValueCache<TypeBase?>? getType,
+        ValueCache<CodeBase?>? getCode,
+        ValueCache<Closures?>? getClosures
     )
     {
         if(getClosures != null)
             return getClosures.Value;
         if(getCode != null)
-            return getCode.Value.Closures;
+            return getCode.Value!.Closures;
         if(TryGetIsHollow(getIsHollow, getSize, getType, getCode) == true)
             return Closures.GetVoid();
 
@@ -122,19 +124,19 @@ static class ResultExtension
     public static ResultData CreateInstance
     (
         Category category
-        , Func<TypeBase> getType
-        , Func<CodeBase> getCode
-        , Func<Closures> getClosures = null
-        , Func<Size> getSize = null
-        , Func<bool?> getIsHollow = null
-        , Func<string> getObjectDump = null
+        , Func<TypeBase?>? getType
+        , Func<CodeBase?>? getCode
+        , Func<Closures?>? getClosures = null
+        , Func<Size?>? getSize = null
+        , Func<bool?>? getIsHollow = null
+        , Func<string>? getObjectDump = null
     )
     {
         var isHollow = getIsHollow == null? null : new ValueCache<bool?>(getIsHollow);
-        var size = getSize == null? null : new ValueCache<Size>(getSize);
-        var type = getType == null? null : new ValueCache<TypeBase>(getType);
-        var code = getCode == null? null : new ValueCache<CodeBase>(getCode);
-        var closures = getClosures == null? null : new ValueCache<Closures>(getClosures);
+        var size = getSize == null? null : new ValueCache<Size?>(getSize);
+        var type = getType == null? null : new ValueCache<TypeBase?>(getType);
+        var code = getCode == null? null : new ValueCache<CodeBase?>(getCode);
+        var closures = getClosures == null? null : new ValueCache<Closures?>(getClosures);
 
         return new()
         {

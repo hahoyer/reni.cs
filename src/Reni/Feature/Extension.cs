@@ -50,15 +50,6 @@ static class Extension
         => new ExtendedFunction<T>(function, arg);
 
 
-    internal static IValue ExtendedValue(this IImplementation feature)
-    {
-        var function = ((IEvalImplementation)feature).Function;
-        if(function != null && function.IsImplicit)
-            return null;
-
-        return feature.Value;
-    }
-
     internal static MetaFunction MetaFeature
         (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
         => MetaFunctionCache[function];
@@ -72,7 +63,7 @@ static class Extension
         if(result == null)
             return null;
 
-        if(result.HasIssue != true && category.HasCode() && result.Code.ArgumentType != null)
+        if(result.HasIssue != true && category.HasCode() && result.Code?.ArgumentType != null)
             (result.Code.ArgumentType == conversion.Source).Assert
                 (() => result.DebuggerDump());
 
@@ -117,7 +108,7 @@ static class Extension
         if(right != null)
             valueCategory = category | Category.Type;
 
-        var valueResult = feature.ValueResult(context, right, valueCategory);
+        var valueResult = feature.ValueResult(right, valueCategory);
 
         if(right == null)
             return valueResult 
@@ -126,6 +117,7 @@ static class Extension
         if(valueResult != null)
             return valueResult
                 .Type
+                .AssertNotNull()
                 .GetResult(category, valueResult, currentTarget, null, context, right);
         
         //Todo: Provide context information like this to "Expect"
@@ -148,7 +140,6 @@ static class Extension
     static Result ValueResult
     (
         this IEvalImplementation feature,
-        ContextBase context,
         ValueSyntax right,
         Category valueCategory
     )
@@ -191,5 +182,6 @@ static class Extension
             .Distinct()
             .SingleOrDefault();
 
-    internal static Result GetResult(this Issue[] issues, Category category, Root root) => new(category, issues);
+    internal static Result GetResult(this Issue[] issues, Category category) 
+        => new(category, issues);
 }
