@@ -67,7 +67,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     internal virtual bool? IsHollow => IsLambda? true : null;
 
     //[DebuggerHidden]
-    internal virtual Result? GetResultForCache(ContextBase context, Category category)
+    internal virtual Result GetResultForCache(ContextBase context, Category category)
     {
         NotImplementedMethod(context, category);
         return null!;
@@ -87,13 +87,13 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
     internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
         => ResultCache.Add(context, cacheItem);
 
-    internal Result? GetResultForAll(ContextBase context) => context.GetResult(Category.All, this);
+    internal Result GetResultForAll(ContextBase context) => context.GetResult(Category.All, this);
 
-    internal BitsConst? Evaluate(ContextBase context)
-        => GetResultForAll(context)?.GetValue(context.RootContext.ExecutionContext);
+    internal BitsConst Evaluate(ContextBase context)
+        => GetResultForAll(context).GetValue(context.RootContext.ExecutionContext);
 
     //[DebuggerHidden]
-    internal TypeBase? GetTypeBase(ContextBase context) => context.GetResult(Category.Type, this)?.Type;
+    internal TypeBase GetTypeBase(ContextBase context) => context.GetResult(Category.Type, this).Type!;
 
     internal bool GetIsHollowStructureElement(ContextBase context)
     {
@@ -102,13 +102,13 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
             return result.Value;
 
         var type = context.GetTypeIfKnown(this) ?? GetTypeBase(context);
-        type.ExpectIsNotNull();
-        return type!.GetSmartUn<FunctionType>().IsHollow;
+        return type.GetSmartUn<FunctionType>().IsHollow;
     }
 
     internal ValueSyntax ReplaceArg(ValueSyntax syntax)
         => Visit(new ReplaceArgVisitor(syntax)) ?? this;
 
-    internal IEnumerable<string>? GetDeclarationOptions(ContextBase context)
-        => GetTypeBase(context)?.DeclarationOptions;
+    [PublicAPI]
+    internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
+        => GetTypeBase(context).DeclarationOptions;
 }

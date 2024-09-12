@@ -200,7 +200,7 @@ sealed class ContextMetaFunctionFromSyntax
     IFunction? IEvalImplementation.Function => null;
     IValue? IEvalImplementation.Value => null;
 
-    Result? IMeta.GetResult(Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
+    Result IMeta.GetResult(Category category, ResultCache left, ContextBase callContext, ValueSyntax right)
         => callContext.GetResult(category, Definition.ReplaceArg(right));
 
     IMeta IMetaImplementation.Function => this;

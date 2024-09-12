@@ -13,8 +13,8 @@ sealed class FunctionInstanceToken : SuffixSyntaxToken
     public override string Id => TokenId;
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax left)
-        => context.GetResult(category | Category.Type, left)?
-            .Type
+        => context.GetResult(category | Category.Type, left)
+            .Type!
             .FunctionInstance
-            .GetResult(category, context.GetResult(category | Category.Type, left) ?? throw new InvalidOperationException());
+            .GetResult(category, context.GetResult(category | Category.Type, left));
 }

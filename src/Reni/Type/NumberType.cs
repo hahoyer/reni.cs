@@ -29,6 +29,7 @@ sealed class NumberType
 
     static readonly Minus MinusOperation = new();
     readonly ValueCache<Result> ZeroResult;
+    NumberType ZeroType => (NumberType)ZeroResult.Value.Type!;
 
     [EnableDump]
     internal int Bits => IsInDump? -1 : Size.ToInt();
@@ -117,13 +118,15 @@ sealed class NumberType
                 .Pointer
                 .GetResult(category, GetObjectResult(category | Category.Type)));
 
-    Result NegationResult(Category category) => ((NumberType)ZeroResult.Value.Type)
-        .OperationResult(category, MinusOperation, this)
-        .ReplaceAbsolute
-        (
-            ZeroResult.Value.Type.ForcedReference,
-            c => ZeroResult.Value.LocalReferenceResult & c)
-        .ReplaceArguments(GetObjectResult);
+    Result NegationResult(Category category)
+        => ZeroType
+            .OperationResult(category, MinusOperation, this)
+            .ReplaceAbsolute
+            (
+                ZeroType.ForcedReference
+                , c => ZeroResult.Value.LocalReferenceResult & c
+            )
+            .ReplaceArguments(GetObjectResult);
 
     Result EnableCutTokenResult(Category category)
         => EnableCut
@@ -166,8 +169,7 @@ sealed class NumberType
         var leftResult = GetObjectResult(category | Category.Type)
             .GetConversion(Align);
         var rightResult = right.Pointer.GetArgumentResult(category | Category.Type).GetConversion(right.Align);
-        var pair = leftResult + rightResult;
-        return result.ReplaceArguments(pair);
+        return result.ReplaceArguments((leftResult + rightResult)!);
     }
 
     CodeBase OperationCode(Size resultSize, string token, TypeBase right)

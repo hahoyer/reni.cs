@@ -87,7 +87,7 @@ abstract class SetterTargetType
             Dump("destinationResult", destinationResult);
             BreakExecution();
 
-            var resultForArg = destinationResult + sourceResult;
+            var resultForArg = (destinationResult + sourceResult)!;
             Dump("resultForArg", resultForArg);
 
             var result = GetSetterResult(category);

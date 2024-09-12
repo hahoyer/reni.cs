@@ -56,7 +56,7 @@ static class Expectations
 
     [DebuggerHidden]
     [ContractAnnotation("b: false => halt")]
-    public static void Expect(this bool b, Func<(SourcePart?, string?)> getData, int stackFrameDepth = 0)
+    public static void Expect(this bool b, Func<(SourcePart?, string?)>? getData= null, int stackFrameDepth = 0)
     {
         if(b)
             return;

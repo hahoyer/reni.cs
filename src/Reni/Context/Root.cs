@@ -159,13 +159,13 @@ sealed class Root
     {
         var rawResult = syntax.GetResultForAll(this);
 
-        rawResult?.Type.ExpectIsNotNull(()=>(syntax.Anchor.SourcePart, "Type is required."));
+        rawResult.Type.ExpectIsNotNull(()=>(syntax.Anchor.SourcePart, "Type is required."));
 
-        var result = rawResult?
+        var result = rawResult
             .Code?
             .GetLocalBlock(rawResult.Type.GetCopier(Category.Code)?.Code)
             .GetAlign();
 
-        return new(result, rawResult?.Issues.ToArray(), description);
+        return new(result, rawResult.Issues.ToArray(), description);
     }
 }

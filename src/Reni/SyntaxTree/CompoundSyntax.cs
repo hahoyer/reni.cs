@@ -151,7 +151,7 @@ sealed class CompoundSyntax : ValueSyntax
         if(CleanupSection != null && (category.HasCode() || category.HasClosures()))
             return context
                     .GetResult(category | Category.Type, CleanupSection.Value)
-                    ?.GetConversion(Root.VoidType)
+                    .GetConversion(Root.VoidType)
                     .GetLocalBlock(category)
                 & category;
 

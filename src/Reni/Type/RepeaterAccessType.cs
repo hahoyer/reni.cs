@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -41,8 +40,8 @@ sealed class RepeaterAccessType
     {
         var rightResult = right
             .GetConversion(category | Category.Type, IndexType)
-            ?.AutomaticDereferencedAlignedResult;
+            .AutomaticDereferencedAlignedResult;
 
-        return GetResult(category, leftResult + rightResult);
+        return GetResult(category, (leftResult + rightResult)!);
     }
 }

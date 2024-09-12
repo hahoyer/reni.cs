@@ -68,9 +68,7 @@ sealed class TypeType
 
     Result StarResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
-        var countResult = right.GetResultForAll(context)?.AutomaticDereferenceResult;
-        if(countResult == null)
-            return null;
+        var countResult = right.GetResultForAll(context).AutomaticDereferenceResult;
         var count = countResult
             .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();
@@ -85,7 +83,7 @@ sealed class TypeType
         (Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         var rightType = right
-            .GetTypeBase(context)?
+            .GetTypeBase(context)
             .GetSmartUn<FunctionType>()
             .GetSmartUn<PointerType>();
 

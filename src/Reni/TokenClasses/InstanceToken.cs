@@ -4,6 +4,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.SyntaxTree;
+using Reni.Type;
 
 namespace Reni.TokenClasses;
 
@@ -24,10 +25,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider
 
     public override string Id => TokenId;
 
-    protected override Result? GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-    {
-        var leftType = left.GetTypeBase(context);
-        return leftType?
-            .GetInstanceResult(category, c => context.GetResultAsReference(c, right));
-    }
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right) 
+        => left.GetTypeBase(context)
+        .GetInstanceResult(category, c => context.GetResultAsReference(c, right));
 }

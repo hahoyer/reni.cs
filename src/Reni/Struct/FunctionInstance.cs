@@ -36,19 +36,11 @@ abstract class FunctionInstance
     [DisableDump]
     Size ArgsPartSize => Parent.ArgumentsType.Size + RelevantValueSize;
 
-    string Description => Body.Anchor.SourceParts.Combine().Id ?? "";
+    string Description => Body.Anchor.SourceParts.Combine().Id;
 
     [Node]
     [DisableDump]
-    internal Closures Closures
-    {
-        get
-        {
-            var result = ResultCache.Closures;
-            (result != null).Assert();
-            return result;
-        }
-    }
+    internal Closures Closures => ResultCache.Closures;
 
     [Node]
     [DisableDump]
@@ -101,8 +93,6 @@ abstract class FunctionInstance
     internal Result GetCallResult(Category category)
     {
         var result = ResultCache & category.FunctionCall();
-        if(result == null)
-            return null;
 
         if(category.HasClosures())
             result.Closures = Closures.GetArgument();
@@ -113,11 +103,10 @@ abstract class FunctionInstance
         return result;
     }
 
-    [CanBeNull]
     Result GetResult(Category category)
     {
         if(IsStopByObjectIdActive)
-            return null;
+            return null!;
 
         var trace = FunctionId.Index.In(-1) && category.HasCode();
         StartMethodDump(trace, category);
@@ -126,9 +115,6 @@ abstract class FunctionInstance
             Dump(nameof(Body), Body.Anchor.SourceParts);
             BreakExecution();
             var rawResult = Context.GetResult(category | Category.Type, Body);
-
-            if (rawResult == null)
-                return ReturnMethodDump(rawResult);
 
             (rawResult.HasIssue || rawResult.CompleteCategory.Contains(category | Category.Type)).Assert();
             if(rawResult.FindClosures != null)
@@ -196,10 +182,10 @@ abstract class FunctionInstance
             var visitResult = ResultCache & (Category.Code | Category.Closures);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(foreignRefsRef)
-                .Code;
-            if(Parent.ArgumentsType.IsHollow)
-                return result.TryReplacePrimitiveRecursivity(FunctionId);
-            return result;
+                .Code!;
+            return Parent.ArgumentsType.IsHollow
+                ? result.TryReplacePrimitiveRecursivity(FunctionId) 
+                : result;
         }
         finally
         {

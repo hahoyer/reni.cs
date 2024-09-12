@@ -17,7 +17,7 @@ sealed class AtToken : InfixPrefixSyntaxToken
         (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
         var target = context.GetResultAsReference(category | Category.Type, left);
-        return target?
+        return target
             .Type
             .AssertNotNull()
             .FindRecentCompoundView

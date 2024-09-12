@@ -75,7 +75,7 @@ abstract class TypeBase
             EnableCut = new(() => new(parent));
             Mutation = new(
                 destination =>
-                    new(category => parent.GetMutation(category, destination))
+                    ResultCache.CreateInstance(category => parent.GetMutation(category, destination))
             );
             ForcedReference = new(parent.GetForcedReferenceForCache);
             Pointer = new(parent.GetPointerForCache);
@@ -766,8 +766,7 @@ abstract class TypeBase
 
         var leftResult = GetObjectResult(category | Category.Type).GetConversion(Align);
         var rightResult = GetObjectResult(category | Category.Type).GetConversion(Align);
-        var pair = leftResult + rightResult;
-        return result.ReplaceArguments(pair);
+        return result.ReplaceArguments((leftResult + rightResult)!);
     }
 
     CodeBase GetIdentityOperationCode(bool isEqual) => Align

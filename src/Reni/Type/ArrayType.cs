@@ -3,6 +3,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -252,7 +253,7 @@ sealed class ArrayType
         var constructorResult = function.GetResult(category | Category.Type, indexType);
         var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
-                .Aggregate((c, n) => n + c)
+                .Aggregate(default(Result), (c, n) => n + c)
             ?? Root.VoidType.GetResult(category);
         return GetResult(category, elements);
     }
@@ -288,10 +289,10 @@ sealed class ArrayType
                 ? argumentsType.GetConversion(category | Category.Type, ElementAccessType)
                 : argumentsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, options));
 
-        var newElementsResult = newElementsResultRaw?.AutomaticDereferencedAlignedResult;
+        var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult;
         var result = ElementType
             .GetArray(Count + newCount, options)
-            .GetResult(category, newElementsResult + oldElementsResult);
+            .GetResult(category, (newElementsResult + oldElementsResult)!);
         return result;
     }
 
@@ -323,7 +324,7 @@ sealed class ArrayType
         var target = (left & Category.All).AutomaticDereferencedAlignedResult
             .GetValue(context.RootContext.ExecutionContext)
             .ToString(ElementType.Size);
-        var conversionBase = right.Evaluate(context).AssertNotNull()!.ToInt32();
+        var conversionBase = right.Evaluate(context).ExpectNotNull().ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);
         var result = BitsConst.Convert(target, conversionBase);
         return Root.BitType.GetResult(category, result).Align;

@@ -1,7 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Feature;
@@ -46,7 +44,7 @@ abstract class ContextBase
             StopByObjectIds();
         }
 
-        Result? ResultCache.IResultProvider.Execute(Category category)
+        Result ResultCache.IResultProvider.Execute(Category category)
             => AsReference
                 ? Context.GetResultAsReference(category, Syntax)
                 : Context.GetResultForCache(category, Syntax);
@@ -117,7 +115,7 @@ abstract class ContextBase
     string IIconKeyProvider.IconKey => "Context";
 
 
-    Result? ResultCache.IResultProvider.Execute(Category category)
+    Result ResultCache.IResultProvider.Execute(Category category)
         => FindRecentCompoundView.ObjectPointerViaContext(category);
 
     Root IRootProvider.Value => RootContext;
@@ -191,7 +189,7 @@ abstract class ContextBase
     internal Compound GetCompound(CompoundSyntax context) => CacheObject.Compounds[context];
 
     //[DebuggerHidden]
-    internal Result? GetResult(Category category, ValueSyntax syntax)
+    internal Result GetResult(Category category, ValueSyntax syntax)
         => GetResultCache(syntax).Get(category);
 
     internal ResultCache GetResultCache(ValueSyntax syntax)
@@ -204,7 +202,7 @@ abstract class ContextBase
         => CacheObject.ResultCache[syntax].Data.Type;
 
     //[DebuggerHidden]
-    Result? GetResultForCache(Category category, ValueSyntax syntax)
+    Result GetResultForCache(Category category, ValueSyntax syntax)
     {
         var trace = syntax.ObjectId.In() && ObjectId.In(7) && category.HasType();
         StartMethodDump(trace, category, syntax);
@@ -212,7 +210,7 @@ abstract class ContextBase
         {
             BreakExecution();
             var result = syntax.GetResultForCache(this, category.Replenished());
-            (result != null && result.IsValidOrIssue(category)).Assert();
+            (result.IsValidOrIssue(category)).Assert();
             return ReturnMethodDump(result);
         }
         finally
@@ -229,11 +227,11 @@ abstract class ContextBase
         return result;
     }
 
-    ResultCache GetResultAsReferenceCacheForCache(ValueSyntax syntax) 
+    ResultCache GetResultAsReferenceCacheForCache(ValueSyntax syntax)
         => new(new ResultProvider(this, syntax, true));
 
-    internal Result? GetResultAsReference(Category category, ValueSyntax syntax)
-        => GetResult(category | Category.Type, syntax)?
+    internal Result GetResultAsReference(Category category, ValueSyntax syntax)
+        => GetResult(category | Category.Type, syntax)
             .LocalReferenceResult;
 
     internal Result GetArgReferenceResult(Category category)
@@ -255,7 +253,7 @@ abstract class ContextBase
             .GetResult
             (
                 category,
-                new(GetFunctionalArgObjectResult),
+                ResultCache.CreateInstance(GetFunctionalArgObjectResult),
                 token,
                 null,
                 this,
@@ -296,10 +294,10 @@ abstract class ContextBase
         return result;
     }
 
-    public Result? CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
+    public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
     {
-        var target = GetResult(category | Category.Type, argsType)?.GetSmartUn<PointerType>().Align;
-        return target?
+        var target = GetResult(category | Category.Type, argsType).GetSmartUn<PointerType>().Align;
+        return target
                 .Type!
                 .GetArray(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
                 .GetResult(category | Category.Type, target)

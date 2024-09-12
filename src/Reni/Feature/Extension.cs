@@ -123,12 +123,10 @@ static class Extension
         //Todo: Provide context information like this to "Expect"
         if(feature.Function == null)
             Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
-        (feature.Function != null).Expect(null);  
+        (feature.Function != null).Expect();  
 
         var argsResult = context.GetResultAsReferenceCache(right);
         var argsType = argsResult.Type;
-        if(argsType == null)
-            return argsResult.Get(category);
 
         return feature
             .Function

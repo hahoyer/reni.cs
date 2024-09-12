@@ -4,4 +4,4 @@ using Reni.FeatureTest.Helper;
 namespace Reni.SemanticsTest;
 
 [UnitTest]
-class Class1: CompilerTest;
+public class Class1: CompilerTest;

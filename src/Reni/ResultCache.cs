@@ -1,7 +1,5 @@
+#nullable enable
 using System.Diagnostics;
-using hw.DebugFormatter;
-using hw.Helper;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
@@ -21,7 +19,7 @@ sealed class ResultCache : DumpableObject
         Result IResultProvider.Execute(Category category)
         {
             NotImplementedMethod(category);
-            return null;
+            return default!;
         }
     }
 
@@ -34,10 +32,11 @@ sealed class ResultCache : DumpableObject
         Result IResultProvider.Execute(Category category) => ObtainResult(category);
     }
 
+    [PublicAPI]
     sealed class CallStack : DumpableObject
     {
-        internal CallStack Former;
-        internal Call Item;
+        internal readonly CallStack? Former;
+        internal readonly Call Item;
 
         internal IEnumerable<Call> ToEnumerable
         {
@@ -49,12 +48,25 @@ sealed class ResultCache : DumpableObject
                         yield return call;
             }
         }
+
+        public CallStack(CallStack? former, Call item)
+        {
+            Former = former;
+            Item = item;
+        }
     }
 
+    [PublicAPI]
     sealed class Call : DumpableObject
     {
-        internal Category Category;
-        internal ResultCache Item;
+        internal readonly Category Category;
+        internal readonly ResultCache Item;
+
+        public Call(Category category, ResultCache item)
+        {
+            Category = category;
+            Item = item;
+        }
 
         protected override string Dump(bool isRecursion)
         {
@@ -72,7 +84,7 @@ sealed class ResultCache : DumpableObject
     const string FunctionDump = "";
 
     [DisableDump]
-    static CallStack Current;
+    static CallStack? Current;
 
     [DisableDump]
     static readonly IResultProvider NotSupported = new ResultNotSupported();
@@ -91,31 +103,33 @@ sealed class ResultCache : DumpableObject
 
     [DisableDump]
     [PublicAPI]
-    static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
+    static Call[] Calls => Current?.ToEnumerable.ToArray() ?? [];
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal TypeBase Type => Get(Category.Type).Type;
+    internal TypeBase Type => Get(Category.Type).Type!;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal CodeBase Code => Get(Category.Code).Code;
+    internal CodeBase Code => Get(Category.Code).Code!;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal Closures Closures => Get(Category.Closures).Closures;
+    internal Closures Closures => Get(Category.Closures).Closures!;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal Size Size => Get(Category.Size).Size;
+    [PublicAPI]
+    internal Size Size => Get(Category.Size).Size!;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
+    [PublicAPI]
     internal bool? IsHollow => Get(Category.IsHollow).IsHollow;
 
     [DisableDump]
@@ -124,28 +138,17 @@ sealed class ResultCache : DumpableObject
     internal Issue[] Issues => Get(Category.IsHollow).Issues;
 
     internal ResultCache(IResultProvider obtainResult)
-        : this()
     {
         Data = new(Category.None);
-        Provider = obtainResult ?? NotSupported;
+        Provider = obtainResult;
     }
 
-    internal ResultCache(Func<Category, Result> obtainResult)
-        : this()
-    {
-        Data = new(Category.None);
-        Provider = new SimpleProvider(obtainResult);
-    }
-
-    ResultCache()
+    ResultCache(Func<Category, Result>? obtainResult, Result? data)
         : base(NextObjectId++)
-        => StopByObjectIds();
-
-    ResultCache(Result data)
-        : this()
     {
-        Data = data;
-        Provider = NotSupported;
+        Data = data ?? new(Category.None);
+        Provider = obtainResult == null? NotSupported : new SimpleProvider(obtainResult);
+        StopByObjectIds();
     }
 
     public override string DumpData()
@@ -159,7 +162,10 @@ sealed class ResultCache : DumpableObject
         return result;
     }
 
-    public static implicit operator ResultCache(Result x) => new(x);
+    public static ResultCache CreateInstance(Func<Category, Result> obtainResult)
+        => new(obtainResult, null);
+
+    public static implicit operator ResultCache(Result x) => new(null, x);
 
     /// <summary>
     ///     Try to update all categories according to <see cref="category" />.
@@ -216,8 +222,6 @@ sealed class ResultCache : DumpableObject
         try
         {
             var result = Provider.Execute(category);
-
-            (result != null).Assert(() => Tracer.Dump(Provider));
             result.IsValidOrIssue(category).Assert();
 
             Data.Update(result);
@@ -293,19 +297,13 @@ sealed class ResultCache : DumpableObject
     {
         try
         {
-            Current = new()
-            {
-                Former = Current, Item = new()
-                {
-                    Category = category, Item = this
-                }
-            };
+            Current = new(Current, new(category, this));
 
             Update(category);
         }
         finally
         {
-            Current = Current.Former;
+            Current = Current.AssertNotNull().Former;
         }
     }
 }

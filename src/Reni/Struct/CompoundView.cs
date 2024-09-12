@@ -162,9 +162,12 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     }
 
     internal Issue[] Issues => Compound.GetIssues(ViewPosition);
+
+    [UsedImplicitly]
     internal bool HasIssues => Issues?.Any() ?? false;
 
     [DisableDump]
+    [UsedImplicitly]
     internal int Count => Compound.Syntax.Statements.Length;
 
     internal CompoundView(Compound compound, int viewPosition)
@@ -218,8 +221,10 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal TypeBase FunctionalType(FunctionSyntax syntax) => FunctionBodyTypeCache[syntax];
 
+    [PublicAPI]
     internal AccessFeature AccessFeature(int position) => AccessFeaturesCache[position];
 
+    [PublicAPI]
     internal TypeBase AccessType(int position)
     {
         var result = Compound.AccessType(ViewPosition, position);
@@ -298,7 +303,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
         var source = result.Source;
         (source == Type.Pointer).Assert(source.Dump);
-        (source == result.GetResult(Category.Code).Code.ArgumentType).Assert();
+        (source == result.GetResult(Category.Code).Code!.ArgumentType).Assert();
         return result;
     }
 

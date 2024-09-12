@@ -88,8 +88,6 @@ sealed class ExpressionSyntax : ValueSyntax
             var left = context.GetResultAsReferenceCache(Left);
 
             var leftType = left.Type;
-            if(leftType == null)
-                return left.Issues.GetResult(category);
 
             if(leftType.HasIssues)
                 return leftType.Issues.GetResult(category);
@@ -118,6 +116,3 @@ sealed class ExpressionSyntax : ValueSyntax
         (ValueSyntax left, Definable definable, SourcePart token, ValueSyntax right, Anchor frameItems)
         => new(left, definable, token, right, frameItems);
 }
-
-// Lord of the weed
-// Katava dscho dscho

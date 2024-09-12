@@ -19,6 +19,7 @@ sealed class EndOfText
     {
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
         {
+            (left != null).Assert();
             (right == null).Assert();
             (left.Right == null).Assert();
             (left.Left.Left == null).Assert();

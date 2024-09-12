@@ -3,6 +3,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.Type;
 using Reni.Validation;
@@ -33,21 +34,23 @@ sealed class Compound
     [DisableDump]
     internal Root Root => Parent.RootContext;
 
-    [DisableDump]
-    internal CompoundView CompoundView => Parent.GetCompoundView(Syntax);
+    CompoundView CompoundView => Parent.GetCompoundView(Syntax);
 
     Size IndexSize => Syntax.IndexSize;
 
     [DisableDump]
+    [UsedImplicitly]
     internal IEnumerable<ResultCache> CachedResults => Syntax.EndPosition.Select(CachedResult);
 
     int EndPosition => Syntax.EndPosition;
 
     [DisableDump]
-    public bool HasIssue => Issues?.Any() ?? false;
+    [UsedImplicitly]
+    internal bool HasIssue => Issues.Any();
 
     [DisableDump]
-    public Issue[]? Issues => GetIssues();
+    [PublicAPI]
+    internal Issue[] Issues => GetIssues();
 
     internal Compound(CompoundSyntax syntax, ContextBase parent)
         : base(NextObjectId++)
@@ -82,15 +85,15 @@ sealed class Compound
     {
         if(IsHollow(position))
             return Basics.Size.Zero;
-        return ResultsOfStatements(Category.Size, 0, position).AssertNotNull().Size;
+        return ResultsOfStatements(Category.Size, 0, position).Size!;
     }
 
     internal bool IsHollow(int? accessPosition = null) => ObtainIsHollow(accessPosition);
 
     internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
-        => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).AssertNotNull().Size;
+        => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size!;
 
-    Result? ResultsOfStatements(Category category, int fromPosition, int? fromNotPosition)
+    Result ResultsOfStatements(Category category, int fromPosition, int? fromNotPosition)
     {
         if(category == Category.None)
             return new(category);
@@ -129,7 +132,7 @@ sealed class Compound
         }
     }
 
-    internal Result? GetResult(Category category)
+    internal Result GetResult(Category category)
     {
         var trace = Syntax.ObjectId.In() && category.HasType();
         StartMethodDump(trace, category);
@@ -150,11 +153,11 @@ sealed class Compound
             Dump(nameof(aggregate), aggregate);
             BreakExecution();
 
-            var resultWithCleanup = aggregate?.ArrangeCleanupCode();
+            var resultWithCleanup = aggregate.ArrangeCleanupCode();
             Dump(nameof(resultWithCleanup), resultWithCleanup);
             BreakExecution();
 
-            var result = resultWithCleanup?
+            var result = resultWithCleanup
                     .ReplaceRelative(this, CodeBase.GetTopRef, Closures.GetVoid)
                 & category;
 
@@ -172,7 +175,7 @@ sealed class Compound
         }
     }
 
-    Result? Combine(Result? result, int position)
+    Result Combine(Result result, int position)
         => Parent.GetCompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
 
     Result AccessResult(Category category, int position)
@@ -198,9 +201,9 @@ sealed class Compound
             var rawResult = uniqueChildContext.GetResult
                 (category | Category.Type, Syntax.PureStatements[position]);
             Dump(nameof(rawResult), rawResult);
-            (rawResult != null && rawResult.CompleteCategory.Contains(category | Category.Type)).Assert();
+            (rawResult.CompleteCategory.Contains(category | Category.Type)).Assert();
             BreakExecution();
-            var unFunction = rawResult!.GetSmartUn<FunctionType>();
+            var unFunction = rawResult.GetSmartUn<FunctionType>();
             Dump(nameof(unFunction), unFunction);
             BreakExecution();
             var result = unFunction.AutomaticDereferenceResult;
@@ -213,7 +216,7 @@ sealed class Compound
     }
 
     internal TypeBase AccessType(int accessPosition, int position)
-        => AccessResult(Category.Type, accessPosition, position).Type;
+        => AccessResult(Category.Type, accessPosition, position).Type!;
 
     bool ObtainIsHollow(int? accessPosition)
     {
@@ -263,22 +266,23 @@ sealed class Compound
     internal Result Cleanup(Category category)
     {
         var uniqueChildContext = Parent.GetCompoundPositionContext(Syntax);
-        var cleanup = Syntax.GetCleanup(uniqueChildContext, category);
+        var cleanup = Syntax.GetCleanup(uniqueChildContext, category)!;
         var aggregate = EndPosition
             .Select()
             .Reverse()
             .Select(index => GetCleanup(category, index))
             .Aggregate();
-        return cleanup + aggregate;
+        return (cleanup + aggregate)
+            .ExpectNotNull();
     }
 
-    Result? GetCleanup(Category category, int index)
+    Result GetCleanup(Category category, int index)
     {
-        var result = AccessType(EndPosition, index).GetCleanup(category);
-        result?.CompleteCategory.Contains(category).Assert();
+        var result = AccessType(EndPosition, index).GetCleanup(category)!;
+        result.CompleteCategory.Contains(category).Assert();
         return result;
     }
 
-    internal Issue[]? GetIssues(int? viewPosition = null)
-        => ResultsOfStatements(Category.Type, 0, viewPosition)?.Issues;
+    internal Issue[] GetIssues(int? viewPosition = null)
+        => ResultsOfStatements(Category.Type, 0, viewPosition).Issues;
 }

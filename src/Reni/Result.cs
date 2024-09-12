@@ -613,7 +613,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         => HasArguments? InternalReplaceArguments(new(provider)) : this;
 
     internal Result ReplaceArguments(Func<Category, Result> getArguments)
-        => HasArguments? InternalReplaceArguments(new(getArguments)) : this;
+        => HasArguments? InternalReplaceArguments(ResultCache.CreateInstance(getArguments)) : this;
 
     Result InternalReplaceArguments(ResultCache getResultForArguments)
     {
@@ -622,9 +622,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             categoryForArgument |= Category.Type;
 
         var resultForArgument = getResultForArguments & categoryForArgument;
-        if(resultForArgument == null)
-            return this;
-
         var result = Clone;
         result.IsDirty = true;
 
@@ -752,7 +749,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     [DebuggerHidden]
-    public static Result? operator &(Result? result, Category category) => result?.Filter(category);
+    public static Result operator &(Result result, Category category) => result.Filter(category);
 
     [DebuggerHidden]
     [Obsolete("", true)]
