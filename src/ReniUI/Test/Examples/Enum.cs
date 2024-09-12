@@ -29,7 +29,7 @@ x = Auswahl Nein then ""No match"" dumpprint
         (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
 
         issue = issues[i++];
-        (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
+        (issue.IssueId == IssueId.ConsequenceError).Assert(issue.Dump);
 
         issue = issues[i++];
         (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
@@ -59,7 +59,7 @@ x = Auswahl Nein then ""No match"" dump_print
         (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
 
         issue = issues[i++];
-        (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
+        (issue.IssueId == IssueId.ConsequenceError).Assert(issue.Dump);
 
         (i == issues.Length).Assert();
     }

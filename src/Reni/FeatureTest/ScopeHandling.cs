@@ -91,7 +91,7 @@ public sealed class PublicNonPublic1 : CompilerTest
         (issueBase.Position.Id == "x").Assert(issueBase.Dump);
         i++;
         issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingDeclarationForType).Assert(issueBase.Dump);
+        (issueBase.IssueId == IssueId.ConsequenceError).Assert(issueBase.Dump);
         (issueBase.Position.Id == "dump_print").Assert(issueBase.Dump);
         i++;
         (i == issueArray.Length).Assert();

@@ -23,7 +23,7 @@ public sealed class Test : CompilerTest
         (issueBase.IssueId == IssueId.MissingDeclarationForType).Assert(issueBase.Dump);
         i++;
         issueBase = issueArray[i];
-        (issueBase.IssueId == IssueId.MissingDeclarationForType).Assert(issueBase.Dump);
+        (issueBase.IssueId == IssueId.ConsequenceError).Assert(issueBase.Dump);
         i++;
         (i == issueArray.Length).Assert();
     }
