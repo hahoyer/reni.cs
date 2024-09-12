@@ -22,6 +22,9 @@ sealed class IssueData : DumpableObject
         internal override bool IsHollow => true;
 
         protected override Size GetSize() => Size.Zero;
+
+        internal override Issue GetMissingDeclarationIssue(SourcePart position)
+            => IssueId.ConsequenceError.GetIssue(position);
     }
 
     internal sealed class IssueCode : CodeBase

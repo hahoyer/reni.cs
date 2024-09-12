@@ -30,6 +30,7 @@ enum IssueId
     , [Setup(typeof(TypeBase), typeof(SearchResult[]))]
     AmbiguousSymbol
 
+    , ConsequenceError
     , EOFInComment
     , EOFInVerbatimText
     , EOLInText
@@ -66,5 +67,4 @@ enum IssueId
     , MissingRightExpression
     , [Setup(typeof(string), typeof(string))]
     UnexpectedException
-
 }

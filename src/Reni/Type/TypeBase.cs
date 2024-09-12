@@ -738,12 +738,14 @@ abstract class TypeBase
                 .Execute(category, left, currentTarget, context, right);
 
         var issue = count == 0
-            ? IssueId.MissingDeclarationForType.GetIssue(currentTarget, this)
+            ? GetMissingDeclarationIssue(currentTarget)
             : IssueId.AmbiguousSymbol.GetIssue(currentTarget, this, searchResults);
 
         return new(category, [..left.Issues, issue]);
     }
 
+    internal virtual Issue GetMissingDeclarationIssue(SourcePart position) 
+        => IssueId.MissingDeclarationForType.GetIssue(position, this);
 
     Result? GetIdentityOperationResult(Category category, TypeBase right, bool isEqual)
     {
