@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.IO.Pipelines;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nerdbank.Streams;
@@ -10,17 +8,6 @@ using OmniSharp.Extensions.LanguageServer.Server;
 using Reni.Helper;
 
 namespace ReniLSP;
-
-[PublicAPI]
-public class Startup
-{
-    public async Task<object> Invoke(object input)
-    {
-        Debugger.Launch();
-        await MainContainer.RunServer();
-        return Task.CompletedTask;
-    }
-}
 
 public static class MainContainer
 {
@@ -48,7 +35,7 @@ public static class MainContainer
     {
         try
         {
-            Expectations.BreakMode = Expectations.BreakModeType.UseException; 
+            Expectations.BreakMode = Expectations.BreakModeType.UseException;
 
             void ConfigureOptions(LanguageServerOptions options) => options
                 .WithInput(reader)
@@ -57,7 +44,8 @@ public static class MainContainer
                 .AddDefaultLoggingProvider()
                 .OnInitialized(Initialized)
                 .WithHandler<MainWrapper>()
-                .WithServices(x => x.AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information)))
+                .WithServices(x
+                    => x.AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information)))
             ;
 
             await LanguageServer.From(ConfigureOptions);
