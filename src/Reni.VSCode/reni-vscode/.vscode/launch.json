@@ -3,24 +3,32 @@
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Launch Program",
-			"program": "${workspaceFolder}/app.js",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"type": "node"
-		},
-		{
-			"name": "Run Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
-			]
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/app.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"]
+    },
+    {
+      "name": "Run Extension (coreCLR) not working",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "env": {
+        "EDGE_USE_CORECLR": "1",
+        "CORECLR_DIR": "C:/Program Files/Microsoft Visual Studio/2022/Community/dotnet/net8.0/runtime/shared/Microsoft.NETCore.App/8.0.8"
+
+      }
+    }
+  ]
 }
