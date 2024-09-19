@@ -83,7 +83,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     internal Anchor Combine(Anchor other, bool check = false)
     {
         if(check)
-            other?.ReasonForEmptiness.AssertIsNull(() => "Cannot combine with empty anchor.");
+            other?.ReasonForEmptiness.ExpectIsNull(() => (SourcePart, "Cannot combine with empty anchor."));
         return Combine(other?.Items);
     }
 

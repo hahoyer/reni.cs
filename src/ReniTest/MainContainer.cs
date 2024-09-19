@@ -31,7 +31,7 @@ static class MainContainer
         configuration.IsBreakEnabled = Debugger.IsAttached;
         configuration.SaveResults = true;
 
-        if(Debugger.IsAttached)
+        if(false && Debugger.IsAttached)
         {
             configuration.SkipSuccessfulMethods = true;
             configuration.SaveResults = false;

@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyVersion("24.0")]
-[assembly: AssemblyFileVersion("24.0.0906.0040")]
+[assembly: AssemblyFileVersion("24.0.0920.0109")]
 [assembly: AssemblyTitle("Reni Compiler: Library")]
 [assembly: AssemblyCompany("HoyerWare")]
 [assembly: AssemblyProduct("Reni Compiler")]
