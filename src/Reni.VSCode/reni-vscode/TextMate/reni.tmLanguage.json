@@ -1,0 +1,124 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Reni",
+  "fileTypes": ["reni2"],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#number" },
+    { "include": "#structural" },
+    { "include": "#declaration" },
+    { "include": "#predefinedName" },
+    { "include": "#predefinedSymbol" },
+    { "include": "#functionSymbol" },
+    { "include": "#definedName" },
+    { "include": "#definedSymbol" },
+    { "include": "#stringSingleQuote" },
+    { "include": "#stringDoubleQuote" }
+  ],
+  "repository": {
+    "comment": {
+      "patterns": [
+        { "include": "#lineComment" },
+        { "include": "#emptyComment" },
+        { "include": "#blockComment" },
+        { "include": "#namedComment" }
+      ]
+    },
+    "lineComment": { "name": "comment.line.reni", "match": "#[^\\(].*$" },
+    "blockComment": {
+      "name": "comment.block.reni",
+      "begin": "#\\((?=\\s)",
+      "end": "(^|(?<=\\s))\\)#"
+    },
+    "emptyComment": { "name": "comment.block.empty.reni", "match": "#\\(\\)#" },
+    "namedComment": {
+      "name": "comment.block.reni",
+      "begin": "#\\((\\w+)",
+      "end": "(^|\\s)(\\1)\\)#",
+      "beginCaptures": {
+        "1": { "name": "comment.block.tag.reni" }
+      },
+      "endCaptures": {
+        "2": { "name": "comment.block.tag.reni" }
+      }
+    },
+    "number": { "name": "constant.numeric.reni", "match": "\\d+" },
+    "predefinedName": {
+      "name": "keyword.control.reni",
+      "match": "\\b(then|else|type|instance|new_value|_A_T_|function_instance)\\b"
+    },
+    "predefinedSymbol": {
+      "name": "keyword.control.reni",
+      "match": "(?<=(^|[\\s\\w({\\[)}\\];,.]))(:|~~~|\\^\\^|\\^)(?=([\\s\\w({\\[)}\\];,\\.])|$)"
+    },
+    "functionSymbol": {
+      "name": "keyword.function.reni",
+      "match": "(?<=(^|[\\s\\w({\\[)}\\];,.]))(@@!|@!|@@|@)(?=([\\s\\w({\\[)}\\];,\\.])|$)"
+    },
+    "definedName": { "name": "entity.text.reni", "match": "\\w+" },
+    "definedSymbol": {
+      "name": "entity.operator.reni",
+      "match": "[\\^!%&/=?\\\\*@+~><|:-]+"
+    },
+    "structural": {
+      "name": "keyword.structural.reni",
+      "match": "[({\\[)}\\];,.]"
+    },
+    "stringDoubleQuote": {
+      "name": "string.quoted.double.reni",
+      "begin": "\"",
+      "end": "\""
+    },
+    "stringSingleQuote": {
+      "name": "string.quoted.single.reni",
+      "begin": "'",
+      "end": "'"
+    },
+    "singleDeclarationTag": {
+      "name": "storage.modifier.reni",
+      "match": "\\b(mutable|converter|mix_in|non_public|public|non_positional|positional)\\b"
+    },
+    "parenthesisDeclarationTag": {
+      "name": "declaration.reni",
+      "begin": "\\(",
+      "end": "\\)",
+      "patterns": [{ "include": "#declarationTag" }]
+    },
+    "bracketDeclarationTag": {
+      "name": "declaration.reni",
+      "begin": "\\[",
+      "end": "\\]",
+      "patterns": [{ "include": "#declarationTag" }]
+    },
+    "braceDeclarationTag": {
+      "name": "declaration.reni",
+      "begin": "{",
+      "end": "}",
+      "patterns": [{ "include": "#declarationTag" }]
+    },
+    "declarationTag": {
+      "patterns": [
+        { "include": "#singleDeclarationTag" },
+        { "include": "#parenthesisDeclarationTag" },
+        { "include": "#bracketDeclarationTag" },
+        { "include": "#braceDeclarationTag" }
+      ]
+    },
+    "declaration": {
+      "patterns": [
+        {
+          "name": "declaration.reni",
+          "match": "!\\s*(mutable|converter|mix_in|non_public|public|non_positional|positional)\\b",
+          "captures": { "1": { "name": "storage.modifier.reni" } }
+        },
+        {
+          "name": "declaration.reni",
+          "begin": "!\\s*\\(",
+          "end": "\\)",
+          "patterns": [{ "include": "#declarationTag" }]
+        }
+      ]
+    }
+  },
+  "scopeName": "source.reni"
+}

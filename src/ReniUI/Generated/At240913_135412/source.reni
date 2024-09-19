@@ -1,0 +1,22 @@
+#( Source: a:\develop\reni.vscode\sample\enum.reni )#
+Auswahl: 
+{
+  this !non_public: ^^;
+  value !mutable !non_public : MaxNumber64 type 0;
+
+  new !non_public : @!
+  {
+      {
+          return: (type: this, value: this.value),
+          this.value := (this.value + 1)enable_cut
+      } return
+  },
+  
+  Ja: new,
+  Nein: new,
+  Vielleicht: new,
+};
+
+x: Auswahl Ja;
+x == Auswahl Nein then "No match" dump_print
+x == Auswahl Ja then "Match" dump_print

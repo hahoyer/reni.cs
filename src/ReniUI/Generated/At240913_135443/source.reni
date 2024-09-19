@@ -1,0 +1,13 @@
+#( Source: a:\develop\reni.vscode\sample\enum.reni )#
+Auswahl: @!
+(
+  Ja: (Type: ^^, Value: "Ja"),
+  Nein: (Type: ^^, Value: "Nein"),
+  Vielleicht: (Type: ^^, Value: "Vielleicht"),
+
+= : ,
+);
+
+x: Auswahl Ja;
+x == Auswahl Nein then "No match" dump_print
+x= Auswah Ja then "

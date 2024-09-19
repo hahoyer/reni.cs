@@ -1,0 +1,42 @@
+ArgumentNullException: Value cannot be null. (Parameter 'key')
+   at System.Collections.Generic.Dictionary`2.FindValue(TKey key)
+   at System.Collections.Generic.Dictionary`2.ContainsKey(TKey key)
+   at hw.Helper.FunctionCache`2.Ensure(TKey key) in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.3\contentFiles\any\any\hw\Helper.Core\Helper\FunctionCache.cs:line 115
+   at hw.Helper.FunctionCache`2.get_Item(TKey key) in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.3\contentFiles\any\any\hw\Helper.Core\Helper\FunctionCache.cs:line 82
+   at Reni.Context.ContextBase.GetResultCache(ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 196
+   at Reni.Context.ContextBase.GetResult(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 193
+   at Reni.Struct.Compound.AccessResult(Category category, Int32 accessPosition, Int32 position) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 201
+   at Reni.Struct.Compound.AccessType(Int32 accessPosition, Int32 position) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 219
+   at Reni.Struct.Compound.GetCleanup(Category category, Int32 index) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 281
+   at Reni.Struct.Compound.<>c__DisplayClass46_0.<Cleanup>b__0(Int32 index) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 273
+   at System.Linq.Enumerable.SelectEnumerableIterator`2.ToArray()
+   at hw.Helper.LinqExtension.Aggregate[T](IEnumerable`1 target, Func`1 getDefault) in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.3\contentFiles\any\any\hw\Helper.Core\Helper\LinqExtension.cs:line 49
+   at Reni.Struct.Compound.Cleanup(Category category) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 270
+   at Reni.Struct.CompoundType.GetCleanup(Category category) in A:\develop\Reni\dev\src\Reni\Struct\CompoundType.cs:line 96
+   at Reni.Code.RemoveLocalReferences.get_NewBody() in A:\develop\Reni\dev\src\Reni\Code\RemoveLocalReferences.cs:line 130
+   at Reni.Code.CodeBase.GetLocalBlock(CodeBase copier) in A:\develop\Reni\dev\src\Reni\Code\CodeBase.cs:line 200
+   at Reni.Result.InternalLocalBlock(Category category) in A:\develop\Reni\dev\src\Reni\Result.cs:line 729
+   at Reni.Result.GetLocalBlock(Category category) in A:\develop\Reni\dev\src\Reni\Result.cs:line 715
+   at Reni.Struct.Compound.<>c__DisplayClass37_0.<ResultsOfStatements>b__3(Result r) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 117
+   at System.Linq.Enumerable.SelectArrayIterator`2.Fill(ReadOnlySpan`1 source, Span`1 destination, Func`2 func)
+   at System.Linq.Enumerable.SelectArrayIterator`2.ToArray()
+   at Reni.Struct.Compound.ResultsOfStatements(Category category, Int32 fromPosition, Nullable`1 fromNotPosition) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 116
+   at Reni.Struct.Compound.GetResult(Category category) in A:\develop\Reni\dev\src\Reni\Struct\Compound.cs:line 142
+   at Reni.SyntaxTree.CompoundSyntax.GetResultForCache(ContextBase context, Category category) in A:\develop\Reni\dev\src\Reni\SyntaxTree\CompoundSyntax.cs:line 108
+   at Reni.Context.ContextBase.GetResultForCache(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 212
+   at Reni.Context.ContextBase.ResultProvider.Reni.ResultCache.IResultProvider.Execute(Category category) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 48
+   at Reni.ResultCache.LinearUpdate(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 224
+   at Reni.ResultCache.Update(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 187
+   at Reni.ResultCache.Get(Category category) in A:\develop\Reni\dev\src\Reni\ResultCache.cs:line 273
+   at Reni.Context.ContextBase.GetResult(Category category, ValueSyntax syntax) in A:\develop\Reni\dev\src\Reni\Context\ContextBase.cs:line 193
+   at Reni.SyntaxTree.ValueSyntax.GetResultForAll(ContextBase context) in A:\develop\Reni\dev\src\Reni\SyntaxTree\ValueSyntax.cs:line 90
+   at Reni.Context.Root.GetMainContainer(ValueSyntax syntax, String description) in A:\develop\Reni\dev\src\Reni\Context\Root.cs:line 160
+   at Reni.Code.CodeContainer.<>c__DisplayClass13_0.<.ctor>b__0() in A:\develop\Reni\dev\src\Reni\Code\CodeContainer.cs:line 48
+   at hw.Helper.ValueCache`1.Ensure() in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.3\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 53
+   at hw.Helper.ValueCache`1.get_Value() in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.3\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 27
+   at Reni.Code.CodeContainer.get_Main() in A:\develop\Reni\dev\src\Reni\Code\CodeContainer.cs:line 29
+   at Reni.Code.CodeContainer.get_Issues() in A:\develop\Reni\dev\src\Reni\Code\CodeContainer.cs:line 25
+   at Reni.Compiler.get_Issues() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 100
+   at ReniUI.CompilerBrowser.get_Issues() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 50
+   at ReniUI.CompilerBrowser.<get_GuardedIssues>b__15_0() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 47
+   at ReniUI.CompilerBrowser.ExceptionGuard[TResult](Func`1 getResult, GuiExceptionGuard`1 guard) in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 76
