@@ -4,9 +4,20 @@
     </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>
-      <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="1.0.0" />
+        <Compile Remove="Buffer.cs" />
+        <Compile Remove="DocumentFormattingHandlerWrapper.cs" />
+        <Compile Remove="Extension.cs" />
+        <Compile Remove="Handler.cs" />
+        <Compile Remove="LoggerFactory.cs" />
+        <Compile Remove="MainContainer.cs" />
+        <Compile Remove="MainWrapper.cs" />
+        <Compile Remove="SemanticTokensHandlerWrapper.cs" />
+        <Compile Remove="TextDocumentSyncHandlerWrapper.cs" />
+
+        <Using Remove="hw.DebugFormatter" />
+        <Using Remove="hw.Helper" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\ReniUI\ReniUI.csproj" />
+        <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
     </ItemGroup>
 </Project>
