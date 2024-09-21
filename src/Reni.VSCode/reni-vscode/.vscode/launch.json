@@ -5,30 +5,22 @@
 {
   "version": "0.2.0",
   "configurations": [
-    
     {
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/app.js",
+      "type": "node",
       "request": "launch",
-      "skipFiles": ["<node_internals>/**"],
-      "type": "node"
+      "name": "Launch Program",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "args": ["app.js"],
+      "outputCapture": "std"
     },
     {
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"]
-    },
-    {
-      "name": "Run Extension (coreCLR) not working",
-      "type": "extensionHost",
-      "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "env": {
-        "EDGE_USE_CORECLR": "1",
-        "CORECLR_DIR": "C:/Program Files/Microsoft Visual Studio/2022/Community/dotnet/net8.0/runtime/shared/Microsoft.NETCore.App/8.0.8"
-
-      }
     }
   ]
 }

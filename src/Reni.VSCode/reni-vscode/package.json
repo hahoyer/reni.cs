@@ -13,28 +13,30 @@
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
-    "languages": [{
-      "id": "reni",
-      "extensions": [".reni"],
-      "configuration": "./TextMate/language-configuration.json"
-  }],
-  "grammars": [{
-      "language": "reni",
-      "scopeName": "source.reni",
-      "path": "./TextMate/reni.tmLanguage.json"
-  }]
-},
+    "languages": [
+      {
+        "id": "reni",
+        "extensions": [
+          ".reni"
+        ],
+        "configuration": "./TextMate/language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "reni",
+        "scopeName": "source.reni",
+        "path": "./TextMate/reni.tmLanguage.json"
+      }
+    ]
+  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test"
   },
-
-"devDependencies": {
-    "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0",
-    "electron-edge-js": "^30.1.2",
-    "eslint": "^8.57.0",
-    "vscode-languageclient": "^9.0.1"
+  "devDependencies": {
+    "electron": "31.3",
+    "electron-edge-js": "31.3"
   }
 }

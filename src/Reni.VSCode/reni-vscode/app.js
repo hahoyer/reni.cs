@@ -1,25 +1,16 @@
-var edge = require("edge-js");
+const path = require("path");
 
-const vscode = require("vscode");
-//const languageClient = require("vscode-languageclient");
+const baseNetAppPath = path.join(__dirname, "bin\\Debug\\net8.0");
 
-function activate(context) {
-  //const server = 'edge.func("A:\\develop\\Reni\\dev\\out\\Debug\\net472\\ReniLSP.dll")';
+process.env.EDGE_USE_CORECLR = 1;
+process.env.EDGE_APP_ROOT = baseNetAppPath;
 
-  const disposable = vscode.commands.registerCommand(
-    "reni-vscode.start-lsp",
-    function () {
-      vscode.window.showInformationMessage("Hello World from reni-vscode!");
-    }
-  );
+var edge = require("electron-edge-js");
 
-  context.subscriptions.push(disposable);
-}
+const reni2dll = path.join(baseNetAppPath, "ReniLSP.dll");
+var reni2 = edge.func(reni2dll);
 
-// This method is called when your extension is deactivated
-function deactivate() {}
-
-module.exports = {
-  activate,
-  deactivate,
-};
+reni2('', function(error, result) {
+  if (error) throw error;
+  window.webContents.send("fromMain", 'getItem', JSON.stringify( result, null, 2 ));
+});
