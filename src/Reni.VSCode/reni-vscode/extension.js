@@ -1,10 +1,9 @@
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS']=true
 const path = require("path");
 
 const baseNetAppPath = path.join(__dirname, "bin\\Debug\\net8.0");
 
 process.env.EDGE_USE_CORECLR = 1;
-process.env.EDGE_APP_ROOT = baseNetAppPath;
+// process.env.EDGE_APP_ROOT = baseNetAppPath;
 var edge = require("electron-edge-js");
 
 
