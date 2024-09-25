@@ -76,7 +76,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReniExe", "ReniExe\ReniExe.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReniLSP", "ReniLSP\ReniLSP.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni.LSPVSIX", "Reni.LSPVSIX\Reni.LSPVSIX.csproj", "{EBA27910-302E-4EA6-B5FC-9B52875B394C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reni.LSPVSIX", "Reni.LSPVSIX\Reni.LSPVSIX.csproj", "{EBA27910-302E-4EA6-B5FC-9B52875B394C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
