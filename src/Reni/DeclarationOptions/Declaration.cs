@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni.DeclarationOptions;
 
 sealed class Declaration : DumpableObject

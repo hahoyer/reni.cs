@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni;
 
 abstract class Singleton<T> : DumpableObject

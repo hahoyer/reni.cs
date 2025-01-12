@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace Reni.TokenClasses.Whitespace
 {
     sealed class ContactType

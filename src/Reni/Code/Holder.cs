@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni.Code
 {
     sealed class Holder : DumpableObject

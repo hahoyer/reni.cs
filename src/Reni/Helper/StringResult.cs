@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni.Helper
 {
     sealed class StringResult : DumpableObject, IFormatResult<string>

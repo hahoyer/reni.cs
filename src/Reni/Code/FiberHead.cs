@@ -1,6 +1,4 @@
-﻿using hw.DebugFormatter;
-
-namespace Reni.Code
+﻿namespace Reni.Code
 {
     abstract class FiberHead : CodeBase
     {

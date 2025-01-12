@@ -20,8 +20,6 @@
 
 #endregion
 
-using hw.DebugFormatter;
-
 namespace Reni.Struct
 {
     sealed class FunctionId : DumpableObject

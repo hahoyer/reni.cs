@@ -1,5 +1,4 @@
-﻿using hw.DebugFormatter;
-using Reni.Basics;
+﻿using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;
 
@@ -47,7 +46,7 @@ sealed class DataStack : DumpableObject, IVisitor
     readonly IExecutionContext Context;
 
     [EnableDump]
-    LocalDataClass LocalData;
+    readonly LocalDataClass LocalData;
 
     internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
 

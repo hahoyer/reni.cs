@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni.Type
 {
     sealed class CreateArrayFromReferenceFeature : DumpableObject

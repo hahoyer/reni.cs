@@ -1,7 +1,6 @@
 #nullable enable
 using hw.Parser;
 using hw.Scanner;
-using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -134,7 +133,7 @@ static class Extension
         var target = (SourcePart)rawTarget;
         var sourcePosition = isStart? target.Start : target.End;
         var position = sourcePosition.TextPosition;
-        return $"Line {position.LineNumber} Column {position.ColumnNumber1 - 1}";
+        return $"Line {position.LineNumber} Column {position.ColumnNumber}";
     }
 
     static TValue[] T<TValue>(params TValue[] value) => value;

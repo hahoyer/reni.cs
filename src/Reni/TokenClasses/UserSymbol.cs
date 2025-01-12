@@ -1,6 +1,4 @@
-﻿using hw.DebugFormatter;
-
-namespace Reni.TokenClasses
+﻿namespace Reni.TokenClasses
 {
     sealed class UserSymbol : Definable
     {

@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni.FeatureTest.Helper;
 
 sealed class TargetSetData : DumpableObject

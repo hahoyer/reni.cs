@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using Reni.Parser;
 
 namespace Reni.TokenClasses.Whitespace

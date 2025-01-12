@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Reni.Helper;
 
 public static class Extension

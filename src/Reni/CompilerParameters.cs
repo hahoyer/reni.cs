@@ -1,6 +1,4 @@
-﻿using hw.DebugFormatter;
-
-namespace Reni;
+﻿namespace Reni;
 
 /// <summary>
 ///     Parameters for compilation

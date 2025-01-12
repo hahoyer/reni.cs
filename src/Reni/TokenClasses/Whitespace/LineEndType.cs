@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-
 namespace Reni.TokenClasses.Whitespace
 {
     sealed class LineEndType : DumpableObject, IVolatileLineBreak

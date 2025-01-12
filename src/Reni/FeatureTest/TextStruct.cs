@@ -1,4 +1,3 @@
-using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.BlogExamples;
