@@ -13,7 +13,9 @@ class ExtensionEntrypoint : Extension
             ExtensionAssemblyVersion,
             "Harald Hoyer",
             "Reni.LSPVSIX",
-            "Reni Language support") { Icon = "reni.ico" }
-        ,
+            "Reni Language support")
+        {
+            Icon = "reni.ico"
+        }
     };
 }
