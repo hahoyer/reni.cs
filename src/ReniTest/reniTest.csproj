@@ -5,6 +5,9 @@
     </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>
+      <PackageReference Include="hw.CompilerTools" Version="25.0.0.9" />
+    </ItemGroup>
+    <ItemGroup>
         <None Update="AssemblyInfo.tt">
             <Generator>TextTemplatingFileGenerator</Generator>
             <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
