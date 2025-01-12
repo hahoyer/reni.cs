@@ -1,5 +1,4 @@
-﻿using hw.DebugFormatter;
-using hw.Parser;
+﻿using hw.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 
@@ -7,7 +6,7 @@ namespace Reni.Parser
 {
     sealed class DeclarationTokenFactory : GenericTokenFactory<BinaryTree>
     {
-        public DeclarationTokenFactory(string title)
+        public DeclarationTokenFactory(string title = "Declaration")
             : base(title) { }
 
         protected override IParserTokenType<BinaryTree> GetTokenClass(string name)

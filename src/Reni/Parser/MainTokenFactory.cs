@@ -1,5 +1,4 @@
-﻿using hw.DebugFormatter;
-using hw.Parser;
+﻿using hw.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Parser;
@@ -13,7 +12,7 @@ sealed class MainTokenFactory : GenericTokenFactory<BinaryTree>
     internal IEnumerable<IParserTokenType<BinaryTree>> AllTokenClasses
         => PredefinedTokenClasses.Concat(UserSymbols);
 
-    public MainTokenFactory(Compiler<BinaryTree>.Component declaration, string title)
+    public MainTokenFactory(Compiler<BinaryTree>.Component declaration, string title = "Main")
         : base(title)
         => Declaration = declaration;
 
