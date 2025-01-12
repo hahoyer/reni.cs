@@ -17,7 +17,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Prefer32Bit>false</Prefer32Bit>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
