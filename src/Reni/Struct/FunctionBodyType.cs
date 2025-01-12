@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -19,27 +17,6 @@ sealed class FunctionBodyType
         , ISymbolProvider<DumpPrintToken>
         , ITemplateProvider
 {
-    sealed class ContextReference : DumpableObject, IContextReference
-    {
-        readonly int Order;
-
-        [Node]
-        readonly FunctionBodyType Parent;
-
-        [EnableDump]
-        FunctionSyntax Syntax => Parent.Syntax;
-
-        public ContextReference(FunctionBodyType parent)
-            : base(parent.ObjectId)
-        {
-            Order = Closures.NextOrder++;
-            Parent = parent;
-            StopByObjectIds(-5);
-        }
-
-        int IContextReference.Order => Order;
-    }
-
     [DisableDump]
     [EnableDump]
     [Node]

@@ -1,6 +1,4 @@
 using System.Numerics;
-using hw.DebugFormatter;
-using JetBrains.Annotations;
 using Reni.Context;
 
 namespace Reni.Runtime;
@@ -133,7 +131,7 @@ static class DataHandler
     internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
     {
         (data != null).Assert("data != null");
-        fixed(byte* dataPointer = &data[dataStart])
+        fixed(byte* dataPointer = &data![dataStart])
         {
             var intPointer = (int*)dataPointer;
             *intPointer += offset;

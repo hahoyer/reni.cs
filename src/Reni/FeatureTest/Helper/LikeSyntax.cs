@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Parser;
 using Reni.SyntaxTree;
@@ -38,7 +37,7 @@ namespace Reni.FeatureTest.Helper
         public LikeSyntax Brackets(ITokenClass tokenClass = null) => new Brackets(this, tokenClass);
     }
 
-    class Brackets : LikeSyntax
+    sealed class Brackets : LikeSyntax
     {
         readonly LikeSyntax Target;
         readonly ITokenClass TokenClass;
@@ -55,7 +54,7 @@ namespace Reni.FeatureTest.Helper
             (target.TokenClass is RightParenthesis).Assert();
             (target.Right == null).Assert();
 
-            (target.Left.Left == null).Assert();
+            (target.Left!.Left == null).Assert();
             (target.Left.TokenClass is LeftParenthesis).Assert();
             target.Left.TokenClass.IsBelongingTo(target.TokenClass).Assert();
             if(TokenClass != null)
@@ -77,7 +76,7 @@ namespace Reni.FeatureTest.Helper
             (target.TokenClass is RightParenthesis).Assert();
             (target.Right == null).Assert();
 
-            (target.Left.Left == null).Assert();
+            (target.Left!.Left == null).Assert();
             (target.Left.TokenClass is LeftParenthesis).Assert();
             (target.Right == null).Assert();
 
@@ -104,7 +103,7 @@ namespace Reni.FeatureTest.Helper
             var s = container.Find(Name, false);
 
             (s != null).Assert();
-            (Position == s.Value).Assert();
+            (Position == s!.Value).Assert();
         }
     }
 

@@ -46,24 +46,24 @@ static class Extension
                 .Create()
         );
 
-        string LocalCanonize(string target) => target.Replace("\r\n", "\n")
+        string localCanonize(string target) => target.Replace("\r\n", "\n")
         //    .Replace("\n","|||\n")
         ;
 
         if(newText.Canonize(spaceReplacement) == expected.Canonize(spaceReplacement))
             return;
 
-        GetDifferenceReport(LocalCanonize(newText.Canonize(spaceReplacement))
-            , LocalCanonize(expected.Canonize(spaceReplacement))).Log();
+        GetDifferenceReport(localCanonize(newText.Canonize(spaceReplacement))
+            , localCanonize(expected.Canonize(spaceReplacement))).Log();
 
         false.Assert(() => $@"                    
 new:
 ----------------------
-{LocalCanonize(newText)}
+{localCanonize(newText)}
 ----------------------
 expected:
 ----------------------
-{LocalCanonize(expected)}
+{localCanonize(expected)}
 ----------------------
 ", 1
         );

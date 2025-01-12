@@ -1,5 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
@@ -58,7 +56,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         target.AssertIsNotNull();
         target.Right.AssertIsNotNull();
 
-        if(target.Right.TokenClass is IDeclarationTag)
+        if(target.Right!.TokenClass is IDeclarationTag)
         {
             target.Right.Right.AssertIsNull();
             target.Right.Left.AssertIsNull();
@@ -89,7 +87,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         (IEnumerable<(BinaryTree[] anchors, BinaryTree tag)> list, BinaryTree target)
     {
         var top = list.First();
-        var anchors = T(target, target.Right, target.Right.Left).Concat(top.anchors).ToArray();
+        var anchors = T(target, target.Right, target.Right!.Left).Concat(top.anchors).ToArray();
         var result = T((anchors, top.tag)).Concat(list.Skip(1)).ToArray();
         return result;
     }

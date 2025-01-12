@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses.Whitespace.Comment;
@@ -56,12 +55,12 @@ sealed class InlineCommentType : DumpableObject, IInline, IItemsType
     {
         var headLength = sourcePart.Start.Match(Lexer.Instance.InlineCommentHead);
         headLength.AssertIsNotNull();
-        var head = sourcePart.Start.Span(headLength.Value);
+        var head = sourcePart.Start.Span(headLength!.Value);
         yield return new(HeadType.Instance, head, parent);
 
         var tailLength = sourcePart.Match(Lexer.Instance.InlineCommentTail, false);
         tailLength.AssertIsNotNull();
-        var tail = sourcePart.End.Span(tailLength.Value);
+        var tail = sourcePart.End.Span(tailLength!.Value);
 
         var contentWithNames = GetContentWithNames(head.End.Span(tail.Start), parent);
         foreach(var item in contentWithNames)
@@ -91,7 +90,7 @@ sealed class InlineCommentType : DumpableObject, IInline, IItemsType
 
         var afterWhiteSpace = sourcePart.Match(Match.WhiteSpace.Until, false);
         afterWhiteSpace.AssertIsNotNull();
-        var close = sourcePart.End.Span(afterWhiteSpace.Value);
+        var close = sourcePart.End.Span(afterWhiteSpace!.Value);
 
         (open.Id == close.Id).Assert();
         if(open.Id.Length > 0)

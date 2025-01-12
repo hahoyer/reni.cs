@@ -33,8 +33,6 @@ sealed class WhiteSpaces
         , int minimalLineBreakCount
     )
     {
-        (target != null).Assert();
-
         SourcePart = target.SourcePart;
         MinimalLineBreakCount = minimalLineBreakCount;
         Configuration = configuration;                    

@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.Scanner;
 
 namespace Reni.TokenClasses.Whitespace;
@@ -20,7 +19,7 @@ abstract class VariantListType : DumpableObject, IItemsType, IItemType
             result.Length.AssertIsNotNull();
             (result.Length == 0).ConditionalBreak();
 
-            var resultingSourcePart = sourcePosition.Span(T(result.Length.Value, sourcePart.EndPosition).Min());
+            var resultingSourcePart = sourcePosition.Span(T(result.Length!.Value, sourcePart.EndPosition).Min());
             (resultingSourcePart.End <= sourcePart.End).Assert();
             yield return new(result.Type, resultingSourcePart, parent);
             sourcePosition += result.Length.Value;

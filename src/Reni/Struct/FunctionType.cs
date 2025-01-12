@@ -1,6 +1,3 @@
-using hw.DebugFormatter;
-using hw.Helper;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -185,7 +182,7 @@ sealed class FunctionType : SetterTargetType
         (result != null).Assert();
 
         if(ArgumentsType is IContextReference arguments)
-            (!result.Contains(arguments)).Assert();
+            (!result!.Contains(arguments)).Assert();
 
         if(ClosureValue == null)
             ClosureValue = result;

@@ -37,10 +37,12 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     [EnableDump(Order = 1)]
     [EnableDumpExcept(null)]
+    [CanBeNull]
     internal BinaryTree Left { get; }
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(null)]
+    [CanBeNull]
     internal BinaryTree Right { get; }
 
     [DisableDump]
@@ -113,14 +115,14 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         {
             if(TokenClass is not IIssueTokenClass errorToken || errorToken.IssueId == default)
                 return TokenClass is IRightBracket
-                    ? new BracketNodes { Left = Left, Center = Left.Right, Right = this }
+                    ? new BracketNodes { Left = Left, Center = Left!.Right, Right = this }
                     : null;
             if(errorToken.IssueId == ExtraLeftBracket)
                 return new() { Left = this, Center = Right, Right = RightMost };
             if(errorToken.IssueId == ExtraRightBracket)
-                return new() { Left = Left.LeftMost, Center = Left, Right = this };
+                return new() { Left = Left!.LeftMost, Center = Left, Right = this };
             if(errorToken.IssueId == MissingMatchingRightBracket)
-                return new() { Left = Left, Center = Left.Right, Right = this };
+                return new() { Left = Left, Center = Left!.Right, Right = this };
 
             throw new InvalidEnumArgumentException($"Unexpected Bracket issue: {errorToken.IssueId}");
         }
@@ -128,7 +130,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     [DisableDump]
     public BinaryTree[] ParserLevelGroup
-        => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? new BinaryTree[0]);
+        => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? []);
 
     [DisableDump]
     IssueId BracketIssueId
@@ -158,8 +160,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
             right.AssertIsNull();
 
-            var innerLeftBracket = left.InnerTokenClass as ILeftBracket;
-            if(innerLeftBracket == null)
+            if(left?.InnerTokenClass is not ILeftBracket innerLeftBracket)
                 return ExtraRightBracket;
 
             left.Left.AssertIsNull();
@@ -309,7 +310,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
         if(tokenClass is ElseToken)
         {
-            var thenItem = Right.TokenClass is ThenToken? Right : null;
+            var thenItem = Right?.TokenClass is ThenToken? Right : null;
             return thenItem == null? default : T(thenItem, this);
         }
 
@@ -325,9 +326,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         , BinaryTree right
     )
     {
-        var linked = token as ILinked<BinaryTree>;
-        linked.AssertIsNotNull();
-        linked.Container.AssertIsNull();
+        ((ILinked<BinaryTree>)token).Container.AssertIsNull();
         return new(left, tokenClass, new(token.GetPrefixSourcePart()), token.Characters, right);
     }
 

@@ -1,4 +1,3 @@
-using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses.Whitespace.Comment;
@@ -32,7 +31,7 @@ sealed class LineCommentType : DumpableObject, IItemsType, ILine
     {
         var headLength = sourcePart.Start.Match(Lexer.Instance.LineCommentHead);
         headLength.AssertIsNotNull();
-        var head = sourcePart.Start.Span(headLength.Value);
+        var head = sourcePart.Start.Span(headLength!.Value);
 
         var tailLength = sourcePart.End.Match(Lexer.Instance.LineEnd, false);
         var tail = sourcePart.End.Span(tailLength ?? 0);

@@ -27,9 +27,8 @@ public static class MainContainer
         await RunServer(reader.UsePipeReader(), writer.UsePipeWriter());
     }
 
-    public static async Task RunServer(PipeReader reader, PipeWriter writer) =>
-        //var pipeReader = new MyReader("reader", reader);
-        await RunOmniServer(reader, writer);
+    public static async Task RunServer(PipeReader reader, PipeWriter writer)
+        => await RunOmniServer(reader, writer);
 
     static async Task RunOmniServer(PipeReader reader, PipeWriter writer)
     {
@@ -37,18 +36,25 @@ public static class MainContainer
         {
             Expectations.BreakMode = Expectations.BreakModeType.UseException;
 
-            void ConfigureOptions(LanguageServerOptions options) => options
+            void configureOptions(LanguageServerOptions options) => options
                 .WithInput(reader)
                 .WithOutput(writer)
                 .WithLoggerFactory(new LoggerFactory())
                 .AddDefaultLoggingProvider()
                 .OnInitialized(Initialized)
                 .WithHandler<MainWrapper>()
-                .WithServices(x
-                    => x.AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information)))
+                .WithServices(services
+                    => services
+                        .AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information))
+                        .AddSingleton(
+                            new ConfigurationItem
+                            {
+                                Section = "reni",
+                            })
+                )
             ;
 
-            await LanguageServer.From(ConfigureOptions);
+            await LanguageServer.From(configureOptions);
         }
         catch(Exception)
         {

@@ -18,7 +18,7 @@ public sealed class DeclarationOptions : DependenceProvider
     x = Auswahl Nein then ""No match"" du
 ";
         var compiler = CompilerBrowser.FromText(text);
-        var t = compiler.Compiler.BinaryTree.Left.RightMost.Token.End;
+        var t = compiler.Compiler.BinaryTree.Left!.RightMost.Token.End;
         var declarations = compiler.GetDeclarations(t.Span(0));
 
         var syntax = compiler.Syntax;
