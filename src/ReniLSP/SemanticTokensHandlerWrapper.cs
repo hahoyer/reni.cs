@@ -65,5 +65,4 @@ sealed class SemanticTokensHandlerWrapper : SemanticTokensHandlerBase
     protected override async Task<SemanticTokensDocument>
         GetSemanticTokensDocument(ITextDocumentIdentifierParams @params, CancellationToken token)
         => await Task.FromResult(new SemanticTokensDocument(RegistrationOptions.Legend));
-
 }

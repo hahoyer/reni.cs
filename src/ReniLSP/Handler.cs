@@ -6,13 +6,15 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
 using Reni.Validation;
 
 namespace ReniLSP;
 
 sealed class Handler : DumpableObject
 {
-    internal readonly ITextDocumentLanguageServer Server;
+    readonly ITextDocumentLanguageServer Server;
+    readonly IWorkspaceLanguageServer ConfigurationHandler;
 
     readonly ConcurrentDictionary<string, Buffer> Buffers = new();
     readonly ILogger<MainWrapper> Logger;
@@ -29,10 +31,16 @@ sealed class Handler : DumpableObject
             WorkDoneProgress = true,
         };
 
-    public Handler(ILogger<MainWrapper> logger, ITextDocumentLanguageServer server)
+    public Handler
+    (
+        ILogger<MainWrapper> logger
+        , ITextDocumentLanguageServer server
+        , IWorkspaceLanguageServer configurationHandler
+    )
     {
         Logger = logger;
         Server = server;
+        ConfigurationHandler = configurationHandler;
     }
 
     public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)
@@ -57,10 +65,14 @@ sealed class Handler : DumpableObject
     public void DidClose(DidCloseTextDocumentParams request)
         => Buffers.TryRemove(request.TextDocument.GetKey(), out var _);
 
-    public Task<TextEditContainer> Format(DocumentFormattingParams request)
+    public async Task<TextEditContainer> Format(DocumentFormattingParams request)
     {
+        var xx = await ConfigurationHandler.RequestConfiguration(new()
+        {
+            Items = (ConfigurationItem[]) [new() { Section = "reni" }]
+        });
         SetFormattingOptions(request.Options);
-        return Task.FromResult(Buffers[request.TextDocument.GetKey()].Format(FormatOptions));
+        return await Task.FromResult(Buffers[request.TextDocument.GetKey()].Format(FormatOptions));
     }
 
     void SetFormattingOptions(FormattingOptions options)
@@ -74,14 +86,6 @@ sealed class Handler : DumpableObject
         else
             FormatOptions.LineBreakAtEndOfText = null;
         FormatOptions.IndentCount = options.TabSize;
-    }
-
-    public Container<JToken> Configuration(ConfigurationParams request)
-    {
-        NotImplementedMethod(request);
-#pragma warning disable VSTHRD114 // Avoid returning a null Task
-        return default;
-#pragma warning restore VSTHRD114 // Avoid returning a null Task
     }
 
     public void DidChangeConfigurationHandlerImplementation(DidChangeConfigurationParams request)
@@ -100,7 +104,6 @@ sealed class Handler : DumpableObject
                 , MaxLineLength = null
                 , AdditionalLineBreaksForMultilineItems = true
                 , LineBreaksBeforeListToken = false
-                , LineBreaksBeforeDeclarationToken = false
                 , LineBreaksAtComplexDeclaration = true
             };
 
@@ -112,8 +115,6 @@ sealed class Handler : DumpableObject
             , AdditionalLineBreaksForMultilineItems
                 = settingsValues["list"]!["AdditionalLineBreaksForMultilineItems"]!.Value<bool>()
             , LineBreaksBeforeListToken = settingsValues["list"]!["LineBreaksBeforeListToken"]!.Value<bool>()
-            , LineBreaksBeforeDeclarationToken
-                = settingsValues["list"]!["LineBreaksBeforeDeclarationToken"]!.Value<bool>()
             , LineBreaksAtComplexDeclaration = settingsValues["list"]!["LineBreaksAtComplexDeclaration"]!.Value<bool>()
         };
     }

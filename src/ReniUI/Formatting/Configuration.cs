@@ -8,7 +8,6 @@ sealed class Configuration : DumpableObject
     public bool? LineBreakAtEndOfText = false;
     public bool AdditionalLineBreaksForMultilineItems = true;
     public bool LineBreaksBeforeListToken;
-    public bool LineBreaksBeforeDeclarationToken;
     public bool LineBreaksAtComplexDeclaration;
     public string LineBreakString = "\r\n";
 }
