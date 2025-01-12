@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
 using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Extensibility.Editor;
@@ -8,7 +9,7 @@ using ReniLSP;
 
 namespace Reni.LSPVSIX;
 
-#pragma warning disable VSEXTPREVIEW_LSP
+[Experimental("VSEXTPREVIEW_SETTINGS")]
 [VisualStudioContribution]
 [UsedImplicitly]
 public sealed class ReniLanguageServerProvider : LanguageServerProvider
@@ -19,19 +20,15 @@ public sealed class ReniLanguageServerProvider : LanguageServerProvider
     [VisualStudioContribution]
     internal static DocumentTypeConfiguration ReniDocumentType => new("reni")
     {
-        FileExtensions = new[] { ".reni" }, BaseDocumentType = LanguageServerBaseDocumentType,
+        FileExtensions = [".reni"], BaseDocumentType = LanguageServerBaseDocumentType,
     };
 
-    public ReniLanguageServerProvider
-        (ExtensionCore container, VisualStudioExtensibility extensibilityObject, TraceSource traceSource)
-        : base(container, extensibilityObject) { }
+    public ReniLanguageServerProvider(ExtensionCore parent, VisualStudioExtensibility target, TraceSource _)
+        : base(parent, target)
+        => Notifier.Initialize(target);
 
-    public override LanguageServerProviderConfiguration LanguageServerProviderConfiguration =>
-        new("%Reni Language Server%",
-            new[]
-            {
-                DocumentFilter.FromDocumentType("reni"),
-            });
+    public override LanguageServerProviderConfiguration LanguageServerProviderConfiguration
+        => new("%Reni.LanguageServer%", [DocumentFilter.FromDocumentType("reni")]);
 
     public override Task<IDuplexPipe> CreateServerConnectionAsync(CancellationToken token)
     {
