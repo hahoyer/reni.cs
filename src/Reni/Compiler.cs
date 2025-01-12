@@ -1,10 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
 using Reni.Helper;
@@ -96,8 +93,8 @@ public sealed class Compiler
         get
         {
             var binaryTree = BinaryTree.AllIssues.ToArray();
-            var syntax = ValueSyntaxCache.Value?.AllIssues.ToArray() ?? new Issue[0];
-            var code = CodeContainer?.Issues.ToArray() ?? new Issue[0];
+            var syntax = ValueSyntaxCache.Value?.AllIssues.ToArray() ?? [];
+            var code = CodeContainer?.Issues.ToArray() ?? [];
             //$"binaryTree: {binaryTree.Length}, syntax: {syntax.Length}, code: {code.Length}".Log(FilePositionTag.Debug);
             return T(binaryTree, syntax, code).ConcatMany();
         }
@@ -213,6 +210,8 @@ public sealed class Compiler
     [DisableDump]
     internal TypeBase MainType => this.CachedValue(() => Syntax.GetTypeBase(Root));
 
+    internal Semantics Semantics => Semantics.From(Root, Syntax);
+
     Compiler(Source source, string moduleName, CompilerParameters parameters)
     {
         (source != null).Assert();
@@ -223,7 +222,7 @@ public sealed class Compiler
         var main = this["Main"];
         var declaration = this["Declaration"];
 
-        MainTokenFactory = new(declaration, "Main");
+        MainTokenFactory = new(declaration);
 
         main.PrioTable = MainPriorityTable;
         main.TokenFactory = new ScannerTokenFactory();
@@ -232,7 +231,7 @@ public sealed class Compiler
         declaration.PrioTable = DeclarationPriorityTable;
         declaration.TokenFactory = new ScannerTokenFactory(true);
         declaration.BoxFunction = target => new ExclamationBoxToken(target);
-        declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory("Declaration"));
+        declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory());
 
         main.Parser.Trace = Parameters.TraceOptions.Parser;
         declaration.Parser.Trace = Parameters.TraceOptions.Parser;
@@ -284,20 +283,16 @@ public sealed class Compiler
 
     public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
     {
-        (fileName != null).Assert();
         var moduleName = ModuleNameFromFileName(fileName);
         return new(new(fileName.ToSmbFile()), moduleName, parameters);
     }
 
     public static Compiler FromText
         (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
-    {
-        (text != null).Assert();
-        return new(
+        => new(
             new(text, sourceIdentifier ?? DefaultSourceIdentifier),
             DefaultModuleName,
             parameters);
-    }
 
     ValueSyntax GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
 
@@ -389,8 +384,6 @@ public sealed class Compiler
         if(Parameters.IsCodeRequired)
             CodeContainerCache.IsValid = true;
     }
-
-    internal Semantics Semantics => Semantics.From(Root, Syntax);
 }
 
 public sealed class TraceCollector : DumpableObject, ITraceCollector
