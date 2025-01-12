@@ -230,6 +230,6 @@ public abstract class Item : DumpableObject
     {
         var start = SourcePart.Start.TextPosition;
         return
-            $"{start.LineNumber}/{start.ColumnNumber1 - 1}: {TypeList}: {SourcePart.Id.Quote()}";
+            $"{start.LineNumber}/{start.ColumnNumber}: {TypeList}: {SourcePart.Id.Quote()}";
     }
 }

@@ -14,8 +14,8 @@ static class Extension
     public static Range GetRange(this SourcePart token)
     {
         var range = token.TextPosition;
-        return new(range.start.LineNumber, range.start.ColumnNumber1 - 1, range.end.LineNumber
-            , range.end.ColumnNumber1 - 1);
+        return new(range.start.LineNumber, range.start.ColumnNumber, range.end.LineNumber
+            , range.end.ColumnNumber);
     }
 
     public static bool? ToBoolean(this FormattingOptions option, string name)
