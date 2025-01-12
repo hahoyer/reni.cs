@@ -21,5 +21,5 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCompany("<#=company #>")]
 [assembly: AssemblyProduct("<#=product #>")]
 [assembly: AssemblyCopyright("Copyright © Harald Hoyer <#=DateTime.Today.ToString("yyyy") #>")]
-[assembly: InternalsVisibleTo("ReniVSIX")]
+[assembly: InternalsVisibleTo("Reni.LSPVSIX")]
 [assembly: InternalsVisibleTo("ReniLSP")]
