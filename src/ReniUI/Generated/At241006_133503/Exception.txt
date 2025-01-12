@@ -1,0 +1,37 @@
+Expectations.ExpectationFailedException: ExpectIsNull: "Should be a value" Cannot combine with empty anchor.
+   at Reni.Helper.Expectations.ExpectationFailed(String cond, Func`1 getData, Int32 stackFrameDepth) in A:\develop\Reni\dev\src\Reni\Helper\Expectations.cs:line 97
+   at Reni.Helper.Expectations.ExpectIsNull(Object b, Func`1 getData, Int32 stackFrameDepth) in A:\develop\Reni\dev\src\Reni\Helper\Expectations.cs:line 54
+   at Reni.SyntaxTree.Anchor.Combine(Anchor other, Boolean check) in A:\develop\Reni\dev\src\Reni\SyntaxTree\Anchor.cs:line 86
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 88
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 126
+   at Reni.SyntaxFactory.FunctionHandler.Reni.SyntaxFactory.IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\FunctionHandler.cs:line 12
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 79
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 65
+   at Reni.SyntaxFactory.ListHandler.Reni.SyntaxFactory.IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\ListHandler.cs:line 12
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 63
+   at Reni.SyntaxFactory.ListHandler.Reni.SyntaxFactory.IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\ListHandler.cs:line 13
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 63
+   at Reni.SyntaxFactory.ListHandler.Reni.SyntaxFactory.IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\ListHandler.cs:line 13
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 63
+   at Reni.SyntaxFactory.ListHandler.Reni.SyntaxFactory.IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\ListHandler.cs:line 13
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, IStatementsToken tokenClass) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 98
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 83
+   at Reni.SyntaxFactory.BracketHandler.Reni.SyntaxFactory.IValueProvider.Get(BinaryTree target, Factory factory, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\BracketHandler.cs:line 12
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 79
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 126
+   at Reni.SyntaxFactory.FunctionHandler.Reni.SyntaxFactory.IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\FunctionHandler.cs:line 12
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 79
+   at Reni.SyntaxFactory.Factory.GetValueSyntax(BinaryTree target) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 126
+   at Reni.SyntaxFactory.ColonHandler.Reni.SyntaxFactory.IStatementProvider.Get(BinaryTree target, Factory factory) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\ColonHandler.cs:line 16
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 61
+   at Reni.SyntaxFactory.ListHandler.Reni.SyntaxFactory.IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\ListHandler.cs:line 12
+   at Reni.SyntaxFactory.Factory.GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 63
+   at Reni.SyntaxFactory.Factory.GetFrameSyntax(BinaryTree target) in A:\develop\Reni\dev\src\Reni\SyntaxFactory\Factory.cs:line 38
+   at Reni.Compiler.GetSyntax(BinaryTree target) in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 304
+   at Reni.Compiler.GetSyntax() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 302
+   at hw.Helper.ValueCache`1.Ensure() in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.4\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 61
+   at hw.Helper.ValueCache`1.get_Value() in C:\Users\hh\.nuget\packages\hw.helper.core\24.1.4\contentFiles\any\any\hw\Helper.Core\Helper\ValueCache.cs:line 30
+   at Reni.Compiler.get_Issues() in A:\develop\Reni\dev\src\Reni\Compiler.cs:line 99
+   at ReniUI.CompilerBrowser.get_Issues() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 50
+   at ReniUI.CompilerBrowser.<get_GuardedIssues>b__15_0() in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 47
+   at ReniUI.CompilerBrowser.ExceptionGuard[TResult](Func`1 getResult, GuiExceptionGuard`1 guard) in A:\develop\Reni\dev\src\ReniUI\CompilerBrowser.cs:line 76
