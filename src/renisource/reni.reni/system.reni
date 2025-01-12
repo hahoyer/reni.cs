@@ -1,7 +1,7 @@
 # System definitions
 
 #(doc
-Basic things, 
+Basic things,
 text class, ...
 doc)#
 
@@ -21,7 +21,7 @@ system:
     MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16.
     TextItemType: @! MaxNumber8 text_item type.
 
-    !    public NewMemory: @
+   !    public NewMemory: @
     {
         ! public result:(((^ elementType) * 1) array_reference mutable)
         instance(systemdata FreePointer enable_reinterpretation).
@@ -33,7 +33,7 @@ system:
         repeat
         (
             while: @ position < count,
-  
+
             body: @
             (
                 result(position) := initializer(position),
@@ -49,7 +49,7 @@ system:
 
 Text: @
 {
-    value: ^.  
+    value: ^.
 
     !public result:
     {
