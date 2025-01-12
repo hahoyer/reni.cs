@@ -4,14 +4,12 @@ using ReniUI.Formatting;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
 [Declaration]
 [Basics]
 [Lists]
 [ThenElse]
 public sealed class Complex : DependenceProvider
 {
-    [Test]
     [UnitTest]
     public void MultilineBreakTest11()
     {
@@ -41,7 +39,6 @@ repeat: @
         text.SimpleFormattingTest(expected, 20, 0, 4, lineBreaksAtComplexDeclaration: true);
     }
 
-    [Test]
     [UnitTest]
     public void Reformat()
     {
@@ -76,7 +73,6 @@ repeat: @
         text.SimpleFormattingTest(expectedText, 100, 0, 4, lineBreaksAtComplexDeclaration: true);
     }
 
-    [Test]
     [UnitTest]
     // ReSharper disable once InconsistentNaming
     public void Reformat1_120()
@@ -111,7 +107,6 @@ repeat: @
         text.SimpleFormattingTest(expectedText, 120, 1, 4, lineBreaksAtComplexDeclaration: true);
     }
 
-    [Test]
     [UnitTest]
     // ReSharper disable once InconsistentNaming
     public void Reformat1_120TopLineBreak()
@@ -145,7 +140,6 @@ repeat: @
             , lineBreaksAtComplexDeclaration: true);
     }
 
-    [Test]
     [UnitTest]
     public void Reformat2()
     {
@@ -169,7 +163,6 @@ repeat: @
     }
 
 
-    [Test]
     [UnitTest]
     public void TwoLevelParenthesis()
     {
@@ -184,7 +177,6 @@ llll: bbbbb;
         text.SimpleFormattingTest(expectedText, 12, 1, 4, lineBreaksAtComplexDeclaration: true);
     }
 
-    [Test]
     [UnitTest]
     public void UseLineBreakBeforeParenthesis()
     {
@@ -212,7 +204,6 @@ llll: bbbbb;
         (newSource == expectedText).Assert("\n\"" + newSource + "\"");
     }
 
-    [Test]
     [UnitTest]
     public void HalfList()
     {

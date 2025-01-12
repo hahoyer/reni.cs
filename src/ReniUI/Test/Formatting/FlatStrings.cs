@@ -2,7 +2,6 @@ using hw.UnitTest;
 
 namespace ReniUI.Test.Formatting;
 
-[TestFixture]
 [UnitTest]
 public class FlatStrings : DependenceProvider
 {
@@ -16,7 +15,6 @@ public class FlatStrings : DependenceProvider
         (flatString == "(1, 3, 4, 6)").Assert(flatString);
     }
 
-    [Test]
     [UnitTest]
     public void AddSeparators1()
     {

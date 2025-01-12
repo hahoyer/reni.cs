@@ -3,12 +3,10 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
 [Lists]
 public sealed class Declaration
     : DependenceProvider
 {
-    [Test]
     [UnitTest]
     public void NameIsLeftOfColon()
     {
@@ -18,7 +16,6 @@ public sealed class Declaration
         text.SimpleFormattingTest(expectedText);
     }
 
-    [Test]
     [UnitTest]
     public void SymbolIsLeftOfColon()
     {
@@ -28,7 +25,6 @@ public sealed class Declaration
         text.SimpleFormattingTest(expectedText);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationLineBreakTest1()
     {
@@ -39,7 +35,6 @@ public sealed class Declaration
         text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void LabeledList()
     {
@@ -54,7 +49,6 @@ public sealed class Declaration
         text.SimpleFormattingTest(expectedText, 12, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationLineBreakTest2()
     {
@@ -65,7 +59,6 @@ llll: bbbbb";
         text.SimpleFormattingTest(expectedText, 15, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationLineBreakTest3()
     {
@@ -77,7 +70,6 @@ ccccc";
         text.SimpleFormattingTest(expectedText, 20, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationLineBreakTestA2()
     {
@@ -90,7 +82,6 @@ llll:
         text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationLineBreakTestA3()
     {
@@ -105,7 +96,6 @@ ccccc";
         text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationLineBreakTestA4()
     {
@@ -122,7 +112,6 @@ ddddd";
         text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     // ReSharper disable once InconsistentNaming
     public void ListWithDeclarationLineBreakTestAA4()
@@ -143,7 +132,6 @@ ddddd";
         text.SimpleFormattingTest(expectedText, 10, 1, 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationTest1()
     {
@@ -153,7 +141,6 @@ ddddd";
         text.SimpleFormattingTest(expectedText, emptyLineLimit: 1, indentCount: 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationTest2()
     {
@@ -163,7 +150,6 @@ ddddd";
         text.SimpleFormattingTest(expectedText, emptyLineLimit: 1, indentCount: 4);
     }
 
-    [Test]
     [UnitTest]
     public void ListWithDeclarationTest3()
     {

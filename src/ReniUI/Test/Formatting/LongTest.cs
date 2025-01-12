@@ -8,10 +8,10 @@ using Reni.TokenClasses;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
+
 public sealed class LongTest : DependenceProvider
 {
-    [Test]
+    
     [UnitTest]
     public void ReformatPart()
     {

@@ -2,7 +2,7 @@ using hw.UnitTest;
 
 namespace ReniUI.Test.UserInteraction;
 
-[TestFixture]
+
 [UnitTest]
 [UserInterAction]
 public sealed class UserInterAction2 : DependenceProvider
@@ -10,7 +10,7 @@ public sealed class UserInterAction2 : DependenceProvider
     const string Text = @"#(aa comment aa)# name!mutable : 3";
     const string Type = @"cccccccccccccccccwiiiikkkkkkkkwkwn";
 
-    [Test]
+    
     [UnitTest]
     public void GetTokenForPosition()
     {

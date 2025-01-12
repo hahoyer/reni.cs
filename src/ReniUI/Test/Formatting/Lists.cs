@@ -3,11 +3,11 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
+
 [FlatStrings]
 public sealed class Lists : DependenceProvider
 {
-    [Test]
+    
     [UnitTest]
     public void SimpleLine()
     {
@@ -19,7 +19,7 @@ public sealed class Lists : DependenceProvider
         (trimmed == "(1, 3, 4, 6)").Assert(trimmed);
     }
 
-    [Test]
+    
     [UnitTest]
     public void SingleElementList()
     {
@@ -31,7 +31,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void SingleElementListFlat()
     {
@@ -41,7 +41,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText, 14, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void StraightList()
     {
@@ -53,7 +53,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void StraightList3()
     {
@@ -66,7 +66,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void StraightListWithMultipleBrackets()
     {
@@ -78,7 +78,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void FlatList2()
     {
@@ -88,7 +88,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText);
     }
 
-    [Test]
+    
     [UnitTest]
     public void ListEndsWithListToken()
     {
@@ -102,7 +102,7 @@ public sealed class Lists : DependenceProvider
         text.SimpleFormattingTest(expectedText, 19, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void ListSeparatorAtEnd()
     {
@@ -114,7 +114,7 @@ public sealed class Lists : DependenceProvider
         (newSource == expectedText).Assert("\n\"" + newSource + "\"");
     }
 
-    [Test]
+    
     [UnitTest]
     public void ListLineBreakTest2()
     {
@@ -125,7 +125,7 @@ bbbbb";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void ListLineBreakTest3()
     {
@@ -137,7 +137,7 @@ ccccc";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void ListTest1()
     {
@@ -147,7 +147,7 @@ ccccc";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void ListTest2()
     {
@@ -157,7 +157,7 @@ ccccc";
         text.SimpleFormattingTest(expectedText, 20, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void MultilineBreakTest()
     {
@@ -174,7 +174,7 @@ ccccc";
         text.SimpleFormattingTest(expectedText, 10, 1);
     }
 
-    [Test]
+    
     [UnitTest]
     public void MultilineBreakTest1()
     {

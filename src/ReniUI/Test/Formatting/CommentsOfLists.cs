@@ -22,7 +22,6 @@ public class CommentsOfLists : DependenceProvider
     }
 
     [UnitTest]
-    [Test]
     public void ComplexText()
     {
         const string text =

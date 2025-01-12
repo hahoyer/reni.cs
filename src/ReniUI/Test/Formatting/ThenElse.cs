@@ -3,11 +3,11 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
+
 public sealed class ThenElse : DependenceProvider
 {
     [UnitTest]
-    [Test]
+    
     public void SimpleThen()
     {
         const string text = @"1 then aaa";
@@ -22,7 +22,7 @@ public sealed class ThenElse : DependenceProvider
     }
 
     [UnitTest]
-    [Test]
+    
     public void ThenElseWithLineBreak()
     {
         const string text = @"ccccccc then aaaaaa else bbbbbbb";
@@ -32,7 +32,7 @@ else bbbbbbb", 10);
     }
 
     [UnitTest]
-    [Test]
+    
     public void ThenElseWithLineBreakAndBrackets()
     {
         const string text = @"(ccccccc then aaaaaa else bbbbbbb)";
@@ -44,7 +44,7 @@ else bbbbbbb", 10);
     }
 
     [UnitTest]
-    [Test]
+    
     public void ThenWithLineBreak()
     {
         const string text = @"ccccccc then aaaaaa ";
@@ -53,7 +53,7 @@ then aaaaaa", 10);
     }
 
     [UnitTest]
-    [Test]
+    
     public void NestedThenElseWithLineBreak()
     {
         const string text = @"cond1 then cond2 then then2 else cond3 else else3 ";
@@ -72,7 +72,7 @@ else
     }
 
     [UnitTest]
-    [Test]
+    
     public void NestedThenElseWithBracketsAndWithLineBreak()
     {
         const string text = @"cond1 then (cond2 then then2 else else2) else else1";

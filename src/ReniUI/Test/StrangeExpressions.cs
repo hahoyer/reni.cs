@@ -4,12 +4,12 @@ using ReniUI.Test.Formatting;
 
 namespace ReniUI.Test
 {
-    [TestFixture]
+    
     [UnitTest]
     [Comments]
     public sealed class StrangeExpressions : DependenceProvider
     {
-        [Test]
+        
         [UnitTest]
         public void StringPrefix()
         {

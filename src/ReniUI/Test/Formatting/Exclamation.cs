@@ -3,11 +3,9 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
 [Declaration]
 public sealed class Exclamation : DependenceProvider
 {
-    [Test]
     [UnitTest]
     public void Simple()
     {
@@ -16,7 +14,6 @@ public sealed class Exclamation : DependenceProvider
         text.SimpleFormattingTest();
     }
 
-    [Test]
     [UnitTest]
     public void OneSpace()
     {
@@ -25,7 +22,6 @@ public sealed class Exclamation : DependenceProvider
 
         text.SimpleFormattingTest(expectedText);
     }
-    [Test]
     [UnitTest]
     public void MultipleTags()
     {

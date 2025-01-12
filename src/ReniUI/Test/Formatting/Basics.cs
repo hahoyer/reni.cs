@@ -4,29 +4,23 @@ using ReniUI.Formatting;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
 public sealed class Basics : DependenceProvider
 {
-    [Test]
     [UnitTest]
     public void BreakLine() => @"aaaaa bbbbb".SimpleFormattingTest(@"aaaaa
 bbbbb", 10);
 
-    [Test]
     [UnitTest]
     public void One() => @"aaaaa".SimpleFormattingTest();
 
-    [Test]
     [UnitTest]
     public void Two() => @"aaaaa bbbbb".SimpleFormattingTest();
 
-    [Test]
     [UnitTest]
     public void BreakLine3() => @"aaaaa bbbbb ccccc".SimpleFormattingTest(@"aaaaa
 bbbbb
 ccccc", 10);
 
-    [Test]
     [UnitTest]
     public void BreakLineWithLimit1() => @"aaaaa 
 
@@ -34,7 +28,6 @@ bbbbb".SimpleFormattingTest(@"aaaaa
 bbbbb",
         emptyLineLimit: 1);
 
-    [Test]
     [UnitTest]
     public void BreakLineWithLimit0() => @"aaaaa 
 
@@ -43,7 +36,6 @@ bbbbb".SimpleFormattingTest(@"aaaaa bbbbb",
 
 
     [UnitTest]
-    [Test]
     public void OmitSpaceWhenLineBreakRemains()
     {
         const string text =
@@ -58,7 +50,6 @@ b"
     }
 
     [UnitTest]
-    [Test]
     public void UseSpaceWhenLineBreakIsRemoved()
     {
         const string text =
@@ -80,7 +71,6 @@ b";
     }
 
     [UnitTest]
-    [Test]
     public void EmptyBrackets()
     {
         const string text =

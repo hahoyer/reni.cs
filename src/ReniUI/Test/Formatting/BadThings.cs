@@ -3,14 +3,12 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting
 {
     [UnitTest]
-    [TestFixture]
     [PairedSyntaxTree]
     [Complex]
     public sealed class BadThings : DependenceProvider
     {
         [UnitTest]
-        [Test]
-        public void BadArgDeclaration()
+        public static void BadArgDeclaration()
         {
             const string text = @"{^   :   ^}";
             var compiler = CompilerBrowser.FromText(text);

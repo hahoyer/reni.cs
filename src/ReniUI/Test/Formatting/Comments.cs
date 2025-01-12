@@ -3,11 +3,9 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
 public sealed class Comments : DependenceProvider
 {
     [UnitTest]
-    [Test]
     public void SingleLine()
     {
         var text =
@@ -23,7 +21,6 @@ text1
     }
 
     [UnitTest]
-    [Test]
     public void SingleLineWithLineBreak()
     {
         var text =
@@ -41,7 +38,6 @@ texxxxxxxxxxxt
     }
 
     [UnitTest]
-    [Test]
     public void SingleLineWithVolatileLineBreak()
     {
         var text =
@@ -57,7 +53,6 @@ texxxxxxxxxxxt";
     }
 
     [UnitTest]
-    [Test]
     public void MultiLineCommentSingleLine()
     {
         const string text =
@@ -70,7 +65,6 @@ texxxxxxxxxxxt";
     }
 
     [UnitTest]
-    [Test]
     public void SeparatorBeforeComment1()
     {
         const string text =
@@ -81,7 +75,6 @@ texxxxxxxxxxxt";
     }
 
     [UnitTest]
-    [Test]
     public void SeparatorBeforeComment2()
     {
         const string text =
@@ -92,7 +85,6 @@ texxxxxxxxxxxt";
     }
 
     [UnitTest]
-    [Test]
     public void SeparatorBeforeComment3()
     {
         const string text =
@@ -103,7 +95,6 @@ texxxxxxxxxxxt";
     }
 
     [UnitTest]
-    [Test]
     public void SeparatorBeforeComment4()
     {
         const string text =
@@ -116,7 +107,6 @@ texxxxxxxxxxxt";
 
 
     [UnitTest]
-    [Test]
     public void IndentWithLineComment()
     {
         const string text = @"(

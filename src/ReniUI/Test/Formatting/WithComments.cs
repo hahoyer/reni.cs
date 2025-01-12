@@ -3,11 +3,11 @@ using hw.UnitTest;
 namespace ReniUI.Test.Formatting;
 
 [UnitTest]
-[TestFixture]
+
 [Complex]
 public sealed class WithComments : DependenceProvider
 {
-    [Test]
+    
     [UnitTest]
     public void ReformatComments()
     {
