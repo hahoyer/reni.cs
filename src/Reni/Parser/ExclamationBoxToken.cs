@@ -8,11 +8,11 @@ sealed class ExclamationBoxToken
     : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass
 {
     public const string TokenId = "(!)";
-    BinaryTree Value { get; }
+    BinaryTree? Value { get; }
 
-    internal ExclamationBoxToken(BinaryTree value) => Value = value;
+    internal ExclamationBoxToken(BinaryTree? value) => Value = value;
 
-    BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
+    BinaryTree? IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
     {
         var leftleft = BinaryTree.Create(left, this, token, Value);
         if(right == null)

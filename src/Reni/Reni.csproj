@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetTypeEx>CSharp.Library</TargetTypeEx>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <Import Project="sys.targets" />
     <ItemGroup>

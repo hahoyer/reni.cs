@@ -1,19 +1,19 @@
 using hw.Scanner;
 using Reni.Parser;
 
-namespace Reni.TokenClasses {
-    interface IFormatItem
-    {
-        [EnableDump]
-        SourcePart Content {get;}
+namespace Reni.TokenClasses;
 
-        [EnableDump]
-        bool IsEssential {get;}
+interface IFormatItem
+{
+    [EnableDump]
+    SourcePart Content {get;}
 
-        [EnableDump]
-        ITokenClass TokenClass {get;}
+    [EnableDump]
+    bool IsEssential {get;}
 
-        [EnableDump]
-        string WhiteSpaces {get;}
-    }
+    [EnableDump]
+    ITokenClass TokenClass {get;}
+
+    [EnableDump]
+    string WhiteSpaces {get;}
 }

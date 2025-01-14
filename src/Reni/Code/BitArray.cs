@@ -32,13 +32,14 @@ sealed class BitArray : FiberHead
         return base.ToList();
     }
 
-    protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    protected override TCode? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        where TCode : default
         => actual.BitArray(this);
 
     [DisableDump]
     internal override bool IsEmpty => IsHollow;
 
-    protected override CodeBase TryToCombine(FiberItem subsequentElement)
+    protected override CodeBase? TryToCombine(FiberItem subsequentElement)
         => subsequentElement.TryToCombineBack(this);
 
     internal override void Visit(IVisitor visitor) => visitor.BitsArray(Size, Data);

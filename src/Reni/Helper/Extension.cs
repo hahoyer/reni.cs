@@ -3,11 +3,11 @@ namespace Reni.Helper;
 public static class Extension
 {
     [PublicAPI]
-    internal static IEnumerable<TTarget> GetDirectChildren<TTarget>(this ITree<TTarget> target)
+    internal static IEnumerable<TTarget?> GetDirectChildren<TTarget>(this ITree<TTarget?> target)
         where TTarget : ITree<TTarget>
-        => target?.GetDirectChildrenInternal();
+        => target.GetDirectChildrenInternal();
 
-    static IEnumerable<TTarget> GetDirectChildrenInternal<TTarget>([NotNull] this ITree<TTarget> target)
+    static IEnumerable<TTarget?> GetDirectChildrenInternal<TTarget>(this ITree<TTarget?> target)
         where TTarget : ITree<TTarget>
     {
         for(var index = 0; index < target.DirectChildCount; index++)
@@ -16,12 +16,9 @@ public static class Extension
 
     [PublicAPI]
     internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
-        (this ITree<TTarget> target, Func<TTarget, bool> predicate = null)
+        (this ITree<TTarget?> target, Func<TTarget, bool>? predicate = null)
         where TTarget : ITree<TTarget>
     {
-        if(target == null)
-            yield break;
-
         var index = 0;
         while(index < target.DirectChildCount)
         {
@@ -36,7 +33,7 @@ public static class Extension
     }
 
     [PublicAPI][NotNull]
-    internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget> target)
+    internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget?> target)
         where TTarget : ITree<TTarget>
     {
         if(target == null)
@@ -113,7 +110,7 @@ public static class Extension
     }
 
     [PublicAPI]
-    internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget> target)
+    internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget?> target)
         where TTarget : ITree<TTarget>
     {
         if(target == null)
@@ -172,13 +169,13 @@ public static class Extension
     static TValue[] T<TValue>(params TValue[] value) => value;
 
     [PublicAPI]
-    internal static IEnumerable<TResult> GetNodesFromLeftToRight<TAspect, TResult>
-        (this TResult target, Func<TResult, TAspect> getAspect)
+    internal static IEnumerable<TResult?> GetNodesFromLeftToRight<TAspect, TResult>
+        (this TResult? target, Func<TResult, TAspect> getAspect)
         where TAspect : ITree<TResult>
     {
         var aspect = getAspect(target);
         var index = 0;
-        var right = new List<TResult>();
+        var right = new List<TResult?>();
         while(true)
         {
             if(index == aspect.LeftDirectChildCount)
@@ -193,8 +190,8 @@ public static class Extension
     }
 
     [PublicAPI]
-    internal static IEnumerable<TResult> GetNodesFromRightToLeft<TAspect, TResult>
-        (this TResult target, Func<TResult, TAspect> getAspect)
+    internal static IEnumerable<TResult?> GetNodesFromRightToLeft<TAspect, TResult>
+        (this TResult? target, Func<TResult, TAspect> getAspect)
         where TAspect : ITree<TResult>
     {
         var aspect = getAspect(target);

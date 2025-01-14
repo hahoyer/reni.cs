@@ -1,12 +1,11 @@
-﻿namespace Reni.TokenClasses
+﻿namespace Reni.TokenClasses;
+
+sealed class UserSymbol : Definable
 {
-    sealed class UserSymbol : Definable
-    {
-        internal UserSymbol(string name) => Id = name;
+    internal UserSymbol(string name) => Id = name;
 
-        [EnableDump]
-        public override string Id { get; }
+    [EnableDump]
+    public override string Id { get; }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + "."+ Id; }
-    }
+    protected override string GetNodeDump() { return base.GetNodeDump() + "."+ Id; }
 }

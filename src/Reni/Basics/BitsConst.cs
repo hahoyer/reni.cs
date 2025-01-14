@@ -134,7 +134,7 @@ public sealed class BitsConst : DumpableObject
 
     public override string ToString() => DumpValue();
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         var left = obj as BitsConst;
         if(left == null)
@@ -285,7 +285,7 @@ public sealed class BitsConst : DumpableObject
         return result;
     }
 
-    public void PrintNumber(BitsConst radix, IOutStream outStream)
+    public void PrintNumber(BitsConst radix, IOutStream? outStream)
     {
         var r = radix.ToInt64();
         if(radix.Size.IsZero)
@@ -295,9 +295,9 @@ public sealed class BitsConst : DumpableObject
         outStream.AddData(left);
     }
 
-    public void PrintNumber(IOutStream outStream) => PrintNumber(GetNone(), outStream);
+    public void PrintNumber(IOutStream? outStream) => PrintNumber(GetNone(), outStream);
 
-    public void PrintText(Size itemSize, IOutStream outStream)
+    public void PrintText(Size itemSize, IOutStream? outStream)
         => outStream.AddData(ToString(itemSize));
 
     public string ToString(Size itemSize)
@@ -398,7 +398,7 @@ public sealed class BitsConst : DumpableObject
 
     internal static int DivideSize(int left, int right) => Math.Max(0, left - right) + 2;
 
-    internal string ByteSequence(Size size = null)
+    internal string ByteSequence(Size? size = null)
     {
         var result = "";
         for(var i = 0; i < (size ?? Size).ByteCount; i++)
@@ -415,7 +415,7 @@ public sealed class BitsConst : DumpableObject
         var methodInfo = typeof(BitsConst).GetMethod(operation);
         if(methodInfo == null)
             throw new MissingMethodException(operation);
-        return (BitsConst)methodInfo.Invoke(this, new object[] { right, size });
+        return (BitsConst)methodInfo.Invoke(this, [right, size])!;
     }
 
     internal BitsConst BitArrayPrefixOp(string operation, Size size)
@@ -423,7 +423,7 @@ public sealed class BitsConst : DumpableObject
         var methodInfo = typeof(BitsConst).GetMethod(operation + "Prefix");
         if(methodInfo == null)
             throw new MissingMethodException(operation);
-        return (BitsConst)methodInfo.Invoke(this, new object[] { size });
+        return (BitsConst)methodInfo.Invoke(this, [size])!;
     }
 
     static Size SlagBits(Size size) => SegmentBits * DataSize(size) - size;
@@ -470,7 +470,7 @@ public sealed class BitsConst : DumpableObject
         return (size - 1) / SegmentBits + 1;
     }
 
-    internal static BitsConst Convert(bool value, Size size = null)
+    internal static BitsConst Convert(bool value, Size? size = null)
         => new(value? -1 : 0, size ?? Size.Bit);
 
     string ToString(int radix)

@@ -1,20 +1,19 @@
 using Reni.Basics;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class InvalidConversionCode : FiberItem
 {
-    sealed class InvalidConversionCode : FiberItem
+    static int NextObjectId;
+
+    internal InvalidConversionCode(Size sourceSize, Size destinationsize)
+        : base(NextObjectId++)
     {
-        static int NextObjectId;
-
-        internal InvalidConversionCode(Size sourceSize, Size destinationsize)
-            : base(NextObjectId++)
-        {
-            InputSize = sourceSize;
-            OutputSize = destinationsize;
-        }
-
-        internal override Size InputSize { get; }
-        internal override Size OutputSize { get; }
-        internal override void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
+        InputSize = sourceSize;
+        OutputSize = destinationsize;
     }
+
+    internal override Size InputSize { get; }
+    internal override Size OutputSize { get; }
+    internal override void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
 }

@@ -1,8 +1,7 @@
-namespace Reni.Context
+namespace Reni.Context;
+
+interface IRootProvider
 {
-    interface IRootProvider
-    {
-        [DisableDump]
-        Root Value { get; }
-    }
+    [DisableDump]
+    Root Value { get; }
 }

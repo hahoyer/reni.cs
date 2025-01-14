@@ -1,4 +1,3 @@
-#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -26,7 +25,7 @@ sealed class Compound
     [DisableDump]
     internal readonly FunctionCache<int, CompoundView> View;
 
-    readonly int Order;
+    readonly int Order = Closures.NextOrder++;
 
     [DisableDump]
     internal TypeBase IndexType => Parent.RootContext.BitType.Number(IndexSize.ToInt());
@@ -55,7 +54,6 @@ sealed class Compound
     internal Compound(CompoundSyntax syntax, ContextBase parent)
         : base(NextObjectId++)
     {
-        Order = Closures.NextOrder++;
         Syntax = syntax;
         Parent = parent;
         View = new(position => new(this, position));
@@ -67,7 +65,7 @@ sealed class Compound
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    int IContextReference.Order => Order;
+    int IContextReference.Order { get; } = Closures.NextOrder++;
 
     Root IRootProvider.Value => Root;
 
@@ -201,7 +199,7 @@ sealed class Compound
             var rawResult = uniqueChildContext.GetResult
                 (category | Category.Type, Syntax.PureStatements[position]);
             Dump(nameof(rawResult), rawResult);
-            (rawResult.CompleteCategory.Contains(category | Category.Type)).Assert();
+            rawResult.CompleteCategory.Contains(category | Category.Type).Assert();
             BreakExecution();
             var unFunction = rawResult.GetSmartUn<FunctionType>();
             Dump(nameof(unFunction), unFunction);

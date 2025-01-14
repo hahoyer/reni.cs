@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using hw.Scanner;
 using Reni.TokenClasses.Whitespace;
 using Reni.TokenClasses.Whitespace.Comment;
@@ -15,12 +16,11 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
 
     [DisableDump]
     [PublicAPI]
-    internal readonly IParent Parent;
-
-    WhiteSpaceItem[] ItemsCache;
+    internal readonly IParent? Parent;
 
     [EnableDump]
-    internal WhiteSpaceItem[] Items => ItemsCache ??= GetItems();
+    [field: AllowNull, MaybeNull]
+    internal WhiteSpaceItem[] Items => field ??= GetItems();
 
     [DisableDump]
     internal bool HasStableLineBreak => Type is IStableLineBreak || Items.Any(item => item.HasStableLineBreak);
@@ -33,17 +33,17 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
     internal WhiteSpaceItem(SourcePart sourcePart)
         : this(RootType.Instance, sourcePart, null) { }
 
-    internal WhiteSpaceItem(IItemType type, SourcePart sourcePart, IParent parent)
+    internal WhiteSpaceItem(IItemType type, SourcePart sourcePart, IParent? parent)
     {
         Type = type;
         SourcePart = sourcePart;
         Parent = parent;
     }
 
-    IWhitespaceItem IParent.GetItem<TItemType>()
+    IWhitespaceItem? IParent.GetItem<TItemType>()
         => Type is TItemType? this : Parent?.GetItem<TItemType>();
 
-    IParent IParent.Parent => Parent;
+    IParent? IParent.Parent => Parent;
     IItemType IParent.Type => Type;
 
     ContactType ISeparatorClass.ContactType => ContactType.Incompatible;
@@ -56,9 +56,9 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
         => Items.Any(item => item.Type is IComment || (areEmptyLinesPossible && item.Type is IVolatileLineBreak));
 
     WhiteSpaceItem[] GetItems()
-        => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? new WhiteSpaceItem[0];
+        => (Type as IItemsType)?.GetItems(SourcePart, this).ToArray() ?? [];
 
-    internal WhiteSpaceItem GetItem(SourcePosition offset)
+    internal WhiteSpaceItem? GetItem(SourcePosition offset)
     {
         (SourcePart.Start <= offset).Assert();
 
@@ -73,7 +73,7 @@ sealed class WhiteSpaceItem : DumpableObject, IWhitespaceItem, ISeparatorClass
             .FirstOrDefault(item => item != null);
     }
 
-    internal string FlatFormat(bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
+    internal string? FlatFormat(bool areEmptyLinesPossible, SeparatorRequests separatorRequests)
     {
         if(HasStableLineBreak || (areEmptyLinesPossible && HasVolatileLineBreak))
             return null;

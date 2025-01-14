@@ -5,7 +5,7 @@ namespace Reni.Code.ReplaceVisitor;
 /// </summary>
 abstract class Base : Visitor<CodeBase, FiberItem>
 {
-    readonly FunctionCache<LocalReference, LocalReference> InternalRefs;
+    readonly FunctionCache<LocalReference, LocalReference?> InternalRefs;
 
     protected Base(int objectId)
         : base(objectId)
@@ -13,15 +13,15 @@ abstract class Base : Visitor<CodeBase, FiberItem>
 
     protected Base() => InternalRefs = new(ReVisit);
 
-    internal override CodeBase Argument(Argument visitedObject) => null;
-    internal override CodeBase ContextReference(ReferenceCode visitedObject) => null;
-    internal override CodeBase BitArray(BitArray visitedObject) => null;
-    internal override CodeBase Default(CodeBase codeBase) => null;
+    internal override CodeBase? Argument(Argument visitedObject) => null;
+    internal override CodeBase? ContextReference(ReferenceCode visitedObject) => null;
+    internal override CodeBase? BitArray(BitArray visitedObject) => null;
+    internal override CodeBase? Default(CodeBase codeBase) => null;
 
-    internal override CodeBase LocalReference(LocalReference visitedObject)
+    internal override CodeBase? LocalReference(LocalReference visitedObject)
         => InternalRefs[visitedObject];
 
-    protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
+    protected override CodeBase? List(List visitedObject, IEnumerable<CodeBase?> newList)
     {
         var newListAsArray = newList.ToArray();
         if(newListAsArray.All(x => x == null))
@@ -31,27 +31,22 @@ abstract class Base : Visitor<CodeBase, FiberItem>
             .Where(x => !x.IsEmpty)
             .ToArray();
 
-        switch(newListCompleted.Length)
+        return newListCompleted.Length switch
         {
-            case 0:
-                return CodeBase.Void;
-            case 1:
-                return newListCompleted[0];
-        }
-
-        return newListCompleted.GetCode();
+            0 => CodeBase.Void, 1 => newListCompleted[0], var _ => newListCompleted.GetCode()
+        };
     }
 
-    protected override FiberItem ThenElse
-        (ThenElse visitedObject, CodeBase newThen, CodeBase newElse)
+    protected override FiberItem? ThenElse
+        (ThenElse visitedObject, CodeBase? newThen, CodeBase? newElse)
     {
         if(newThen == null && newElse == null)
             return null;
         return visitedObject.ReCreate(newThen, newElse);
     }
 
-    protected override CodeBase Fiber
-        (Fiber visitedObject, CodeBase newHead, FiberItem[] newItems)
+    protected override CodeBase? Fiber
+        (Fiber visitedObject, CodeBase? newHead, FiberItem?[] newItems)
     {
         if(newHead == null && newItems.All(x => x == null))
             return null;
@@ -59,7 +54,7 @@ abstract class Base : Visitor<CodeBase, FiberItem>
         return visitedObject.ReCreate(newHead, newItems);
     }
 
-    LocalReference ReVisit(LocalReference visitedObject)
+    LocalReference? ReVisit(LocalReference visitedObject)
         => visitedObject
             .ValueCode
             .Visit(this)

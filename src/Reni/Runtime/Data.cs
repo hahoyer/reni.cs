@@ -30,7 +30,7 @@ public sealed class Data
 
     static readonly BiasCache BiasCache = new(100);
 
-    public static IOutStream OutStream { internal get; set; }
+    public static IOutStream? OutStream { internal get; set; }
     readonly byte[] Content;
     int Length;
 

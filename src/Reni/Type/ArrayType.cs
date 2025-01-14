@@ -1,4 +1,3 @@
-#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -25,7 +24,7 @@ sealed class ArrayType
 {
     internal sealed class Options : DumpableObject
     {
-        internal static readonly string DefaultOptionsId = Create().Data.Id;
+        internal static readonly string? DefaultOptionsId = Create().Data.Id;
 
         public Flag IsMutable { get; }
         public Flag IsTextItem { get; }
@@ -184,7 +183,7 @@ sealed class ArrayType
                 : base.SimpleItemSize;
 
     [DisableDump]
-    internal override IImplementation? FunctionDeclarationForPointerType
+    internal override IImplementation FunctionDeclarationForPointerType
         => Feature.Extension.FunctionFeature(ElementAccessResult);
 
     [DisableDump]
@@ -275,7 +274,7 @@ sealed class ArrayType
         Category category,
         IContextReference objectReference,
         TypeBase argumentsType,
-        string options
+        string? options
     )
     {
         var oldElementsResult = Pointer

@@ -8,5 +8,5 @@ public interface ITree<out TTarget>
     [DisableDump]
     int DirectChildCount { get; }
 
-    TTarget GetDirectChild(int index);
+    TTarget? GetDirectChild(int index);
 }

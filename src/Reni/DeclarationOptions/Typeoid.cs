@@ -1,4 +1,3 @@
-namespace Reni.DeclarationOptions
-{
-    public class Typeoid : DumpableObject;
-}
+namespace Reni.DeclarationOptions;
+
+public class Typeoid : DumpableObject;

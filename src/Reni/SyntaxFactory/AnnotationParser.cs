@@ -7,7 +7,7 @@ using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
 
 static class AnnotationParser
 {
-    internal static(BinaryTree item, Annotation[] annotations) CheckForAnnotations(this BinaryTree target)
+    internal static(BinaryTree? item, (BinaryTree annotation, BinaryTree[] anchors)[] annotations) CheckForAnnotations(this BinaryTree? target)
     {
         if(target == null)
             return (item: null, annotations: null);

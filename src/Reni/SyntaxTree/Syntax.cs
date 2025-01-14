@@ -20,7 +20,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         [DisableDump]
         protected sealed override int DirectChildCount => 0;
 
-        protected sealed override Syntax GetDirectChild(int index)
+        protected sealed override Syntax? GetDirectChild(int index)
             => throw new($"Unexpected call: {nameof(GetDirectChild)}({index})");
     }
 
@@ -32,10 +32,10 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
             : base(anchor)
             => Issue = issue;
 
-        protected override IEnumerable<Issue> GetIssues() => T(Issue);
+        protected override IEnumerable<Issue> GetIssues() => [Issue];
     }
 
-    internal class Level
+    internal sealed class Level
     {
         public bool IsCorrectMapping;
         public bool IsCorrectOrder;
@@ -118,7 +118,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     [DisableDump]
     protected abstract int DirectChildCount { get; }
 
-    protected abstract Syntax GetDirectChild(int index);
+    protected abstract Syntax? GetDirectChild(int index);
 
     protected virtual IEnumerable<Issue> GetIssues() => null;
 

@@ -1,10 +1,9 @@
-namespace Reni.Type
-{
-    sealed class CreateArrayFromReferenceFeature : DumpableObject
-    {
-        [EnableDump]
-        readonly TypeBase Type;
+namespace Reni.Type;
 
-        public CreateArrayFromReferenceFeature(TypeBase type) => Type = type;
-    }
+sealed class CreateArrayFromReferenceFeature : DumpableObject
+{
+    [EnableDump]
+    readonly TypeBase Type;
+
+    public CreateArrayFromReferenceFeature(TypeBase type) => Type = type;
 }

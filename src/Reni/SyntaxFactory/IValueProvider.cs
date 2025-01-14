@@ -1,10 +1,9 @@
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
-namespace Reni.SyntaxFactory
+namespace Reni.SyntaxFactory;
+
+interface IValueProvider
 {
-    interface IValueProvider
-    {
-        ValueSyntax Get(BinaryTree target, Factory factory, Anchor frameItems);
-    }
+    ValueSyntax? Get(BinaryTree? target, Factory factory, Anchor frameItems);
 }

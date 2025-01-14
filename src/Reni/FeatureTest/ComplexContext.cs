@@ -19,5 +19,5 @@ namespace Reni.FeatureTest;
 [Output("Ha")]
 public sealed class ComplexContext : CompilerTest
 {
-    protected override string Target => (SmbFile.SourceFolder / "ComplexContext.reni").String;
+    protected override string? Target => (SmbFile.SourceFolder! / "ComplexContext.reni").String!;
 }

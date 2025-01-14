@@ -2,26 +2,25 @@ using hw.Parser;
 using Reni.Parser;
 using Reni.SyntaxFactory;
 
-namespace Reni.TokenClasses
+namespace Reni.TokenClasses;
+
+[BelongsTo(typeof(MainTokenFactory))]
+[BelongsTo(typeof(DeclarationTokenFactory))]
+[Variant(0)]
+[Variant(1)]
+[Variant(2)]
+sealed class List : TokenClass, IBelongingsMatcher, IStatementsToken
 {
-    [BelongsTo(typeof(MainTokenFactory))]
-    [BelongsTo(typeof(DeclarationTokenFactory))]
-    [Variant(0)]
-    [Variant(1)]
-    [Variant(2)]
-    sealed class List : TokenClass, IBelongingsMatcher, IStatementsToken
-    {
-        [DisableDump]
-        internal readonly int Level;
+    [DisableDump]
+    internal readonly int Level;
 
-        public List(int level) => Level = level;
+    public List(int level) => Level = level;
 
-        public override string Id => TokenId(Level);
+    public override string Id => TokenId(Level);
 
-        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
-            => otherMatcher == this;
+    bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+        => otherMatcher == this;
 
-        IStatementsProvider IStatementsToken.Provider => Factory.List;
-        public static string TokenId(int level) => ",;.".Substring(level, 1);
-    }
+    IStatementsProvider IStatementsToken.Provider => Factory.List;
+    public static string TokenId(int level) => ",;.".Substring(level, 1);
 }

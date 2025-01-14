@@ -21,7 +21,8 @@ sealed class List : FiberHead
 
     internal override IEnumerable<CodeBase> ToList() => Data;
 
-    protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    protected override TCode? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        where TCode : default
         => actual.List(this);
 
     protected override CodeBase TryToCombine(FiberItem subsequentElement)
@@ -69,32 +70,26 @@ sealed class List : FiberHead
     protected override Closures GetClosures() => Data.GetClosures();
     internal override void Visit(IVisitor visitor) => visitor.List(Data);
 
-    internal static CodeBase Create(params CodeBase[] data)
+    internal static CodeBase Create(params CodeBase?[] data)
     {
-        var d = data.Where(item => item != null).ToArray();
-        switch(d.Length)
+        var actualData = data.Where(item => item != null).Cast<CodeBase>().ToArray();
+        return actualData.Length switch
         {
-            case 0:
-                return Void;
-            case 1:
-                return d.First();
-            default:
-                return new List(d);
-        }
+            0 => Void, 1 => actualData[0], var _ => new List(actualData)
+        };
     }
 
-    internal static CodeBase CheckedCreate(IEnumerable<CodeBase> data)
+    internal static CodeBase? CheckedCreate(IEnumerable<CodeBase>? data)
     {
         if(data == null)
             return null;
 
         var dataArray = data.ToArray();
 
-        if(!dataArray.Any())
-            return null;
-        if(dataArray.Length == 1)
-            return dataArray[0];
-        return new List(dataArray);
+        return dataArray.Length switch
+        {
+            0 => null, 1 => dataArray[0], var _ => new List(dataArray)
+        };
     }
 
     void AssertValid()
@@ -120,7 +115,7 @@ sealed class List : FiberHead
         var size = Size;
         foreach(var topFrameData in topFrameDatas)
         {
-            if(topFrameData.Size + topFrameData.Offset != size)
+            if(topFrameData!.Size + topFrameData.Offset != size)
                 return false;
             size -= topFrameData.Size;
         }
@@ -128,7 +123,7 @@ sealed class List : FiberHead
         return size.IsZero;
     }
 
-    internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
+    internal TypeBase? Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
         => Data
             .Select(x => x.Visit(argTypeVisitor))
             .DistinctNotNull();

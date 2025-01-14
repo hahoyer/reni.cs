@@ -1,11 +1,11 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest.Reference
-{
-    [UnitTest]
-    [AllScopeHandling]
-    [Target(@"
+namespace Reni.FeatureTest.Reference;
+
+[UnitTest]
+[AllScopeHandling]
+[Target(@"
 o: 
 @
 ( 
@@ -24,12 +24,12 @@ o:
 
 o('abcdef') dump_print1
 ")]
-    [Output("abcdef")]
-    public sealed class FunctionalDumpSimple : CompilerTest;
+[Output("abcdef")]
+public sealed class FunctionalDumpSimple : CompilerTest;
 
-    [UnitTest]
-    [FunctionalDumpSimple]
-    [Target(@"
+[UnitTest]
+[FunctionalDumpSimple]
+[Target(@"
 o: 
 @
 ( 
@@ -45,6 +45,5 @@ o:
 
 o('abcdef') dump_print1
 ")]
-    [Output("adf")]
-    public sealed class ArrayReferenceDumpSimple : CompilerTest;
-}
+[Output("adf")]
+public sealed class ArrayReferenceDumpSimple : CompilerTest;

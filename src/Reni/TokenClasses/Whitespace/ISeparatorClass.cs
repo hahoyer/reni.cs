@@ -1,7 +1,6 @@
-namespace Reni.TokenClasses.Whitespace
+namespace Reni.TokenClasses.Whitespace;
+
+interface ISeparatorClass
 {
-    interface ISeparatorClass
-    {
-        ContactType ContactType { get; }
-    }
+    ContactType ContactType { get; }
 }

@@ -6,11 +6,11 @@ namespace Reni;
 
 sealed class ResultData
 {
-    internal Closures Closures;
-    internal CodeBase Code;
+    internal Closures? Closures;
+    internal CodeBase? Code;
     internal bool? IsHollow;
-    internal Size Size;
-    internal TypeBase Type;
+    internal Size? Size;
+    internal TypeBase? Type;
 
     public void Reset(Category category)
     {
@@ -26,7 +26,7 @@ sealed class ResultData
             Closures = null;
     }
 
-    public void Set(Category category, object value)
+    public void Set(Category category, object? value)
     {
         if(Equals(value, null))
             Reset(category);

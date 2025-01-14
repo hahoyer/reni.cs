@@ -27,7 +27,7 @@ sealed class LineCommentType : DumpableObject, IItemsType, ILine
 
     internal static readonly LineCommentType Instance = new();
 
-    IEnumerable<WhiteSpaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
+    IEnumerable<WhiteSpaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent? parent)
     {
         var headLength = sourcePart.Start.Match(Lexer.Instance.LineCommentHead);
         headLength.AssertIsNotNull();

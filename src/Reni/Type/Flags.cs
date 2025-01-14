@@ -4,14 +4,14 @@ sealed class Flags : DumpableObject
 {
     internal readonly List<string> Names = new();
     internal int CurrentIndex { get; set; }
-    internal string Id { get; private set; }
+    internal string? Id { get; private set; }
 
     internal string DumpPrintText
         => Names.Select((name, i) => Value(i)? "[" + name + "]" : "").Stringify("");
 
     internal bool IsValid => CurrentIndex == Id.Length;
 
-    internal Flags(string id) => Id = id;
+    internal Flags(string? id) => Id = id;
 
     internal static char IdChar(bool value) => value? '.' : ' ';
 
@@ -40,7 +40,7 @@ sealed class Flag : DumpableObject
         Parent.Names.Add(name);
     }
 
-    internal string SetTo(bool value)
+    internal string? SetTo(bool value)
         => Parent.Id.Substring(0, Index)
             + Flags.IdChar(value)
             + Parent.Id.Substring(Index + 1);

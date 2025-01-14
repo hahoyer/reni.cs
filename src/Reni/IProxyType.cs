@@ -1,9 +1,8 @@
 using Reni.Feature;
 
-namespace Reni
+namespace Reni;
+
+interface IProxyType
 {
-    interface IProxyType
-    {
-        IConversion Converter { get; }
-    }
+    IConversion Converter { get; }
 }

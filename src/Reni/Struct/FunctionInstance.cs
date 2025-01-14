@@ -20,7 +20,7 @@ abstract class FunctionInstance
 
     [Node]
     [EnableDump]
-    readonly ValueSyntax Body;
+    readonly ValueSyntax? Body;
 
     bool IsObtainBodyCodeActive;
 
@@ -69,7 +69,7 @@ abstract class FunctionInstance
     [DisableDump]
     internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
 
-    protected FunctionInstance(FunctionType parent, ValueSyntax body)
+    protected FunctionInstance(FunctionType parent, ValueSyntax? body)
     {
         Body = body;
         Parent = parent;

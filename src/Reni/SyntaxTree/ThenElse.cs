@@ -1,4 +1,3 @@
-#nullable enable
 using Reni.Basics;
 using Reni.Context;
 using Reni.Helper;
@@ -11,7 +10,7 @@ sealed class CondSyntax : ValueSyntax
 {
     [Node]
     [EnableDump]
-    readonly ValueSyntax Cond;
+    readonly ValueSyntax? Cond;
 
     [Node]
     [EnableDump]
@@ -22,7 +21,7 @@ sealed class CondSyntax : ValueSyntax
     readonly ValueSyntax? Then;
 
     internal CondSyntax
-        (ValueSyntax condSyntax, ValueSyntax? thenSyntax, ValueSyntax? elseSyntax, Anchor anchor)
+        (ValueSyntax? condSyntax, ValueSyntax? thenSyntax, ValueSyntax? elseSyntax, Anchor anchor)
         : base(anchor)
     {
         Cond = condSyntax;
@@ -99,8 +98,8 @@ sealed class CondSyntax : ValueSyntax
             .GetResult
             (
                 category,
-                () => condResult.Code?.GetThenElse(thenResult.Code, elseResult.Code),
-                () => condResult.Closures + thenResult.Closures + elseResult.Closures
+                () => condResult.Code?.GetThenElse(thenResult.Code!, elseResult.Code!),
+                () => condResult.Closures! + thenResult.Closures! + elseResult.Closures!
             );
     }
 

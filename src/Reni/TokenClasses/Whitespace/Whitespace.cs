@@ -14,11 +14,11 @@ namespace Reni.TokenClasses.Whitespace
 
     interface IParent
     {
-        IWhitespaceItem GetItem<TItemType>()
+        IWhitespaceItem? GetItem<TItemType>()
             where TItemType : IItemType;
 
         IItemType Type { get; }
-        IParent Parent { get; }
+        IParent? Parent { get; }
     }
 
     namespace Comment

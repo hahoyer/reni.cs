@@ -16,9 +16,9 @@ namespace Reni.FeatureTest;
 
 public abstract class TextStruct : CompilerTest
 {
-    protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
+    protected virtual string? InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";
-    static string Definition() => (SmbFile.SourceFolder / "Text.reni").String;
+    static string Definition() => (SmbFile.SourceFolder! / "Text.reni").String!;
 }
 
 [UnitTest]

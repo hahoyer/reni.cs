@@ -1,8 +1,7 @@
-namespace Reni.TokenClasses.Whitespace
+namespace Reni.TokenClasses.Whitespace;
+
+interface IItemType
 {
-    interface IItemType
-    {
-        [DisableDump]
-        bool IsSeparatorRequired { get; }
-    }
+    [DisableDump]
+    bool IsSeparatorRequired { get; }
 }

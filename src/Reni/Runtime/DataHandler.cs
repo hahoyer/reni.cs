@@ -130,8 +130,7 @@ static class DataHandler
 
     internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
     {
-        (data != null).Assert("data != null");
-        fixed(byte* dataPointer = &data![dataStart])
+        fixed(byte* dataPointer = &data[dataStart])
         {
             var intPointer = (int*)dataPointer;
             *intPointer += offset;
@@ -155,7 +154,7 @@ static class DataHandler
 
     internal static void PrintNumber(this byte[] data) => PrintText(new BigInteger(data).ToString());
 
-    internal static void PrintText(this string text) => Data.OutStream.AddData(text);
+    internal static void PrintText(this string text) => Data.OutStream?.AddData(text);
 
     internal static void PrintText(this byte[] text) => new string(text.Select(x => (char)x).ToArray()).PrintText();
 

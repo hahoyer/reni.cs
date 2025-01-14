@@ -1,8 +1,7 @@
-namespace Reni.TokenClasses.Whitespace
+namespace Reni.TokenClasses.Whitespace;
+
+sealed class LineEndType : DumpableObject, IVolatileLineBreak
 {
-    sealed class LineEndType : DumpableObject, IVolatileLineBreak
-    {
-        internal static readonly LineEndType Instance = new();
-        bool IItemType.IsSeparatorRequired => false;
-    }
+    internal static readonly LineEndType Instance = new();
+    bool IItemType.IsSeparatorRequired => false;
 }

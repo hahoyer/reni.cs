@@ -23,48 +23,49 @@
 using Reni.Basics;
 using Reni.Struct;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class Call : FiberItem
 {
-    sealed class Call : FiberItem
+    [Node]
+    [DisableDump]
+    internal readonly FunctionId FunctionId;
+
+    [Node]
+    [DisableDump]
+    readonly Size ResultSize;
+
+    [Node]
+    [DisableDump]
+    internal readonly Size ArgsAndRefsSize;
+
+    internal Call(FunctionId functionId, Size resultSize, Size argsAndRefsSize)
     {
-        [Node]
-        [DisableDump]
-        internal readonly FunctionId FunctionId;
+        FunctionId = functionId;
+        ResultSize = resultSize;
+        ArgsAndRefsSize = argsAndRefsSize;
+        StopByObjectIds(-1);
+    }
 
-        [Node]
-        [DisableDump]
-        readonly Size ResultSize;
+    [DisableDump]
+    internal override Size InputSize => ArgsAndRefsSize;
 
-        [Node]
-        [DisableDump]
-        internal readonly Size ArgsAndRefsSize;
+    [DisableDump]
+    internal override Size OutputSize => ResultSize;
 
-        internal Call(FunctionId functionId, Size resultSize, Size argsAndRefsSize)
-        {
-            FunctionId = functionId;
-            ResultSize = resultSize;
-            ArgsAndRefsSize = argsAndRefsSize;
-            StopByObjectIds(-1);
-        }
+    protected override TFiber? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        where TFiber : default
+        => actual.Call(this);
 
-        [DisableDump]
-        internal override Size InputSize => ArgsAndRefsSize;
+    protected override string GetNodeDump() => base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize;
 
-        [DisableDump]
-        internal override Size OutputSize => ResultSize;
+    internal override void Visit(IVisitor visitor) => visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize);
 
-        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual) => actual.Call(this);
-
-        protected override string GetNodeDump() => base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize;
-
-        internal override void Visit(IVisitor visitor) => visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize);
-
-        public FiberItem TryConvertToRecursiveCall(FunctionId functionId)
-        {
-            if(FunctionId != functionId)
-                return this;
-            ResultSize.IsZero.Assert();
-            return ArgsAndRefsSize.GetRecursiveCall();
-        }
+    public FiberItem TryConvertToRecursiveCall(FunctionId functionId)
+    {
+        if(FunctionId != functionId)
+            return this;
+        ResultSize.IsZero.Assert();
+        return ArgsAndRefsSize.GetRecursiveCall();
     }
 }

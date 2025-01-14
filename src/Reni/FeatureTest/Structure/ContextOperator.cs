@@ -1,11 +1,11 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest.Structure
-{
-    [UnitTest]
-    [InnerAccess]
-    [TargetSet(@"
+namespace Reni.FeatureTest.Structure;
+
+[UnitTest]
+[InnerAccess]
+[TargetSet(@"
 x: @ 
 {
   256;
@@ -17,12 +17,12 @@ x: @
 x() dump_print
 
 ", "(256, ^^, 257, 258)")]
-    public sealed class ContextOperatorPrint : CompilerTest;
+public sealed class ContextOperatorPrint : CompilerTest;
 
-    [UnitTest]
-    [Access]
-    [NamedSimpleAssignment]
-    [TargetSet(@"
+[UnitTest]
+[Access]
+[NamedSimpleAssignment]
+[TargetSet(@"
 x: @ 
 (
   '12345';
@@ -36,13 +36,13 @@ xx : x();
 xxx : xx this;
 xxx xxx dump_print
 ", "257")]
-    public sealed class ContextOperatorAccess : CompilerTest;
+public sealed class ContextOperatorAccess : CompilerTest;
 
-    [UnitTest]
-    [Access]
-    [NamedSimpleAssignment]
-    [ContextOperatorAccess]
-    [TargetSet(@"
+[UnitTest]
+[Access]
+[NamedSimpleAssignment]
+[ContextOperatorAccess]
+[TargetSet(@"
 x: @ 
 (
   '12345';
@@ -56,14 +56,14 @@ xx : x();
 xx this() xxx dump_print
 
 ", "257")]
-    public sealed class ContextOperatorFunctionAccess : CompilerTest;
+public sealed class ContextOperatorFunctionAccess : CompilerTest;
 
-    [UnitTest]
-    [Access]
-    [NamedSimpleAssignment]
-    [ContextOperatorFunctionAccess]
-    [ContextOperatorAccess]
-    [TargetSet(@"
+[UnitTest]
+[Access]
+[NamedSimpleAssignment]
+[ContextOperatorFunctionAccess]
+[ContextOperatorAccess]
+[TargetSet(@"
 x: @ 
 (
   '12345';
@@ -77,13 +77,13 @@ xx : x();
 xx this xxx dump_print
 
 ", "257")]
-    public sealed class ContextOperatorPropertyAccess : CompilerTest;
+public sealed class ContextOperatorPropertyAccess : CompilerTest;
 
-    [UnitTest]
-    [Access]
-    [NamedSimpleAssignment]
-    [ContextOperatorPropertyAccess]
-    [TargetSet(@"
+[UnitTest]
+[Access]
+[NamedSimpleAssignment]
+[ContextOperatorPropertyAccess]
+[TargetSet(@"
 x: @ 
 (
   '12345';
@@ -98,13 +98,12 @@ xx this xxx := 2;
 xx dump_print
 
 ", "(12345, @!, 12345678901, 2, 12345678901234567890123456789)")]
-    public sealed class ContextOperatorAssign : CompilerTest;
+public sealed class ContextOperatorAssign : CompilerTest;
 
-    [UnitTest]
-    [ContextOperatorPrint]
-    [ContextOperatorAccess]
-    [ContextOperatorAssign]
-    [ContextOperatorPropertyAccess]
-    [ContextOperatorFunctionAccess]
-    public sealed class ContextOperator : CompilerTest;
-}
+[UnitTest]
+[ContextOperatorPrint]
+[ContextOperatorAccess]
+[ContextOperatorAssign]
+[ContextOperatorPropertyAccess]
+[ContextOperatorFunctionAccess]
+public sealed class ContextOperator : CompilerTest;

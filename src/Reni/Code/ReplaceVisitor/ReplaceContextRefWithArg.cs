@@ -16,7 +16,7 @@ abstract class ReplaceContextReference<TContext> : Base
         Replacement = replacement;
     }
 
-    internal override CodeBase ContextReference(ReferenceCode visitedObject)
+    internal override CodeBase? ContextReference(ReferenceCode visitedObject)
     {
         if(visitedObject.Target == (IContextReference)Context)
             return Replacement();

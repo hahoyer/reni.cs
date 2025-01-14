@@ -2,37 +2,36 @@
 using Reni.Parser;
 using Reni.SyntaxFactory;
 
-namespace Reni.TokenClasses
+namespace Reni.TokenClasses;
+
+[BelongsTo(typeof(MainTokenFactory))]
+sealed class RightParenthesis
+    : RightParenthesisBase
+        , IBracketMatch<BinaryTree>
+        , ISyntaxScope
+        , IValueToken
 {
-    [BelongsTo(typeof(MainTokenFactory))]
-    sealed class RightParenthesis
-        : RightParenthesisBase
-            , IBracketMatch<BinaryTree>
-            , ISyntaxScope
-            , IValueToken
+    sealed class Matched
+        : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueToken
     {
-        sealed class Matched
-            : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueToken
-        {
-            static string Id => "()";
+        static string Id => "()";
 
-            BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
-                => right == null? left : BinaryTree.Create(left, this, token, right);
+        BinaryTree? IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
+            => right == null? left : BinaryTree.Create(left, this, token, right);
 
-            string IParserTokenType<BinaryTree>.PrioTableId => Id;
-            string ITokenClass.Id => Id;
+        string IParserTokenType<BinaryTree>.PrioTableId => Id;
+        string ITokenClass.Id => Id;
 
-            IValueProvider IValueToken.Provider => Factory.MatchedBracket;
-        }
-
-        public RightParenthesis(int level)
-            : base(level) { }
-
-        [EnableDump]
-        new int Level => base.Level;
-
-        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
-
-        IValueProvider IValueToken.Provider => Factory.Bracket;
+        IValueProvider IValueToken.Provider => Factory.MatchedBracket;
     }
+
+    public RightParenthesis(int level)
+        : base(level) { }
+
+    [EnableDump]
+    new int Level => base.Level;
+
+    IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
+
+    IValueProvider IValueToken.Provider => Factory.Bracket;
 }

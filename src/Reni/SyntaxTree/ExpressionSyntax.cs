@@ -39,18 +39,18 @@ sealed class ExpressionSyntax : ValueSyntax
     [Node]
     [EnableDump(Order = -1)]
     [EnableDumpExcept(null)]
-    internal ValueSyntax Left { get; }
+    internal ValueSyntax? Left { get; }
 
     [Node]
     [EnableDump(Order = 1)]
     [EnableDumpExcept(null)]
-    internal ValueSyntax Right { get; }
+    internal ValueSyntax? Right { get; }
 
     readonly SourcePart Token;
 
     int CurrentResultDepth;
 
-    internal ExpressionSyntax(ValueSyntax left, Definable definable, SourcePart token, ValueSyntax right, Anchor anchor)
+    internal ExpressionSyntax(ValueSyntax? left, Definable definable, SourcePart token, ValueSyntax? right, Anchor anchor)
         : base(anchor)
     {
         Token = token;
@@ -63,7 +63,7 @@ sealed class ExpressionSyntax : ValueSyntax
     [DisableDump]
     protected override int DirectChildCount => 2;
 
-    protected override Syntax GetDirectChild(int index)
+    protected override Syntax? GetDirectChild(int index)
         => index switch
         {
             0 => Left, 1 => Right, _ => null
@@ -101,7 +101,7 @@ sealed class ExpressionSyntax : ValueSyntax
         }
     }
 
-    internal override ValueSyntax Visit(ISyntaxVisitor visitor)
+    internal override ValueSyntax? Visit(ISyntaxVisitor visitor)
     {
         var left = Left?.Visit(visitor);
         var right = Right?.Visit(visitor);
@@ -111,7 +111,7 @@ sealed class ExpressionSyntax : ValueSyntax
         return Create(left ?? Left, Definable, Token, right ?? Right, Anchor);
     }
 
-    internal static ExpressionSyntax Create
-        (ValueSyntax left, Definable definable, SourcePart token, ValueSyntax right, Anchor frameItems)
+    internal static ExpressionSyntax? Create
+        (ValueSyntax? left, Definable definable, SourcePart token, ValueSyntax? right, Anchor frameItems)
         => new(left, definable, token, right, frameItems);
 }

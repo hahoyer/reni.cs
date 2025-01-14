@@ -16,8 +16,7 @@ sealed class LineGroup : DumpableObject
     [EnableDump]
     readonly SourcePart SourcePart;
 
-    readonly IItemType Predecessor;
-    readonly int Lines;
+    readonly IItemType? Predecessor;
     readonly bool IsLast;
     readonly IConfiguration Configuration;
 
@@ -25,7 +24,7 @@ sealed class LineGroup : DumpableObject
 
     /// <summary>
     ///     When this line group belongs to a comment group it is 0.<br />
-    ///     Otherwise it is the minimal line break count from configuration,<br />
+    ///     Otherwise, it is the minimal line break count from configuration,<br />
     ///     reduced by one if the predecessor is a line comment.<br />
     /// </summary>
     /// <remarks>
@@ -38,7 +37,7 @@ sealed class LineGroup : DumpableObject
 
     /// <summary>
     ///     When there is no line limit by configuration it is the number of lines in this group.<br />
-    ///     Otherwise it is the minimum of the line limit by configuration<br />
+    ///     Otherwise, it is the minimum of the line limit by configuration<br />
     ///     - reduced by one if the predecessor is a line comment - and number of lines.
     /// </summary>
     /// <remarks>
@@ -47,8 +46,8 @@ sealed class LineGroup : DumpableObject
     ///     configuration line limit is 0.
     /// </remarks>
     int LineBreaksToKeep => Configuration.EmptyLineLimit == null
-        ? Lines
-        : T(Configuration.EmptyLineLimit.Value - PredecessorLine, Lines).Min();
+        ? field
+        : T(Configuration.EmptyLineLimit.Value - PredecessorLine, field).Min();
 
     /// <summary>
     ///     Target line count respects everything:<br />
@@ -65,8 +64,8 @@ sealed class LineGroup : DumpableObject
 
     /// <summary>
     ///     Will be null if it is line break mode.<br />
-    ///     Otherwise it will be zero or one spaces<br />
-    ///     depending of separator request of the current position (head/inner/tail/flat).
+    ///     Otherwise, it will be zero or one spaces<br />
+    ///     depending on separator request of the current position (head/inner/tail/flat).
     /// </summary>
     int? TargetSpacesCount => LineBreakMode? null :
         Configuration.SeparatorRequests.Get(Predecessor == null, IsLast)? 1 : 0;
@@ -74,7 +73,7 @@ sealed class LineGroup : DumpableObject
     internal LineGroup
     (
         SourcePart sourcePart
-        , IItemType predecessor
+        , IItemType? predecessor
         , int lines
         , bool isLast
         , IConfiguration configuration
@@ -82,7 +81,7 @@ sealed class LineGroup : DumpableObject
     {
         SourcePart = sourcePart;
         Predecessor = predecessor;
-        Lines = lines;
+        LineBreaksToKeep = lines;
         IsLast = isLast;
         Configuration = configuration;
     }

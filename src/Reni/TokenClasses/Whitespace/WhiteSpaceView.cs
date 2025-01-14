@@ -19,9 +19,9 @@ sealed class WhiteSpaceView : DumpableObject
     readonly LineGroup Tail;
 
 
-    internal WhiteSpaceView(CommentGroup[] comments, LineGroup tail, SourcePart sourcePartForTrace)
+    internal WhiteSpaceView(CommentGroup[]? comments, LineGroup tail, SourcePart sourcePartForTrace)
     {
-        Comments = comments ?? new CommentGroup[0];
+        Comments = comments ?? [];
         Tail = tail;
         SourcePartForTrace = sourcePartForTrace;
     }
@@ -31,7 +31,7 @@ sealed class WhiteSpaceView : DumpableObject
     internal IEnumerable<Edit> GetEdits(int indent)
     {
         var commentEdits = Comments
-            .SelectMany((item, index) => item.GetEdits(indent)
+            .SelectMany(item => item.GetEdits(indent)
                 .ToArray());
 
         var linesAndSpacesEdits

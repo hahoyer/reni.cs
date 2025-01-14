@@ -48,12 +48,12 @@ sealed class DeclarerSyntax : DumpableObject
     }
 
     [EnableDumpExcept(null)]
-    internal readonly NameSyntax Name;
+    internal readonly NameSyntax? Name;
 
-    internal readonly TagSyntax[] Tags;
+    internal readonly TagSyntax?[] Tags;
 
     [EnableDumpExcept(null)]
-    internal readonly Syntax.IssueSyntax Issue;
+    internal readonly Syntax.IssueSyntax? Issue;
 
     readonly bool? MeansPublic;
 
@@ -98,9 +98,9 @@ sealed class DeclarerSyntax : DumpableObject
 
     DeclarerSyntax
     (
-        TagSyntax[] tags
+        TagSyntax?[] tags
         , NameSyntax name
-        , Syntax.IssueSyntax issue
+        , Syntax.IssueSyntax? issue
         , bool? meansPublic
     )
     {
@@ -120,7 +120,7 @@ sealed class DeclarerSyntax : DumpableObject
             + Tags.Select(tag => "!" + ((tag?.Value as TokenClass)?.Id ?? "?")).Stringify("")
             + "]";
 
-    internal Syntax GetDirectChild(int index)
+    internal Syntax? GetDirectChild(int index)
     {
         if(index < 0)
             return null;
@@ -135,7 +135,7 @@ sealed class DeclarerSyntax : DumpableObject
 
     internal static DeclarerSyntax Create
     (
-        BinaryTree name
+        BinaryTree? name
         , Annotation[] tags
         , bool meansPublic
     )
@@ -147,7 +147,7 @@ sealed class DeclarerSyntax : DumpableObject
         if(nameIssueAnchors.Length == 0 && tags.Length == 0)
             return new([], nameSyntax, null, meansPublic);
 
-        var issueAnchors = tags
+        BinaryTree?[] issueAnchors = tags
             .Where(i => i.annotation == null)
             .SelectMany(tuple => tuple.anchors)
             .Union(nameIssueAnchors)
@@ -173,7 +173,7 @@ sealed class DeclarerSyntax : DumpableObject
         );
     }
 
-    static NameSyntax GetNameSyntax(BinaryTree name)
+    static NameSyntax GetNameSyntax(BinaryTree? name)
         => name == null? null : new NameSyntax(name.Token.Id, Anchor.Create(name));
 
     static TagSyntax GetTagSyntax(Annotation target)

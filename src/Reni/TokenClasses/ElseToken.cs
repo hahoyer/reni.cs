@@ -2,18 +2,17 @@ using hw.Parser;
 using Reni.Parser;
 using Reni.SyntaxFactory;
 
-namespace Reni.TokenClasses
+namespace Reni.TokenClasses;
+
+[BelongsTo(typeof(MainTokenFactory))]
+sealed class ElseToken : TokenClass, IValueToken, IBelongingsMatcher
 {
-    [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ElseToken : TokenClass, IValueToken, IBelongingsMatcher
-    {
-        public const string TokenId = "else";
+    public const string TokenId = "else";
 
-        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
-            => otherMatcher is ThenToken;
+    bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+        => otherMatcher is ThenToken;
 
-        IValueProvider IValueToken.Provider => Factory.Else;
+    IValueProvider IValueToken.Provider => Factory.Else;
 
-        public override string Id => TokenId;
-    }
+    public override string Id => TokenId;
 }

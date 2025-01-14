@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -8,7 +9,7 @@ namespace Reni;
 /// <summary>
 ///     Contains list of references to compiler environments.
 /// </summary>
-sealed class Closures : DumpableObject, IEquatable<Closures>
+sealed class Closures : DumpableObject, IEquatable<Closures?>
 {
     sealed class ArgumentsClosure : Singleton<ArgumentsClosure>, IContextReference
     {
@@ -27,10 +28,9 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
 
     readonly ValueCache<IContextReference[]> SortedDataCache;
 
-    SizeArray SizesCache;
-
     [DisableDump]
-    SizeArray Sizes => SizesCache ??= CalculateSizes();
+    [field: AllowNull, MaybeNull]
+    SizeArray Sizes => field ??= CalculateSizes();
 
     internal bool HasArguments => Contains(ArgumentsClosure.Instance);
     public int Count => Data.Count;
@@ -65,8 +65,8 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
         : this()
         => AddRange(a);
 
-    public bool Equals(Closures other)
-        => other != null && Data.SequenceEqual(other.Data);
+    public bool Equals(Closures? other)
+        => !ReferenceEquals(other,null) && Data.SequenceEqual(other.Data);
 
     protected override string GetNodeDump() => $"{base.GetNodeDump()}{(IsRecursive? "r" : "")}#{Count}";
 
@@ -83,7 +83,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
         return result;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
         => ReferenceEquals(this, obj) || (obj is Closures other && Equals(other));
 
     public override int GetHashCode() => Data.Sum(item => item.Order);
@@ -228,6 +228,6 @@ sealed class Closures : DumpableObject, IEquatable<Closures>
     public static Closures operator +(Closures x, Closures y) => x.Sequence(y);
     public static Closures operator -(Closures x, Closures y) => x.Without(y);
     public static Closures operator -(Closures x, IContextReference y) => x.Without(y);
-    public static bool operator ==(Closures left, Closures right) => Equals(left, right);
-    public static bool operator !=(Closures left, Closures right) => !Equals(left, right);
+    public static bool operator ==(Closures? left, Closures? right) => Equals(left, right);
+    public static bool operator !=(Closures? left, Closures? right) => !Equals(left, right);
 }

@@ -42,7 +42,7 @@ sealed class BiasCache
         return a - b;
     }
 
-    public string Dump(byte[] data, int position)
+    public string? Dump(byte[] data, int position)
     {
         if(position + DataHandler.RefBytes > data.Length)
             return null;

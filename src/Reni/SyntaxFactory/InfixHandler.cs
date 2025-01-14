@@ -73,7 +73,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public InfixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidInfixExpression, tokenClass) { }
 
-        Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+        Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right)
             => new(category, GetIssue(left.Anchor.SourcePart + right.Anchor.SourcePart));
     }
 
@@ -82,7 +82,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public SuffixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidSuffixExpression, tokenClass) { }
 
-        Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
+        Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax? left)
             => new(category, GetIssue(left.Anchor.SourcePart));
 
     }
@@ -92,7 +92,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public PrefixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidPrefixExpression, tokenClass) { }
 
-        Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax? right, SourcePart token)
             => new(category, GetIssue(right.Anchor.SourcePart));
     }
 
@@ -109,12 +109,12 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         Result ITerminal.GetResult(ContextBase context, Category category, SourcePart token)
             => new(category, GetIssue(token));
 
-        ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor)
+        ValueSyntax? ITerminal.Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return default;
         }
-        TypeBase ITerminal.TryGetTypeBase(SourcePart token)
+        TypeBase? ITerminal.TryGetTypeBase(SourcePart token)
         {
             NotImplementedMethod(token);
             return default;
@@ -127,7 +127,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
             = new(type => new(tokenClass
                 => GetErrorTokenClass(type, tokenClass)));
 
-    ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
+    ValueSyntax? IValueProvider.Get(BinaryTree? target, Factory factory, Anchor anchor)
     {
         var left = factory.GetValueSyntax(target.Left);
         var right = factory.GetValueSyntax(target.Right);

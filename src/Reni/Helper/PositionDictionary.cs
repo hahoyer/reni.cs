@@ -15,20 +15,20 @@ public sealed class PositionDictionary<TResult> : DumpableObject
     internal TResult this[SourcePosition key] => VisibleValues[key];
 
     [DisableDump]
-    TResult this[SourcePart keyPart]
+    TResult? this[SourcePart keyPart]
     {
         get => GetItem(keyPart);
         set => Add(keyPart.Length == 0? InvisibleValues : VisibleValues, keyPart.Start, value);
     }
 
     [DisableDump]
-    internal TResult this[BinaryTree key]
+    internal TResult? this[BinaryTree key]
     {
         get => this[KeyMap(key)];
         set => this[KeyMap(key)] = value;
     }
 
-    TResult GetItem(SourcePart keyPart)
+    TResult? GetItem(SourcePart keyPart)
     {
         (keyPart.Length == 0? InvisibleValues : VisibleValues).TryGetValue(keyPart.Start, out var result);
         return result;

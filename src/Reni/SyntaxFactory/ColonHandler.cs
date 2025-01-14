@@ -7,7 +7,7 @@ namespace Reni.SyntaxFactory;
 
 sealed class ColonHandler : DumpableObject, IStatementProvider
 {
-    IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
+    IStatementSyntax IStatementProvider.Get(BinaryTree? target, Factory factory)
     {
         var (item, annotations) = target.Left.CheckForAnnotations();
         var declarer = DeclarerSyntax.Create(item, annotations??[], factory.MeansPublic);

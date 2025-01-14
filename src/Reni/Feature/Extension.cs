@@ -26,17 +26,17 @@ static class Extension
             function =>
                 new(type => new(function, type)));
 
-    internal static Value Value(Func<Category, Result> function, TypeBase target = null)
+    internal static Value Value(Func<Category, Result> function, TypeBase? target = null)
         => ValueCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
     internal static Conversion Conversion
-        (Func<Category, Result> function, TypeBase target = null)
+        (Func<Category, Result> function, TypeBase? target = null)
         => ConversionCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
     internal static ObjectFunction FunctionFeature
     (
         Func<Category, IContextReference, TypeBase, Result> function,
-        IContextReferenceProvider target = null
+        IContextReferenceProvider? target = null
     )
     {
         var context = (target ?? function.Target as IContextReferenceProvider).AssertNotNull();
@@ -54,10 +54,10 @@ static class Extension
         (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
         => MetaFunctionCache[function];
 
-    internal static TypeBase ResultType(this IConversion conversion)
-        => conversion.GetResult(Category.Type).Type;
+    internal static TypeBase? ResultType(this IConversion conversion)
+        => conversion.GetResult(Category.Type)?.Type;
 
-    internal static Result GetResult(this IConversion conversion, Category category)
+    internal static Result? GetResult(this IConversion conversion, Category category)
     {
         var result = conversion.Execute(category);
         if(result == null)
@@ -71,17 +71,17 @@ static class Extension
     }
 
     public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
-        (this T target, IEnumerable<IGenericProviderForType> baseList = null)
+        (this T target, IEnumerable<IGenericProviderForType>? baseList = null)
         where T : TypeBase
         => CreateList(baseList, () => new GenericProviderForType<T>(target));
 
     public static IEnumerable<IDeclarationProvider> GenericListFromDefinable<T>
-        (this T target, IEnumerable<IDeclarationProvider> baseList = null)
+        (this T target, IEnumerable<IDeclarationProvider>? baseList = null)
         where T : Definable
         => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
 
     static IEnumerable<TGeneric> CreateList<TGeneric>
-        (IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
+        (IEnumerable<TGeneric>? baseList, Func<TGeneric> creator)
     {
         yield return creator();
 
@@ -98,7 +98,7 @@ static class Extension
         Category category,
         SourcePart currentTarget,
         ContextBase context,
-        ValueSyntax right
+        ValueSyntax? right
     )
     {
         (feature.Function == null || !feature.Function.IsImplicit || feature.Value == null)
@@ -129,16 +129,16 @@ static class Extension
         var argsType = argsResult.Type;
 
         return feature
-            .Function
+            .Function!
             .GetResult(category, argsType)
             .ReplaceArguments(argsResult);
 
     }
 
-    static Result ValueResult
+    static Result? ValueResult
     (
         this IEvalImplementation feature,
-        ValueSyntax right,
+        ValueSyntax? right,
         Category valueCategory
     )
     {
@@ -161,7 +161,7 @@ static class Extension
         ResultCache left,
         SourcePart token,
         ContextBase context,
-        ValueSyntax right
+        ValueSyntax? right
     )
     {
         var metaFeature = ((IMetaImplementation)feature).Function;
@@ -173,7 +173,7 @@ static class Extension
             .ReplaceArguments(left);
     }
 
-    internal static T DistinctNotNull<T>(this IEnumerable<T> enumerable)
+    internal static T? DistinctNotNull<T>(this IEnumerable<T?> enumerable)
         where T : class
         => enumerable
             .Where(x => x != null)

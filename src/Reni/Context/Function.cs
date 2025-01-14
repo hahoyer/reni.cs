@@ -12,9 +12,9 @@ sealed class Function : Child, IFunctionContext
     readonly int Order;
 
     [Node]
-    TypeBase ValueType { get; }
+    TypeBase? ValueType { get; }
 
-    internal Function(ContextBase parent, TypeBase argumentsType, TypeBase valueType = null)
+    internal Function(ContextBase parent, TypeBase argumentsType, TypeBase? valueType = null)
         : base(parent)
     {
         Order = Closures.NextOrder++;

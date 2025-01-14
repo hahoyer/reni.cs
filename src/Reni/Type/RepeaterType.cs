@@ -1,9 +1,8 @@
-namespace Reni.Type
+namespace Reni.Type;
+
+interface IRepeaterType
 {
-    interface IRepeaterType
-    {
-        TypeBase ElementType { get; }
-        TypeBase IndexType { get; }
-        bool IsMutable { get; }
-    }
+    TypeBase ElementType { get; }
+    TypeBase IndexType { get; }
+    bool IsMutable { get; }
 }

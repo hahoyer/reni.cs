@@ -1,11 +1,10 @@
 using Reni.TokenClasses;
 
-namespace Reni.SyntaxTree
+namespace Reni.SyntaxTree;
+
+interface IItem
 {
-    interface IItem
-    {
-        Anchor Anchor { get; }
-        Syntax[] DirectChildren { get; }
-        BinaryTree SpecialAnchor { get; }
-    }
+    Anchor Anchor { get; }
+    Syntax[] DirectChildren { get; }
+    BinaryTree SpecialAnchor { get; }
 }

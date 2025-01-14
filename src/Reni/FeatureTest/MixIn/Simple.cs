@@ -2,12 +2,12 @@ using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Reference;
 
-namespace Reni.FeatureTest.MixIn
-{
-    [UnitTest]
-    [ReferenceSimple]
-    [ArrayReferenceAll]
-    [TargetSet(@"
+namespace Reni.FeatureTest.MixIn;
+
+[UnitTest]
+[ReferenceSimple]
+[ArrayReferenceAll]
+[TargetSet(@"
 Base: @ 
 (
     a: 3;
@@ -21,5 +21,4 @@ This: @
 
 This()a dump_print
 ", "3")]
-    public sealed class Simple : CompilerTest;
-}
+public sealed class Simple : CompilerTest;

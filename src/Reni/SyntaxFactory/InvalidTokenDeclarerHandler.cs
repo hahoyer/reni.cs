@@ -1,4 +1,3 @@
-namespace Reni.SyntaxFactory
-{
-    class InvalidTokenDeclarerHandler : DumpableObject, IDeclarerProvider;
-}
+namespace Reni.SyntaxFactory;
+
+class InvalidTokenDeclarerHandler : DumpableObject, IDeclarerProvider;

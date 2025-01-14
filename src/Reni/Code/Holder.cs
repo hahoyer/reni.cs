@@ -1,16 +1,15 @@
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class Holder : DumpableObject
 {
-    sealed class Holder : DumpableObject
+    public Holder(int index, int id)
     {
-        public Holder(int index, int id)
-        {
-            Index = index;
-            Id = id;
-        }
-
-        int Id { get; }
-        int Index { get; }
-
-        public string Name => "h" + Id + "_" + Index;
+        Index = index;
+        Id = id;
     }
+
+    int Id { get; }
+    int Index { get; }
+
+    public string Name => "h" + Id + "_" + Index;
 }

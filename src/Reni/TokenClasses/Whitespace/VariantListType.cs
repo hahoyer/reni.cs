@@ -4,7 +4,7 @@ namespace Reni.TokenClasses.Whitespace;
 
 abstract class VariantListType : DumpableObject, IItemsType, IItemType
 {
-    IEnumerable<WhiteSpaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent parent)
+    IEnumerable<WhiteSpaceItem> IItemsType.GetItems(SourcePart sourcePart, IParent? parent)
     {
         var sourcePosition = sourcePart.Start.Clone;
         while(sourcePosition < sourcePart.End)

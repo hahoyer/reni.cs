@@ -23,21 +23,20 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest.Structure
-{
-    [UnitTest]
-    [AccessSimple]
-    [AccessSimple1]
-    [Target(@"
+namespace Reni.FeatureTest.Structure;
+
+[UnitTest]
+[AccessSimple]
+[AccessSimple1]
+[Target(@"
 ((0;1;2;300;) _A_T_ 0) dump_print;
 ((0;1;2;300;) _A_T_ 1) dump_print;
 ((0;1;2;300;) _A_T_ 2) dump_print;
 ((0;1;2;300;) _A_T_ 3) dump_print;
 ")]
-    [Output("012300")]
-    public sealed class Access : CompilerTest
-    {
-        [UnitTest]
-        public override void Run() => BaseRun();
-    }
+[Output("012300")]
+public sealed class Access : CompilerTest
+{
+    [UnitTest]
+    public override void Run() => BaseRun();
 }

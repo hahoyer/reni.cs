@@ -1,30 +1,29 @@
 using Reni.Basics;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class LocalStackReference : DumpableObject, IStackDataAddressBase
 {
-    sealed class LocalStackReference : DumpableObject, IStackDataAddressBase
+    [EnableDump]
+    readonly FunctionCache<string, StackData> Locals;
+
+    [EnableDump]
+    readonly string Holder;
+
+    public LocalStackReference(FunctionCache<string, StackData> locals, string holder)
     {
-        [EnableDump]
-        readonly FunctionCache<string, StackData> Locals;
+        Locals = locals;
+        Holder = holder;
+    }
 
-        [EnableDump]
-        readonly string Holder;
+    string IStackDataAddressBase.Dump() => Holder;
 
-        public LocalStackReference(FunctionCache<string, StackData> locals, string holder)
-        {
-            Locals = locals;
-            Holder = holder;
-        }
+    StackData IStackDataAddressBase.GetTop(Size offset, Size size)
+        => Locals[Holder].DoPull(offset).DoGetTop(size);
 
-        string IStackDataAddressBase.Dump() => Holder;
-
-        StackData IStackDataAddressBase.GetTop(Size offset, Size size)
-            => Locals[Holder].DoPull(offset).DoGetTop(size);
-
-        void IStackDataAddressBase.SetTop(Size offset, StackData right)
-        {
-            var dataForTrace = ((IStackDataAddressBase)this).GetTop(offset, right.Size);
-            NotImplementedMethod(offset, right, nameof(dataForTrace), dataForTrace);
-        }
+    void IStackDataAddressBase.SetTop(Size offset, StackData right)
+    {
+        var dataForTrace = ((IStackDataAddressBase)this).GetTop(offset, right.Size);
+        NotImplementedMethod(offset, right, nameof(dataForTrace), dataForTrace);
     }
 }

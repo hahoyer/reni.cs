@@ -1,4 +1,3 @@
-#nullable enable
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -30,7 +29,7 @@ abstract class TypeBase
 
         [Node]
         [SmartNode]
-        public readonly FunctionCache<int, FunctionCache<string, ArrayType>> Array;
+        public readonly FunctionCache<int, FunctionCache<string?, ArrayType>> Array;
 
         [Node]
         [SmartNode]
@@ -68,7 +67,7 @@ abstract class TypeBase
 
         [Node]
         [SmartNode]
-        internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
+        internal readonly FunctionCache<string?, ArrayReferenceType> ArrayReferenceCache;
 
         public CacheContainer(TypeBase parent)
         {
@@ -355,7 +354,7 @@ abstract class TypeBase
     protected virtual TypeBase GetReversePair(TypeBase first) => first.Cache.Pair[this];
     internal virtual TypeBase GetPair(TypeBase second) => second.GetReversePair(this);
 
-    internal virtual Result? GetCleanup(Category category)
+    internal virtual Result GetCleanup(Category category)
         => GetVoidCodeAndRefs(category);
 
     internal virtual Result? GetCopier(Category category) => GetVoidCodeAndRefs(category);
@@ -461,7 +460,7 @@ abstract class TypeBase
     internal ArrayType GetArray(int count, string? options = null)
         => Cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
 
-    internal ArrayReferenceType GetArrayReference(string optionsId)
+    internal ArrayReferenceType GetArrayReference(string? optionsId)
         => Cache.ArrayReferenceCache[optionsId];
 
     internal Result GetArrayCopier(Category category)
@@ -472,7 +471,7 @@ abstract class TypeBase
 
     internal Result GetArrayCleanup(Category category)
     {
-        GetCleanup(category)?.IsEmpty.Assert();
+        GetCleanup(category).IsEmpty.Assert();
         return GetVoidCodeAndRefs(category);
     }
 
@@ -721,7 +720,7 @@ abstract class TypeBase
         SourcePart currentTarget,
         Definable? definable,
         ContextBase context,
-        ValueSyntax right
+        ValueSyntax? right
     )
     {
         var searchResults

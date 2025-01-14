@@ -33,20 +33,20 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
     internal override Result GetResultForCache(ContextBase context, Category category)
         => Terminal.GetResult(context, category, Token);
 
-    internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
+    internal override ValueSyntax? Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 }
 
 sealed class PrefixSyntax : ValueSyntax
 {
     [Node]
-    internal readonly ValueSyntax Right;
+    internal readonly ValueSyntax? Right;
 
     [Node]
     readonly IPrefix Prefix;
 
     readonly SourcePart Token;
 
-    public PrefixSyntax(IPrefix prefix, ValueSyntax right, SourcePart token, Anchor brackets)
+    public PrefixSyntax(IPrefix prefix, ValueSyntax? right, SourcePart token, Anchor brackets)
         : base(brackets)
     {
         Prefix = prefix;
@@ -57,23 +57,23 @@ sealed class PrefixSyntax : ValueSyntax
 
     protected override int DirectChildCount => 1;
 
-    protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
+    protected override Syntax? GetDirectChild(int index) => index == 0? Right : null;
 
     internal override Result GetResultForCache(ContextBase context, Category category)
         => Prefix.GetResult(context, category, Right, Token);
 
     public static Result<ValueSyntax> Create
-        (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
+        (IPrefix prefix, Result<ValueSyntax?> right, SourcePart token, Anchor brackets)
         => new PrefixSyntax(prefix, right.Target, token, brackets).AddIssues<ValueSyntax>(right.Issues);
 }
 
 sealed class InfixSyntax : ValueSyntax
 {
     [Node]
-    internal readonly ValueSyntax Left;
+    internal readonly ValueSyntax? Left;
 
     [Node]
-    internal readonly ValueSyntax Right;
+    internal readonly ValueSyntax? Right;
 
     [Node]
     internal readonly IInfix Infix;
@@ -81,7 +81,7 @@ sealed class InfixSyntax : ValueSyntax
     [PublicAPI]
     internal readonly SourcePart Token;
 
-    public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, SourcePart token, Anchor brackets)
+    public InfixSyntax(ValueSyntax? left, IInfix infix, ValueSyntax? right, SourcePart token, Anchor brackets)
         : base(brackets)
     {
         Left = left;
@@ -94,7 +94,7 @@ sealed class InfixSyntax : ValueSyntax
 
     protected override int DirectChildCount => 2;
 
-    protected override Syntax GetDirectChild(int index)
+    protected override Syntax? GetDirectChild(int index)
         => index switch
         {
             0 => Left, 1 => Right, _ => null
@@ -105,7 +105,7 @@ sealed class InfixSyntax : ValueSyntax
 
     public static Result<ValueSyntax> Create
     (
-        Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, SourcePart token
+        Result<ValueSyntax?> left, IInfix infix, Result<ValueSyntax?> right, SourcePart token
         , Anchor brackets
     )
     {
@@ -116,13 +116,13 @@ sealed class InfixSyntax : ValueSyntax
 
 interface IPendingProvider
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
+    Result GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right);
 }
 
 sealed class SuffixSyntax : ValueSyntax
 {
     [Node]
-    internal readonly ValueSyntax Left;
+    internal readonly ValueSyntax? Left;
 
     [Node]
     readonly ISuffix Suffix;
@@ -131,7 +131,7 @@ sealed class SuffixSyntax : ValueSyntax
     [EnableDump]
     readonly SourcePart Token;
 
-    internal SuffixSyntax(ValueSyntax left, ISuffix suffix, SourcePart token, Anchor brackets)
+    internal SuffixSyntax(ValueSyntax? left, ISuffix suffix, SourcePart token, Anchor brackets)
         : base(brackets)
     {
         Left = left;
@@ -143,13 +143,13 @@ sealed class SuffixSyntax : ValueSyntax
     [DisableDump]
     protected override int DirectChildCount => 1;
 
-    protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
+    protected override Syntax? GetDirectChild(int index) => index == 0? Left : null;
 
     internal override Result GetResultForCache(ContextBase context, Category category)
         => Suffix.GetResult(context, category, Left);
 
     public static Result<ValueSyntax> Create
-        (Result<ValueSyntax> left, ISuffix suffix, SourcePart token, Anchor brackets)
+        (Result<ValueSyntax?> left, ISuffix suffix, SourcePart token, Anchor brackets)
     {
         ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, token, brackets);
         return syntax.AddIssues(left.Issues);
@@ -159,22 +159,22 @@ sealed class SuffixSyntax : ValueSyntax
 interface ITerminal
 {
     Result GetResult(ContextBase context, Category category, SourcePart token);
-    ValueSyntax Visit(ISyntaxVisitor visitor);
+    ValueSyntax? Visit(ISyntaxVisitor visitor);
     Declaration[] Declarations { get; }
-    TypeBase TryGetTypeBase(SourcePart token);
+    TypeBase? TryGetTypeBase(SourcePart token);
 }
 
 interface IPrefix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
+    Result GetResult(ContextBase context, Category category, ValueSyntax? right, SourcePart token);
 }
 
 interface IInfix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
+    Result GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right);
 }
 
 interface ISuffix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax left);
+    Result GetResult(ContextBase context, Category category, ValueSyntax? left);
 }

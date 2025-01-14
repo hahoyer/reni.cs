@@ -1,30 +1,29 @@
 ﻿using hw.Parser;
 using Reni.Parser;
 
-namespace Reni.TokenClasses
+namespace Reni.TokenClasses;
+
+[BelongsTo(typeof(DeclarationTokenFactory))]
+sealed class RightDeclarationParenthesis
+    : RightParenthesisBase
+        , IBracketMatch<BinaryTree>
+
 {
-    [BelongsTo(typeof(DeclarationTokenFactory))]
-    sealed class RightDeclarationParenthesis
-        : RightParenthesisBase
-            , IBracketMatch<BinaryTree>
-
+    sealed class Matched
+        : DumpableObject
+            , IParserTokenType<BinaryTree>
     {
-        sealed class Matched
-            : DumpableObject
-                , IParserTokenType<BinaryTree>
+        BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
         {
-            BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
-            {
-                (right == null).Assert();
-                return left;
-            }
-
-            string IParserTokenType<BinaryTree>.PrioTableId => "()";
+            (right == null).Assert();
+            return left!;
         }
 
-        public RightDeclarationParenthesis(int level)
-            : base(level) { }
-
-        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
+        string IParserTokenType<BinaryTree>.PrioTableId => "()";
     }
+
+    public RightDeclarationParenthesis(int level)
+        : base(level) { }
+
+    IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 }

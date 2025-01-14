@@ -26,7 +26,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     [DisableDump]
     internal BinaryTree Main => this.CachedValue(GetMain);
 
-    Anchor(params BinaryTree[] items)
+    Anchor(params BinaryTree?[] items)
     {
         Items = items
             .Where(item => item != null)
@@ -52,8 +52,8 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         return base.GetNodeDump() + itemDump;
     }
 
-    internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.Start);
-    internal Anchor GetRightOf(BinaryTree target) => GetRightOf(target.Token.End);
+    internal Anchor GetLeftOf(BinaryTree? target) => GetLeftOf(target.Token.Start);
+    internal Anchor GetRightOf(BinaryTree? target) => GetRightOf(target.Token.End);
 
     [PublicAPI]
     internal Anchor GetLeftOf(SourcePosition position)
@@ -66,15 +66,15 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     internal static Anchor Create(string reasonForEmptiness)
         => new(reasonForEmptiness);
 
-    internal static Anchor Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
+    internal static Anchor Create(BinaryTree? leftAnchor, BinaryTree? rightAnchor)
         => new(leftAnchor, rightAnchor);
 
-    internal static Anchor Create(BinaryTree leftAnchor)
+    internal static Anchor Create(BinaryTree? leftAnchor)
         => new(leftAnchor.AssertNotNull());
 
-    internal static Anchor Create(params BinaryTree[] items) => new(items);
+    internal static Anchor Create(params BinaryTree?[] items) => new(items);
 
-    internal static Anchor CheckedCreate(params BinaryTree[] items)
+    internal static Anchor CheckedCreate(params BinaryTree?[] items)
         => items == null || items.Length == 0? null : new(items);
 
     internal Anchor Combine(Anchor other, bool check = false)
@@ -102,7 +102,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
             item.SetSyntax(syntax);
     }
 
-    public static Anchor CreateAll(BinaryTree target)
+    public static Anchor CreateAll(BinaryTree? target)
         => Create(target.GetNodesFromLeftToRight().ToArray());
 
     public static Anchor operator +(Anchor left, Anchor right)

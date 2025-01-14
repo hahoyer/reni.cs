@@ -68,10 +68,10 @@ public sealed class Size
         : base(NextObjectId++)
         => Value = value;
 
-    Size IAggregateable<Size>.Aggregate(Size other) => this + other;
+    Size IAggregateable<Size>.Aggregate(Size? other) => this + other!;
 
-    public int CompareTo(Size other) => LessThan(other)? -1 :
-        other.LessThan(this)? 1 : 0;
+    int IComparable<Size>.CompareTo(Size? other) => LessThan(other!)? -1 :
+        other!.LessThan(this)? 1 : 0;
 
 
     /// <summary>
@@ -88,7 +88,7 @@ public sealed class Size
 
     public static Size Create(int x)
     {
-        var result = (Size)Values[x];
+        var result = (Size?)Values[x];
         if(result == null)
         {
             result = new(x);

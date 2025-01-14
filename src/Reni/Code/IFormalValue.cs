@@ -1,10 +1,9 @@
-﻿namespace Reni.Code
+﻿namespace Reni.Code;
+
+internal interface IFormalValue
 {
-    internal interface IFormalValue
-    {
-        string Dump(int index, int size);
-        string Dump();
-        IFormalValue RefPlus(int right);
-        void Check(FormalValueAccess[] accesses);
-    }
+    string Dump(int index, int size);
+    string Dump();
+    IFormalValue RefPlus(int right);
+    void Check(FormalValueAccess[] accesses);
 }

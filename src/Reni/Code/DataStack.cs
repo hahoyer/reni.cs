@@ -18,7 +18,7 @@ sealed class DataStack : DumpableObject, IVisitor
     {
         public StackData Data;
         public FrameData Frame = new(null);
-        public LocalDataClass(IOutStream outStream) => Data = new EmptyStackData(outStream);
+        public LocalDataClass(IOutStream? outStream) => Data = new EmptyStackData(outStream);
 
         string IStackDataAddressBase.Dump() => "stack";
 
@@ -41,7 +41,7 @@ sealed class DataStack : DumpableObject, IVisitor
     }
 
     [DisableDump]
-    internal ITraceCollector TraceCollector;
+    internal ITraceCollector? TraceCollector;
 
     readonly IExecutionContext Context;
 
@@ -146,7 +146,7 @@ sealed class DataStack : DumpableObject, IVisitor
     {
         var oldFrame = LocalData.Frame;
         var argsAndRefs = Pull(argsAndRefsSize);
-        TraceCollector.Call(argsAndRefs, functionId);
+        TraceCollector?.Call(argsAndRefs, functionId);
         do
         {
             LocalData.Frame = new(argsAndRefs);
@@ -154,7 +154,7 @@ sealed class DataStack : DumpableObject, IVisitor
         }
         while(LocalData.Frame.IsRepeatRequired);
 
-        TraceCollector.Return();
+        TraceCollector?.Return();
         LocalData.Frame = oldFrame;
     }
 
@@ -192,7 +192,7 @@ sealed class DataStack : DumpableObject, IVisitor
 
     void IVisitor.PrintText(Size size, Size itemSize) => Pull(size).PrintText(itemSize);
 
-    void IVisitor.PrintText(string dumpPrintText) => Context.OutStream.AddData(dumpPrintText);
+    void IVisitor.PrintText(string dumpPrintText) => Context.OutStream?.AddData(dumpPrintText);
 
     void IVisitor.RecursiveCall() => LocalData.Frame.IsRepeatRequired = true;
 
@@ -245,7 +245,7 @@ sealed class DataStack : DumpableObject, IVisitor
         if(condition)
             return;
 
-        TraceCollector.AssertionFailed(dumper, 1);
+        TraceCollector?.AssertionFailed(dumper, 1);
     }
 
     void SubVisit(IFormalCodeItem codeBase)
@@ -266,7 +266,7 @@ sealed class DataStack : DumpableObject, IVisitor
 
 interface IExecutionContext
 {
-    IOutStream OutStream { get; }
+    IOutStream? OutStream { get; }
     CodeBase Function(FunctionId functionId);
 }
 

@@ -9,6 +9,7 @@ using Reni.SyntaxTree;
 namespace Reni.TokenClasses;
 
 [BelongsTo(typeof(MainTokenFactory))]
+[UsedImplicitly]
 sealed class NewValueToken : NonSuffixSyntaxToken
 {
     public const string TokenId = "new_value";
@@ -23,9 +24,9 @@ sealed class NewValueToken : NonSuffixSyntaxToken
             .CreateValueReferenceResult(category);
 
     protected override Result GetResult
-        (ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        (ContextBase context, Category category, ValueSyntax? right, SourcePart token)
     {
         NotImplementedMethod(context, category, token, right);
-        return default;
+        return default!;
     }
 }

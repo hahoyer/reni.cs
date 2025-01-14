@@ -20,7 +20,7 @@ sealed class AccessFeature
     [EnableDump]
     public int Position { get; }
 
-    ValueCache<IFunction> FunctionFeature { get; }
+    ValueCache<IFunction?> FunctionFeature { get; }
 
     ValueSyntax Statement => View
         .Compound
@@ -41,9 +41,9 @@ sealed class AccessFeature
 
     TypeBase IConversion.Source => View.Type.Pointer;
 
-    IFunction IEvalImplementation.Function => FunctionFeature.Value;
+    IFunction? IEvalImplementation.Function => FunctionFeature.Value;
 
-    IValue IEvalImplementation.Value
+    IValue? IEvalImplementation.Value
     {
         get
         {
@@ -54,7 +54,7 @@ sealed class AccessFeature
         }
     }
 
-    IMeta IMetaImplementation.Function
+    IMeta? IMetaImplementation.Function
         => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
     Result ResultCache.IResultProvider.Execute(Category category) => GetResult(category);
@@ -63,13 +63,13 @@ sealed class AccessFeature
 
     Result GetResult(Category category) => View.AccessViaObject(category, Position);
 
-    IFunction ObtainFunctionFeature()
+    IFunction? ObtainFunctionFeature()
     {
         if(Statement is FunctionSyntax functionSyntax)
             return functionSyntax.FunctionFeature(View);
 
         var valueType = View.ValueType(Position);
         StopByObjectIds();
-        return ((IEvalImplementation)valueType.CheckedFeature)?.Function;
+        return ((IEvalImplementation?)valueType.CheckedFeature)?.Function;
     }
 }

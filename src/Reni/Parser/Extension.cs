@@ -7,12 +7,12 @@ namespace Reni.Parser;
 
 static class Extension
 {
-    internal static T[] Plus<T>(this IEnumerable<T> x, IEnumerable<T> y)
+    internal static T[] Plus<T>(this IEnumerable<T>? x, IEnumerable<T>? y)
         => (x ?? new T[0])
             .Concat(y ?? new T[0])
             .ToDistinctNotNullArray();
 
-    internal static T[] Plus<T>(this IEnumerable<T> x, T y)
+    internal static T[] Plus<T>(this IEnumerable<T>? x, T y)
         where T : class
         => (x ?? new T[0])
             .Concat(y.NullableToArray())
@@ -21,25 +21,25 @@ static class Extension
     internal static T[] Plus<T>(this T x, IEnumerable<T> y)
         => new[] { x }.Concat(y).ToDistinctNotNullArray();
 
-    internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
+    internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T>? y)
         => (y ?? new T[0]).Where(item => item != null).Distinct().ToArray();
 
-    internal static bool IsRelevantWhitespace(this IEnumerable<IItem> whiteSpaces)
+    internal static bool IsRelevantWhitespace(this IEnumerable<IItem>? whiteSpaces)
         => whiteSpaces?.Any(item => !Lexer.IsSpace(item)) ?? false;
 
     internal static bool HasComment(this IToken token)
         => Lexer.Instance.HasComment(token.GetPrefixSourcePart());
 
-    internal static bool HasComment(this IEnumerable<IItem> whiteSpaces)
+    internal static bool HasComment(this IEnumerable<IItem>? whiteSpaces)
         => whiteSpaces?.Any(IsComment) ?? false;
 
-    internal static bool HasLineComment(this IEnumerable<IItem> whiteSpaces)
+    internal static bool HasLineComment(this IEnumerable<IItem>? whiteSpaces)
         => whiteSpaces?.Any(Lexer.IsLineComment) ?? false;
 
-    internal static bool HasMultiLineComment(this IEnumerable<IItem> whiteSpaces)
+    internal static bool HasMultiLineComment(this IEnumerable<IItem>? whiteSpaces)
         => whiteSpaces?.Any(Lexer.IsMultiLineComment) ?? false;
 
-    internal static bool HasWhiteSpaces(this IEnumerable<IItem> whiteSpaces)
+    internal static bool HasWhiteSpaces(this IEnumerable<IItem>? whiteSpaces)
         => whiteSpaces?.Any(Lexer.IsSpace) ?? false;
 
     internal static bool HasLineAtEnd(this IItem item) => item.IsLineEnd() || item.IsLineComment();
@@ -144,23 +144,23 @@ static class Extension
         }
     }
 
-    internal static IMatch SavePart(this IMatch target, Action<string> onMatch, Action onMismatch = null)
+    internal static IMatch SavePart(this IMatch target, Action<string> onMatch, Action? onMismatch = null)
         => new SavePartMatch(target, onMatch, onMismatch);
 
     internal static int? Apply(this IMatch pattern, string target)
         => (new Source(target) + 0).Match(pattern);
 
-    internal static Result<TTarget> AddIssues<TTarget>(this TTarget target, params Issue[] issues)
+    internal static Result<TTarget> AddIssues<TTarget>(this TTarget target, params Issue[]? issues)
         where TTarget : class
         => new(target, issues);
 
-    internal static Result<TResult> Apply<TArg1, TResult>(this Result<TArg1> arg1, Func<TArg1, TResult> creator)
+    internal static Result<TResult> Apply<TArg1, TResult>(this Result<TArg1>? arg1, Func<TArg1?, TResult> creator)
         where TArg1 : class
         where TResult : class
         => creator(arg1?.Target).AddIssues(arg1?.Issues);
 
     internal static Result<TResult> Apply<TArg1, TArg2, TResult>
-        (this(Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, TResult> creator)
+        (this(Result<TArg1>? arg1, Result<TArg2>? arg2) arg, Func<TArg1?, TArg2?, TResult> creator)
         where TArg1 : class
         where TArg2 : class
         where TResult : class
@@ -169,8 +169,8 @@ static class Extension
 
     internal static Result<TResult> Apply<TArg1, TArg2, TArg3, TResult>
     (
-        this(Result<TArg1> arg1, Result<TArg2> arg2, Result<TArg3> arg3) arg
-        , Func<TArg1, TArg2, TArg3, TResult> creator
+        this(Result<TArg1>? arg1, Result<TArg2>? arg2, Result<TArg3>? arg3) arg
+        , Func<TArg1?, TArg2?, TArg3?, TResult> creator
     )
         where TArg1 : class
         where TArg2 : class
@@ -180,13 +180,13 @@ static class Extension
             .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).ConcatMany().ToArray());
 
     internal static Result<TResult> Apply<TArg1, TResult>
-        (this Result<TArg1> arg1, Func<TArg1, Result<TResult>> creator)
+        (this Result<TArg1>? arg1, Func<TArg1?, Result<TResult>> creator)
         where TArg1 : class
         where TResult : class
         => creator(arg1?.Target).With(arg1?.Issues);
 
     internal static Result<TResult> Apply<TArg1, TArg2, TResult>
-        (this(Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, Result<TResult>> creator)
+        (this(Result<TArg1>? arg1, Result<TArg2>? arg2) arg, Func<TArg1?, TArg2?, Result<TResult>> creator)
         where TArg1 : class
         where TArg2 : class
         where TResult : class
@@ -195,8 +195,8 @@ static class Extension
 
     internal static Result<TResult> Apply<TArg1, TArg2, TArg3, TResult>
     (
-        this(Result<TArg1> arg1, Result<TArg2> arg2, Result<TArg3> arg3) arg
-        , Func<TArg1, TArg2, TArg3, Result<TResult>> creator
+        this(Result<TArg1>? arg1, Result<TArg2>? arg2, Result<TArg3>? arg3) arg
+        , Func<TArg1?, TArg2?, TArg3?, Result<TResult>> creator
     )
         where TArg1 : class
         where TArg2 : class
@@ -274,7 +274,7 @@ static class Extension
         return result + current.End.Span(dumpWith).Id + "..." + (next.Start + -dumpWith).Span(dumpWith).Id + "[";
     }
 
-    internal static SourcePart Combine(this IEnumerable<SourcePart> target1)
+    internal static SourcePart? Combine(this IEnumerable<SourcePart> target1)
     {
         var target = target1.ToArray();
 

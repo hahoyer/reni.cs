@@ -1,7 +1,6 @@
-namespace Reni.SyntaxFactory
+namespace Reni.SyntaxFactory;
+
+interface IStatementsToken
 {
-    interface IStatementsToken
-    {
-        IStatementsProvider Provider { get; }
-    }
+    IStatementsProvider Provider { get; }
 }

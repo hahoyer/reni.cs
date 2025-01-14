@@ -26,7 +26,7 @@ sealed class ArrayReferenceType
         Flags Data { get; }
         public string DumpPrintText => Data.DumpPrintText;
 
-        Options(string optionsId)
+        Options(string? optionsId)
         {
             Data = new(optionsId);
             IsForceMutable = Data.Register("force_mutable");
@@ -38,9 +38,9 @@ sealed class ArrayReferenceType
 
         protected override string GetNodeDump() => DumpPrintText;
 
-        internal static Options Create(string optionsId) => new(optionsId);
+        internal static Options Create(string? optionsId) => new(optionsId);
 
-        internal static string ForceMutable(bool value)
+        internal static string? ForceMutable(bool value)
             => Create(null).IsForceMutable.SetTo(value);
     }
 
@@ -81,7 +81,7 @@ sealed class ArrayReferenceType
     internal ArrayReferenceType EnableReinterpretation
         => ValueType.GetArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
 
-    internal ArrayReferenceType(TypeBase valueType, string optionsId)
+    internal ArrayReferenceType(TypeBase valueType, string? optionsId)
     {
         Order = Closures.NextOrder++;
         OptionsValue = Options.Create(optionsId);
@@ -165,7 +165,7 @@ sealed class ArrayReferenceType
     Result EnableReinterpretationResult(Category category)
         => GetResultFromPointer(category, EnableReinterpretation);
 
-    IConversion ForcedConversion(ArrayReferenceType destination)
+    IConversion? ForcedConversion(ArrayReferenceType destination)
         =>
             HasForcedConversion(destination)
                 ? Feature.Extension.Conversion
@@ -222,6 +222,6 @@ sealed class ArrayReferenceType
     Result MinusResult(Category category, TypeBase right)
     {
         NotImplementedMethod(category, right);
-        return null;
+        return null!;
     }
 }

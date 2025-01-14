@@ -1,32 +1,27 @@
-﻿using Reni.Basics;
+﻿using System.Diagnostics.CodeAnalysis;
+using Reni.Basics;
 
 namespace Reni.Code;
 
 abstract class FiberItem : DumpableObject, IFormalCodeItem
 {
     static int NextObjectId;
-    static string NewCombinedReasonValue;
-
-    [EnableDumpExcept("")]
-    [EnableDump]
-    readonly string Reason;
 
     [DisableDump]
-    string ReasonForCombine => Reason == ""? NodeDumpForDebug() : Reason;
+    [field: EnableDumpExcept("")]
+    [field: EnableDump]
+    string ReasonForCombine => field == ""? NodeDumpForDebug() : field;
 
     [DisableDump]
-    static string NewCombinedReason
+    [field: AllowNull]
+    [field: MaybeNull]
+    static string? NewCombinedReason
     {
-        get
-        {
-            if(NewCombinedReasonValue == null)
-                return "";
-            return NewCombinedReasonValue;
-        }
+        get;
         set
         {
-            (NewCombinedReasonValue == null != (value == null)).Assert();
-            NewCombinedReasonValue = value;
+            (field == null != (value == null)).Assert();
+            field = value;
         }
     }
 
@@ -42,11 +37,11 @@ abstract class FiberItem : DumpableObject, IFormalCodeItem
     [DisableDump]
     internal Size TemporarySize => OutputSize + GetAdditionalTemporarySize();
 
-    protected FiberItem(int objectId, string reason = null)
+    protected FiberItem(int objectId, string? reason = null)
         : base(objectId)
-        => Reason = reason ?? NewCombinedReason;
+        => ReasonForCombine = reason ?? NewCombinedReason ?? "";
 
-    protected FiberItem(string reason = null)
+    protected FiberItem(string? reason = null)
         : this(NextObjectId++, reason) { }
 
     Size IFormalCodeItem.Size => DeltaSize;
@@ -66,33 +61,33 @@ abstract class FiberItem : DumpableObject, IFormalCodeItem
 
     protected virtual Size GetAdditionalTemporarySize() => Size.Zero;
 
-    protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+    protected virtual FiberItem[]? TryToCombineImplementation(FiberItem subsequentElement)
         => null;
 
-    internal virtual CodeBase TryToCombineBack(BitArray precedingElement) => null;
-    internal virtual CodeBase TryToCombineBack(TopFrameRef precedingElement) => null;
-    internal virtual CodeBase TryToCombineBack(TopData precedingElement) => null;
-    internal virtual CodeBase TryToCombineBack(TopFrameData precedingElement) => null;
-    internal virtual CodeBase TryToCombineBack(TopRef precedingElement) => null;
-    internal virtual CodeBase TryToCombineBack(List precedingElement) => null;
-    internal virtual CodeBase TryToCombineBack(LocalReference precedingElement) => null;
-    internal virtual FiberItem[] TryToCombineBack(IdentityTestCode precedingElement) => null;
-    internal virtual FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement) => null;
-    internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) => null;
-    internal virtual FiberItem[] TryToCombineBack(BitCast preceding) => null;
-    internal virtual FiberItem[] TryToCombineBack(DePointer preceding) => null;
+    internal virtual CodeBase? TryToCombineBack(BitArray precedingElement) => null;
+    internal virtual CodeBase? TryToCombineBack(TopFrameRef precedingElement) => null;
+    internal virtual CodeBase? TryToCombineBack(TopData precedingElement) => null;
+    internal virtual CodeBase? TryToCombineBack(TopFrameData precedingElement) => null;
+    internal virtual CodeBase? TryToCombineBack(TopRef precedingElement) => null;
+    internal virtual CodeBase? TryToCombineBack(List precedingElement) => null;
+    internal virtual CodeBase? TryToCombineBack(LocalReference precedingElement) => null;
+    internal virtual FiberItem[]? TryToCombineBack(IdentityTestCode precedingElement) => null;
+    internal virtual FiberItem[]? TryToCombineBack(BitArrayBinaryOp precedingElement) => null;
+    internal virtual FiberItem[]? TryToCombineBack(BitArrayPrefixOp precedingElement) => null;
+    internal virtual FiberItem[]? TryToCombineBack(BitCast preceding) => null;
+    internal virtual FiberItem[]? TryToCombineBack(DePointer preceding) => null;
 
-    internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement)
+    internal virtual FiberItem[]? TryToCombineBack(ReferencePlusConstant precedingElement)
         => null;
 
-    protected virtual TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    protected virtual TFiber? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => default;
 
     protected virtual Closures GetRefsImplementation() => Closures.GetVoid();
 
     protected override string GetNodeDump() => base.GetNodeDump() + DumpSignature;
 
-    internal FiberItem[] TryToCombine(FiberItem subsequentElement)
+    internal FiberItem[]? TryToCombine(FiberItem subsequentElement)
     {
         NewCombinedReason = ReasonForCombine + " " + subsequentElement.ReasonForCombine;
         var result = TryToCombineImplementation(subsequentElement);
@@ -100,7 +95,7 @@ abstract class FiberItem : DumpableObject, IFormalCodeItem
         return result;
     }
 
-    internal TFiber Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    internal TFiber? Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => VisitImplementation(actual);
 }
 

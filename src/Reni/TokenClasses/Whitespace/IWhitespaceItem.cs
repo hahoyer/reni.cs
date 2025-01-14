@@ -1,9 +1,8 @@
 using hw.Scanner;
 
-namespace Reni.TokenClasses.Whitespace
+namespace Reni.TokenClasses.Whitespace;
+
+interface IWhitespaceItem : IParent
 {
-    interface IWhitespaceItem : IParent
-    {
-        SourcePart SourcePart { get; }
-    }
+    SourcePart SourcePart { get; }
 }

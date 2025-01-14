@@ -1,4 +1,3 @@
-#nullable enable
 using hw.Parser;
 using hw.Scanner;
 using Reni.Context;

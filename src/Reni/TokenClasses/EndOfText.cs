@@ -17,7 +17,7 @@ sealed class EndOfText
 {
     sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
     {
-        BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
+        BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
         {
             right.AssertIsNull();
             left.AssertIsNotNull();

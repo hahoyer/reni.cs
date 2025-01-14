@@ -11,11 +11,11 @@ static class Extension
     sealed class EqualityComparer<T>
         : IEqualityComparer<T>
     {
-        new readonly Func<T, T, bool> Equals;
+        new readonly Func<T?, T?, bool> Equals;
 
-        public EqualityComparer(Func<T, T, bool> equals) => Equals = equals;
+        public EqualityComparer(Func<T?, T?, bool> equals) => Equals = equals;
 
-        bool IEqualityComparer<T>.Equals(T x, T y) => Equals(x, y);
+        bool IEqualityComparer<T>.Equals(T? x, T? y) => Equals(x, y);
         int IEqualityComparer<T>.GetHashCode(T obj) => 1;
     }
 
@@ -34,16 +34,16 @@ static class Extension
     }
 
     internal static string NodeDump(this object o)
-        => o is DumpableObject r? r.NodeDump : o.ToString();
+        => o is DumpableObject r? r.NodeDump : o.ToString()!;
 
     internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other)
         => other is IBelongingsMatcher otherMatcher && current.IsBelongingTo(otherMatcher);
 
-    internal static bool IsBelongingTo(this ITokenClass current, ITokenClass other)
+    internal static bool IsBelongingTo(this ITokenClass current, ITokenClass? other)
         => (current as IBelongingsMatcher)?.IsBelongingTo(other) ?? false;
 
 
-    internal static IEnumerable<Syntax> CheckedItemsAsLongAs(this Syntax target, Func<Syntax, bool> condition)
+    internal static IEnumerable<Syntax> CheckedItemsAsLongAs(this Syntax? target, Func<Syntax, bool> condition)
     {
         if(target == null || !condition(target))
             yield break;
@@ -73,13 +73,13 @@ static class Extension
                     .DeclaringType!
                     .GetAttributes<VariantAttribute>(false)
                     .Select
-                        (item => (string)((MethodInfo)member).Invoke(null, item.CreationParameter));
+                        (item => (string)((MethodInfo)member).Invoke(null, item.CreationParameter)!);
             case MemberTypes.Field:
-                return new[] { (string)((FieldInfo)member).GetValue(null) };
+                return [(string)((FieldInfo)member).GetValue(null)!];
         }
 
         Dumpable.NotImplementedFunction(member.Name);
-        return null;
+        return null!;
     }
 
     internal static string GetFormattedNow()
@@ -97,6 +97,6 @@ static class Extension
         return result;
     }
 
-    public static IEqualityComparer<T> Comparer<T>(Func<T, T, bool> equals)
+    public static IEqualityComparer<T> Comparer<T>(Func<T?, T?, bool> equals)
         => new EqualityComparer<T>(equals);
 }

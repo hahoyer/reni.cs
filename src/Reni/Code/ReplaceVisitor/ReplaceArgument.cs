@@ -34,14 +34,11 @@ abstract class ReplaceArgument : Base
     static int NextObjectId;
 
     [DisableDump]
-    protected ResultCache ActualArg { get; }
+    protected readonly ResultCache ActualArg;
 
     internal ReplaceArgument(ResultCache actualArg)
         : base(NextObjectId++)
-    {
-        (actualArg != null).Assert(() => "actualArg != null");
-        ActualArg = actualArg;
-    }
+        => ActualArg = actualArg;
 
     protected abstract CodeBase ActualCode { get; }
 

@@ -1,11 +1,10 @@
 using Reni.Code;
 using Reni.Feature;
 
-namespace Reni.Type
+namespace Reni.Type;
+
+interface IReference : IContextReference
 {
-    interface IReference : IContextReference
-    {
-        IConversion Converter { get; }
-        bool IsWeak { get; }
-    }
+    IConversion Converter { get; }
+    bool IsWeak { get; }
 }

@@ -1,10 +1,9 @@
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
-namespace Reni.SyntaxFactory
+namespace Reni.SyntaxFactory;
+
+interface IStatementProvider
 {
-    interface IStatementProvider
-    {
-        IStatementSyntax Get(BinaryTree target, Factory factory);
-    }
+    IStatementSyntax Get(BinaryTree? target, Factory factory);
 }

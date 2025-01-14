@@ -34,7 +34,7 @@ sealed class SearchResult : DumpableObject, IImplementation
         StopByObjectIds();
     }
 
-    IFunction IEvalImplementation.Function
+    IFunction? IEvalImplementation.Function
     {
         get
         {
@@ -43,7 +43,7 @@ sealed class SearchResult : DumpableObject, IImplementation
         }
     }
 
-    IValue IEvalImplementation.Value
+    IValue? IEvalImplementation.Value
     {
         get
         {
@@ -52,7 +52,7 @@ sealed class SearchResult : DumpableObject, IImplementation
         }
     }
 
-    IMeta IMetaImplementation.Function
+    IMeta? IMetaImplementation.Function
     {
         get
         {
@@ -71,13 +71,13 @@ sealed class SearchResult : DumpableObject, IImplementation
         return searchResult;
     }
 
-    internal Result Execute
+    internal Result? Execute
     (
         Category category,
         ResultCache left,
         SourcePart currentTarget,
         ContextBase context,
-        ValueSyntax right
+        ValueSyntax? right
     )
     {
         var trace = ObjectId.In(-1) && category.HasType();
@@ -112,7 +112,7 @@ sealed class SearchResult : DumpableObject, IImplementation
     }
 
     internal Result SpecialExecute(Category category)
-        => Feature.GetResult(category, null, null, null);
+        => Feature.GetResult(category, null!, null!, null);
 
     internal bool HasHigherPriority(SearchResult other)
         => Feature is AccessFeature == other.Feature is AccessFeature

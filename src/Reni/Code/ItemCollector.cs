@@ -8,8 +8,8 @@ sealed class ItemCollector
     protected override IEnumerable<IFormalCodeItem> Fiber
     (
         Fiber visitedObject,
-        IEnumerable<IFormalCodeItem> newHead,
-        IEnumerable<IFormalCodeItem>[] newItems
+        IEnumerable<IFormalCodeItem>? newHead,
+        IEnumerable<IFormalCodeItem>?[] newItems
     )
     {
         yield return visitedObject;
@@ -21,18 +21,18 @@ sealed class ItemCollector
                 yield return item;
 
         var codeItems = newItems
-            .Select((item, index) => item ?? new[] { visitedObject.FiberItems[index] })
+            .Select((item, index) => item ?? [visitedObject.FiberItems[index]])
             .SelectMany(i => i);
         foreach(var item in codeItems)
             yield return item;
     }
 
     protected override IEnumerable<IFormalCodeItem> List
-        (List visitedObject, IEnumerable<IEnumerable<IFormalCodeItem>> newList)
+        (List visitedObject, IEnumerable<IEnumerable<IFormalCodeItem>?> newList)
     {
         yield return visitedObject;
         var codeItems = newList
-            .Select((item, index) => item ?? new[] { visitedObject.Data[index] })
+            .Select((item, index) => item ?? [visitedObject.Data[index]])
             .SelectMany(i => i);
         foreach(var item in codeItems)
             yield return item;
@@ -48,14 +48,14 @@ sealed class ItemCollector
     protected override IEnumerable<IFormalCodeItem> ThenElse
     (
         ThenElse visitedObject,
-        IEnumerable<IFormalCodeItem> newThen,
-        IEnumerable<IFormalCodeItem> newElse
+        IEnumerable<IFormalCodeItem>? newThen,
+        IEnumerable<IFormalCodeItem>? newElse
     )
     {
         yield return visitedObject;
-        foreach(var item in newThen)
+        foreach(var item in newThen ?? [])
             yield return item;
-        foreach(var item in newElse)
+        foreach(var item in newElse ?? [])
             yield return item;
     }
 }

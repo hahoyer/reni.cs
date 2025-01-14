@@ -93,7 +93,8 @@ sealed class Fiber : CodeBase
         return new Fiber(FiberHead, fiberItems, null);
     }
 
-    protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    protected override TCode? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        where TCode : default
         => actual.Fiber(this);
 
     internal override void Visit(IVisitor visitor)
@@ -119,7 +120,7 @@ sealed class Fiber : CodeBase
         }
     }
 
-    internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
+    internal CodeBase ReCreate(CodeBase? newHead, FiberItem?[] newItems)
         => (newHead ?? FiberHead)
             .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
 

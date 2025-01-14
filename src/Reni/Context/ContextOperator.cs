@@ -19,7 +19,7 @@ sealed class ContextOperator : TerminalSyntaxToken
         => context
             .FindRecentCompoundView
             .ContextOperatorResult(category);
-    protected override TypeBase TryGetTypeBase(SourcePart token)
+    protected override TypeBase? TryGetTypeBase(SourcePart token)
     {
         NotImplementedMethod(token);
         return default;

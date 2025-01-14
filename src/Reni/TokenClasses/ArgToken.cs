@@ -19,10 +19,10 @@ sealed class ArgToken : NonSuffixSyntaxToken
     protected override Result GetResult(ContextBase context, Category category)
         => context.GetArgReferenceResult(category);
 
-    internal override ValueSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
+    internal override ValueSyntax? Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
     protected override Declaration[] Declarations => PredefinedDeclarations;
 
-    protected override Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+    protected override Result GetResult(ContextBase context, Category category, ValueSyntax? right, SourcePart token)
         => context.GetFunctionalArgResult(category, right, token);
 }

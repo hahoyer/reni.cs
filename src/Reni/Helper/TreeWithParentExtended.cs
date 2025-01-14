@@ -8,10 +8,10 @@ abstract class TreeWithParentExtended<TResult, TTarget> : TreeWithParent<TResult
     int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
 
     [DisableDump]
-    TResult[] LeftChildren => this.CachedValue(() => LeftDirectChildCount.Select(GetDirectChild).ToArray());
+    TResult?[] LeftChildren => this.CachedValue(() => LeftDirectChildCount.Select(GetDirectChild).ToArray());
 
     [DisableDump]
-    TResult[] RightChildren => this.CachedValue(GetRightChildren);
+    TResult?[] RightChildren => this.CachedValue(GetRightChildren);
 
     [DisableDump]
     internal TResult LeftMost => this.GetNodesFromLeftToRight().First();
@@ -20,16 +20,16 @@ abstract class TreeWithParentExtended<TResult, TTarget> : TreeWithParent<TResult
     internal TResult RightMost => this.GetNodesFromRightToLeft().First();
 
     [DisableDump]
-    internal TResult LeftNeighbor => RightMostLeftSibling?.RightMost ?? LeftParent;
+    internal TResult? LeftNeighbor => RightMostLeftSibling?.RightMost ?? LeftParent;
 
     [DisableDump]
-    internal TResult RightNeighbor => LeftMostRightSibling?.LeftMost ?? RightParent;
+    internal TResult? RightNeighbor => LeftMostRightSibling?.LeftMost ?? RightParent;
 
     [DisableDump]
-    internal TResult RightMostLeftSibling => GetDirectChild(LeftDirectChildCount - 1);
+    internal TResult? RightMostLeftSibling => GetDirectChild(LeftDirectChildCount - 1);
 
     [DisableDump]
-    internal TResult LeftMostRightSibling => GetDirectChild(LeftDirectChildCount);
+    internal TResult? LeftMostRightSibling => GetDirectChild(LeftDirectChildCount);
 
     [DisableDump]
     internal bool IsLeftChild => Parent?.RightMostLeftSibling == this;
@@ -38,13 +38,13 @@ abstract class TreeWithParentExtended<TResult, TTarget> : TreeWithParent<TResult
     internal bool IsRightChild => Parent?.LeftMostRightSibling == this;
 
     [DisableDump]
-    TResult LeftParent
+    TResult? LeftParent
         => Parent != null && Parent.LeftChildren.Contains(this)
             ? Parent.LeftParent
             : Parent;
 
     [DisableDump]
-    TResult RightParent
+    TResult? RightParent
         => Parent != null && Parent.RightChildren.Contains(this)
             ? Parent.RightParent
             : Parent;
@@ -55,12 +55,12 @@ abstract class TreeWithParentExtended<TResult, TTarget> : TreeWithParent<TResult
     [DisableDump]
     int ITree<TResult>.DirectChildCount => DirectChildCount;
 
-    TResult ITree<TResult>.GetDirectChild(int index) => GetDirectChild(index);
+    TResult? ITree<TResult>.GetDirectChild(int index) => GetDirectChild(index);
 
     [DisableDump]
     int ITree<TResult>.LeftDirectChildCount => FlatItem.LeftDirectChildCount;
 
-    TResult[] GetRightChildren()
+    TResult?[] GetRightChildren()
         => (DirectChildCount - LeftDirectChildCount)
             .Select(index => GetDirectChild(index + LeftDirectChildCount))
             .ToArray();

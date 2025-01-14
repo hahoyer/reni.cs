@@ -161,7 +161,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         var compilerSyntax = Compiler.Syntax;
         if(trace)
         {
-            compilerSyntax.Dump().FlaggedLine();
+            compilerSyntax!.Dump().FlaggedLine();
             compilerSyntax.Anchor.Dump().FlaggedLine();
         }
 

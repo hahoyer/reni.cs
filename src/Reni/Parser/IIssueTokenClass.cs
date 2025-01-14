@@ -1,9 +1,8 @@
 ﻿using Reni.Validation;
 
-namespace Reni.Parser
+namespace Reni.Parser;
+
+interface IIssueTokenClass: ITokenClass
 {
-    interface IIssueTokenClass: ITokenClass
-    {
-        IssueId IssueId { get; }
-    }
+    IssueId IssueId { get; }
 }

@@ -1,4 +1,3 @@
-#nullable enable
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -24,7 +23,7 @@ sealed class ContextReferenceType
 
     internal ContextReferenceType(CompoundView parent) => Parent = parent;
 
-    IImplementation? ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     [DisableDump]
     internal override Root Root => Parent.Root;

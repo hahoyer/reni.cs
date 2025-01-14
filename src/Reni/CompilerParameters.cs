@@ -3,6 +3,7 @@
 /// <summary>
 ///     Parameters for compilation
 /// </summary>
+[PublicAPI]
 public sealed class CompilerParameters : Attribute
 {
     public sealed class TraceOptionsClass
@@ -54,7 +55,7 @@ public sealed class CompilerParameters : Attribute
     public CompilationLevel CompilationLevel = CompilationLevel.Run;
     public bool? DebuggableGeneratedCode = false;
 
-    public IOutStream OutStream;
+    public IOutStream? OutStream;
 
     [Node]
     [EnableDump]

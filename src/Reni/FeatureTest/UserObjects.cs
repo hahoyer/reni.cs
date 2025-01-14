@@ -1,14 +1,14 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest
-{
-    [UnitTest]
-    [AllScopeHandling]
-    [ComplexContext]
-    [TargetSet
-        (
-            @"
+namespace Reni.FeatureTest;
+
+[UnitTest]
+[AllScopeHandling]
+[ComplexContext]
+[TargetSet
+(
+    @"
 system: @!
 ( MaxNumber8: @! '7f' to_number_of_base 16 
 . MaxNumber16: @! '7fff' to_number_of_base 16 
@@ -40,6 +40,5 @@ complex FromReal(2) dump_print;
 ' ' dump_print;
 (complex Create(0,1) * complex Create(0,1)) dump_print
 ",
-            "2+0i -1+0i")]
-    public sealed class UserObjects : CompilerTest;
-}
+    "2+0i -1+0i")]
+public sealed class UserObjects : CompilerTest;

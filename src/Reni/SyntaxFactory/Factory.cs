@@ -32,7 +32,7 @@ sealed class Factory : DumpableObject
 
     Factory(bool meansPublic) => MeansPublic = meansPublic;
 
-    internal ValueSyntax GetFrameSyntax(BinaryTree target)
+    internal ValueSyntax? GetFrameSyntax(BinaryTree target)
     {
         var kernel = target.BracketKernel;
         var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
@@ -43,7 +43,7 @@ sealed class Factory : DumpableObject
         return CompoundSyntax.Create(statements, null, anchor);
     }
 
-    internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master)
+    internal IStatementSyntax[] GetStatementsSyntax(BinaryTree? target, Anchor anchor, ITokenClass master)
     {
         if(target == null)
         {
@@ -66,7 +66,7 @@ sealed class Factory : DumpableObject
         }
     }
 
-    internal ValueSyntax GetValueSyntax(BinaryTree target, Anchor anchor)
+    internal ValueSyntax? GetValueSyntax(BinaryTree? target, Anchor anchor)
     {
         if(target == null)
             return new EmptyList(anchor);
@@ -93,7 +93,7 @@ sealed class Factory : DumpableObject
         }
     }
 
-    ValueSyntax GetStatementsSyntax(BinaryTree target, Anchor anchor, IStatementsToken tokenClass)
+    ValueSyntax? GetStatementsSyntax(BinaryTree? target, Anchor anchor, IStatementsToken tokenClass)
     {
         var node = tokenClass
             .Provider
@@ -102,7 +102,7 @@ sealed class Factory : DumpableObject
         return CompoundSyntax.Create(node, null, anchor);
     }
 
-    ValueSyntax GetIssueSyntax(IssueId issueId, BinaryTree target, Anchor anchor)
+    ValueSyntax? GetIssueSyntax(IssueId issueId, BinaryTree? target, Anchor anchor)
     {
         var resultingAnchor = Anchor.Create(target).Combine(anchor);
 
@@ -122,10 +122,10 @@ sealed class Factory : DumpableObject
         return new EmptyList(Anchor.CreateAll(target).Combine(anchor, true));
     }
 
-    internal ValueSyntax GetValueSyntax(BinaryTree target)
+    internal ValueSyntax? GetValueSyntax(BinaryTree? target)
         => target == null? null : GetValueSyntax(target, Anchor.Create("Should be a value"));
 
-    Factory GetCurrentFactory(BinaryTree target)
+    Factory GetCurrentFactory(BinaryTree? target)
     {
         var level = target.GetBracketLevel();
         if(level == null)
@@ -140,7 +140,7 @@ sealed class Factory : DumpableObject
                 : new(!MeansPublic);
     }
 
-    internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, Anchor anchor)
+    internal ExpressionSyntax? GetExpressionSyntax(BinaryTree? target, Anchor anchor)
     {
         var definable = target.TokenClass as Definable;
         (definable != null).Assert();

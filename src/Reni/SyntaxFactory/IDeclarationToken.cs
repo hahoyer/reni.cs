@@ -1,7 +1,6 @@
-namespace Reni.SyntaxFactory
+namespace Reni.SyntaxFactory;
+
+interface IDeclarationToken
 {
-    interface IDeclarationToken
-    {
-        IStatementProvider Provider { get; }
-    }
+    IStatementProvider Provider { get; }
 }

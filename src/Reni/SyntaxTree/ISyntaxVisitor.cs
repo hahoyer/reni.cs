@@ -1,7 +1,6 @@
-namespace Reni.SyntaxTree
+namespace Reni.SyntaxTree;
+
+interface ISyntaxVisitor
 {
-    interface ISyntaxVisitor
-    {
-        ValueSyntax Arg { get; }
-    }
+    ValueSyntax? Arg { get; }
 }

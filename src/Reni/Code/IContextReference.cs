@@ -1,12 +1,11 @@
-﻿namespace Reni.Code
-{
-    interface IContextReference
-    {
-        int Order { get; }
-    }
+﻿namespace Reni.Code;
 
-    interface IContextReferenceProvider
-    {
-        IContextReference ContextReference { get; }
-    }
+interface IContextReference
+{
+    int Order { get; }
+}
+
+interface IContextReferenceProvider
+{
+    IContextReference ContextReference { get; }
 }

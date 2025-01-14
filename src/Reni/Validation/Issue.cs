@@ -81,6 +81,6 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
 
     void AssertValid() => (Position != null).Assert();
 
-    public static bool operator ==(Issue left, Issue right) => Equals(left, right);
-    public static bool operator !=(Issue left, Issue right) => !Equals(left, right);
+    public static bool operator ==(Issue? left, Issue? right) => Equals(left, right);
+    public static bool operator !=(Issue? left, Issue? right) => !Equals(left, right);
 }

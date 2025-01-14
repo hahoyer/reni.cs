@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -283,7 +282,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump()))
             .CheckedReference
             .ExpectNotNull(() => (null, $"Type {Type!.DumpPrintText} is not a reference type."))
-            .Converter.GetResult(CompleteCategory)
+            .Converter.GetResult(CompleteCategory)!
             .ReplaceArguments(this);
 
     [DisableDump]
@@ -535,7 +534,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(HasType && HasCode && Type!.HasQuickSize)
             (Code!.Size == Type.Size).Assert(() => "Code and Type differ: " + Dump());
         if(HasClosures && HasCode)
-            Code!.Closures.IsEqual(Closures)
+            Code!.Closures.IsEqual(Closures!)
                 .Assert(() => "Code and Closures differ: " + Dump());
     }
 
@@ -566,7 +565,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 IsHollow = null;
 
             if(category.HasSize())
-                Size += other.Size;
+            {
+                Size += other.Size!;
+            }
             else if(HasSize)
                 Size = null;
 

@@ -30,7 +30,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     internal readonly CompilerParameters Parameters;
 
     [UsedImplicitly]
-    Compiler[] RunResults;
+    Compiler[]? RunResults;
 
     TargetSetData[] TargetSet
     {
@@ -71,8 +71,8 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
         }
     }
 
-    protected virtual string Output => GetStringAttribute<OutputAttribute>();
-    protected virtual string Target => GetStringAttribute<TargetAttribute>();
+    protected virtual string? Output => GetStringAttribute<OutputAttribute>();
+    protected virtual string? Target => GetStringAttribute<TargetAttribute>();
 
     protected virtual void Verify(IEnumerable<Issue> issues)
         => (!issues.Any()).Assert(() => issues.Select(issue => issue.LogDump).Stringify("\n"));
@@ -82,13 +82,13 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     internal Compiler CreateFileAndRunCompiler
     (
         string name,
-        string text,
-        string expectedOutput = null,
-        Action<Compiler> expectedResult = null
+        string? text,
+        string? expectedOutput = null,
+        Action<Compiler>? expectedResult = null
     )
         => CreateFileAndRunCompiler(name, new(text, expectedOutput), expectedResult);
 
-    Compiler CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
+    Compiler CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler>? expectedResult)
     {
         var fileName = name + ".reni";
         var f = fileName.ToSmbFile();
@@ -96,7 +96,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
         return RunCompiler(fileName, expectedResult, targetSetData);
     }
 
-    Compiler RunCompiler(string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
+    Compiler RunCompiler(string fileName, Action<Compiler>? expectedResult, TargetSetData targetSet)
     {
         var outStream = new OutStream();
         Parameters.OutStream = outStream;
@@ -148,7 +148,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
 
     public IEnumerable<Compiler> Inspect() => BaseRun();
 
-    internal string GetStringAttribute<T>()
+    internal string? GetStringAttribute<T>()
         where T : StringAttribute
     {
         var result = GetType().GetAttribute<T>(true);

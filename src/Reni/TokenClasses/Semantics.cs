@@ -8,33 +8,33 @@ sealed class Semantics : DumpableObject
 {
     sealed class Declaration
     {
-        public readonly List<Usage> Usages = new();
-        public string Position;
+        public readonly List<Usage> Usages = [];
+        public string? Position;
 
         [DisableDumpExcept(true)]
         public bool IsPublic;
 
         [DisableDump]
-        public BinaryTree Anchor;
+        public BinaryTree? Anchor;
     }
 
     sealed class Usage
     {
-        public string Position;
+        public string? Position;
 
         [DisableDump]
-        public BinaryTree Anchor;
+        public BinaryTree? Anchor;
     }
 
     [EnableDumpExcept(null)]
-    internal string Information;
+    internal string? Information;
 
     [EnableDump]
-    readonly FunctionCache<string, List<Declaration>> Dictionary = new(_ => new());
+    readonly FunctionCache<string, List<Declaration>> Dictionary = new(_ => []);
 
-    Semantics(ContextBase context, ValueSyntax parent) => Initialize(context, parent);
+    Semantics(ContextBase context, ValueSyntax? parent) => Initialize(context, parent);
 
-    void Initialize(ContextBase context, Syntax target)
+    void Initialize(ContextBase context, Syntax? target)
     {
         if(target == null)
             return;
@@ -45,11 +45,11 @@ sealed class Semantics : DumpableObject
         FlatInitialize(context, target);
     }
 
-    void FlatInitialize(ContextBase context, Syntax target)
+    void FlatInitialize(ContextBase context, Syntax? target)
     {
         switch(target)
         {
-            case DeclarationSyntax declaration when declaration.Declarer.Name == null:
+            case DeclarationSyntax declaration when declaration.Declarer?.Name == null:
                 NotImplementedMethod(target);
                 return;
             case DeclarationSyntax declaration:
@@ -75,7 +75,7 @@ sealed class Semantics : DumpableObject
 
     void FlatInitialize(DeclarationSyntax target)
     {
-        var declarations = Dictionary[target.Declarer.Name.Value];
+        var declarations = Dictionary[target.Declarer!.Name!.Value];
         if(declarations.Any())
         {
             NotImplementedMethod(target);
@@ -122,5 +122,5 @@ sealed class Semantics : DumpableObject
         return;
     }
 
-    internal static Semantics From(ContextBase context, ValueSyntax parent) => new(context, parent);
+    internal static Semantics From(ContextBase context, ValueSyntax? parent) => new(context, parent);
 }

@@ -1,25 +1,24 @@
 using Reni.Type;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class ArgumentTypeVisitor : Visitor<TypeBase, TypeBase>
 {
-    sealed class ArgumentTypeVisitor : Visitor<TypeBase, TypeBase>
-    {
-        internal override TypeBase Argument(Argument visitedObject) => visitedObject.Type;
-        internal override TypeBase BitArray(BitArray visitedObject) => null;
-        internal override TypeBase ContextReference(ReferenceCode visitedObject) => null;
+    internal override TypeBase Argument(Argument visitedObject) => visitedObject.Type;
+    internal override TypeBase? BitArray(BitArray visitedObject) => null;
+    internal override TypeBase? ContextReference(ReferenceCode visitedObject) => null;
 
-        internal override TypeBase Fiber(Fiber visitedObject)
-            => visitedObject.Visit(this);
+    internal override TypeBase Fiber(Fiber visitedObject)
+        => visitedObject.Visit(this);
 
-        internal override TypeBase List(List visitedObject)
-            => visitedObject.Visit(this);
+    internal override TypeBase? List(List visitedObject)
+        => visitedObject.Visit(this);
 
-        internal override TypeBase ThenElse(ThenElse visitedObject)
-            => visitedObject.Visit(this);
+    internal override TypeBase? ThenElse(ThenElse visitedObject)
+        => visitedObject.Visit(this);
 
-        internal override TypeBase Default(CodeBase codeBase) => null;
+    internal override TypeBase? Default(CodeBase codeBase) => null;
 
-        internal override TypeBase LocalReference(LocalReference visitedObject)
-            => visitedObject.AlignedValueCode.Visit(this);
-    }
+    internal override TypeBase? LocalReference(LocalReference visitedObject)
+        => visitedObject.AlignedValueCode.Visit(this);
 }

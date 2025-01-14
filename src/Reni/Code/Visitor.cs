@@ -9,43 +9,43 @@ abstract class Visitor<TCode, TFiber> : DumpableObject
 
     protected Visitor() { }
 
-    internal abstract TCode Default(CodeBase codeBase);
+    internal abstract TCode? Default(CodeBase codeBase);
 
-    internal virtual TCode Argument(Argument visitedObject)
+    internal virtual TCode? Argument(Argument visitedObject)
     {
         NotImplementedMethod(visitedObject);
         return default;
     }
 
-    internal virtual TCode ContextReference(ReferenceCode visitedObject)
+    internal virtual TCode? ContextReference(ReferenceCode visitedObject)
     {
         NotImplementedMethod(visitedObject);
         return default;
     }
 
-    internal virtual TCode LocalReference(LocalReference visitedObject)
+    internal virtual TCode? LocalReference(LocalReference visitedObject)
     {
         NotImplementedMethod(visitedObject);
         return default;
     }
 
-    internal virtual TCode BitArray(BitArray visitedObject)
+    internal virtual TCode? BitArray(BitArray visitedObject)
     {
         NotImplementedMethod(visitedObject);
         return default;
     }
 
-    internal virtual TCode Fiber(Fiber visitedObject)
+    internal virtual TCode? Fiber(Fiber visitedObject)
     {
         var newHead = visitedObject.FiberHead.Visit(this);
         var data = visitedObject.FiberItems;
-        var newItems = new TFiber[data.Length];
+        var newItems = new TFiber?[data.Length];
         for(var index = 0; index < data.Length; index++)
             newItems[index] = data[index].Visit(this);
         return Fiber(visitedObject, newHead, newItems);
     }
 
-    protected virtual TCode Fiber(Fiber visitedObject, TCode newHead, TFiber[] newItems)
+    protected virtual TCode? Fiber(Fiber visitedObject, TCode? newHead, TFiber?[] newItems)
     {
         NotImplementedMethod(visitedObject, newHead, newItems);
         return default;
@@ -53,11 +53,11 @@ abstract class Visitor<TCode, TFiber> : DumpableObject
 
     protected virtual Visitor<TCode, TFiber> After(Size size) => this;
 
-    internal virtual TCode List(List visitedObject)
+    internal virtual TCode? List(List visitedObject)
     {
         var visitor = this;
         var data = visitedObject.Data;
-        var newList = new TCode[data.Length];
+        var newList = new TCode?[data.Length];
         for(var index = 0; index < data.Length; index++)
         {
             var codeBase = data[index];
@@ -68,45 +68,45 @@ abstract class Visitor<TCode, TFiber> : DumpableObject
         return visitor.List(visitedObject, newList);
     }
 
-    protected virtual TCode List(List visitedObject, IEnumerable<TCode> newList)
+    protected virtual TCode? List(List visitedObject, IEnumerable<TCode?> newList)
     {
         NotImplementedMethod(visitedObject, newList);
         return default;
     }
 
-    internal virtual TFiber ThenElse(ThenElse visitedObject)
+    internal virtual TFiber? ThenElse(ThenElse visitedObject)
     {
         var newThen = visitedObject.ThenCode.Visit(this);
         var newElse = visitedObject.ElseCode.Visit(this);
         return ThenElse(visitedObject, newThen, newElse);
     }
 
-    protected virtual TFiber ThenElse(ThenElse visitedObject, TCode newThen, TCode newElse)
+    protected virtual TFiber? ThenElse(ThenElse visitedObject, TCode? newThen, TCode? newElse)
     {
         NotImplementedMethod(visitedObject, newThen, newElse);
         return default;
     }
 
-    internal virtual TFiber Call(Call visitedObject) => default;
-    internal virtual TCode TopRef(TopRef visitedObject) => default;
-    internal virtual TCode TopFrameData(TopFrameData visitedObject) => default;
-    internal virtual TCode TopData(TopData visitedObject) => default;
-    internal virtual TFiber DePointer(DePointer visitedObject) => default;
-    internal virtual TFiber Drop(Drop visitedObject) => default;
-    internal virtual TFiber BitCast(BitCast visitedObject) => default;
-    internal virtual TFiber BitArrayBinaryOp(BitArrayBinaryOp visitedObject) => default;
-    internal virtual TFiber ArraySetter(ArraySetter visitedObject) => default;
-    internal virtual TFiber ArrayGetter(ArrayGetter visitedObject) => default;
-    internal virtual TFiber Assign(Assign visitedObject) => default;
-    internal virtual TCode DumpPrintText(DumpPrintText visitedObject) => default;
+    internal virtual TFiber? Call(Call visitedObject) => default;
+    internal virtual TCode? TopRef(TopRef visitedObject) => default;
+    internal virtual TCode? TopFrameData(TopFrameData visitedObject) => default;
+    internal virtual TCode? TopData(TopData visitedObject) => default;
+    internal virtual TFiber? DePointer(DePointer visitedObject) => default;
+    internal virtual TFiber? Drop(Drop visitedObject) => default;
+    internal virtual TFiber? BitCast(BitCast visitedObject) => default;
+    internal virtual TFiber? BitArrayBinaryOp(BitArrayBinaryOp visitedObject) => default;
+    internal virtual TFiber? ArraySetter(ArraySetter visitedObject) => default;
+    internal virtual TFiber? ArrayGetter(ArrayGetter visitedObject) => default;
+    internal virtual TFiber? Assign(Assign visitedObject) => default;
+    internal virtual TCode? DumpPrintText(DumpPrintText visitedObject) => default;
 
-    internal virtual TFiber ReferencePlusConstant(ReferencePlusConstant visitedObject)
+    internal virtual TFiber? ReferencePlusConstant(ReferencePlusConstant visitedObject)
         => default;
 
-    internal virtual TFiber DumpPrintTextOperation(DumpPrintTextOperation visitedObject)
+    internal virtual TFiber? DumpPrintTextOperation(DumpPrintTextOperation visitedObject)
         => default;
 
-    internal virtual TFiber DumpPrintNumberOperation(DumpPrintNumberOperation visitedObject)
+    internal virtual TFiber? DumpPrintNumberOperation(DumpPrintNumberOperation visitedObject)
         => default;
 
 

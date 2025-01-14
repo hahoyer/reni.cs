@@ -1,4 +1,3 @@
-#nullable enable
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -24,7 +23,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
         [DisableDump]
         protected sealed override int DirectChildCount => 0;
 
-        protected sealed override Syntax GetDirectChild(int index)
+        protected sealed override Syntax? GetDirectChild(int index)
             => throw new($"Unexpected call: {nameof(GetDirectChild)}({index})");
     }
 
@@ -48,7 +47,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 
     SourcePart IStatementSyntax.SourcePart => Anchor.SourceParts.Combine();
 
-    ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor) => this;
+    ValueSyntax? IStatementSyntax.ToValueSyntax(Anchor anchor) => this;
 
     ValueSyntax IStatementSyntax.Value => this;
 
@@ -105,7 +104,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
         return type.GetSmartUn<FunctionType>().IsHollow;
     }
 
-    internal ValueSyntax ReplaceArg(ValueSyntax syntax)
+    internal ValueSyntax? ReplaceArg(ValueSyntax? syntax)
         => Visit(new ReplaceArgVisitor(syntax)) ?? this;
 
     [PublicAPI]

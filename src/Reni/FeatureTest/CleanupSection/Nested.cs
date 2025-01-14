@@ -1,11 +1,11 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest.CleanupSection
-{
-    [UnitTest]
-    [Simple]
-    [TargetSet(@"
+namespace Reni.FeatureTest.CleanupSection;
+
+[UnitTest]
+[Simple]
+[TargetSet(@"
 Base: @ 
 {
     a: 1;
@@ -23,6 +23,4 @@ This: @
 
 This() dump_print
 ", "((1), 3)(this cleanup)(base cleanup)")]
-    public sealed class Nested : CompilerTest;
-
-}
+public sealed class Nested : CompilerTest;

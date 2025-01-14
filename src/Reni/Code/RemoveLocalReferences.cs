@@ -19,7 +19,7 @@ sealed class RemoveLocalReferences : Base
 
         public Counter(CodeBase body) => body.Visit(this);
 
-        internal override CodeBase LocalReference(LocalReference visitedObject)
+        internal override CodeBase? LocalReference(LocalReference visitedObject)
         {
             if(ReferencesCounts.ContainsKey(visitedObject))
                 ReferencesCounts[visitedObject]++;
@@ -43,7 +43,7 @@ sealed class RemoveLocalReferences : Base
             NewBody = GetNewBody(body);
         }
 
-        internal override CodeBase LocalReference(LocalReference visitedObject)
+        internal override CodeBase? LocalReference(LocalReference visitedObject)
             => References.Contains(visitedObject)? Map[visitedObject] : null;
 
         CodeBase GetNewBody(CodeBase body)
@@ -71,7 +71,7 @@ sealed class RemoveLocalReferences : Base
             Target = target;
         }
 
-        internal override CodeBase LocalReference(LocalReference visitedObject)
+        internal override CodeBase? LocalReference(LocalReference visitedObject)
             => visitedObject != Target
                 ? null
                 : CodeBase

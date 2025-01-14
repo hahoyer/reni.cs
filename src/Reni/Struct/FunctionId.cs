@@ -20,22 +20,21 @@
 
 #endregion
 
-namespace Reni.Struct
+namespace Reni.Struct;
+
+sealed class FunctionId : DumpableObject
 {
-    sealed class FunctionId : DumpableObject
+    public static FunctionId Getter(int index) => new FunctionId(index, true);
+    public static FunctionId Setter(int index) => new FunctionId(index, false);
+
+    internal readonly int Index;
+    internal readonly bool IsGetter;
+
+    FunctionId(int index, bool isGetter)
     {
-        public static FunctionId Getter(int index) => new FunctionId(index, true);
-        public static FunctionId Setter(int index) => new FunctionId(index, false);
-
-        internal readonly int Index;
-        internal readonly bool IsGetter;
-
-        FunctionId(int index, bool isGetter)
-        {
-            Index = index;
-            IsGetter = isGetter;
-        }
-        public override string ToString() => Dump();
-        protected override string Dump(bool isRecursive) => Index + "." + (IsGetter ? "get" : "set");
+        Index = index;
+        IsGetter = isGetter;
     }
+    public override string ToString() => Dump();
+    protected override string Dump(bool isRecursive) => Index + "." + (IsGetter ? "get" : "set");
 }

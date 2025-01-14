@@ -6,9 +6,9 @@ sealed class SavePartMatch : DumpableObject, IMatch
 {
     readonly IMatch Target;
     readonly Action<string> OnMatch;
-    readonly Action OnMismatch;
+    readonly Action? OnMismatch;
 
-    public SavePartMatch(IMatch target, Action<string> onMatch, Action onMismatch = null)
+    public SavePartMatch(IMatch target, Action<string> onMatch, Action? onMismatch = null)
     {
         Target = target;
         OnMatch = onMatch;

@@ -1,26 +1,26 @@
 ﻿using Reni.Basics;
 using Reni.Context;
 
-namespace Reni.Code
+namespace Reni.Code;
+
+sealed class Assign : FiberItem
 {
-    sealed class Assign : FiberItem
-    {
-        internal readonly Size TargetSize;
+    internal readonly Size TargetSize;
 
-        public Assign(Size targetSize) { TargetSize = targetSize; }
+    public Assign(Size targetSize) { TargetSize = targetSize; }
 
-        [DisableDump]
-        internal override Size InputSize => Root.DefaultRefAlignParam.RefSize * 2;
+    [DisableDump]
+    internal override Size InputSize => Root.DefaultRefAlignParam.RefSize * 2;
 
-        [DisableDump]
-        internal override Size OutputSize => Size.Zero;
+    [DisableDump]
+    internal override Size OutputSize => Size.Zero;
 
-        protected override string GetNodeDump()
-            => base.GetNodeDump() + " TargetSize=" + TargetSize;
+    protected override string GetNodeDump()
+        => base.GetNodeDump() + " TargetSize=" + TargetSize;
 
-        internal override void Visit(IVisitor visitor) => visitor.Assign(TargetSize);
+    internal override void Visit(IVisitor visitor) => visitor.Assign(TargetSize);
 
-        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
-            => actual.Assign(this);
-    }
+    protected override TFiber? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        where TFiber : default
+        => actual.Assign(this);
 }

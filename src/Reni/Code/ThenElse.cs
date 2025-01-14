@@ -37,34 +37,33 @@ sealed class ThenElse : FiberItem
 
     protected override Closures GetRefsImplementation() => ThenCode.Closures.Sequence(ElseCode.Closures);
 
-    internal override FiberItem[] TryToCombineBack(BitCast preceding)
+    internal override FiberItem[]? TryToCombineBack(BitCast preceding)
     {
         if(preceding.InputSize == preceding.OutputSize)
             return null;
-        return new FiberItem[]
-        {
+        return
+        [
             new BitCast(preceding.InputSize, preceding.InputSize, Size.Bit)
             , new ThenElse(preceding.InputSize, ThenCode, ElseCode)
-        };
+        ];
     }
 
     protected override Size GetAdditionalTemporarySize()
         => ThenCode.TemporarySize.GetMax(ElseCode.TemporarySize).GetMax(OutputSize) - OutputSize;
 
-    protected override TFiber VisitImplementation<TResult, TFiber>
-        (Visitor<TResult, TFiber> actual) => actual.ThenElse(this);
+    protected override TFiber? VisitImplementation<TResult, TFiber>
+        (Visitor<TResult, TFiber> actual)
+        where TFiber : default
+        => actual.ThenElse(this);
 
     internal override void Visit(IVisitor visitor)
         => visitor.ThenElse(CondSize, ThenCode, ElseCode);
 
-    internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse)
+    internal FiberItem ReCreate(CodeBase? newThen, CodeBase? newElse)
         => new ThenElse(CondSize, newThen ?? ThenCode, newElse ?? ElseCode);
 
-    internal TypeBase Visit(Visitor<TypeBase, TypeBase> actual)
-        => new[]
-            {
-                ThenCode, ElseCode
-            }
-            .Select(item => item?.Visit(actual))
+    internal TypeBase? Visit(Visitor<TypeBase, TypeBase> actual)
+        => new[] { ThenCode, ElseCode }
+            .Select(item => item.Visit(actual))
             .DistinctNotNull();
 }

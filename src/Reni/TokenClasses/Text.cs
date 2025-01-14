@@ -33,7 +33,7 @@ sealed class Text : TerminalSyntaxToken, IIssueTokenClass
                 (category, () => Code.Extension.GetCode(BitsConst.ConvertAsText(data)), Closures.GetVoid);
     }
 
-    protected override TypeBase TryGetTypeBase(SourcePart token)
+    protected override TypeBase? TryGetTypeBase(SourcePart token)
     {
         NotImplementedMethod(token);
         return default;

@@ -18,7 +18,7 @@ sealed class RefAlignParam : IEquatable<RefAlignParam>
         RefSize = refSize;
     }
 
-    public bool Equals(RefAlignParam obj)
+    public bool Equals(RefAlignParam? obj)
     {
         if(ReferenceEquals(null, obj))
             return false;
@@ -31,11 +31,11 @@ sealed class RefAlignParam : IEquatable<RefAlignParam>
     {
         unchecked
         {
-            return (AlignBits * 397) ^ (RefSize != null? RefSize.GetHashCode() : 0);
+            return (AlignBits * 397) ^ RefSize.GetHashCode();
         }
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if(ReferenceEquals(null, obj))
             return false;

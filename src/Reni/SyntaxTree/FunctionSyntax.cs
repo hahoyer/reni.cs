@@ -8,14 +8,14 @@ namespace Reni.SyntaxTree;
 sealed class FunctionSyntax : ValueSyntax
 {
     [EnableDumpExcept(null)]
-    internal ValueSyntax Getter { get; }
+    internal ValueSyntax? Getter { get; }
 
     [EnableDump]
     [EnableDumpExcept(false)]
     internal bool IsImplicit { get; }
 
     [EnableDumpExcept(null)]
-    internal ValueSyntax Setter { get; }
+    internal ValueSyntax? Setter { get; }
 
     bool IsMetaFunction { get; }
 
@@ -25,10 +25,10 @@ sealed class FunctionSyntax : ValueSyntax
 
     internal FunctionSyntax
     (
-        ValueSyntax setter,
+        ValueSyntax? setter,
         bool isImplicit,
         bool isMetaFunction,
-        ValueSyntax getter, Anchor anchor
+        ValueSyntax? getter, Anchor anchor
     )
         : base(anchor)
     {
@@ -44,7 +44,7 @@ sealed class FunctionSyntax : ValueSyntax
     [DisableDump]
     protected override int DirectChildCount => 2;
 
-    protected override Syntax GetDirectChild(int index)
+    protected override Syntax? GetDirectChild(int index)
         => index switch
         {
             0 => Setter, 1 => Getter, _ => null

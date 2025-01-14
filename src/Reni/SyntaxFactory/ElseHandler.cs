@@ -5,10 +5,10 @@ namespace Reni.SyntaxFactory;
 
 sealed class ElseHandler : DumpableObject, IValueProvider
 {
-    ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
+    ValueSyntax? IValueProvider.Get(BinaryTree? target, Factory factory, Anchor frameItems)
     {
         var condTarget = target.Left;
-        BinaryTree thenTarget = null;
+        BinaryTree? thenTarget = null;
         BinaryTree thenAnchor = null;
 
         if(condTarget?.TokenClass is ThenToken)

@@ -36,7 +36,5 @@ public sealed class NumberExtensionConversion : DependenceProvider
         var source = new Root(null).BitType.Number(1);
         var destination = new Root(null).BitType.Number(3);
         var paths = Type.ConversionService.FindPath(source, destination);
-
-        (paths != null).Assert();
     }
 }

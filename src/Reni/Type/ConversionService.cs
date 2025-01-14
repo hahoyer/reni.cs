@@ -7,19 +7,19 @@ static class ConversionService
     internal sealed class ClosureService
     {
         TypeBase Source { get; }
-        readonly List<TypeBase> FoundTypes = new();
+        readonly List<TypeBase> FoundTypes = [];
         readonly ValueCache<List<ConversionPath>> NewPathsCache;
 
         ClosureService(TypeBase source)
         {
             Source = source;
-            NewPathsCache = new(() => new());
+            NewPathsCache = new(() => []);
         }
 
         internal static IEnumerable<ConversionPath> GetResult(TypeBase source)
             => new ClosureService(source).GetResult();
 
-        IEnumerable<ConversionPath> ExtendPathByOneConversionAndCollect(ConversionPath startFeature = null)
+        IEnumerable<ConversionPath> ExtendPathByOneConversionAndCollect(ConversionPath? startFeature = null)
         {
             var startType = startFeature?.Destination ?? Source;
 

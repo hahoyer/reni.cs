@@ -8,9 +8,9 @@ abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.ICo
     internal readonly TTarget FlatItem;
 
     [DisableDump]
-    internal readonly TResult Parent;
+    internal readonly TResult? Parent;
 
-    internal TResult[] DirectChildren
+    internal TResult?[] DirectChildren
     {
         get
         {
@@ -21,7 +21,7 @@ abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.ICo
         }
     }
 
-    protected TreeWithParent(TTarget flatItem, TResult parent)
+    protected TreeWithParent(TTarget flatItem, TResult? parent)
     {
         FlatItem = flatItem;
         Parent = parent;
@@ -29,14 +29,14 @@ abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.ICo
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    protected abstract TResult Create(TTarget flatItem);
+    protected abstract TResult? Create(TTarget flatItem);
 
-    TResult CreateDirectChild(int index)
+    TResult? CreateDirectChild(int index)
     {
         var node = FlatItem.GetDirectChild(index);
         return node == null? null : Create(node);
     }
 
-    protected TResult GetDirectChild(int index)
+    protected TResult? GetDirectChild(int index)
         => index < 0 || index >= FlatItem.DirectChildCount? null : DirectChildren[index];
 }

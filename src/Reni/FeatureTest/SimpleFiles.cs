@@ -20,11 +20,10 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest;
+
+[UnitTest]
+public sealed class SimpleFiles : CompilerTest
 {
-    [UnitTest]
-    public sealed class SimpleFiles : CompilerTest
-    {
-        public override void Run() { }
-    }
+    public override void Run() { }
 }

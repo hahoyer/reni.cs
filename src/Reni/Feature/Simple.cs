@@ -20,13 +20,12 @@ sealed class Value
     {
         Function = function;
         Source = source;
-        (Source != null).Assert();
     }
 
-    IFunction IEvalImplementation.Function => null;
+    IFunction? IEvalImplementation.Function => null;
     IValue IEvalImplementation.Value => this;
 
-    IMeta IMetaImplementation.Function => null;
+    IMeta? IMetaImplementation.Function => null;
 
     Result IValue.Execute(Category category) => Function(category);
 

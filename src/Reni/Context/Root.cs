@@ -33,10 +33,10 @@ sealed class Root
 
     [DisableDump]
     [Node]
-    readonly IParent Parent;
+    readonly IParent? Parent;
 
     [DisableDump]
-    public IExecutionContext ExecutionContext => Parent.ExecutionContext;
+    public IExecutionContext? ExecutionContext => Parent?.ExecutionContext;
 
     [DisableDump]
     [Node]
@@ -48,12 +48,12 @@ sealed class Root
     internal static RefAlignParam DefaultRefAlignParam => new(BitsConst.SegmentAlignBits, Size.Create(64));
 
     [DisableDump]
-    public bool ProcessErrors => Parent.ProcessErrors;
+    public bool? ProcessErrors => Parent?.ProcessErrors;
 
     [DisableDump]
-    internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
+    internal IEnumerable<Definable>? DefinedNames => Parent?.DefinedNames;
 
-    internal Root(IParent parent) => Parent = parent;
+    internal Root(IParent? parent) => Parent = parent;
 
     IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature
         => this.CachedValue(() => GetCreateArrayFeature(false));
@@ -81,16 +81,15 @@ sealed class Root
 
     IImplementation GetMinusFeature()
     {
-        var metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
+        var metaDictionary = new FunctionCache<string, ValueSyntax?>(CreateMetaDictionary);
         return new ContextMetaFunctionFromSyntax
             (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]);
     }
 
-    ValueSyntax CreateMetaDictionary(string source)
+    ValueSyntax? CreateMetaDictionary(string source)
     {
-        var result = Parent.ParsePredefinedItem(source);
-        (!result.Issues.Any()).Assert();
-        return result.Target;
+        var result = Parent?.ParsePredefinedItem(source);
+        return result?.Target;
     }
 
     internal FunctionType GetFunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
@@ -128,12 +127,12 @@ sealed class Root
                 if(category.HasCode())
                 {
                     if(i > 0)
-                        result.Code = result.Code + ", ".GetDumpPrintTextCode();
-                    result.Code = result.Code + elemResult.Code;
+                        result.Code = result.Code! + ", ".GetDumpPrintTextCode();
+                    result.Code = result.Code! + elemResult.Code!;
                 }
 
                 if(category.HasClosures())
-                    result.Closures = result.Closures!.Sequence(elemResult.Closures);
+                    result.Closures = result.Closures!.Sequence(elemResult.Closures!);
                 result.IsDirty = false;
 
                 Dump("result", result);
@@ -141,7 +140,7 @@ sealed class Root
             }
 
             if(category.HasCode())
-                result.Code = result.Code + ")".GetDumpPrintTextCode();
+                result.Code = result.Code! + ")".GetDumpPrintTextCode();
             return ReturnMethodDump(result);
         }
         finally
@@ -153,7 +152,7 @@ sealed class Root
     internal FunctionContainer GetFunctionContainer(int index) => Functions.Container(index);
     internal FunctionType GetFunction(int index) => Functions.Item(index);
 
-    internal Container GetMainContainer(ValueSyntax syntax, string description)
+    internal Container GetMainContainer(ValueSyntax? syntax, string description)
     {
         var rawResult = syntax.GetResultForAll(this);
 

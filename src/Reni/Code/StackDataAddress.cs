@@ -22,7 +22,7 @@ sealed class StackDataAddress : NonListStackData
     [EnableDump]
     readonly Size Offset;
 
-    public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream outStream)
+    public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream? outStream)
         : base(outStream)
     {
         Data = data;
@@ -39,9 +39,8 @@ sealed class StackDataAddress : NonListStackData
         if(size == DataStack.RefSize && opToken == "Plus")
             return RefPlus(Size.Create(right.GetBitsConst().ToInt32()));
 
-
         NotImplementedMethod(opToken, size, right);
-        return null;
+        return default!;
     }
 
     protected override StackDataAddress GetAddress() => this;
@@ -69,7 +68,7 @@ sealed class StackDataAddress : NonListStackData
 
 interface IStackDataAddressBase
 {
-    StackData GetTop(Size offset, Size size);
+    StackData? GetTop(Size offset, Size size);
     string Dump();
     void SetTop(Size offset, StackData right);
 }

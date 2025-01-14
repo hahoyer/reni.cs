@@ -22,7 +22,7 @@ sealed class RecursionType
         get
         {
             NotImplementedMethod();
-            return null;
+            return null!;
         }
     }
 
@@ -40,7 +40,7 @@ sealed class RecursionType
     bool IFunction.IsImplicit => false;
 
     Result IMeta.GetResult
-        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
+        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right)
     {
         NotImplementedMethod(contextBase, left, category, right);
         return null!;

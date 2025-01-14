@@ -64,14 +64,14 @@ abstract class CodeBase
 
     protected virtual Closures GetClosures() => Closures.GetVoid();
 
-    internal virtual IEnumerable<CodeBase> ToList() => new[] { this };
+    internal virtual IEnumerable<CodeBase> ToList() => [this];
 
-    protected virtual TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    protected virtual TCode? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => actual.Default(this);
 
     internal virtual void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
 
-    internal virtual CodeBase ArrangeCleanupCode() => null;
+    internal virtual CodeBase? ArrangeCleanupCode() => null;
 
     protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
 
@@ -166,7 +166,7 @@ abstract class CodeBase
         return this;
     }
 
-    internal TCode Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    internal TCode? Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         => VisitImplementation(actual);
 
     internal CodeBase GetCall(FunctionId index, Size resultSize)
@@ -215,7 +215,7 @@ abstract class CodeBase
     internal CodeBase GetDumpPrintNumber(Size leftSize)
         => Concat(new DumpPrintNumberOperation(leftSize, Size - leftSize));
 
-    internal CodeBase GetDumpPrintText(Size itemSize)
+    internal CodeBase GetDumpPrintText(Size? itemSize)
         => Concat(new DumpPrintTextOperation(Size, itemSize.AssertNotNull()));
 
     internal CodeBase GetNumberOperation(string operation, Size size)
@@ -241,7 +241,7 @@ abstract class CodeBase
         }
     }
 
-    internal Container GetContainer(string description, FunctionId functionId = null)
+    internal Container GetContainer(string description, FunctionId? functionId = null)
         => new(GetAlign(), null, description, functionId);
 
     public static CodeBase operator +(CodeBase a, CodeBase b) => a.GetSequence(b);

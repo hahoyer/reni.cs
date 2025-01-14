@@ -13,14 +13,14 @@ sealed class Container : DumpableObject
         = new("UnexpectedVisitOfPending");
 
     [Node]
-    internal readonly FunctionId FunctionId;
+    internal readonly FunctionId? FunctionId;
 
     [Node]
-    internal readonly Issue[] Issues;
+    internal readonly Issue[]? Issues;
 
     [Node]
     [EnableDump]
-    internal CodeBase Data { get; }
+    internal CodeBase? Data { get; }
 
     [Node]
     [EnableDump]
@@ -29,7 +29,7 @@ sealed class Container : DumpableObject
     bool HasIssues => Issues?.Any() ?? false;
     bool HasCode => Data != null;
 
-    internal Container(CodeBase data, Issue[] issues, string description, FunctionId functionId = null)
+    internal Container(CodeBase? data, Issue[]? issues, string description, FunctionId? functionId = null)
         : base(NextObjectId++)
     {
         Description = description;

@@ -31,7 +31,7 @@ sealed class UnknownStackData : NonListStackData
 
     internal override Size Size { get; }
 
-    public UnknownStackData(Size size, IOutStream outStream)
+    public UnknownStackData(Size size, IOutStream? outStream)
         : base(outStream)
         => Size = size;
 

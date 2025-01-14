@@ -37,9 +37,9 @@ sealed class ObjectFunction : ObjectFunctionBase, IImplementation
         : base(function, target) { }
 
     IFunction IEvalImplementation.Function => this;
-    IValue IEvalImplementation.Value => null;
+    IValue? IEvalImplementation.Value => null;
 
-    IMeta IMetaImplementation.Function => null;
+    IMeta? IMetaImplementation.Function => null;
 }
 
 sealed class Function : FunctionFeatureImplementation

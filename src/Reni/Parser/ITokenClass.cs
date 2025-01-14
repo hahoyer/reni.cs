@@ -1,8 +1,6 @@
-namespace Reni.Parser
-{
-    public interface ITokenClass
-    {
-        string Id { get; }
-    }
+namespace Reni.Parser;
 
+public interface ITokenClass
+{
+    string Id { get; }
 }

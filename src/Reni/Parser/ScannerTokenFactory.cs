@@ -10,14 +10,14 @@ sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<BinaryTree>, Co
     bool IsSubParser { get; }
 
     [EnableDump]
-    Compiler<BinaryTree>.Component Current;
+    Compiler<BinaryTree>.Component? Current;
 
     LexerItem[] Classes =>
     [
         Lexer.Instance.WhiteSpacesItem
         , Lexer.Instance.InlineCommentItem
         , new(new Number(), Lexer.Instance.MatchNumber)
-        , new(Current.Get<ScannerTokenType<BinaryTree>>(), Lexer.Instance.MatchAny)
+        , new(Current!.Get<ScannerTokenType<BinaryTree>>()!, Lexer.Instance.MatchAny)
         , new(new Text(), Lexer.Instance.MatchText)
     ];
 

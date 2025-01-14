@@ -10,7 +10,7 @@ public sealed class Edit : DumpableObject
     [EnableDump(Order = 2)]
     internal readonly string Insert;
 
-    internal readonly string Flag;
+    internal readonly string? Flag;
 
     [EnableDump(Order = 1)]
     string Position => Remove.NodeDump;
@@ -28,7 +28,7 @@ public sealed class Edit : DumpableObject
 
     protected override string GetNodeDump() => Flag ?? base.GetNodeDump();
 
-    static Edit Create1(SourcePart sourcePart, string insert)
+    static Edit? Create1(SourcePart sourcePart, string insert)
     {
         var remove = sourcePart.Id;
         if(remove == insert)
@@ -52,10 +52,10 @@ public sealed class Edit : DumpableObject
         }
 
         if(insert.StartsWith(remove))
-            return new(sourcePart.End.Span(0), insert.Substring(remove.Length), "insertEnd");
+            return new(sourcePart.End.Span(0), insert[remove.Length..], "insertEnd");
 
         if(insert.EndsWith(remove))
-            return new(sourcePart.Start.Span(0), insert.Substring(0, insert.Length - remove.Length)
+            return new(sourcePart.Start.Span(0), insert[..^remove.Length]
                 , "insertStart");
 
         return new(sourcePart, insert, "replaceAll>");

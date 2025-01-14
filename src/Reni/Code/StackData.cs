@@ -4,40 +4,40 @@ namespace Reni.Code;
 
 abstract class StackData : DumpableObject
 {
-    internal readonly IOutStream OutStream;
+    internal readonly IOutStream? OutStream;
 
-    protected StackData(IOutStream outStream) => OutStream = outStream;
+    protected StackData(IOutStream? outStream) => OutStream = outStream;
 
     internal abstract Size Size { get; }
 
     internal virtual StackData Push(StackData stackData)
     {
         NotImplementedMethod(stackData);
-        return null;
+        return default!;
     }
 
     internal virtual StackData PushOnto(NonListStackData formerStack)
     {
         NotImplementedMethod(formerStack);
-        return null;
+        return default!;
     }
 
     protected virtual StackData GetTop(Size size)
     {
         NotImplementedMethod(size);
-        return null;
+        return default!;
     }
 
     protected virtual StackData Pull(Size size)
     {
         NotImplementedMethod(size);
-        return null;
+        return default!;
     }
 
     internal virtual StackData PushOnto(ListStack formerStack)
     {
         NotImplementedMethod(formerStack);
-        return null;
+        return default!;
     }
 
     internal virtual StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
@@ -51,19 +51,19 @@ abstract class StackData : DumpableObject
     protected virtual StackDataAddress GetAddress()
     {
         NotImplementedMethod();
-        return null;
+        return default!;
     }
 
     internal virtual BitsConst GetBitsConst()
     {
         NotImplementedMethod();
-        return null;
+        return default!;
     }
 
     internal virtual StackData ForcedPull(Size size)
     {
         NotImplementedMethod(size);
-        return null;
+        return default!;
     }
 
     internal virtual IEnumerable<DataStack.DataMemento> GetItemMementos()

@@ -1,4 +1,3 @@
-namespace Reni.SyntaxFactory
-{
-    interface IDeclarerProvider;
-}
+namespace Reni.SyntaxFactory;
+
+interface IDeclarerProvider;

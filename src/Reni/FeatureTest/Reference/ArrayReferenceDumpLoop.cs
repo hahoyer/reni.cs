@@ -1,11 +1,11 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.FeatureTest.Reference
-{
-    [UnitTest]
-    [ArrayReferenceDumpSimple]
-    [Target(@"
+namespace Reni.FeatureTest.Reference;
+
+[UnitTest]
+[ArrayReferenceDumpSimple]
+[Target(@"
 repeat: @ ^ while() then(^ body(), repeat(^));
 
 o: 
@@ -31,6 +31,5 @@ o:
 
 o('abcdef') dump_print
 ")]
-    [Output("abcdef")]
-    public sealed class ArrayReferenceDumpLoop : CompilerTest;
-}
+[Output("abcdef")]
+public sealed class ArrayReferenceDumpLoop : CompilerTest;

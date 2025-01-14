@@ -29,7 +29,7 @@ sealed class BitCast : FiberItem
         StopByObjectIds();
     }
 
-    protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+    protected override FiberItem[]? TryToCombineImplementation(FiberItem subsequentElement)
         => subsequentElement.TryToCombineBack(this);
 
     internal override FiberItem[] TryToCombineBack(BitCast preceding)
@@ -42,7 +42,7 @@ sealed class BitCast : FiberItem
         return new FiberItem[] { new BitCast(OutputSize, preceding.InputSize, inputDataSize) };
     }
 
-    internal override CodeBase TryToCombineBack(BitArray precedingElement)
+    internal override CodeBase? TryToCombineBack(BitArray precedingElement)
     {
         var bitsConst = precedingElement.Data;
         if(bitsConst.Size > InputDataSize)
@@ -154,6 +154,7 @@ sealed class BitCast : FiberItem
         return null;
     }
 
-    protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+    protected override TFiber? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+        where TFiber : default
         => actual.BitCast(this);
 }

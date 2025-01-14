@@ -20,7 +20,7 @@ sealed class CompoundSyntax : ValueSyntax
 
     [EnableDump(Order = 2)]
     [EnableDumpExcept(null)]
-    internal readonly CleanupSyntax CleanupSection;
+    internal readonly CleanupSyntax? CleanupSection;
 
     [EnableDump(Order = 1)]
     internal readonly IStatementSyntax[] Statements;
@@ -32,7 +32,7 @@ sealed class CompoundSyntax : ValueSyntax
             .Select(data => (FunctionSyntax)data.Value);
 
     [DisableDump]
-    internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
+    internal ValueSyntax?[] PureStatements => Statements.Select(s => s.Value).ToArray();
 
     [EnableDump(Order = 100)]
     internal IDictionary<string, int> NameIndex
@@ -68,7 +68,7 @@ sealed class CompoundSyntax : ValueSyntax
             .SelectMany((s, i) => s.Declarer.IsConverterSyntax? new[] { i } : new int[0])
             .ToArray();
 
-    CompoundSyntax(IStatementSyntax[] statements, CleanupSyntax cleanupSection, Anchor anchor)
+    CompoundSyntax(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
         : base(NextObjectId++, anchor)
     {
         Statements = statements;
@@ -95,7 +95,7 @@ sealed class CompoundSyntax : ValueSyntax
     protected override string GetNodeDump()
         => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-    protected override Syntax GetDirectChild(int index)
+    protected override Syntax? GetDirectChild(int index)
     {
         if(index >= 0 && index < Statements.Length)
             return (Syntax)Statements[index];
@@ -105,7 +105,7 @@ sealed class CompoundSyntax : ValueSyntax
     internal override Result GetResultForCache(ContextBase context, Category category)
         => context.GetCompound(this).GetResult(category);
 
-    internal override ValueSyntax Visit(ISyntaxVisitor visitor)
+    internal override ValueSyntax? Visit(ISyntaxVisitor visitor)
     {
         var statements = Statements.Select(s => s.Value.Visit(visitor)).ToArray();
         var cleanupSection = CleanupSection?.Value.Visit(visitor);
@@ -127,14 +127,14 @@ sealed class CompoundSyntax : ValueSyntax
 
     internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
 
-    public static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax cleanupSection, Anchor anchor)
+    public static CompoundSyntax? Create(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
         => new(statements, cleanupSection, anchor);
 
     public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
-    internal bool IsMutable(int position) => Statements[position].Declarer.IsMutableSyntax;
+    internal bool IsMutable(int position) => Statements[position].Declarer!.IsMutableSyntax;
 
-    internal int? Find(string name, bool publicOnly)
+    internal int? Find(string? name, bool publicOnly)
     {
         if(name == null)
             return null;
@@ -194,9 +194,9 @@ sealed class CompoundSyntax : ValueSyntax
 
 interface IStatementSyntax
 {
-    ValueSyntax Value { get; }
-    DeclarerSyntax Declarer { get; }
+    ValueSyntax? Value { get; }
+    DeclarerSyntax? Declarer { get; }
     SourcePart SourcePart { get; }
-    ValueSyntax ToValueSyntax(Anchor anchor);
-    IStatementSyntax With(Anchor frameItems);
+    ValueSyntax? ToValueSyntax(Anchor anchor);
+    IStatementSyntax With(Anchor? frameItems);
 }

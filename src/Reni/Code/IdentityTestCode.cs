@@ -30,6 +30,6 @@ sealed class IdentityTestCode : FiberItem
     internal override void Visit(IVisitor visitor)
         => visitor.BitArrayBinaryOp(DataFunctionName, OutputSize, ArgumentSize, ArgumentSize);
 
-    protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+    protected override FiberItem[]? TryToCombineImplementation(FiberItem subsequentElement)
         => subsequentElement.TryToCombineBack(this);
 }

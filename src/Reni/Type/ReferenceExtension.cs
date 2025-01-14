@@ -2,14 +2,13 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 
-namespace Reni.Type
-{
-    static class ReferenceExtension
-    {
-        internal static TypeBase Type(this IReference target) => (TypeBase) target;
+namespace Reni.Type;
 
-        internal static Size Size(this IContextReference target)
-            => (target as TypeBase)?.Size
-                ?? Root.DefaultRefAlignParam.RefSize;
-    }
+static class ReferenceExtension
+{
+    internal static TypeBase Type(this IReference target) => (TypeBase) target;
+
+    internal static Size Size(this IContextReference target)
+        => (target as TypeBase)?.Size
+            ?? Root.DefaultRefAlignParam.RefSize;
 }

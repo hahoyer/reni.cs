@@ -1,4 +1,3 @@
-#nullable enable
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;

@@ -5,7 +5,7 @@ namespace Reni.SyntaxFactory;
 
 class FunctionHandler : DumpableObject, IValueProvider
 {
-    ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
+    ValueSyntax? IValueProvider.Get(BinaryTree? target, Factory factory, Anchor frameItems)
     {
         var token = (Function)target.TokenClass;
         return new FunctionSyntax

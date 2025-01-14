@@ -1,11 +1,10 @@
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
-namespace Reni.SyntaxFactory
+namespace Reni.SyntaxFactory;
+
+class DefinableHandler : DumpableObject, IValueProvider
 {
-    class DefinableHandler : DumpableObject, IValueProvider
-    {
-        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
-            => factory.GetExpressionSyntax(target, frameItems);
-    }
+    ValueSyntax? IValueProvider.Get(BinaryTree? target, Factory factory, Anchor frameItems)
+        => factory.GetExpressionSyntax(target, frameItems);
 }

@@ -6,11 +6,11 @@ namespace Reni.SyntaxFactory;
 
 static class Extension
 {
-    internal static ValueSyntax GetInfixSyntax
+    internal static ValueSyntax? GetInfixSyntax
     (
-        this ValueSyntax left,
+        this ValueSyntax? left,
         ITokenClass tokenClass, SourcePart token,
-        ValueSyntax right,
+        ValueSyntax? right,
         Anchor anchor
     )
         => left == null? right == null

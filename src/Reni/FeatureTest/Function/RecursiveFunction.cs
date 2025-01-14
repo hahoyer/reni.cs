@@ -6,20 +6,20 @@ using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.ThenElse;
 using Reni.FeatureTest.TypeType;
 
-namespace Reni.FeatureTest.Function
-{
-    [UnitTest]
-    [InnerAccess]
-    [Add2Numbers]
-    [UseThen]
-    [UseElse]
-    [ApplyTypeOperator]
-    [Equal]
-    [ApplyTypeOperatorWithCut]
-    [SimpleFunction]
-    [TwoFunctions1]
-    [FunctionWithRefArg]
-    [Target(@"
+namespace Reni.FeatureTest.Function;
+
+[UnitTest]
+[InnerAccess]
+[Add2Numbers]
+[UseThen]
+[UseElse]
+[ApplyTypeOperator]
+[Equal]
+[ApplyTypeOperatorWithCut]
+[SimpleFunction]
+[TwoFunctions1]
+[FunctionWithRefArg]
+[Target(@"
 f: @
 {
     1000 type instance
@@ -33,7 +33,6 @@ f: @
     )
 };
 f(4)dump_print"
-        )]
-    [Output("24")]
-    public sealed class RecursiveFunction : CompilerTest;
-}
+)]
+[Output("24")]
+public sealed class RecursiveFunction : CompilerTest;

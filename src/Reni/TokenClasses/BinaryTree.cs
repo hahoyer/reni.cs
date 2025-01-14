@@ -22,28 +22,26 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     internal sealed class BracketNodes
     {
-        internal BinaryTree Center;
-        internal BinaryTree Left;
-        internal BinaryTree Right;
+        internal BinaryTree? Center;
+        internal BinaryTree? Left;
+        internal BinaryTree? Right;
 
         [DisableDump]
         internal Anchor ToAnchor => Anchor.Create(Left, Right);
 
         [DisableDump]
-        internal BinaryTree[] Anchors => T(Left, Right);
+        internal BinaryTree?[] Anchors => [Left, Right];
     }
 
     static int NextObjectId;
 
     [EnableDump(Order = 1)]
     [EnableDumpExcept(null)]
-    [CanBeNull]
-    internal BinaryTree Left { get; }
+    internal BinaryTree? Left { get; }
 
     [EnableDump(Order = 3)]
     [EnableDumpExcept(null)]
-    [CanBeNull]
-    internal BinaryTree Right { get; }
+    internal BinaryTree? Right { get; }
 
     [DisableDump]
     internal readonly SourcePart Token;
@@ -52,28 +50,28 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     internal readonly WhiteSpaceItem WhiteSpaces;
 
     [DisableDump]
-    internal Syntax Syntax;
+    internal Syntax? Syntax;
 
     [DisableDump]
-    internal BinaryTree Parent;
+    internal BinaryTree? Parent;
 
     [PublicAPI]
     [EnableDump]
     [EnableDumpExcept(null)]
-    internal IFormatter Formatter;
+    internal IFormatter? Formatter;
 
     [DisableDump]
     readonly ITokenClass InnerTokenClass;
 
-    readonly FunctionCache<bool, string> FlatFormatCache;
-    readonly FunctionCache<int, BinaryTree> ContainingTreeItemCache;
+    readonly FunctionCache<bool, string?> FlatFormatCache;
+    readonly FunctionCache<int, BinaryTree?> ContainingTreeItemCache;
 
     [DisableDump]
-    BinaryTree LeftNeighbor;
+    BinaryTree? LeftNeighbor;
 
     [DisableDump]
     [UsedImplicitly]
-    BinaryTree RightNeighbor;
+    BinaryTree? RightNeighbor;
 
     int Depth;
 
@@ -101,15 +99,13 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     [DisableDump]
     internal IEnumerable<Issue> AllIssues
-        => T(Left?.AllIssues, Issues, Right?.AllIssues)
-            .ConcatMany()
-            .Where(node => node != null);
+        => T(Left?.AllIssues, Issues, Right?.AllIssues).ConcatMany();
 
     [DisableDump]
     internal Issue[] Issues => this.CachedValue(GetIssue).NullableToArray().ToArray();
 
     [DisableDump]
-    internal BracketNodes BracketKernel
+    internal BracketNodes? BracketKernel
     {
         get
         {
@@ -129,7 +125,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     }
 
     [DisableDump]
-    public BinaryTree[] ParserLevelGroup
+    public BinaryTree?[] ParserLevelGroup
         => this.CachedValue(() => GetParserLevelGroup()?.ToArray() ?? []);
 
     [DisableDump]
@@ -155,8 +151,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
                 return ExtraLeftBracket;
             }
 
-            rightBracket.AssertIsNotNull();
-            var level = rightBracket.Level;
+            var level = rightBracket!.Level;
 
             right.AssertIsNull();
 
@@ -193,11 +188,11 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     BinaryTree
     (
-        BinaryTree left
+        BinaryTree? left
         , ITokenClass tokenClass
         , WhiteSpaceItem whiteSpaces
         , SourcePart token
-        , BinaryTree right
+        , BinaryTree? right
     )
         : base(NextObjectId++)
     {
@@ -219,17 +214,17 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     SourcePart ISyntax.Main => Token;
     int ITree<BinaryTree>.DirectChildCount => 2;
 
-    BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
+    BinaryTree? ITree<BinaryTree>.GetDirectChild(int index)
         => index switch
         {
-            0 => Left, 1 => Right, _ => null
+            0 => Left, 1 => Right, var _ => null
         };
 
     int ITree<BinaryTree>.LeftDirectChildCount => 1;
 
     protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id}{InnerTokenClassPart})";
 
-    Issue GetIssue()
+    Issue? GetIssue()
     {
         var issueId = (TokenClass as IIssueTokenClass)?.IssueId ?? default;
         if(issueId == default)
@@ -243,7 +238,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
                 => issueId.GetIssue(Token, LeftMost.SourcePart)
             , EOFInComment or EOLInText or EOFInVerbatimText
                 => issueId.GetIssue(Token)
-            , _ => throw new InvalidEnumArgumentException($"Unexpected issue: {issueId}")
+            , var _ => throw new InvalidEnumArgumentException($"Unexpected issue: {issueId}")
         };
     }
 
@@ -253,7 +248,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         return issueId == default? InnerTokenClass : IssueTokenClass.From[issueId];
     }
 
-    BinaryTree GetContainingTreeItemForCache(SourcePosition position)
+    BinaryTree? GetContainingTreeItemForCache(SourcePosition position)
     {
         if(position < WhiteSpaces.SourcePart.Start)
             return Left?.ContainingTreeItemCache[position.Position];
@@ -285,7 +280,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         }
     }
 
-    IEnumerable<BinaryTree> GetParserLevelGroup()
+    IEnumerable<BinaryTree?>? GetParserLevelGroup()
     {
         var tokenClass = InnerTokenClass;
 
@@ -320,17 +315,17 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     internal static BinaryTree Create
     (
-        BinaryTree left
+        BinaryTree? left
         , ITokenClass tokenClass
         , IToken token
-        , BinaryTree right
+        , BinaryTree? right
     )
     {
         ((ILinked<BinaryTree>)token).Container.AssertIsNull();
         return new(left, tokenClass, new(token.GetPrefixSourcePart()), token.Characters, right);
     }
 
-    internal BinaryTree ReCreate(BinaryTree[] left = null, BinaryTree[] right = null)
+    internal BinaryTree ReCreate(BinaryTree?[]? left = null, BinaryTree?[]? right = null)
     {
         (left == null || left.Length <= 1).Assert();
         (right == null || right.Length <= 1).Assert();
@@ -348,7 +343,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
     }
 
-    string GetFlatStringValue(bool areEmptyLinesPossible)
+    string? GetFlatStringValue(bool areEmptyLinesPossible)
     {
         var separatorRequests = SeparatorRequests;
         var tokenString = Left == null? "" : WhiteSpaces.FlatFormat(areEmptyLinesPossible, separatorRequests);
@@ -398,7 +393,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     /// </summary>
     /// <param name="areEmptyLinesPossible"></param>
     /// <returns>The formatted line or null if target contains line breaks.</returns>
-    internal string GetFlatString(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible];
+    internal string? GetFlatString(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible];
 
     /// <summary>
     ///     Get the line length of target when formatted as one line.
@@ -413,12 +408,12 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
             return;
         (Syntax == null || Syntax == syntax).Assert(() => @$"
 this: {Dump()}
-Current: {Syntax.Dump()}
+Current: {Syntax!.Dump()}
 New: {syntax.Dump()}");
         Syntax = syntax;
     }
 
-    internal BinaryTree GetContainingTreeItem(SourcePosition offset)
+    internal BinaryTree? GetContainingTreeItem(SourcePosition offset)
     {
         (Token.Source == offset.Source).Assert();
         return ContainingTreeItemCache[offset.Position];
@@ -441,11 +436,10 @@ New: {syntax.Dump()}");
         return result;
     }
 
-    internal(BinaryTree token, WhiteSpaceItem item) GetContainingItem(SourcePosition offset)
+    internal(BinaryTree? token, WhiteSpaceItem? item) GetContainingItem(SourcePosition offset)
     {
         var result = GetContainingTreeItem(offset);
-        result.AssertIsNotNull();
-        var item = result.WhiteSpaces.GetItem(offset);
+        var item = result?.WhiteSpaces.GetItem(offset);
         return (result, item);
     }
 }

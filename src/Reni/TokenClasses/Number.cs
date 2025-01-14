@@ -16,7 +16,7 @@ sealed class Number : TerminalSyntaxToken
     protected override Result GetResult(ContextBase context, Category category, SourcePart token)
         => context.RootContext.BitType.GetResult(category, BitsConst.Convert(token.Id));
 
-    protected override TypeBase TryGetTypeBase(SourcePart token)
+    protected override TypeBase? TryGetTypeBase(SourcePart token)
     {
         NotImplementedMethod(token);
         return default;

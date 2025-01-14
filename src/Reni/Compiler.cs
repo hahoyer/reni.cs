@@ -25,7 +25,7 @@ public sealed class Compiler
     const string DefaultModuleName = "ReniModule";
 
     [UsedImplicitly]
-    public Exception Exception;
+    public Exception? Exception;
 
     internal readonly CompilerParameters Parameters;
 
@@ -41,8 +41,8 @@ public sealed class Compiler
 
     readonly MainTokenFactory MainTokenFactory;
     readonly string ModuleName;
-    readonly ValueCache<ValueSyntax> ValueSyntaxCache;
-    readonly ValueCache<MethodInfo> CSharpMethodCache;
+    readonly ValueCache<ValueSyntax?> ValueSyntaxCache;
+    readonly ValueCache<MethodInfo?> CSharpMethodCache;
 
     bool IsInExecutionPhase;
 
@@ -69,23 +69,24 @@ public sealed class Compiler
         {
             var result = ValueSyntaxCache.Value;
             AssertValidSyntaxLinkForBinaryTree();
-            return result;
+            return result!;
         }
     }
 
     [Node]
     [DisableDump]
-    internal CodeContainer CodeContainer => Parameters.IsCodeRequired? CodeContainerCache.Value : null;
+    [PublicAPI]
+    internal CodeContainer? CodeContainer => Parameters.IsCodeRequired? CodeContainerCache.Value : null;
 
     [DisableDump]
     [Node]
-    internal string CSharpString => this.CachedValue(() => CodeContainer?.CSharpString);
+    internal string? CSharpString => this.CachedValue(() => CodeContainer?.CSharpString);
 
     [UsedImplicitly]
     bool IsTraceEnabled
         => IsInExecutionPhase && Parameters.TraceOptions.Functions;
 
-    MethodInfo CSharpMethod => CSharpMethodCache.Value;
+    MethodInfo? CSharpMethod => CSharpMethodCache.Value;
 
     [DisableDump]
     internal IEnumerable<Issue> Issues
@@ -157,20 +158,18 @@ public sealed class Compiler
 
             result += PrioTable.BracketParallels
             (
-                new[]
-                {
+                [
                     LeftParenthesis.TokenId(3)
                     , LeftParenthesis.TokenId(2)
                     , LeftParenthesis.TokenId(1)
                     , PrioTable.BeginOfText
-                },
-                new[]
-                {
+                ],
+                [
                     RightParenthesisBase.TokenId(3)
                     , RightParenthesisBase.TokenId(2)
                     , RightParenthesisBase.TokenId(1)
                     , PrioTable.EndOfText
-                }
+                ]
             );
 
             result.Title = "Main";
@@ -189,18 +188,16 @@ public sealed class Compiler
             result += PrioTable.Right(TokenClasses.List.TokenId(2));
             result += PrioTable.BracketParallels
             (
-                new[]
-                {
+                [
                     LeftParenthesis.TokenId(3)
                     , LeftParenthesis.TokenId(2)
                     , LeftParenthesis.TokenId(1)
-                },
-                new[]
-                {
+                ],
+                [
                     RightParenthesisBase.TokenId(3)
                     , RightParenthesisBase.TokenId(2)
                     , RightParenthesisBase.TokenId(1)
-                }
+                ]
             );
             result.Title = "Declaration";
             return result;
@@ -212,9 +209,8 @@ public sealed class Compiler
 
     internal Semantics Semantics => Semantics.From(Root, Syntax);
 
-    Compiler(Source source, string moduleName, CompilerParameters parameters)
+    Compiler(Source source, string moduleName, CompilerParameters? parameters)
     {
-        (source != null).Assert();
         Source = source;
         Parameters = parameters ?? new CompilerParameters();
         ModuleName = moduleName;
@@ -248,9 +244,9 @@ public sealed class Compiler
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
     CodeBase IExecutionContext.Function(FunctionId functionId)
-        => CodeContainer.Function(functionId);
+        => CodeContainer!.Function(functionId);
 
-    IOutStream IExecutionContext.OutStream => Parameters.OutStream;
+    IOutStream? IExecutionContext.OutStream => Parameters.OutStream;
 
     IEnumerable<Definable> Root.IParent.DefinedNames
         => MainTokenFactory.AllTokenClasses.OfType<Definable>();
@@ -261,7 +257,7 @@ public sealed class Compiler
 
     bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
 
-    MethodInfo GetCSharpMethod()
+    MethodInfo? GetCSharpMethod()
     {
         try
         {
@@ -270,33 +266,33 @@ public sealed class Compiler
                 .CodeToAssembly
                     (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)
                 .GetExportedTypes()[0]
-                .GetMethod(Generator.MainFunctionName);
+                .GetMethod(Generator.MainFunctionName)!;
         }
         catch(CSharpCompilerErrorException e)
         {
             foreach(var error in e.Errors)
-                Parameters.OutStream.AddLog(error + "\n");
+                Parameters.OutStream!.AddLog(error + "\n");
 
             return null;
         }
     }
 
-    public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
+    public static Compiler FromFile(string fileName, CompilerParameters? parameters = null)
     {
         var moduleName = ModuleNameFromFileName(fileName);
         return new(new(fileName.ToSmbFile()), moduleName, parameters);
     }
 
     public static Compiler FromText
-        (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
+        (string text, CompilerParameters? parameters = null, string? sourceIdentifier = null)
         => new(
             new(text, sourceIdentifier ?? DefaultSourceIdentifier),
             DefaultModuleName,
             parameters);
 
-    ValueSyntax GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
+    ValueSyntax? GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
 
-    static ValueSyntax GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
+    static ValueSyntax? GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
 
     void AssertValidSyntaxLinkForBinaryTree()
     {
@@ -311,8 +307,8 @@ public sealed class Compiler
     static string ModuleNameFromFileName(string fileName)
         => "_" + Path.GetFileName(fileName).Symbolize();
 
-    Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-        => Factory.Root.GetValueSyntax(Parse(new(sourceText, PredefinedSource)).BracketKernel.Center);
+    Result<ValueSyntax?> ParsePredefinedItem(string sourceText)
+        => Factory.Root.GetValueSyntax(Parse(new(sourceText, PredefinedSource)).BracketKernel!.Center);
 
     [UsedImplicitly]
     public Compiler Empower()
@@ -341,7 +337,7 @@ public sealed class Compiler
         }
 
         if(Parameters.TraceOptions.CodeSequence && Parameters.IsCodeRequired)
-            ("Code\n" + CodeContainer.Dump()).FlaggedLine();
+            ("Code\n" + CodeContainer!.Dump()).FlaggedLine();
 
         if(Parameters.RunFromCode)
         {
@@ -363,7 +359,7 @@ public sealed class Compiler
 
         Data.OutStream = Parameters.OutStream;
         IsInExecutionPhase = true;
-        CSharpMethod.Invoke(null, new object[0]);
+        CSharpMethod.Invoke(null, []);
         IsInExecutionPhase = false;
         Data.OutStream = null;
     }
@@ -371,13 +367,13 @@ public sealed class Compiler
     internal void ExecuteFromCode(DataStack dataStack)
     {
         IsInExecutionPhase = true;
-        CodeContainer.Main.Data.Visit(dataStack);
+        CodeContainer!.Main.Data!.Visit(dataStack);
         IsInExecutionPhase = false;
     }
 
-    BinaryTree Parse(Source source) => this["Main"].Parser.Execute(source);
+    BinaryTree? Parse(Source source) => this["Main"].Parser.Execute(source);
 
-    void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
+    void RunFromCode() => CodeContainer!.Execute(this, TraceCollector.Instance);
 
     internal void Materialize()
     {

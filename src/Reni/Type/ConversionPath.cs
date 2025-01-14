@@ -147,12 +147,12 @@ sealed class ConversionPath
     public static ConversionPath operator +(IConversion a, ConversionPath b)
         => new(new[] { a }.Concat(b.Elements).ToArray());
 
-    public static ConversionPath operator +(ConversionPath a, IConversion b)
+    public static ConversionPath operator +(ConversionPath? a, IConversion b)
     {
         if(a == null)
             return new(b);
 
-        return new(a.Elements.Concat(new[] { b }).ToArray());
+        return new(a.Elements.Concat([b]).ToArray());
     }
 
     internal Result Execute(Category category)

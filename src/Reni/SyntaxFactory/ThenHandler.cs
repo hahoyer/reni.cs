@@ -5,7 +5,7 @@ namespace Reni.SyntaxFactory;
 
 sealed class ThenHandler : DumpableObject, IValueProvider
 {
-    ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
+    ValueSyntax? IValueProvider.Get(BinaryTree? target, Factory factory, Anchor anchor)
         => new CondSyntax
         (
             factory.GetValueSyntax(target.Left)

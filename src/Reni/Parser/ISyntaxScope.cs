@@ -1,4 +1,3 @@
-namespace Reni.Parser
-{
-    interface ISyntaxScope;
-}
+namespace Reni.Parser;
+
+interface ISyntaxScope;

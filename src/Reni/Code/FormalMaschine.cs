@@ -171,7 +171,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
             FramePoints[i + delta] = framePoints[i];
     }
 
-    IFormalValue[] GetInputValuesFromFrame(Size offset, Size size)
+    IFormalValue?[] GetInputValuesFromFrame(Size offset, Size size)
     {
         var accesses = new List<FormalValueAccess>();
         var start = FrameData.Length + offset.ToInt();
