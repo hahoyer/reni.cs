@@ -19,6 +19,6 @@ abstract class TokenClass : ParserTokenType<BinaryTree>, ITokenClass, ISeparator
 
     string ITokenClass.Id => Id;
 
-    protected override BinaryTree? Create(BinaryTree? left, IToken token, BinaryTree? right)
+    protected override BinaryTree Create(BinaryTree? left, IToken token, BinaryTree? right)
         => BinaryTree.Create(left, this, token, right);
 }

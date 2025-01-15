@@ -7,7 +7,7 @@ internal sealed class BitsStackData : NonListStackData
     [EnableDump]
     private readonly BitsConst Data;
 
-    public BitsStackData(BitsConst data, IOutStream? outStream)
+    public BitsStackData(BitsConst data, IOutStream outStream)
         : base(outStream)
     {
         Data = data;

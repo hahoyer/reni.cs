@@ -96,8 +96,6 @@ sealed class DumpPrintTextOperation : FiberItem
     internal readonly Size ItemSize;
     internal DumpPrintTextOperation(Size leftSize, Size itemSize)
     {
-        (leftSize != null).Assert();
-        (itemSize != null).Assert();
         InputSize = leftSize;
         ItemSize = itemSize;
     }

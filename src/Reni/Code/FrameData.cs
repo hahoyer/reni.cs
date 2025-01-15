@@ -7,7 +7,7 @@ sealed class FrameData(StackData? data) : DumpableObject, IStackDataAddressBase
     [EnableDumpExcept(false)]
     internal bool IsRepeatRequired;
 
-    StackData IStackDataAddressBase.GetTop(Size offset, Size size)
+    StackData? IStackDataAddressBase.GetTop(Size offset, Size size)
         => Data?.DoPull(Data.Size + offset).DoGetTop(size);
 
     void IStackDataAddressBase.SetTop(Size offset, StackData right)

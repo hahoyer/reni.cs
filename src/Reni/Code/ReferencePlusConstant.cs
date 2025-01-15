@@ -37,7 +37,7 @@ sealed class ReferencePlusConstant : FiberItem
 
     internal override CodeBase TryToCombineBack(TopRef precedingElement) => new TopRef(precedingElement.Offset + Right);
 
-    internal override CodeBase? TryToCombineBack(TopFrameRef precedingElement) => new TopFrameRef(precedingElement.Offset + Right);
+    internal override CodeBase TryToCombineBack(TopFrameRef precedingElement) => new TopFrameRef(precedingElement.Offset + Right);
 
     protected override FiberItem[]? TryToCombineImplementation(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
 

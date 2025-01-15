@@ -15,7 +15,7 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
         get
         {
             NotImplementedMethod();
-            return null;
+            return null!;
         }
     }
 

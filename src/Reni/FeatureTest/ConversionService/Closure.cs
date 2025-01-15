@@ -10,7 +10,7 @@ public sealed class Closure : DependenceProvider
     [UnitTest]
     public void OfNumber()
     {
-        var number = new Root(null).BitType.Number(1);
+        var number = new Root(null!).BitType.Number(1);
         var types = number.SymmetricFeatureClosure().Types().ToArray();
 
         types.Contains(number).Assert();
@@ -22,7 +22,7 @@ public sealed class Closure : DependenceProvider
     [UnitTest]
     public void ClosureServiceOfAlignedNumber()
     {
-        var source = new Root(null).BitType.Number(8);
+        var source = new Root(null!).BitType.Number(8);
         var paths = source.SymmetricPathsClosureBackwards().ToArray();
 
         var destinations = paths.Select(p => p.Source).ToArray();
@@ -36,7 +36,7 @@ public sealed class Closure : DependenceProvider
     [UnitTest]
     public void ClosureServiceOfAlignedNumberBackwards()
     {
-        var source = new Root(null).BitType.Number(8);
+        var source = new Root(null!).BitType.Number(8);
         var paths = source.SymmetricPathsClosureBackwards().ToArray();
 
         var destinations = paths.Select(p => p.Source).ToArray();
@@ -50,7 +50,7 @@ public sealed class Closure : DependenceProvider
     [UnitTest]
     public void ClosureServiceOfNumber()
     {
-        var source = new Root(null).BitType.Number(1);
+        var source = new Root(null!).BitType.Number(1);
         var paths = Type.ConversionService.ClosureService.GetResult(source);
         var destinations = paths.Select(p => p.Destination).ToArray();
 
@@ -63,7 +63,7 @@ public sealed class Closure : DependenceProvider
     [UnitTest]
     public void OfNumberPointer()
     {
-        var number = new Root(null).BitType.Number(4);
+        var number = new Root(null!).BitType.Number(4);
         var pointer = number.Pointer;
         var paths = pointer.SymmetricPathsClosure().ToArray();
 

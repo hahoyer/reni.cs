@@ -32,14 +32,14 @@ sealed class DePointer : FiberItem
     internal override CodeBase TryToCombineBack(TopRef precedingElement)
         => new TopData(precedingElement.Offset, OutputSize, DataSize);
 
-    internal override CodeBase TryToCombineBack(LocalReference precedingElement)
+    internal override CodeBase? TryToCombineBack(LocalReference precedingElement)
     {
         if(precedingElement.ValueType.Size == DataSize)
             return precedingElement.ValueCode.GetBitCast(OutputSize);
         return null;
     }
 
-    internal override CodeBase? TryToCombineBack(TopFrameRef precedingElement)
+    internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
         => new TopFrameData(precedingElement.Offset, OutputSize, DataSize);
 
     internal override void Visit(IVisitor visitor) => visitor.DePointer(OutputSize, DataSize);

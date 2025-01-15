@@ -218,7 +218,7 @@ sealed class DataStack : DumpableObject, IVisitor
     void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
     {
         var frame = LocalData.Frame.Data;
-        var value = frame
+        var value = frame!
             .DoPull(offset)
             .DoGetTop(size)
             .BitCast(dataSize)
@@ -266,7 +266,7 @@ sealed class DataStack : DumpableObject, IVisitor
 
 interface IExecutionContext
 {
-    IOutStream? OutStream { get; }
+    IOutStream OutStream { get; }
     CodeBase Function(FunctionId functionId);
 }
 

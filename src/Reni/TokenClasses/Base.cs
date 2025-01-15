@@ -88,17 +88,17 @@ abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValue
 
 abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueToken
 {
-    Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax? left)
+    Result ISuffix.GetResult(ContextBase context, Category category, ValueSyntax left)
         => GetResult(context, category, left);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
 
-    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax? left);
+    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax left);
 }
 
 abstract class InfixSyntaxToken : InfixToken, IInfix, IValueToken
 {
-    Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right)
+    Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         => GetResult(context, category, left, right);
 
     IValueProvider IValueToken.Provider => Factory.Infix;

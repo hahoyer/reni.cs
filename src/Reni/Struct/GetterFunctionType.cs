@@ -13,7 +13,7 @@ sealed class GetterFunction : FunctionInstance
         => FunctionId = FunctionId.Getter(index);
 
     [DisableDump]
-    internal TypeBase ReturnType => GetCallResult(Category.Type).Type;
+    internal TypeBase ReturnType => GetCallResult(Category.Type).Type!;
 
     [DisableDump]
     protected override Size RelevantValueSize => Size.Zero;

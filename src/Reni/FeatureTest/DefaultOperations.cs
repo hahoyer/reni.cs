@@ -12,9 +12,9 @@ public abstract class ApplyCompareOperator : CompilerTest
 {
     protected abstract string Operator { get; }
     protected abstract bool Result { get; }
-    protected virtual IEnumerable<System.Type> DependsOn => new[] { typeof(Add2Numbers) };
-    protected override string? Target => "(1" + Operator + "100)dump_print";
-    protected override string? Output => Result? "-1" : "0";
+    protected virtual IEnumerable<System.Type> DependsOn => [typeof(Add2Numbers)];
+    protected override string Target => "(1" + Operator + "100)dump_print";
+    protected override string Output => Result? "-1" : "0";
 }
 
 [UnitTest]

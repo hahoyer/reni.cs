@@ -158,7 +158,7 @@ abstract class TypeBase
     internal BitType BitType => Root.BitType;
 
     [DisableDump]
-    internal TypeBase? TypeForStructureElement => GetDeAlign(Category.Type).Type;
+    internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type!;
 
     [DisableDump]
     internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type!;
@@ -284,7 +284,7 @@ abstract class TypeBase
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
         => Root
-            .DefinedNames
+            .DefinedNames!
             .Where(IsDeclarationOption)
             .Select(item => item.Id)
             .OrderBy(item => item)

@@ -70,7 +70,7 @@ sealed class PointerType
     protected override IEnumerable<IConversion> RawSymmetricConversions
         =>
             base.RawSymmetricConversions.Concat
-                (new IConversion[] { Feature.Extension.Conversion(DereferenceResult) });
+                ([Feature.Extension.Conversion(DereferenceResult)]);
 
     protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 

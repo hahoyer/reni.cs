@@ -13,9 +13,9 @@ sealed class DeclarerSyntax : DumpableObject
 {
     internal sealed class TagSyntax : Syntax.NoChildren
     {
-        internal readonly IDeclarationTag Value;
+        internal readonly IDeclarationTag? Value;
 
-        internal TagSyntax(IDeclarationTag value, Anchor anchor)
+        internal TagSyntax(IDeclarationTag? value, Anchor anchor)
             : base(anchor)
         {
             Value = value;
@@ -28,7 +28,7 @@ sealed class DeclarerSyntax : DumpableObject
                 yield return IssueId.InvalidDeclarationTag.GetIssue(Anchor.Main.SourcePart);
         }
 
-        internal override void AssertValid(Level level, BinaryTree target = null)
+        internal override void AssertValid(Level? level, BinaryTree? target = null)
             => base.AssertValid(level == null? null : new Level { IsCorrectOrder = level.IsCorrectOrder }, target);
     }
 
@@ -43,14 +43,14 @@ sealed class DeclarerSyntax : DumpableObject
             StopByObjectIds();
         }
 
-        internal override void AssertValid(Level level, BinaryTree target = null)
+        internal override void AssertValid(Level? level, BinaryTree? target = null)
             => base.AssertValid(level == null? null : new Level { IsCorrectOrder = level.IsCorrectOrder }, target);
     }
 
     [EnableDumpExcept(null)]
     internal readonly NameSyntax? Name;
 
-    internal readonly TagSyntax?[] Tags;
+    internal readonly TagSyntax[] Tags;
 
     [EnableDumpExcept(null)]
     internal readonly Syntax.IssueSyntax? Issue;
@@ -64,10 +64,16 @@ sealed class DeclarerSyntax : DumpableObject
 
     [DisableDump]
     internal SourcePart SourcePart
-        => T(Tags.SelectMany(node => node.Anchor.SourceParts), Name?.Anchor.SourceParts)
-            .ConcatMany()
-            .Where(i => i != null)
-            .Aggregate();
+    {
+        get
+        {
+            IEnumerable<SourcePart?> sourceParts = T(Tags.SelectMany(node => node.Anchor.SourceParts), Name?.Anchor.SourceParts)
+                .ConcatMany();
+            return sourceParts
+                .Where(i => i != null)
+                .Aggregate()!;
+        }
+    }
 
     [EnableDumpExcept(false)]
     internal bool IsPublic
@@ -98,18 +104,17 @@ sealed class DeclarerSyntax : DumpableObject
 
     DeclarerSyntax
     (
-        TagSyntax?[] tags
+        TagSyntax[] tags
         , NameSyntax name
         , Syntax.IssueSyntax? issue
         , bool? meansPublic
     )
     {
-        tags.AssertIsNotNull();
         Tags = tags;
         Name = name;
         MeansPublic = meansPublic;
         Issue = issue;
-        DirectChildrenCache = new(() => DirectChildCount.Select(GetDirectChild).ToArray());
+        DirectChildrenCache = new(() => DirectChildCount.Select(i => GetDirectChild(i)!).ToArray());
         StopByObjectIds(713);
     }
 
@@ -117,7 +122,7 @@ sealed class DeclarerSyntax : DumpableObject
         => base.GetNodeDump()
             + "["
             + (Name?.Value ?? "")
-            + Tags.Select(tag => "!" + ((tag?.Value as TokenClass)?.Id ?? "?")).Stringify("")
+            + Tags.Select(tag => "!" + ((tag.Value as TokenClass)?.Id ?? "?")).Stringify("")
             + "]";
 
     internal Syntax? GetDirectChild(int index)

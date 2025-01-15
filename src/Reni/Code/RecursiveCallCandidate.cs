@@ -15,7 +15,7 @@ sealed class RecursiveCallCandidate : FiberItem
 
     internal override void Visit(IVisitor visitor) => visitor.RecursiveCallCandidate();
 
-    internal override CodeBase TryToCombineBack(TopFrameData precedingElement)
+    internal override CodeBase? TryToCombineBack(TopFrameData precedingElement)
     {
         if((DeltaSize + precedingElement.Size).IsZero
            && precedingElement.Offset.IsZero)
@@ -23,7 +23,7 @@ sealed class RecursiveCallCandidate : FiberItem
         return base.TryToCombineBack(precedingElement);
     }
 
-    internal override CodeBase TryToCombineBack(List precedingElement)
+    internal override CodeBase? TryToCombineBack(List precedingElement)
     {
         if (precedingElement.IsCombinePossible(this))
             return new RecursiveCall();

@@ -16,8 +16,8 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         [EnableDump]
         readonly CompoundView CompoundView;
 
-        public RecursionWhileObtainingCompoundSizeException
-            (CompoundView compoundView) => CompoundView = compoundView;
+        public RecursionWhileObtainingCompoundSizeException(CompoundView compoundView)
+            => CompoundView = compoundView;
     }
 
     sealed class ConverterAccess : DumpableObject, IConversion
@@ -34,7 +34,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             Type = type;
         }
 
-        Result IConversion.Execute(Category category)
+        Result? IConversion.Execute(Category category)
         {
             var innerResult = ((IConversion)Parent).Execute(category);
             var conversion = Type.Pointer.GetMutation(Parent);
@@ -87,11 +87,10 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     TypeBase IndexType => Compound.IndexType;
 
     [DisableDump]
-    [NotNull]
     internal CompoundContext CompoundContext => CompoundContextCache.Value;
 
     [DisableDump]
-    internal Size CompoundViewSize
+    internal Size? CompoundViewSize
     {
         get
         {
@@ -162,7 +161,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Issue[] Issues => Compound.GetIssues(ViewPosition);
 
     [UsedImplicitly]
-    internal bool HasIssues => Issues?.Any() ?? false;
+    internal bool HasIssues => Issues.Any();
 
     [DisableDump]
     [UsedImplicitly]
@@ -186,9 +185,9 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     protected override string GetNodeDump()
     {
         var result = base.GetNodeDump();
-        result += "(" + (Context?.ContextIdentificationDump ?? "?") + ")";
+        result += $"({Context.ContextIdentificationDump})";
         if(HasIssues)
-            result += ".AllIssues[" + Issues.Length + "]";
+            result += $".AllIssues[{Issues.Length}]";
         return result;
     }
 
@@ -286,7 +285,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             return resultType.GetResult(category);
 
         return resultType.GetResult
-            (category, c => Type?.GetObjectResult(c).AddToReference(() => FieldOffset(position)));
+            (category, c => Type.GetObjectResult(c).AddToReference(() => FieldOffset(position)));
     }
 
 
@@ -301,7 +300,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
         var source = result.Source;
         (source == Type.Pointer).Assert(source.Dump);
-        (source == result.GetResult(Category.Code).Code!.ArgumentType).Assert();
+        (source == result.GetResult(Category.Code)?.Code!.ArgumentType).Assert();
         return result;
     }
 
@@ -352,7 +351,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     }
 
     CodeBase ObjectPointerViaContext()
-        => Compound.GetCode().GetReferenceWithOffset(CompoundViewSize * -1);
+        => Compound.GetCode().GetReferenceWithOffset(CompoundViewSize! * -1);
 
     internal TypeBase ValueType(int position)
         => Compound

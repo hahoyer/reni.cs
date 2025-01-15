@@ -166,15 +166,15 @@ interface ITerminal
 
 interface IPrefix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax? right, SourcePart token);
+    Result GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token);
 }
 
 interface IInfix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right);
+    Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 }
 
 interface ISuffix
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax? left);
+    Result GetResult(ContextBase context, Category category, ValueSyntax left);
 }

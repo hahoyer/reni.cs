@@ -285,7 +285,7 @@ public sealed class BitsConst : DumpableObject
         return result;
     }
 
-    public void PrintNumber(BitsConst radix, IOutStream? outStream)
+    public void PrintNumber(BitsConst radix, IOutStream outStream)
     {
         var r = radix.ToInt64();
         if(radix.Size.IsZero)
@@ -295,9 +295,9 @@ public sealed class BitsConst : DumpableObject
         outStream.AddData(left);
     }
 
-    public void PrintNumber(IOutStream? outStream) => PrintNumber(GetNone(), outStream);
+    public void PrintNumber(IOutStream outStream) => PrintNumber(GetNone(), outStream);
 
-    public void PrintText(Size itemSize, IOutStream? outStream)
+    public void PrintText(Size itemSize, IOutStream outStream)
         => outStream.AddData(ToString(itemSize));
 
     public string ToString(Size itemSize)

@@ -13,7 +13,7 @@ sealed class ArgToken : NonSuffixSyntaxToken
 {
     public const string TokenId = "^";
 
-    static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
+    static readonly Declaration[] PredefinedDeclarations = [new("dumpprint")];
     public override string Id => TokenId;
 
     protected override Result GetResult(ContextBase context, Category category)

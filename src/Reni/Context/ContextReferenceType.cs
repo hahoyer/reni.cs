@@ -48,7 +48,7 @@ sealed class ContextReferenceType
 
     protected override IEnumerable<IConversion> StripConversions
         => base.StripConversions
-            .Concat(new[] { Feature.Extension.Conversion(PointerConversion) });
+            .Concat([Feature.Extension.Conversion(PointerConversion)]);
 
     new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType
@@ -62,7 +62,7 @@ sealed class ContextReferenceType
             (
                 category
                 , c => GetArgumentResult(c)
-                        .AddToReference(() => Parent.CompoundViewSize * -1)
+                        .AddToReference(() => Parent.CompoundViewSize! * -1)
                     ?? throw new InvalidOperationException()
             );
 }

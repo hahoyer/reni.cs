@@ -39,7 +39,7 @@ public sealed class CodeContainer : DumpableObject, ValueCache.IContainer
         }
     }
 
-    internal CodeContainer(ValueSyntax? syntax, Root root, string moduleName, string description)
+    internal CodeContainer(ValueSyntax syntax, Root root, string moduleName, string description)
     {
         ModuleName = moduleName;
         Root = root;
@@ -65,7 +65,7 @@ public sealed class CodeContainer : DumpableObject, ValueCache.IContainer
     {
         var item = FunctionsCache[functionId.Index];
         var container = functionId.IsGetter? item.Getter : item.Setter;
-        return container.Data!;
+        return container!.Data!;
     }
 
     string GetCSharpStringForCache()

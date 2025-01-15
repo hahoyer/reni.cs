@@ -20,7 +20,7 @@ sealed class Fiber : CodeBase
     internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
         : this(fiberHead, null, fiberItem) { }
 
-    Fiber(FiberHead fiberHead, IEnumerable<FiberItem> fiberItems, FiberItem fiberItem)
+    Fiber(FiberHead fiberHead, IEnumerable<FiberItem>? fiberItems, FiberItem? fiberItem)
         : base(NextObjectId++)
     {
         FiberHead = fiberHead;
@@ -124,7 +124,7 @@ sealed class Fiber : CodeBase
         => (newHead ?? FiberHead)
             .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
 
-    internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
+    internal TypeBase? Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
         => new[] { FiberHead.Visit(argTypeVisitor) }
             .Concat(FiberItems.Select(x => x.Visit(argTypeVisitor)))
             .DistinctNotNull();

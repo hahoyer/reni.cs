@@ -72,7 +72,7 @@ static class ConversionService
     {
         TypeBase Source { get; }
 
-        internal ConversionPath Result
+        internal ConversionPath? Result
         {
             get
             {
@@ -80,9 +80,6 @@ static class ConversionService
                     return SimplePath;
 
                 var paths = ClosureService.GetResult(Source);
-                if(paths == null)
-                    return new();
-
                 var others = new List<ConversionPath>();
 
                 foreach(var path in paths)
@@ -139,7 +136,7 @@ static class ConversionService
         protected override bool IsDestination(TypeBase source) => source == Destination;
     }
 
-    internal static ConversionPath FindPath(TypeBase source, TypeBase destination)
+    internal static ConversionPath? FindPath(TypeBase source, TypeBase destination)
         => new ExplicitConversionProcess(source, destination).Result;
 
     static ConversionPath FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
@@ -150,7 +147,7 @@ static class ConversionService
     {
         var path = FindPath(source, t => t is TDestination);
         if(path == null)
-            return Enumerable.Empty<TDestination>();
+            return [];
         return path.IsValid? new[] { (TDestination)path.Destination } : null;
     }
 

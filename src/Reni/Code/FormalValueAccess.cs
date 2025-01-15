@@ -17,12 +17,12 @@ sealed class FormalValueAccess : DumpableObject
         Index = index;
     }
 
-    public static IFormalValue[] Transpose(FormalValueAccess[] accesses)
+    public static IFormalValue?[] Transpose(FormalValueAccess?[] accesses)
     {
         var distinctAccesses = accesses.Distinct().ToArray();
         if(distinctAccesses.Length == 1 && distinctAccesses[0] == null)
             return new IFormalValue[1];
-        var result = accesses.Select(x => x == null? null : x.FormalValue).Distinct().ToArray();
+        var result = accesses.Select(x => x?.FormalValue).Distinct().ToArray();
         foreach(var formalValue in result)
             formalValue?.Check(accesses.Where(x => x != null && x.FormalValue == formalValue).ToArray());
 
@@ -47,12 +47,12 @@ sealed class FormalValueAccess : DumpableObject
         (string operation, IFormalValue formalLeftSubValue, IFormalValue formalRightSubValue)
         => new BitArrayBinaryOpValue(operation, formalLeftSubValue, formalRightSubValue);
 
-    internal static void Check(FormalValueAccess[] accesses)
+    internal static void Check(FormalValueAccess?[] accesses)
     {
-        var ss = accesses.Select(x => x.Size).Distinct().ToArray();
+        var ss = accesses.Select(x => x?.Size).Distinct().ToArray();
         if(ss.Length != 1 || ss[0] != accesses.ToArray().Length)
             "Size problem".FlaggedLine();
-        var ii = accesses.Select((x, i) => i - x.Index).Distinct().ToArray();
+        var ii = accesses.Select((x, i) => i - x!.Index).Distinct().ToArray();
         if(ii.Length != 1 || ii[0] != 0)
             "Consequtivity problem".FlaggedLine();
     }
@@ -93,10 +93,10 @@ sealed class FormalPointer : NamedValue
     [EnableDump]
     readonly char Name;
 
-    readonly FormalPointer[] Points;
+    readonly FormalPointer?[] Points;
     readonly int Index;
 
-    FormalPointer(FormalPointer[] points, int index)
+    FormalPointer(FormalPointer?[] points, int index)
     {
         Name = FormalMachine.Names[NextPointer++];
         Points = points;
@@ -108,12 +108,12 @@ sealed class FormalPointer : NamedValue
     protected override IFormalValue RefPlus(int right)
     {
         Ensure(Points, Index + right);
-        return Points[Index + right];
+        return Points[Index + right]!;
     }
 
     protected override char GetNodeDump() => Name;
 
-    public static void Ensure(FormalPointer[] points, int index)
+    public static void Ensure(FormalPointer?[] points, int index)
     {
         if(points[index] == null)
             points[index] = new(points, index);
@@ -122,7 +122,7 @@ sealed class FormalPointer : NamedValue
 
 abstract class NamedValue : DumpableObject, IFormalValue
 {
-    void IFormalValue.Check(FormalValueAccess[] accesses) => FormalValueAccess.Check(accesses);
+    void IFormalValue.Check(FormalValueAccess?[] accesses) => FormalValueAccess.Check(accesses);
 
     string IFormalValue.Dump(int index, int size)
     {
@@ -141,7 +141,7 @@ abstract class NamedValue : DumpableObject, IFormalValue
     protected virtual IFormalValue RefPlus(int right)
     {
         NotImplementedMethod(right);
-        return null;
+        return null!;
     }
 
     string CreateText(int size)
@@ -231,7 +231,7 @@ sealed class BitCastValue : DumpableObject, IFormalValue
         CastedBits = castedBits;
     }
 
-    void IFormalValue.Check(FormalValueAccess[] accesses) => FormalValueAccess.Check(accesses);
+    void IFormalValue.Check(FormalValueAccess?[] accesses) => FormalValueAccess.Check(accesses);
 
     string IFormalValue.Dump(int index, int size)
     {
@@ -245,7 +245,7 @@ sealed class BitCastValue : DumpableObject, IFormalValue
     IFormalValue IFormalValue.RefPlus(int right)
     {
         NotImplementedMethod(right);
-        return null;
+        return null!;
     }
 }
 
@@ -254,7 +254,7 @@ sealed class BitsArrayValue : DumpableObject, IFormalValue
     readonly BitsConst Data;
 
     public BitsArrayValue(BitsConst data) => Data = data;
-    void IFormalValue.Check(FormalValueAccess[] formalValueAccesses) { }
+    void IFormalValue.Check(FormalValueAccess?[] formalValueAccesses) { }
 
     string IFormalValue.Dump(int index, int size)
     {
@@ -272,7 +272,7 @@ sealed class BitsArrayValue : DumpableObject, IFormalValue
     IFormalValue IFormalValue.RefPlus(int right)
     {
         NotImplementedMethod(right);
-        return null;
+        return null!;
     }
 
     protected override string Dump(bool isRecursion) => Data.DumpValue();

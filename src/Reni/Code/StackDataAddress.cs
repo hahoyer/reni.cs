@@ -22,7 +22,7 @@ sealed class StackDataAddress : NonListStackData
     [EnableDump]
     readonly Size Offset;
 
-    public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream? outStream)
+    public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream outStream)
         : base(outStream)
     {
         Data = data;
@@ -53,7 +53,7 @@ sealed class StackDataAddress : NonListStackData
     }
 
     internal new StackData Dereference(Size size, Size dataSize)
-        => Data.GetTop(Offset, size).BitCast(dataSize).BitCast(size);
+        => Data.GetTop(Offset, size)!.BitCast(dataSize).BitCast(size);
 
     internal new void Assign(Size size, StackData right)
         => Data.SetTop(Offset, right.Dereference(size, size));

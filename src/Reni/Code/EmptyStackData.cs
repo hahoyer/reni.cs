@@ -4,7 +4,7 @@ namespace Reni.Code;
 
 sealed class EmptyStackData : StackData
 {
-    internal EmptyStackData(IOutStream? outStream)
+    internal EmptyStackData(IOutStream outStream)
         : base(outStream) { }
 
     internal override StackData Push(StackData stackData) => stackData;

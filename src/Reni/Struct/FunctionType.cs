@@ -16,7 +16,6 @@ sealed class FunctionType : SetterTargetType
     [DisableDump]
     internal readonly FunctionSyntax Body;
 
-    [NotNull]
     [Node]
     [EnableDump]
     internal readonly GetterFunction Getter;
@@ -26,7 +25,7 @@ sealed class FunctionType : SetterTargetType
 
     [Node]
     [EnableDump]
-    internal readonly SetterFunction Setter;
+    internal readonly SetterFunction? Setter;
 
     [Node]
     [EnableDump]
@@ -64,15 +63,14 @@ sealed class FunctionType : SetterTargetType
         get
         {
             var getter = Getter.CodeItems;
-            var setter = Setter?.CodeItems;
-            return setter == null? getter : getter.Concat(setter);
+            var setter = Setter?.CodeItems ??[];
+            return getter.Concat(setter);
         }
     }
 
-    Closures GetterClosures => Getter.Closures;//CheckClosureValue(Getter.Closures);
+    Closures GetterClosures => Getter.Closures; //CheckClosureValue(Getter.Closures);
 
-    internal FunctionType
-        (int index, FunctionSyntax body, CompoundView compoundView, TypeBase argumentsType)
+    internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argumentsType)
     {
         Getter = new(this, index, body.Getter);
         Setter = body.Setter == null? null : new SetterFunction(this, index, body.Setter);
@@ -119,7 +117,7 @@ sealed class FunctionType : SetterTargetType
         }
     }
 
-    protected override Result GetSetterResult(Category category) => Setter.GetCallResult(category);
+    protected override Result? GetSetterResult(Category category) => Setter?.GetCallResult(category);
 
     protected override Result GetGetterResult(Category category) => Getter.GetCallResult(category);
     protected override Size GetSize() => ArgumentsType.Size + GetterClosures.Size;
@@ -178,7 +176,7 @@ sealed class FunctionType : SetterTargetType
         //return result;
         if(ObjectId == -25)
             $"{NodeDump}: {result.LogDump()}".Log();
-        
+
         (result != null).Assert();
 
         if(ArgumentsType is IContextReference arguments)

@@ -246,14 +246,14 @@ public sealed class Compiler
     CodeBase IExecutionContext.Function(FunctionId functionId)
         => CodeContainer!.Function(functionId);
 
-    IOutStream? IExecutionContext.OutStream => Parameters.OutStream;
+    IOutStream IExecutionContext.OutStream => Parameters.OutStream ?? new DefaultOutStream();
 
     IEnumerable<Definable> Root.IParent.DefinedNames
         => MainTokenFactory.AllTokenClasses.OfType<Definable>();
 
     IExecutionContext Root.IParent.ExecutionContext => this;
 
-    Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
+    Result<ValueSyntax?> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
 
     bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
 
@@ -371,7 +371,7 @@ public sealed class Compiler
         IsInExecutionPhase = false;
     }
 
-    BinaryTree? Parse(Source source) => this["Main"].Parser.Execute(source);
+    BinaryTree Parse(Source source) => this["Main"].Parser.Execute(source)!;
 
     void RunFromCode() => CodeContainer!.Execute(this, TraceCollector.Instance);
 
@@ -381,6 +381,13 @@ public sealed class Compiler
             CodeContainerCache.IsValid = true;
     }
 }
+
+sealed class DefaultOutStream : DumpableObject, IOutStream
+{
+    void IOutStream.AddData(string text) {}
+    void IOutStream.AddLog(string text) {}
+}
+
 
 public sealed class TraceCollector : DumpableObject, ITraceCollector
 {

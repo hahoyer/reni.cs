@@ -299,9 +299,9 @@ sealed class ArrayType
     {
         var result = Root.ConcatPrintResult(category, Count, DumpPrintResult);
         if(category.HasCode())
-            result.Code = ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")).GetDumpPrintTextCode
-                    ()
-                + result.Code;
+            //todo: replace strings by TokenId
+            result.Code = ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")).GetDumpPrintTextCode()
+                + result.Code!;
         return result;
     }
 

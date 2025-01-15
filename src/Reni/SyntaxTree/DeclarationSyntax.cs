@@ -12,7 +12,7 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     internal readonly ValueSyntax? Value;
 
     [DisableDump]
-    internal string? NameOrNull => Declarer?.Name.Value;
+    internal string? NameOrNull => Declarer?.Name?.Value;
 
     [DisableDump]
     internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
@@ -34,7 +34,7 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
 
     SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
-    ValueSyntax? IStatementSyntax.ToValueSyntax(Anchor anchor)
+    ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor)
         => CompoundSyntax.Create([this], null, anchor);
 
     [DisableDump]

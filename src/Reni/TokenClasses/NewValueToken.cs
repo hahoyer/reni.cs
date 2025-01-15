@@ -13,7 +13,7 @@ namespace Reni.TokenClasses;
 sealed class NewValueToken : NonSuffixSyntaxToken
 {
     public const string TokenId = "new_value";
-    static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
+    static readonly Declaration[] PredefinedDeclarations = [new("dumpprint")];
 
     protected override Declaration[] Declarations => PredefinedDeclarations;
     public override string Id => TokenId;

@@ -22,7 +22,7 @@ sealed class Root
         bool ProcessErrors { get; }
         IExecutionContext ExecutionContext { get; }
         IEnumerable<Definable> DefinedNames { get; }
-        Result<ValueSyntax> ParsePredefinedItem(string source);
+        Result<ValueSyntax?> ParsePredefinedItem(string source);
     }
 
     internal static readonly VoidType VoidType = new();
@@ -33,10 +33,10 @@ sealed class Root
 
     [DisableDump]
     [Node]
-    readonly IParent? Parent;
+    readonly IParent Parent;
 
     [DisableDump]
-    public IExecutionContext? ExecutionContext => Parent?.ExecutionContext;
+    public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
     [DisableDump]
     [Node]
@@ -48,12 +48,12 @@ sealed class Root
     internal static RefAlignParam DefaultRefAlignParam => new(BitsConst.SegmentAlignBits, Size.Create(64));
 
     [DisableDump]
-    public bool? ProcessErrors => Parent?.ProcessErrors;
+    public bool? ProcessErrors => Parent.ProcessErrors;
 
     [DisableDump]
-    internal IEnumerable<Definable>? DefinedNames => Parent?.DefinedNames;
+    internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
 
-    internal Root(IParent? parent) => Parent = parent;
+    internal Root(IParent parent) => Parent = parent;
 
     IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature
         => this.CachedValue(() => GetCreateArrayFeature(false));
@@ -81,15 +81,15 @@ sealed class Root
 
     IImplementation GetMinusFeature()
     {
-        var metaDictionary = new FunctionCache<string, ValueSyntax?>(CreateMetaDictionary);
+        var metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
         return new ContextMetaFunctionFromSyntax
             (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]);
     }
 
-    ValueSyntax? CreateMetaDictionary(string source)
+    ValueSyntax CreateMetaDictionary(string source)
     {
-        var result = Parent?.ParsePredefinedItem(source);
-        return result?.Target;
+        var result = Parent.ParsePredefinedItem(source);
+        return result.Target!;
     }
 
     internal FunctionType GetFunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
@@ -152,7 +152,7 @@ sealed class Root
     internal FunctionContainer GetFunctionContainer(int index) => Functions.Container(index);
     internal FunctionType GetFunction(int index) => Functions.Item(index);
 
-    internal Container GetMainContainer(ValueSyntax? syntax, string description)
+    internal Container GetMainContainer(ValueSyntax syntax, string description)
     {
         var rawResult = syntax.GetResultForAll(this);
 
@@ -160,7 +160,7 @@ sealed class Root
 
         var result = rawResult
             .Code?
-            .GetLocalBlock(rawResult.Type.GetCopier(Category.Code)?.Code)
+            .GetLocalBlock(rawResult.Type!.GetCopier(Category.Code)?.Code!)
             .GetAlign();
 
         return new(result, rawResult.Issues.ToArray(), description);

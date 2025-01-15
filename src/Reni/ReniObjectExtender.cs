@@ -36,7 +36,7 @@ static class Extension
     internal static string NodeDump(this object o)
         => o is DumpableObject r? r.NodeDump : o.ToString()!;
 
-    internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other)
+    internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass? other)
         => other is IBelongingsMatcher otherMatcher && current.IsBelongingTo(otherMatcher);
 
     internal static bool IsBelongingTo(this ITokenClass current, ITokenClass? other)

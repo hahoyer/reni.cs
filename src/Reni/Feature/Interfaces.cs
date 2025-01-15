@@ -48,12 +48,12 @@ abstract class ContextMetaFeatureImplementation
     IFunction? IEvalImplementation.Function => null;
     IValue? IEvalImplementation.Value => null;
 
-    Result? IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right)
+    Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right)
         => GetResult(contextBase, category, right);
 
     IMeta IMetaImplementation.Function => this;
 
-    protected abstract Result? GetResult(ContextBase contextBase, Category category, ValueSyntax? right);
+    protected abstract Result GetResult(ContextBase contextBase, Category category, ValueSyntax? right);
 }
 
 /// <summary>
@@ -164,9 +164,9 @@ sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvid
 
 sealed class MetaFunction : DumpableObject, IImplementation, IMeta
 {
-    readonly Func<Category, ResultCache, ContextBase, ValueSyntax, Result> Function;
+    readonly Func<Category, ResultCache, ContextBase, ValueSyntax?, Result> Function;
 
-    public MetaFunction(Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
+    public MetaFunction(Func<Category, ResultCache, ContextBase, ValueSyntax?, Result> function)
         => Function = function;
 
     IFunction? IEvalImplementation.Function => null;
@@ -193,9 +193,9 @@ sealed class ContextMetaFunctionFromSyntax
     : DumpableObject, IImplementation, IMeta
 {
     [EnableDump]
-    readonly ValueSyntax? Definition;
+    readonly ValueSyntax Definition;
 
-    public ContextMetaFunctionFromSyntax(ValueSyntax? definition) => Definition = definition;
+    public ContextMetaFunctionFromSyntax(ValueSyntax definition) => Definition = definition;
     IFunction? IEvalImplementation.Function => null;
     IValue? IEvalImplementation.Value => null;
 

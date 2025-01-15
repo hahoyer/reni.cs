@@ -9,7 +9,7 @@ sealed class ListStack : StackData
 
     public ListStack(NonListStackData top, NonListStackData formerStackData)
         : base(top.OutStream)
-        => Data = new[] { top, formerStackData };
+        => Data = [top, formerStackData];
 
     public ListStack(NonListStackData data, ListStack formerStack)
         : base(formerStack.OutStream)
@@ -19,7 +19,7 @@ sealed class ListStack : StackData
         formerStack.Data.CopyTo(Data, 1);
     }
 
-    ListStack(NonListStackData[] data, IOutStream? outStream)
+    ListStack(NonListStackData[] data, IOutStream outStream)
         : base(outStream)
         => Data = data;
 
@@ -142,7 +142,7 @@ sealed class ListStack : StackData
 
 abstract class NonListStackData : StackData
 {
-    protected NonListStackData(IOutStream? outStream)
+    protected NonListStackData(IOutStream outStream)
         : base(outStream) { }
 
     internal override StackData Push(StackData stackData) => stackData.PushOnto(this);

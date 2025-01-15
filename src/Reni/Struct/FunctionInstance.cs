@@ -20,21 +20,21 @@ abstract class FunctionInstance
 
     [Node]
     [EnableDump]
-    readonly ValueSyntax? Body;
+    readonly ValueSyntax Body;
 
     bool IsObtainBodyCodeActive;
 
     [Node]
     [DisableDump]
-    internal CodeBase BodyCode => this.CachedValue(GetBodyCode);
+    internal CodeBase? BodyCode => this.CachedValue(GetBodyCode);
 
     [DisableDump]
-    internal CodeBase AlignedBodyCode => BodyCode?.GetAlign();
+    internal CodeBase? AlignedBodyCode => BodyCode?.GetAlign();
 
     [DisableDump]
     Size ArgsPartSize => Parent.ArgumentsType.Size + RelevantValueSize;
 
-    string Description => Body.Anchor.SourceParts.Combine().Id;
+    string Description => Body.Anchor.SourceParts.Combine()!.Id;
 
     [Node]
     [DisableDump]
@@ -69,7 +69,7 @@ abstract class FunctionInstance
     [DisableDump]
     internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
 
-    protected FunctionInstance(FunctionType parent, ValueSyntax? body)
+    protected FunctionInstance(FunctionType parent, ValueSyntax body)
     {
         Body = body;
         Parent = parent;
@@ -97,7 +97,7 @@ abstract class FunctionInstance
         if(result.HasIssue != true && category.HasCode())
             result.Code = CallType
                 .ArgumentCode
-                .GetCall(FunctionId, result.Size);
+                .GetCall(FunctionId, result.Size!);
         return result;
     }
 
@@ -150,8 +150,7 @@ abstract class FunctionInstance
 
     Result ReplaceArgsReference(Result result)
     {
-        var reference = Parent.ArgumentsType as IContextReference;
-        if(reference == null)
+        if(Parent.ArgumentsType is not IContextReference reference)
             return result;
 
         return result
@@ -168,7 +167,7 @@ abstract class FunctionInstance
             .GetFrameRef()
             .GetReferenceWithOffset(ArgsPartSize);
 
-    CodeBase GetBodyCode()
+    CodeBase? GetBodyCode()
     {
         if(IsObtainBodyCodeActive || IsStopByObjectIdActive)
             return null;
@@ -194,7 +193,7 @@ abstract class FunctionInstance
     public string DumpFunction()
     {
         var result = "\n";
-        result += "body=" + Body.NodeDump;
+        result += "body=" + Body!.NodeDump;
         result += "\n";
         return result;
     }

@@ -13,8 +13,6 @@ abstract class FiberItem : DumpableObject, IFormalCodeItem
     string ReasonForCombine => field == ""? NodeDumpForDebug() : field;
 
     [DisableDump]
-    [field: AllowNull]
-    [field: MaybeNull]
     static string? NewCombinedReason
     {
         get;

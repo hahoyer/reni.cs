@@ -10,9 +10,9 @@ public sealed class NumberPointerCutConversion : DependenceProvider
     [UnitTest]
     public static void Run()
     {
-        var source = new Root(null).BitType.Number(8).EnableCut.Pointer;
-        var destination = new Root(null).BitType.Number(6);
-        var path = Type.ConversionService.FindPath(source, destination);
+        var source = new Root(null!).BitType.Number(8).EnableCut.Pointer;
+        var destination = new Root(null!).BitType.Number(6);
+        var path = Type.ConversionService.FindPath(source, destination)!;
 
         var calculatedDestination = path.Execute(Category.Type).Type;
         (calculatedDestination == destination).Assert();

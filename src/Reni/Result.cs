@@ -565,9 +565,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 IsHollow = null;
 
             if(category.HasSize())
-            {
-                Size += other.Size!;
-            }
+                Size = Size! + other.Size!;
             else if(HasSize)
                 Size = null;
 
@@ -577,13 +575,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 Type = null;
 
             if(category.HasCode())
-                Code = Code + other.Code;
+                Code = Code! + other.Code!;
             else if(HasCode)
                 Code = null;
         }
 
         if(category.HasClosures())
-            Closures = Closures.AssertNotNull().Sequence(other.Closures);
+            Closures = Closures.AssertNotNull().Sequence(other.Closures!);
         else if(HasClosures)
             Closures = null;
 
@@ -631,7 +629,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(HasCode)
             result.Code = Code!.ReplaceArgument(resultForArgument);
         if(HasClosures)
-            result.Closures = Closures!.WithoutArgument() + resultForArgument.Closures;
+            result.Closures = Closures!.WithoutArgument() + resultForArgument.Closures!;
         result.IsDirty = false;
         return result;
     }
@@ -657,7 +655,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result;
     }
 
-    internal Result ReplaceAbsolute<TRefInCode>(TRefInCode? refInCode, Func<Category, Result> getReplacement)
+    internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
         where TRefInCode : IContextReference
     {
         if(HasClosures && !Closures!.Contains(refInCode))
@@ -671,9 +669,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         result.IsDirty = true;
 
         if(HasCode)
-            result.Code = Code!.ReplaceAbsolute(refInCode, () => replacement.Code);
+            result.Code = Code!.ReplaceAbsolute(refInCode, () => replacement.Code!);
         if(HasClosures)
-            result.Closures = Closures!.Without(refInCode).Sequence(replacement.Closures);
+            result.Closures = Closures!.Without(refInCode).Sequence(replacement.Closures!);
         result.IsDirty = false;
         return result;
     }
@@ -706,7 +704,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             return this;
         var result = Clone;
         result.IsDirty = true;
-        result.Code = SmartClosures.ReplaceRefsForFunctionBody(Code, replacement);
+        result.Code = SmartClosures.ReplaceRefsForFunctionBody(Code!, replacement);
         result.Closures = replacement.Closures;
         result.IsDirty = false;
         return result;
@@ -727,9 +725,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         var result = (this & category).ExpectNotNull();
         var copier = Type!.GetCopier(category);
         if(category.HasCode())
-            result.Code = Code!.GetLocalBlock(copier?.Code);
+            result.Code = Code!.GetLocalBlock(copier?.Code!);
         if(category.HasClosures())
-            result.Closures = Closures!.Sequence(copier?.Closures);
+            result.Closures = Closures!.Sequence(copier?.Closures!);
         return result;
     }
 
@@ -834,7 +832,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         var result = ((IConversion)Type.ExpectNotNull(() => (null, "Un requires type category:\n " + Dump())))
             .GetResult(CompleteCategory);
-        return result.ReplaceArguments(this);
+        return result!.ReplaceArguments(this);
     }
 
     internal Result GetSmartUn<T>()
@@ -849,7 +847,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result ConvertToConverter(TypeBase source)
         => source.IsHollow || (!HasClosures && !HasCode)
             ? this
-            : ReplaceAbsolute(source.CheckedReference, source.GetArgumentResult);
+            : ReplaceAbsolute(source.CheckedReference!, source.GetArgumentResult);
 
     [PublicAPI]
     internal Result GetWithCleanupAdded(Result cleanup)
@@ -862,7 +860,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
         var result = Clone;
         if(HasCode)
-            result.Code = result.Code!.GetWithCleanupAdded(cleanup.Code);
+            result.Code = result.Code!.GetWithCleanupAdded(cleanup.Code!);
         return result;
     }
 

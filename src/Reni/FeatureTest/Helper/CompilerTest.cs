@@ -45,7 +45,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
                 return result;
 
             return result
-                .Concat(new[] { new TargetSetData(Target, Output) })
+                .Concat([new TargetSetData(Target, Output)])
                 .ToArray();
         }
     }

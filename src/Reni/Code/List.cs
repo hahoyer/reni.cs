@@ -25,7 +25,7 @@ sealed class List : FiberHead
         where TCode : default
         => actual.List(this);
 
-    protected override CodeBase TryToCombine(FiberItem subsequentElement)
+    protected override CodeBase? TryToCombine(FiberItem subsequentElement)
     {
         if(!IsNonFiberHeadList)
             return subsequentElement.TryToCombineBack(this);

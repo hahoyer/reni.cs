@@ -4,9 +4,9 @@ namespace Reni.Code;
 
 abstract class StackData : DumpableObject
 {
-    internal readonly IOutStream? OutStream;
+    internal readonly IOutStream OutStream;
 
-    protected StackData(IOutStream? outStream) => OutStream = outStream;
+    protected StackData(IOutStream outStream) => OutStream = outStream;
 
     internal abstract Size Size { get; }
 

@@ -37,10 +37,10 @@ sealed class InlineCommentType : DumpableObject, IInline, IItemsType
 
         [DisableDump]
         protected override ItemPrototype[] VariantPrototypes { get; } =
-        {
+        [
             new(LineEndType.Instance, Lexer.Instance.LineEnd)
             , new(TextLineType.Instance, Lexer.Instance.LineEndOrEnd.Until)
-        };
+        ];
     }
 
     sealed class TailType : DumpableObject, ITail

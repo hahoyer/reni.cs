@@ -29,7 +29,8 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
     readonly ValueCache<IContextReference[]> SortedDataCache;
 
     [DisableDump]
-    [field: AllowNull, MaybeNull]
+    [field: AllowNull]
+    [field: MaybeNull]
     SizeArray Sizes => field ??= CalculateSizes();
 
     internal bool HasArguments => Contains(ArgumentsClosure.Instance);
@@ -66,7 +67,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
         => AddRange(a);
 
     public bool Equals(Closures? other)
-        => !ReferenceEquals(other,null) && Data.SequenceEqual(other.Data);
+        => !ReferenceEquals(other, null) && Data.SequenceEqual(other.Data);
 
     protected override string GetNodeDump() => $"{base.GetNodeDump()}{(IsRecursive? "r" : "")}#{Count}";
 
@@ -101,7 +102,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
 
     void Add(IContextReference newItem)
     {
-        var index = Data.IndexWhere(item=>item.Order >= newItem.Order);
+        var index = Data.IndexWhere(item => item.Order >= newItem.Order);
 
         if(index == null)
         {
@@ -114,7 +115,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
             return;
 
         (index == Data.Count || Data[index.Value].Order > newItem.Order)
-            .Assert(()=>$"{Data[index.Value].NodeDump()}=={newItem.NodeDump()}:{Data[index.Value].Order}");
+            .Assert(() => $"{Data[index.Value].NodeDump()}=={newItem.NodeDump()}:{Data[index.Value].Order}");
         Data.Insert(index.Value, newItem);
     }
 
@@ -134,9 +135,9 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
         return result;
     }
 
-    public Closures Without(IContextReference e)
+    public Closures Without(IContextReference? e)
     {
-        if(!Data.Contains(e))
+        if(e == null || !Data.Contains(e))
             return this;
         var r = new List<IContextReference>(Data);
         r.Remove(e);

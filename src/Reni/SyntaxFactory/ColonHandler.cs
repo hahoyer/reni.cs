@@ -7,10 +7,10 @@ namespace Reni.SyntaxFactory;
 
 sealed class ColonHandler : DumpableObject, IStatementProvider
 {
-    IStatementSyntax IStatementProvider.Get(BinaryTree? target, Factory factory)
+    IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
     {
         var (item, annotations) = target.Left.CheckForAnnotations();
-        var declarer = DeclarerSyntax.Create(item, annotations??[], factory.MeansPublic);
+        var declarer = DeclarerSyntax.Create(item, annotations, factory.MeansPublic);
         var value = factory.GetValueSyntax(target.Right);
 
         var result = DeclarationSyntax
@@ -18,11 +18,11 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         return result;
     }
 
-    static(BinaryTree name, (BinaryTree[] anchors, BinaryTree tag)[] tags) GetNameAndTags(BinaryTree target)
+    static(BinaryTree name, (BinaryTree[] anchors, BinaryTree tag)[]? tags) GetNameAndTags(BinaryTree target)
     {
         if(target.TokenClass is ExclamationBoxToken)
         {
-            var (name, tags) = GetNameAndTags(target.Left);
+            var (name, tags) = GetNameAndTags(target.Left!);
             var attributes = GetAttributes(target);
 
             if(tags == null)
@@ -41,27 +41,24 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         }
 
         NotImplementedFunction(target);
-        return (null, GetDeclarationTags(target));
+        return (null, GetDeclarationTags(target))!;
     }
 
     static(BinaryTree[] anchors, BinaryTree tag)[] GetAttributes(BinaryTree target)
     {
         NotImplementedFunction(target);
-        return default;
+        return default!;
     }
 
 
-    static(BinaryTree[] anchors, BinaryTree tag)[] GetDeclarationTags(BinaryTree target)
+    static(BinaryTree?[] anchors, BinaryTree tag)[] GetDeclarationTags(BinaryTree target)
     {
-        target.AssertIsNotNull();
-        target.Right.AssertIsNotNull();
-
         if(target.Right!.TokenClass is IDeclarationTag)
         {
             target.Right.Right.AssertIsNull();
             target.Right.Left.AssertIsNull();
 
-            var l = GetDeclarationTags(target.Left);
+            var l = GetDeclarationTags(target.Left!);
 
             return T((T(target, target.Right), target.Right));
         }
@@ -69,9 +66,9 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         if(target.Right.TokenClass is IRightBracket)
             return AddMainTag(target
                 .Right
-                .BracketKernel
+                .BracketKernel!
                 .Center
-                .Chain(arg => arg?.Left?.Left)
+                .Chain(arg => arg.Left?.Left)
                 .Reverse()
                 .Select(GetDeclarationTag1), target);
 
@@ -83,8 +80,8 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
             .ToArray();
     }
 
-    static(BinaryTree[] anchors, BinaryTree tag)[] AddMainTag
-        (IEnumerable<(BinaryTree[] anchors, BinaryTree tag)> list, BinaryTree target)
+    static(BinaryTree?[] anchors, BinaryTree tag)[] AddMainTag
+        (IEnumerable<(BinaryTree?[] anchors, BinaryTree tag)> list, BinaryTree target)
     {
         var top = list.First();
         var anchors = T(target, target.Right, target.Right!.Left).Concat(top.anchors).ToArray();
@@ -92,7 +89,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         return result;
     }
 
-    static(BinaryTree[] anchors, BinaryTree tag) GetDeclarationTag1(BinaryTree arg)
+    static(BinaryTree?[] anchors, BinaryTree tag) GetDeclarationTag1(BinaryTree arg)
     {
         if(arg.Left == null && arg.Right == null)
             return (T(arg), arg);
@@ -103,7 +100,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
         return default;
     }
 
-    static(BinaryTree[] anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
+    static(BinaryTree?[] anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
     {
         target.AssertIsNotNull();
         target.Left.AssertIsNull();
@@ -118,7 +115,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
             .GroupBy(node => node.TokenClass is IDeclarationTag)
             .ToDictionary(group => group.Key, group => group.ToArray());
         var tags = nodes.SingleOrDefault(node => node.Key).Value;
-        var result = tags.Select(tag => (anchors: new BinaryTree[0], tag)).ToArray();
+        var result = tags.Select(tag => (anchors: new BinaryTree?[0], tag)).ToArray();
         var other = nodes.SingleOrDefault(node => !node.Key).Value;
         other?.All(item => item.TokenClass is IBracket).Assert();
         result[0].anchors = T(T(target), other).ConcatMany().ToArray();

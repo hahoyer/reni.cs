@@ -10,8 +10,8 @@ public sealed class NumberExtensionConversion : DependenceProvider
     [UnitTest]
     public void Run4To8Forced()
     {
-        var numberSmall = new Root(null).BitType.Number(4);
-        var numberLarge = new Root(null).BitType.Number(8);
+        var numberSmall = new Root(null!).BitType.Number(4);
+        var numberLarge = new Root(null!).BitType.Number(8);
         var paths = Type.ConversionService.ForcedConversions(new((TypeBase)numberSmall), new((TypeBase)numberLarge))
             .ToArray();
 
@@ -21,8 +21,8 @@ public sealed class NumberExtensionConversion : DependenceProvider
     [UnitTest]
     public void Run1To3Forced()
     {
-        var numberSmall = new Root(null).BitType.Number(1);
-        var numberLarge = new Root(null).BitType.Number(3);
+        var numberSmall = new Root(null!).BitType.Number(1);
+        var numberLarge = new Root(null!).BitType.Number(3);
         var paths = Type.ConversionService.ForcedConversions(new((TypeBase)numberSmall), new((TypeBase)numberLarge))
             .ToArray();
 
@@ -33,8 +33,8 @@ public sealed class NumberExtensionConversion : DependenceProvider
     [Closure]
     public void Run1To3()
     {
-        var source = new Root(null).BitType.Number(1);
-        var destination = new Root(null).BitType.Number(3);
+        var source = new Root(null!).BitType.Number(1);
+        var destination = new Root(null!).BitType.Number(3);
         var paths = Type.ConversionService.FindPath(source, destination);
     }
 }

@@ -12,7 +12,7 @@ sealed class ExclamationBoxToken
 
     internal ExclamationBoxToken(BinaryTree? value) => Value = value;
 
-    BinaryTree? IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
+    BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
     {
         var leftleft = BinaryTree.Create(left, this, token, Value);
         if(right == null)

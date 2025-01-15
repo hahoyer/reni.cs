@@ -13,7 +13,7 @@ namespace Reni.Feature;
 static class Extension
 {
     static readonly
-        FunctionCache<Func<Category, ResultCache, ContextBase, ValueSyntax, Result>, MetaFunction>
+        FunctionCache<Func<Category, ResultCache, ContextBase, ValueSyntax?, Result>, MetaFunction>
         MetaFunctionCache = new(function => new(function));
 
     static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> ValueCache
@@ -51,11 +51,11 @@ static class Extension
 
 
     internal static MetaFunction MetaFeature
-        (Func<Category, ResultCache, ContextBase, ValueSyntax, Result> function)
+        (Func<Category, ResultCache, ContextBase, ValueSyntax?, Result> function)
         => MetaFunctionCache[function];
 
     internal static TypeBase? ResultType(this IConversion conversion)
-        => conversion.GetResult(Category.Type)?.Type;
+        => conversion.GetResult(Category.Type)!.Type;
 
     internal static Result? GetResult(this IConversion conversion, Category category)
     {

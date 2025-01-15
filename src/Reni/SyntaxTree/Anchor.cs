@@ -9,13 +9,13 @@ namespace Reni.SyntaxTree;
 sealed class Anchor : DumpableObject, ValueCache.IContainer
 {
     internal readonly BinaryTree[] Items;
-    readonly string ReasonForEmptiness;
+    readonly string? ReasonForEmptiness;
 
     [DisableDump]
     internal SourcePart[] SourceParts => Items.SourceParts();
 
     [DisableDump]
-    internal SourcePart SourcePart => SourceParts.Combine();
+    internal SourcePart SourcePart => SourceParts.Combine()!;
 
     [DisableDump]
     public IEnumerable<Issue> Issues => Items.SelectMany(node => node.AllIssues);
@@ -30,8 +30,9 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     {
         Items = items
             .Where(item => item != null)
+            .Cast<BinaryTree>()
             .Distinct()
-            .OrderBy(item => item.Token.Position)
+            .OrderBy(item => item!.Token.Position)
             .ToArray();
 
         Items.Any().Assert();
@@ -40,7 +41,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
 
     Anchor(string reasonForEmptiness)
     {
-        Items = new BinaryTree[0];
+        Items = [];
         ReasonForEmptiness = reasonForEmptiness;
     }
 
@@ -52,8 +53,8 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         return base.GetNodeDump() + itemDump;
     }
 
-    internal Anchor GetLeftOf(BinaryTree? target) => GetLeftOf(target.Token.Start);
-    internal Anchor GetRightOf(BinaryTree? target) => GetRightOf(target.Token.End);
+    internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.Start);
+    internal Anchor GetRightOf(BinaryTree target) => GetRightOf(target.Token.End);
 
     [PublicAPI]
     internal Anchor GetLeftOf(SourcePosition position)
@@ -74,17 +75,17 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
 
     internal static Anchor Create(params BinaryTree?[] items) => new(items);
 
-    internal static Anchor CheckedCreate(params BinaryTree?[] items)
+    internal static Anchor? CheckedCreate(BinaryTree?[]? items)
         => items == null || items.Length == 0? null : new(items);
 
-    internal Anchor Combine(Anchor other, bool check = false)
+    internal Anchor Combine(Anchor? other, bool check = false)
     {
         if(check)
             other?.ReasonForEmptiness.ExpectIsNull(() => (SourcePart, "Cannot combine with empty anchor."));
         return Combine(other?.Items);
     }
 
-    internal Anchor Combine(BinaryTree[] other)
+    internal Anchor Combine(BinaryTree[]? other)
     {
         if(other == null || !other.Any())
             return this;
@@ -105,7 +106,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     public static Anchor CreateAll(BinaryTree? target)
         => Create(target.GetNodesFromLeftToRight().ToArray());
 
-    public static Anchor operator +(Anchor left, Anchor right)
+    public static Anchor? operator +(Anchor? left, Anchor? right)
         => left == null? right :
             right == null? left : left.Combine(right, true);
 }

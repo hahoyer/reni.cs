@@ -15,20 +15,19 @@ sealed class Combination : DumpableObject, IConversion, IEquatable<IConversion>
     }
 
     Result IConversion.Execute(Category category)
-        => Right.GetResult(category).ReplaceArguments(Left.GetResult);
+        => Right.GetResult(category)!.ReplaceArguments(Left.GetResult!);
 
     TypeBase IConversion.Source => Left.Source;
 
-    bool IEquatable<IConversion>.Equals(IConversion other)
+    bool IEquatable<IConversion>.Equals(IConversion? other)
     {
-        var typedOther = other as Combination;
-        if(typedOther == null)
+        if(other is not Combination typedOther)
             return false;
         return Left == typedOther.Left
             && Right == typedOther.Right;
     }
 
-    public static IConversion CheckedCreate(IConversion left, IConversion right)
+    public static IConversion? CheckedCreate(IConversion? left, IConversion? right)
     {
         if(left == null)
             return right;

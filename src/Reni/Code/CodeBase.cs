@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
@@ -10,18 +11,17 @@ namespace Reni.Code;
 abstract class CodeBase
     : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
 {
-    Closures ClosuresValue;
-    Size SizeValue;
-
     [Node]
     [DisableDump]
-    internal Size Size => SizeValue ??= GetSize().AssertNotNull();
+    [field: AllowNull, MaybeNull]
+    internal Size Size => field ??= GetSize().AssertNotNull();
 
     [DisableDump]
     internal Size TemporarySize => GetTemporarySize();
 
     [DisableDump]
-    internal Closures Closures => ClosuresValue ??= GetClosures();
+    [field: AllowNull, MaybeNull]
+    internal Closures Closures => field ??= GetClosures();
 
 
     [DisableDump]
@@ -39,7 +39,8 @@ abstract class CodeBase
         : base(objectId)
         => StopByObjectIds();
 
-    CodeBase IAggregateable<CodeBase>.Aggregate(CodeBase other) => this + other;
+    CodeBase IAggregateable<CodeBase>.Aggregate(CodeBase? other) => other == null? this : this + other;
+
     Size IFormalCodeItem.Size => Size;
 
     void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);

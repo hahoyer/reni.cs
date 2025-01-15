@@ -98,7 +98,7 @@ sealed class InfixHandler : DumpableObject, IValueProvider
 
     sealed class TerminalErrorTokenClass : InfixTypeErrorTokenClass, ITerminal
     {
-        static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
+        static readonly Declaration[] PredefinedDeclarations = [new("dumpprint")];
 
         public TerminalErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidTerminalExpression, tokenClass) { }

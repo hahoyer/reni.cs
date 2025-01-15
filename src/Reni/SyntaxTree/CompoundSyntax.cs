@@ -32,7 +32,7 @@ sealed class CompoundSyntax : ValueSyntax
             .Select(data => (FunctionSyntax)data.Value);
 
     [DisableDump]
-    internal ValueSyntax?[] PureStatements => Statements.Select(s => s.Value).ToArray();
+    internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
 
     [EnableDump(Order = 100)]
     internal IDictionary<string, int> NameIndex
@@ -125,9 +125,9 @@ sealed class CompoundSyntax : ValueSyntax
         return Create(newStatements, newCleanupSection, Anchor);
     }
 
-    internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
+    internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree? listTarget = null) => this;
 
-    public static CompoundSyntax? Create(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
+    public static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
         => new(statements, cleanupSection, anchor);
 
     public string GetCompoundIdentificationDump() => "." + ObjectId + "i";

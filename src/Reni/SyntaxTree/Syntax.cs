@@ -20,7 +20,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         [DisableDump]
         protected sealed override int DirectChildCount => 0;
 
-        protected sealed override Syntax? GetDirectChild(int index)
+        protected sealed override Syntax GetDirectChild(int index)
             => throw new($"Unexpected call: {nameof(GetDirectChild)}({index})");
     }
 
@@ -44,7 +44,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     internal readonly Anchor Anchor;
 
     [EnableDumpExcept(null)]
-    internal Issue[] Issues => this.CachedValue(() => GetIssues()?.ToArray() ?? new Issue[0]);
+    internal Issue[] Issues => this.CachedValue(() => GetIssues().ToArray());
 
     internal BinaryTree MainAnchor => Anchor.Main;
 
@@ -55,9 +55,9 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     [DisableDump]
     internal IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
 
-    internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
+    internal Syntax?[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
-    public BinaryTree LeftMostAnchor
+    public BinaryTree? LeftMostAnchor
     {
         get
         {
@@ -71,7 +71,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         }
     }
 
-    public BinaryTree RightMostAnchor
+    public BinaryTree? RightMostAnchor
     {
         get
         {
@@ -85,11 +85,10 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         }
     }
 
-    public SourcePart ChildSourcePart => LeftMostAnchor.SourcePart.Start.Span(RightMostAnchor.SourcePart.End);
     internal SourcePart[] Anchors => Anchor.SourceParts;
 
     [DisableDump]
-    internal Syntax Parent => MainAnchor.Parent?.Syntax;
+    internal Syntax? Parent => MainAnchor.Parent?.Syntax;
 
     protected Syntax(Anchor anchor, int? objectId = null)
         : base(objectId)
@@ -103,13 +102,13 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
     Anchor IItem.Anchor => Anchor;
-    Syntax[] IItem.DirectChildren => DirectChildren;
-    BinaryTree IItem.SpecialAnchor => null;
+    Syntax?[] IItem.DirectChildren => DirectChildren;
+    BinaryTree? IItem.SpecialAnchor => null;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     int ITree<Syntax>.DirectChildCount => DirectChildCount;
 
-    Syntax ITree<Syntax>.GetDirectChild(int index)
+    Syntax? ITree<Syntax>.GetDirectChild(int index)
         => index < 0 || index >= DirectChildCount? null : DirectChildren[index];
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -120,7 +119,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 
     protected abstract Syntax? GetDirectChild(int index);
 
-    protected virtual IEnumerable<Issue> GetIssues() => null;
+    protected virtual IEnumerable<Issue> GetIssues() => [];
 
     internal virtual Result<ValueSyntax> ToValueSyntax()
     {
@@ -128,17 +127,17 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
             return (ValueSyntax)this;
 
         NotImplementedMethod();
-        return default;
+        return default!;
     }
 
-    internal virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
+    internal virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree? target = null)
     {
         NotImplementedMethod(target);
-        return default;
+        return default!;
     }
 
 
-    internal virtual void AssertValid(Level level = null, BinaryTree target = null)
+    internal virtual void AssertValid(Level? level = null, BinaryTree? target = null)
     {
         level ??= new();
 
@@ -146,7 +145,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
             node?.AssertValid(level, target);
     }
 
-    internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
+    internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree? target = null)
         => ToCompoundSyntaxHandler(target);
 
     internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)

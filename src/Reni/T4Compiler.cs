@@ -12,6 +12,6 @@ public sealed class T4Compiler
         var f = fileName.ToSmbFile();
         f.String = Text;
         var compiler = Compiler.FromFile(fileName);
-        return compiler.CSharpString;
+        return compiler.CSharpString!;
     }
 }

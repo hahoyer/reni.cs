@@ -12,9 +12,9 @@ public sealed class AlternativePrioTableTest : CompilerTest
     {
         var syntaxPrototype = LikeSyntax.Compound
         (
-            new[] {LikeSyntax.Number(3)},
-            new Declaration[] { },
-            new[] {0}
+            [LikeSyntax.Number(3)],
+            [],
+            [0]
         );
         Parameters.CompilationLevel= CompilationLevel.Syntax;
         CreateFileAndRunCompiler
@@ -29,9 +29,9 @@ public sealed class AlternativePrioTableTest : CompilerTest
     {
         var syntaxPrototype = LikeSyntax.Compound
         (
-            new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
-            new Declaration[] { },
-            new[] {0, 1}
+            [LikeSyntax.Number(3), LikeSyntax.Number(4)],
+            [],
+            [0, 1]
         );
         Parameters.CompilationLevel= CompilationLevel.Syntax;
         CreateFileAndRunCompiler
@@ -46,9 +46,9 @@ public sealed class AlternativePrioTableTest : CompilerTest
     {
         var syntaxPrototype = LikeSyntax.Compound
         (
-            new[] {LikeSyntax.Number(3)},
-            new[] {new Declaration("converter", 0)},
-            new int[] { }
+            [LikeSyntax.Number(3)],
+            [new Declaration("converter", 0)],
+            []
         );
         Parameters.CompilationLevel= CompilationLevel.Syntax;
         CreateFileAndRunCompiler

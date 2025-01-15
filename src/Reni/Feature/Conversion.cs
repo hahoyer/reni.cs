@@ -13,14 +13,13 @@ sealed class Conversion : DumpableObject, IConversion
     TypeBase Source { get; }
 
     [EnableDump]
-    TypeBase Destination => Function(Category.Type).Type;
+    TypeBase Destination => Function(Category.Type).Type!;
 
     internal Conversion(Func<Category, Result> function, TypeBase source)
         : base(NextObjectId++)
     {
         Function = function;
         Source = source;
-        (Source != null).Assert();
         StopByObjectIds();
     }
 
@@ -28,9 +27,5 @@ sealed class Conversion : DumpableObject, IConversion
     TypeBase IConversion.Source => Source;
 
     protected override string GetNodeDump()
-        => Source.DumpPrintText
-            + "-->"
-            + (Destination?.DumpPrintText ?? "<unknown>")
-            + " MethodName="
-            + Function.Method.Name;
+        => $"{Source.DumpPrintText}-->{Destination.DumpPrintText} MethodName={Function.Method.Name}";
 }

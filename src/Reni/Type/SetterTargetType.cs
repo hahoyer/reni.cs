@@ -9,9 +9,7 @@ namespace Reni.Type;
 abstract class SetterTargetType
     : TypeBase, IProxyType, IConversion, IValue, IReference, ISymbolProvider<ReassignToken>
 {
-    readonly int Order;
-
-    protected SetterTargetType() => Order = Closures.NextOrder++;
+    readonly int Order = Closures.NextOrder++;
 
     int IContextReference.Order => Order;
 
@@ -24,7 +22,7 @@ abstract class SetterTargetType
     IConversion IReference.Converter => this;
     bool IReference.IsWeak => true;
 
-    IImplementation ISymbolProvider<ReassignToken>.Feature
+    IImplementation? ISymbolProvider<ReassignToken>.Feature
         => IsMutable? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
     Result IValue.Execute(Category category) => GetGetterResult(category);

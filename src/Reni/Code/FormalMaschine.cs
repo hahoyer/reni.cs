@@ -12,10 +12,10 @@ sealed class FormalMachine : DumpableObject, IVisitor
 
     readonly Size StartAddress;
 
-    readonly FormalValueAccess[] Data;
-    readonly FormalPointer[] Points;
-    FormalValueAccess[] FrameData = new FormalValueAccess[0];
-    FormalPointer[] FramePoints = new FormalPointer[1];
+    readonly FormalValueAccess?[] Data;
+    readonly FormalPointer?[] Points;
+    FormalValueAccess?[] FrameData = [];
+    FormalPointer?[] FramePoints = new FormalPointer[1];
     int NextValue;
     static Size RefSize => Root.DefaultRefAlignParam.RefSize;
 
@@ -129,7 +129,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
         var index = (StartAddress + offset).ToInt();
         FormalPointer.Ensure(Points, index);
         var startAddress = (StartAddress - RefSize).ToInt();
-        SetFormalValues(Points[index], startAddress, RefSize);
+        SetFormalValues(Points[index]!, startAddress, RefSize);
     }
 
     internal string CreateGraph() => Data.Aggregate("", (current, t) => current + (t == null? " ?" : t.Dump()))
@@ -173,7 +173,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
 
     IFormalValue?[] GetInputValuesFromFrame(Size offset, Size size)
     {
-        var accesses = new List<FormalValueAccess>();
+        var accesses = new List<FormalValueAccess?>();
         var start = FrameData.Length + offset.ToInt();
         for(var i = 0; i < size.ToInt(); i++)
             accesses.Add(FrameData[i + start]);

@@ -18,7 +18,7 @@ sealed class StableReferenceType
     [DisableDump]
     protected override IEnumerable<IConversion> StripConversions
         => base.StripConversions
-            .Concat(new[] { Feature.Extension.Conversion(ConvertToPointer) });
+            .Concat([Feature.Extension.Conversion(ConvertToPointer)]);
 
     [DisableDump]
     internal override TypeBase Weaken => Parent;

@@ -20,7 +20,7 @@ sealed class ConversionPath
     IEnumerable<TypeBase> Types
         => Elements
             .Select(element => element.Source)
-            .Concat(new[] { Destination })
+            .Concat([Destination])
             .ToArray();
 
     IEnumerable<TypeBase> TypesByDestination
@@ -43,7 +43,7 @@ sealed class ConversionPath
         : this()
     {
         Source = source;
-        Elements = new IConversion[0];
+        Elements = [];
         IsValid.Assert();
     }
 

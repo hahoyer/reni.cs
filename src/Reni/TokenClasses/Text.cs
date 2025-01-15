@@ -10,7 +10,7 @@ namespace Reni.TokenClasses;
 
 sealed class Text : TerminalSyntaxToken, IIssueTokenClass
 {
-    static readonly Declaration[] PredefinedDeclarations = { new("dumpprint") };
+    static readonly Declaration[] PredefinedDeclarations = [new("dumpprint")];
     readonly IssueId IssueId;
 
     public Text(IssueId issueId = IssueId.None) => IssueId = issueId;

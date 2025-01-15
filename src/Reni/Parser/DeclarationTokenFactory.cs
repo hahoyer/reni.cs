@@ -18,7 +18,7 @@ sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTr
     readonly string Name;
     public InvalidDeclarationError(string name) => Name = name;
 
-    BinaryTree? IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
+    BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree? left, IToken token, BinaryTree? right)
         => BinaryTree.Create(left, this, token, right);
 
     string IParserTokenType<BinaryTree>.PrioTableId => Name;

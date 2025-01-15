@@ -71,7 +71,7 @@ static class Generator
         var runtime = Assembly
             .GetExecutingAssembly()
             .GetAssemblies()
-            .Top( a=>a.FullName.AssertNotNull().Contains("System.Runtime"));
+            .Top( a=>a.FullName.AssertNotNull().Contains("System.Runtime"))!;
 
         var referencedAssemblies
             = types
@@ -116,11 +116,11 @@ static class Generator
 
 sealed class MyResolver : MetadataReferenceResolver
 {
-    public override bool Equals(object other) => other == this;
+    public override bool Equals(object? other) => other == this;
     public override int GetHashCode() => 1;
 
     public override ImmutableArray<PortableExecutableReference> ResolveReference
-        (string reference, string baseFilePath, MetadataReferenceProperties properties)
+        (string reference, string? baseFilePath, MetadataReferenceProperties properties)
     {
         Dumpable.NotImplementedFunction(reference, baseFilePath, properties);
         return default;

@@ -15,8 +15,8 @@ public static class Extension
     }
 
     [PublicAPI]
-    internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
-        (this ITree<TTarget?> target, Func<TTarget, bool>? predicate = null)
+    internal static IEnumerable<TTarget?> GetNodesFromTopToBottom<TTarget>
+        (this ITree<TTarget?> target, Func<TTarget?, bool>? predicate = null)
         where TTarget : ITree<TTarget>
     {
         var index = 0;
@@ -32,8 +32,8 @@ public static class Extension
         }
     }
 
-    [PublicAPI][NotNull]
-    internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget?> target)
+    [PublicAPI]
+    internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget?>? target)
         where TTarget : ITree<TTarget>
     {
         if(target == null)
@@ -62,55 +62,56 @@ public static class Extension
     }
 
     [PublicAPI]
-    internal static int[] GetPath<TTarget>(this TTarget container, Func<TTarget, bool> isMatch)
-        where TTarget : ITree<TTarget>
+    internal static int[]? GetPath<TTarget>(this TTarget? container, Func<TTarget?, bool> isMatch)
+        where TTarget : ITree<TTarget?>?
     {
         if(container == null)
             return null;
 
         if(isMatch(container))
-            return new int[0];
+            return [];
 
         return container
             .DirectChildCount
             .Select(container.GetDirectChild)
-            .Select((node, index) => GetSubPath(node, index, isMatch))
+            .Select((node, index) =>  GetSubPath(node, index, isMatch))
             .FirstOrDefault(path => path != null);
     }
 
     [PublicAPI]
-    internal static IEnumerable<int[]> GetPaths<TTarget>(this TTarget container, Func<TTarget, bool> isMatch)
-        where TTarget : ITree<TTarget>
+    internal static IEnumerable<int[]> GetPaths<TTarget>(this TTarget container, Func<TTarget?, bool> isMatch)
+        where TTarget : ITree<TTarget>?
     {
         if(container == null)
             return new int[0][];
 
         if(isMatch(container))
-            return new[] { new int[0] };
+            return [[]];
 
         return container
             .DirectChildCount
             .Select(container.GetDirectChild)
             .SelectMany((node, index) => GetSubPaths(node, index, isMatch))
-            .Where(path => path != null);
+            .Where(path => path != null)
+            .Cast<int[]>();
     }
 
-    static int[] GetSubPath<TTarget>(TTarget container, int index, Func<TTarget, bool> isMatch)
-        where TTarget : ITree<TTarget>
+    static int[]? GetSubPath<TTarget>(TTarget container, int index, Func<TTarget?, bool> isMatch)
+        where TTarget : ITree<TTarget>?
     {
         var subPath = GetPath(container, isMatch);
         return subPath == null? null : T(index).Concat(subPath).ToArray();
     }
 
-    static IEnumerable<int[]> GetSubPaths<TTarget>(TTarget container, int index, Func<TTarget, bool> isMatch)
-        where TTarget : ITree<TTarget>
+    static IEnumerable<int[]?> GetSubPaths<TTarget>(TTarget container, int index, Func<TTarget?, bool> isMatch)
+        where TTarget : ITree<TTarget>?
     {
         var subPath = GetPaths(container, isMatch);
         return subPath.Select(subPath => T(index).Concat(subPath).ToArray());
     }
 
     [PublicAPI]
-    internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget?> target)
+    internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget?>? target)
         where TTarget : ITree<TTarget>
     {
         if(target == null)
@@ -140,37 +141,11 @@ public static class Extension
         }
     }
 
-    static TTarget[] SubBackChain<TTarget>(this TTarget target, TTarget recent)
-        where TTarget : class, ITree<TTarget>
-    {
-        if(target == recent)
-            return new TTarget[0];
-
-        return target.DirectChildCount
-            .Select(target.GetDirectChild)
-            .Where(child => child != null)
-            .Select(child => child.BackChain(recent).ToArray())
-            .FirstOrDefault(result => result.Any());
-    }
-
-    internal static IEnumerable<TTarget> BackChain<TTarget>(this TTarget target, TTarget recent)
-        where TTarget : class, ITree<TTarget>
-    {
-        var subChain = target.SubBackChain(recent);
-        if(subChain == null)
-            yield break;
-
-        foreach(var items in subChain)
-            yield return items;
-
-        yield return target;
-    }
-
     static TValue[] T<TValue>(params TValue[] value) => value;
 
     [PublicAPI]
     internal static IEnumerable<TResult?> GetNodesFromLeftToRight<TAspect, TResult>
-        (this TResult? target, Func<TResult, TAspect> getAspect)
+        (this TResult? target, Func<TResult?, TAspect> getAspect)
         where TAspect : ITree<TResult>
     {
         var aspect = getAspect(target);
@@ -191,7 +166,7 @@ public static class Extension
 
     [PublicAPI]
     internal static IEnumerable<TResult?> GetNodesFromRightToLeft<TAspect, TResult>
-        (this TResult? target, Func<TResult, TAspect> getAspect)
+        (this TResult? target, Func<TResult?, TAspect> getAspect)
         where TAspect : ITree<TResult>
     {
         var aspect = getAspect(target);
