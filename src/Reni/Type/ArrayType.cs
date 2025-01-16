@@ -31,7 +31,7 @@ sealed class ArrayType
         Flags Data { get; }
         public string DumpPrintText => Data.DumpPrintText;
 
-        Options(string? optionsId)
+        Options(string optionsId)
         {
             Data = new(optionsId);
             IsMutable = Data.Register("mutable");
@@ -42,7 +42,7 @@ sealed class ArrayType
 
         protected override string GetNodeDump() => DumpPrintText;
 
-        public static Options Create(string? optionsId = null) => new(optionsId);
+        public static Options Create(string optionsId = "") => new(optionsId);
     }
 
     [DisableDump]
@@ -311,25 +311,25 @@ sealed class ArrayType
             .GetGenericDumpPrintResult(category)
             .ReplaceAbsolute
             (
-                ElementType.Pointer.CheckedReference,
+                ElementType.Pointer.CheckedReference!,
                 c => ReferenceResult(c).AddToReference(() => ElementType.Size * position)
             );
 
     Result ElementAccessResult(Category category, TypeBase right)
         => AccessType.GetResult(category, GetObjectResult(category), right);
 
-    Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
+    Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
     {
         var target = (left & Category.All).AutomaticDereferencedAlignedResult
             .GetValue(context.RootContext.ExecutionContext)
             .ToString(ElementType.Size);
-        var conversionBase = right.Evaluate(context).ExpectNotNull().ToInt32();
+        var conversionBase = right!.Evaluate(context).ExpectNotNull().ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);
         var result = BitsConst.Convert(target, conversionBase);
         return Root.BitType.GetResult(category, result).Align;
     }
 
-    Result CountResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
+    Result CountResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
         => IndexType.GetResult(category, () => BitsConst.Convert(Count).GetCode(IndexSize));
 
     IConversion? ForcedConversion(ArrayReferenceType destination)

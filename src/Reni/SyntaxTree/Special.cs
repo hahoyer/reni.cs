@@ -116,7 +116,7 @@ sealed class InfixSyntax : ValueSyntax
 
 interface IPendingProvider
 {
-    Result GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right);
+    Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 }
 
 sealed class SuffixSyntax : ValueSyntax

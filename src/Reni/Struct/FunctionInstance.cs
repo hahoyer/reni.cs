@@ -29,7 +29,7 @@ abstract class FunctionInstance
     internal CodeBase? BodyCode => this.CachedValue(GetBodyCode);
 
     [DisableDump]
-    internal CodeBase? AlignedBodyCode => BodyCode?.GetAlign();
+    internal CodeBase AlignedBodyCode => BodyCode!.GetAlign();
 
     [DisableDump]
     Size ArgsPartSize => Parent.ArgumentsType.Size + RelevantValueSize;
@@ -67,7 +67,7 @@ abstract class FunctionInstance
     bool IsGetter => FunctionId.IsGetter;
 
     [DisableDump]
-    internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
+    internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode!.Visit(new ItemCollector())!;
 
     protected FunctionInstance(FunctionType parent, ValueSyntax body)
     {
@@ -193,7 +193,7 @@ abstract class FunctionInstance
     public string DumpFunction()
     {
         var result = "\n";
-        result += "body=" + Body!.NodeDump;
+        result += "body=" + Body.NodeDump;
         result += "\n";
         return result;
     }

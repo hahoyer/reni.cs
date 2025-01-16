@@ -43,7 +43,7 @@ sealed class PointerType
     IConversion IReference.Converter => this;
     bool IReference.IsWeak => true;
 
-    IImplementation? ISymbolProvider<StableReference>.Feature
+    IImplementation ISymbolProvider<StableReference>.Feature
         => Feature.Extension.Value(GetConversionToStableReference);
 
     [DisableDump]

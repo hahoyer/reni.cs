@@ -18,7 +18,7 @@ sealed class DataStack : DumpableObject, IVisitor
     {
         public StackData Data;
         public FrameData Frame = new(null);
-        public LocalDataClass(IOutStream? outStream) => Data = new EmptyStackData(outStream);
+        public LocalDataClass(IOutStream outStream) => Data = new EmptyStackData(outStream);
 
         string IStackDataAddressBase.Dump() => "stack";
 
@@ -192,7 +192,7 @@ sealed class DataStack : DumpableObject, IVisitor
 
     void IVisitor.PrintText(Size size, Size itemSize) => Pull(size).PrintText(itemSize);
 
-    void IVisitor.PrintText(string dumpPrintText) => Context.OutStream?.AddData(dumpPrintText);
+    void IVisitor.PrintText(string dumpPrintText) => Context.OutStream.AddData(dumpPrintText);
 
     void IVisitor.RecursiveCall() => LocalData.Frame.IsRepeatRequired = true;
 

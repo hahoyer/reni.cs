@@ -8,11 +8,11 @@ public sealed class PositionDictionary<TResult> : DumpableObject
 {
     static int Position;
 
-    readonly Dictionary<SourcePosition, TResult> InvisibleValues = new();
-    readonly Dictionary<SourcePosition, TResult> VisibleValues = new();
+    readonly Dictionary<SourcePosition, TResult?> InvisibleValues = new();
+    readonly Dictionary<SourcePosition, TResult?> VisibleValues = new();
 
     [DisableDump]
-    internal TResult this[SourcePosition key] => VisibleValues[key];
+    internal TResult? this[SourcePosition key] => VisibleValues[key];
 
     [DisableDump]
     TResult? this[SourcePart keyPart]
@@ -34,7 +34,7 @@ public sealed class PositionDictionary<TResult> : DumpableObject
         return result;
     }
 
-    static void Add(Dictionary<SourcePosition, TResult> values, SourcePosition key, TResult value)
+    static void Add(Dictionary<SourcePosition, TResult?> values, SourcePosition key, TResult? value)
     {
         values.TryGetValue(key, out var oldValue);
         if(ReferenceEquals(oldValue, value))
@@ -45,7 +45,7 @@ public sealed class PositionDictionary<TResult> : DumpableObject
                 ()
                     => $@"Tree-item is anchor in more than one {typeof(TResult).PrettyName()}-item: 
 key = {key.DebuggerDump()}
-value = {value.LogDump()}
+value = {value?.LogDump()}
 oldValue = {oldValue!.LogDump()}"
             );
         values[key] = value;

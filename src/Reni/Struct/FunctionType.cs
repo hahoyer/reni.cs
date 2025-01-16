@@ -31,7 +31,7 @@ sealed class FunctionType : SetterTargetType
     [EnableDump]
     readonly CompoundView CompoundView;
 
-    Closures ClosureValue;
+    Closures? ClosureValue;
 
     IEnumerable<string> InternalDeclarationOptions
     {
@@ -63,7 +63,7 @@ sealed class FunctionType : SetterTargetType
         get
         {
             var getter = Getter.CodeItems;
-            var setter = Setter?.CodeItems ??[];
+            var setter = Setter?.CodeItems ?? [];
             return getter.Concat(setter);
         }
     }
@@ -104,20 +104,9 @@ sealed class FunctionType : SetterTargetType
             ? Getter.Issues
             : Getter.Issues.Concat(Setter.Issues).ToArray();
 
-    internal override string DumpPrintText
-    {
-        get
-        {
-            var valueType = ValueType;
-            var result = "@(";
-            result += ArgumentsType.DumpPrintText;
-            result += ")=>";
-            result += valueType?.DumpPrintText ?? "<unknown>";
-            return result;
-        }
-    }
+    internal override string DumpPrintText => $"@({ArgumentsType.DumpPrintText})=>{ValueType.DumpPrintText}";
 
-    protected override Result? GetSetterResult(Category category) => Setter?.GetCallResult(category);
+    protected override Result GetSetterResult(Category category) => Setter?.GetCallResult(category) ?? Root.VoidType.GetResult(category);
 
     protected override Result GetGetterResult(Category category) => Getter.GetCallResult(category);
     protected override Size GetSize() => ArgumentsType.Size + GetterClosures.Size;
@@ -177,10 +166,8 @@ sealed class FunctionType : SetterTargetType
         if(ObjectId == -25)
             $"{NodeDump}: {result.LogDump()}".Log();
 
-        (result != null).Assert();
-
         if(ArgumentsType is IContextReference arguments)
-            (!result!.Contains(arguments)).Assert();
+            (!result.Contains(arguments)).Assert();
 
         if(ClosureValue == null)
             ClosureValue = result;

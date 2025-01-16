@@ -29,8 +29,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     Anchor(params BinaryTree?[] items)
     {
         Items = items
-            .Where(item => item != null)
-            .Cast<BinaryTree>()
+            .OfType<BinaryTree>()
             .Distinct()
             .OrderBy(item => item!.Token.Position)
             .ToArray();
@@ -85,7 +84,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         return Combine(other?.Items);
     }
 
-    internal Anchor Combine(BinaryTree[]? other)
+    internal Anchor Combine(BinaryTree?[]? other)
     {
         if(other == null || !other.Any())
             return this;

@@ -26,7 +26,7 @@ sealed class ArrayReferenceType
         Flags Data { get; }
         public string DumpPrintText => Data.DumpPrintText;
 
-        Options(string? optionsId)
+        Options(string optionsId)
         {
             Data = new(optionsId);
             IsForceMutable = Data.Register("force_mutable");
@@ -38,10 +38,10 @@ sealed class ArrayReferenceType
 
         protected override string GetNodeDump() => DumpPrintText;
 
-        internal static Options Create(string? optionsId) => new(optionsId);
+        internal static Options Create(string optionsId) => new(optionsId);
 
         internal static string? ForceMutable(bool value)
-            => Create(null).IsForceMutable.SetTo(value);
+            => Create("").IsForceMutable.SetTo(value);
     }
 
     [DisableDump]

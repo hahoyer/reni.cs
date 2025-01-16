@@ -7,8 +7,6 @@ using Reni.Validation;
 
 namespace Reni.SyntaxTree;
 
-using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
-
 sealed class DeclarerSyntax : DumpableObject
 {
     internal sealed class TagSyntax : Syntax.NoChildren
@@ -67,8 +65,9 @@ sealed class DeclarerSyntax : DumpableObject
     {
         get
         {
-            IEnumerable<SourcePart?> sourceParts = T(Tags.SelectMany(node => node.Anchor.SourceParts), Name?.Anchor.SourceParts)
-                .ConcatMany();
+            IEnumerable<SourcePart?> sourceParts
+                = T(Tags.SelectMany(node => node.Anchor.SourceParts), Name?.Anchor.SourceParts)
+                    .ConcatMany();
             return sourceParts
                 .Where(i => i != null)
                 .Aggregate()!;
@@ -105,7 +104,7 @@ sealed class DeclarerSyntax : DumpableObject
     DeclarerSyntax
     (
         TagSyntax[] tags
-        , NameSyntax name
+        , NameSyntax? name
         , Syntax.IssueSyntax? issue
         , bool? meansPublic
     )
@@ -134,7 +133,7 @@ sealed class DeclarerSyntax : DumpableObject
         index -= Tags.Length;
         return index switch
         {
-            0 => Name, 1 => Issue, _ => null
+            0 => Name, 1 => Issue, var _ => null
         };
     }
 
@@ -152,11 +151,10 @@ sealed class DeclarerSyntax : DumpableObject
         if(nameIssueAnchors.Length == 0 && tags.Length == 0)
             return new([], nameSyntax, null, meansPublic);
 
-        BinaryTree?[] issueAnchors = tags
-            .Where(i => i.annotation == null)
-            .SelectMany(tuple => tuple.anchors)
+        var issueAnchors = tags
+            .Where(i => i.Value == null)
+            .SelectMany(tuple => tuple.Anchors)
             .Union(nameIssueAnchors)
-            .Where(a => a != null)
             .Distinct()
             .ToArray();
 
@@ -171,26 +169,23 @@ sealed class DeclarerSyntax : DumpableObject
 
         return new
         (
-            tags.Select(GetTagSyntax).Where(i => i != null).ToArray()
+            tags.Where(tag=>tag.Value != null).Select(GetTagSyntax).OfType<TagSyntax>().ToArray()
             , nameSyntax
             , issueSyntax
             , meansPublic
         );
     }
 
-    static NameSyntax GetNameSyntax(BinaryTree? name)
+    static NameSyntax? GetNameSyntax(BinaryTree? name)
         => name == null? null : new NameSyntax(name.Token.Id, Anchor.Create(name));
 
-    static TagSyntax GetTagSyntax(Annotation target)
+    static TagSyntax? GetTagSyntax(Annotation target)
     {
-        var tag = target.annotation;
-        if(tag == null)
-            return null;
-
+        var tag = target.Value!;
         var tagToken = tag.TokenClass as DeclarationTagToken;
-        return new(tagToken, Anchor.Create(tag).Combine(target.anchors));
+        return new(tagToken, Anchor.Create(tag).Combine(target.Anchors));
     }
 
-    public bool IsDefining(string name, bool publicOnly)
+    public bool IsDefining(string? name, bool publicOnly)
         => name != null && Name?.Value == name && (!publicOnly || IsPublic);
 }

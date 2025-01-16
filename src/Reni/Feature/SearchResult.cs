@@ -71,7 +71,7 @@ sealed class SearchResult : DumpableObject, IImplementation
         return searchResult;
     }
 
-    internal Result? Execute
+    internal Result Execute
     (
         Category category,
         ResultCache left,
@@ -96,8 +96,7 @@ sealed class SearchResult : DumpableObject, IImplementation
             BreakExecution();
 
             var replaceAbsolute = result
-                .ReplaceAbsolute
-                    (ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
+                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference!, ConverterPath.Execute);
             Dump(nameof(replaceAbsolute), replaceAbsolute);
             if(trace)
                 Dump(nameof(left), left.Code);

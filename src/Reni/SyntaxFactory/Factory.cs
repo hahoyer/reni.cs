@@ -32,18 +32,18 @@ sealed class Factory : DumpableObject
 
     Factory(bool meansPublic) => MeansPublic = meansPublic;
 
-    internal ValueSyntax? GetFrameSyntax(BinaryTree target)
+    internal ValueSyntax GetFrameSyntax(BinaryTree target)
     {
-        var kernel = target.BracketKernel;
-        var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
+        var kernel = target.BracketKernel!;
+        var statements = GetStatementsSyntax(kernel.Center);
         var listAnchors = kernel.Center?.ParserLevelGroup;
-        if(listAnchors != null && listAnchors.Any() && listAnchors[0].TokenClass is not TokenClasses.List)
+        if(listAnchors != null && listAnchors.Any() && listAnchors[0]!.TokenClass is not TokenClasses.List)
             listAnchors = null;
         var anchor = kernel.ToAnchor.Combine(listAnchors);
         return CompoundSyntax.Create(statements, null, anchor);
     }
 
-    internal IStatementSyntax[] GetStatementsSyntax(BinaryTree? target, Anchor anchor, ITokenClass master)
+    internal IStatementSyntax[] GetStatementsSyntax(BinaryTree? target, Anchor? anchor = null, ITokenClass? master = null)
     {
         if(target == null)
         {
@@ -59,7 +59,7 @@ sealed class Factory : DumpableObject
                 // ReSharper disable once ConvertClosureToMethodGroup
                 anchor.AssertIsNull();
                 return T(declarationToken.Provider.Get(target, factory));
-            case IStatementsToken statementsToken when target.TokenClass.IsBelongingTo(master):
+            case IStatementsToken statementsToken when target.TokenClass.IsBelongingTo(master ?? target.TokenClass):
                 return statementsToken.Provider.Get(target, factory, anchor);
             default:
                 return T((IStatementSyntax)GetValueSyntax(target, anchor));
@@ -133,7 +133,7 @@ sealed class Factory : DumpableObject
 
         return level switch
             {
-                0 => true, 3 => true, _ => false
+                0 => true, 3 => true, var _ => false
             }
             == MeansPublic
                 ? this

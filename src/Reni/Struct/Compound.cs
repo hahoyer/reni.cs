@@ -104,7 +104,7 @@ sealed class Compound
 
             var positions = ((fromNotPosition ?? EndPosition) - fromPosition)
                 .Select(i => fromPosition + i)
-                .Where(position => Syntax.PureStatements[position]?.IsLambda == false)
+                .Where(position => Syntax.PureStatements[position].IsLambda == false)
                 .ToArray();
 
             var rawResults = positions

@@ -54,15 +54,12 @@ static class Extension
         (Func<Category, ResultCache, ContextBase, ValueSyntax?, Result> function)
         => MetaFunctionCache[function];
 
-    internal static TypeBase? ResultType(this IConversion conversion)
+    internal static TypeBase ResultType(this IConversion conversion)
         => conversion.GetResult(Category.Type)!.Type;
 
-    internal static Result? GetResult(this IConversion conversion, Category category)
+    internal static Result GetResult(this IConversion conversion, Category category)
     {
         var result = conversion.Execute(category);
-        if(result == null)
-            return null;
-
         if(result.HasIssue != true && category.HasCode() && result.Code?.ArgumentType != null)
             (result.Code.ArgumentType == conversion.Source).Assert
                 (() => result.DebuggerDump());

@@ -14,7 +14,7 @@ sealed class AtToken : InfixPrefixSyntaxToken
     public override string Id => TokenId;
 
     protected override Result GetResult
-        (ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right)
+        (ContextBase context, Category category, ValueSyntax left, ValueSyntax? right)
     {
         var target = context.GetResultAsReference(category | Category.Type, left);
         return target

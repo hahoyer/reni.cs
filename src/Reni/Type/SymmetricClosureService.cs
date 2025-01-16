@@ -8,12 +8,12 @@ sealed class SymmetricClosureService
     {
         TypeBase Start(IConversion feature);
         TypeBase End(IConversion feature);
-        IConversion Combine(IConversion startFeature, IConversion feature);
+        IConversion? Combine(IConversion? startFeature, IConversion feature);
     }
 
     sealed class ForwardNavigator : INavigator
     {
-        IConversion INavigator.Combine(IConversion start, IConversion end)
+        IConversion? INavigator.Combine(IConversion? start, IConversion end)
             => Feature.Combination.CheckedCreate(start, end);
 
         TypeBase INavigator.End(IConversion feature) => feature.ResultType();
@@ -22,33 +22,35 @@ sealed class SymmetricClosureService
 
     sealed class BackwardNavigator : INavigator
     {
-        IConversion INavigator.Combine(IConversion start, IConversion end)
+        IConversion? INavigator.Combine(IConversion? start, IConversion end)
             => Feature.Combination.CheckedCreate(end, start);
 
         TypeBase INavigator.End(IConversion feature) => feature.Source;
         TypeBase INavigator.Start(IConversion feature) => feature.ResultType();
     }
 
-    internal static readonly INavigator Forward = new ForwardNavigator();
+    static readonly INavigator Forward = new ForwardNavigator();
     static readonly INavigator Backward = new BackwardNavigator();
+    readonly INavigator Navigator;
 
-    TypeBase Source { get; }
-    IEnumerable<IConversion> AllFeatures { get; }
-    List<TypeBase> FoundTypes;
-    List<IConversion> NewFeatures;
+    readonly TypeBase Source;
+    readonly ValueCache<IEnumerable<IConversion>> ResultsCache;
+    IEnumerable<IConversion>? AllFeatures;
+    List<TypeBase>? FoundTypes;
+    List<IConversion>? NewFeatures;
+    internal IEnumerable<IConversion> Results => ResultsCache.Value;
 
-    internal SymmetricClosureService(TypeBase source)
+    internal SymmetricClosureService(TypeBase source, INavigator? navigator = null)
     {
+        Navigator = navigator ?? Forward;
         Source = source;
-        AllFeatures = source
-            .SymmetricFeatureClosure()
-            .ToArray();
+        ResultsCache = new(Execute);
     }
 
     internal static IEnumerable<IConversion> To(TypeBase source)
-        => new SymmetricClosureService(source).Execute(Backward);
+        => new SymmetricClosureService(source, Backward).Results;
 
-    IEnumerable<IConversion> Combination(INavigator navigator, IConversion startFeature = null)
+    IEnumerable<IConversion> Combination(INavigator navigator, IConversion? startFeature = null)
     {
         var startType = Source;
         if(startFeature != null)
@@ -57,30 +59,34 @@ sealed class SymmetricClosureService
         foreach(var feature in AllFeatures.Where(feature => navigator.Start(feature) == startType))
         {
             var destination = navigator.End(feature);
-            if(FoundTypes.Contains(destination))
+            if(FoundTypes!.Contains(destination))
                 continue;
             FoundTypes.Add(destination);
             var newFeature = navigator.Combine(startFeature, feature);
             if(newFeature == null)
                 continue;
             yield return newFeature;
-            NewFeatures.Add(newFeature);
+            NewFeatures!.Add(newFeature);
         }
     }
 
-    internal IEnumerable<IConversion> Execute(INavigator navigator)
+    IEnumerable<IConversion> Execute()
     {
-        FoundTypes = new();
-        NewFeatures = new();
+        FoundTypes = [];
+        NewFeatures = [];
 
-        foreach(var feature in Combination(navigator))
+        AllFeatures = Source
+            .SymmetricFeatureClosure()
+            .ToArray();
+
+        foreach(var feature in Combination(Navigator))
             yield return feature;
 
         while(NewFeatures.Any())
         {
             var features = NewFeatures;
-            NewFeatures = new();
-            foreach(var feature in features.SelectMany(f => Combination(navigator, f)))
+            NewFeatures = [];
+            foreach(var feature in features.SelectMany(f => Combination(Navigator, f)))
                 yield return feature;
         }
     }

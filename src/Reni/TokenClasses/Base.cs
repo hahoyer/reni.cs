@@ -40,22 +40,22 @@ abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
 
 abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueToken
 {
-    Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right)
+    Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         => GetResult(context, category, left, right);
 
-    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax? right, SourcePart token)
+    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
         => GetResult(context, category, right);
 
     IValueProvider IValueToken.Provider => Factory.Infix;
 
-    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right);
+    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 
-    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax? right);
+    protected abstract Result GetResult(ContextBase context, Category category, ValueSyntax right);
 }
 
 abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueToken
 {
-    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax? right, SourcePart token)
+    Result IPrefix.GetResult(ContextBase context, Category category, ValueSyntax right, SourcePart token)
         => GetResult(context, category, right, token);
 
     Declaration[] ITerminal.Declarations => Declarations;
@@ -104,5 +104,5 @@ abstract class InfixSyntaxToken : InfixToken, IInfix, IValueToken
     IValueProvider IValueToken.Provider => Factory.Infix;
 
     protected abstract Result GetResult
-        (ContextBase callContext, Category category, ValueSyntax? left, ValueSyntax? right);
+        (ContextBase callContext, Category category, ValueSyntax left, ValueSyntax right);
 }

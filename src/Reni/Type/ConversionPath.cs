@@ -14,9 +14,6 @@ sealed class ConversionPath
     internal readonly TypeBase Source;
     internal readonly IConversion[] Elements;
 
-    [DisableDump]
-    internal bool IsValid => Source != null;
-
     IEnumerable<TypeBase> Types
         => Elements
             .Select(element => element.Source)
@@ -36,30 +33,23 @@ sealed class ConversionPath
 
     internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
-    internal ConversionPath()
-        : base(NextObjectId++) { }
-
     internal ConversionPath(TypeBase source)
-        : this()
-    {
-        Source = source;
-        Elements = [];
-        IsValid.Assert();
-    }
+        : this(source, []) { }
 
     internal ConversionPath(params IConversion[] rawElements)
-        : this()
-    {
-        rawElements.Any().Assert();
-        Source = rawElements.First().Source;
-        IsValid.Assert();
-        Elements = rawElements.RemoveCircles().ToArray();
+        : this(rawElements.First().Source, rawElements.RemoveCircles().ToArray()) { }
 
+
+    ConversionPath(TypeBase source, IConversion[] elements)
+        : base(NextObjectId++)
+    {
+        Source = source;
+        Elements = elements;
         AssertValid();
         StopByObjectIds(-284);
     }
 
-    bool IEquatable<ConversionPath>.Equals(ConversionPath other)
+    bool IEquatable<ConversionPath>.Equals(ConversionPath? other)
     {
         if(this == other)
             return true;

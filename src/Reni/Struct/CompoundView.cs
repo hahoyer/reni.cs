@@ -34,11 +34,11 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             Type = type;
         }
 
-        Result? IConversion.Execute(Category category)
+        Result IConversion.Execute(Category category)
         {
             var innerResult = ((IConversion)Parent).Execute(category);
             var conversion = Type.Pointer.GetMutation(Parent);
-            var result = innerResult?.ReplaceArguments(conversion);
+            var result = innerResult.ReplaceArguments(conversion);
             return result;
         }
 
@@ -291,7 +291,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result ReplaceObjectPointerByContext(Result target)
     {
-        var reference = Type.SmartPointer.CheckedReference;
+        var reference = Type.SmartPointer.CheckedReference!;
         return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
     }
 
@@ -342,7 +342,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             return ReturnMethodDump
             (
                 genericDumpPrintResult.ReplaceAbsolute
-                    (accessType.CheckedReference, c => AccessValueViaObject(c, position)));
+                    (accessType.CheckedReference!, c => AccessValueViaObject(c, position)));
         }
         finally
         {
@@ -359,9 +359,9 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             .AssertNotNull()
             .TypeForStructureElement;
 
-    internal IImplementation Find(Definable definable, bool publicOnly)
+    internal IImplementation? Find(Definable definable, bool publicOnly)
     {
-        var position = Compound.Syntax.Find(definable?.Id, publicOnly);
+        var position = Compound.Syntax.Find(definable.Id, publicOnly);
         return position == null? null : AccessFeature(position.Value);
     }
 
@@ -378,7 +378,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             : Type
                 .ForcedReference
                 .GetCode()
-                .GetReferenceWithOffset(CompoundViewSize);
+                .GetReferenceWithOffset(CompoundViewSize!);
 
     Result CreateElement(Category category, int index, TypeBase elementType)
         => AccessViaObjectPointer(category, index).GetConversion(elementType);

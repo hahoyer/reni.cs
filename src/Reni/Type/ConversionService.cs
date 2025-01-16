@@ -39,10 +39,7 @@ static class ConversionService
         }
 
         bool IsRelevantForConversionPathExtension(IConversion feature)
-        {
-            var resultType = feature.ResultType();
-            return !(resultType == null || FoundTypes.Contains(resultType));
-        }
+            => !FoundTypes.Contains(feature.ResultType());
 
         IEnumerable<ConversionPath> GetResult()
         {
@@ -139,16 +136,14 @@ static class ConversionService
     internal static ConversionPath? FindPath(TypeBase source, TypeBase destination)
         => new ExplicitConversionProcess(source, destination).Result;
 
-    static ConversionPath FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
+    static ConversionPath? FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
         => new GenericConversionProcess(source, isDestination).Result;
 
     internal static IEnumerable<TDestination> FindPathDestination<TDestination>(TypeBase source)
         where TDestination : TypeBase
     {
         var path = FindPath(source, t => t is TDestination);
-        if(path == null)
-            return [];
-        return path.IsValid? new[] { (TDestination)path.Destination } : null;
+        return path == null? [] : [(TDestination)path.Destination];
     }
 
     internal static IEnumerable<IConversion> ForcedConversions
@@ -274,10 +269,9 @@ static class ConversionService
         (this IEnumerable<SearchResult> list)
         => list.FrameElementList((a, b) => a.HasHigherPriority(b));
 
-    static IEnumerable<T> FrameElementList<T>
-        (this IEnumerable<T> list, Func<T, T, bool> isInRelation)
+    static IEnumerable<T> FrameElementList<T>(this IEnumerable<T> list, Func<T, T, bool> isInRelation)
     {
         var l = list.ToArray();
-        return l.Where(item => l.All(other => other.Equals(item) || !isInRelation(other, item)));
+        return l.Where(item => l.All(other => other!.Equals(item) || !isInRelation(other, item)));
     }
 }

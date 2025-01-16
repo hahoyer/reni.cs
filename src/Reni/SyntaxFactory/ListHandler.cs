@@ -5,7 +5,7 @@ namespace Reni.SyntaxFactory;
 
 sealed class ListHandler : DumpableObject, IStatementsProvider
 {
-    IStatementSyntax[] IStatementsProvider.Get(BinaryTree? target, Factory factory, Anchor anchor)
+    IStatementSyntax[] IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor? anchor)
     {
         (anchor == null || anchor.IsEmpty).Assert();
         var left = factory.GetStatementsSyntax(target.Left, anchor?.GetLeftOf(target), target.TokenClass);

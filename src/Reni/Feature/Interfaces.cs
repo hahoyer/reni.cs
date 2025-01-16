@@ -61,7 +61,7 @@ abstract class ContextMetaFeatureImplementation
 /// </summary>
 interface IConversion
 {
-    Result? Execute(Category category);
+    Result Execute(Category category);
     TypeBase Source { get; }
 }
 
@@ -184,8 +184,7 @@ sealed class ContextMetaFunction : ContextMetaFeatureImplementation
 
     public ContextMetaFunction(Func<ContextBase, Category, ValueSyntax?, Result> function) => Function = function;
 
-    protected override Result GetResult
-        (ContextBase contextBase, Category category, ValueSyntax? right)
+    protected override Result GetResult(ContextBase contextBase, Category category, ValueSyntax? right)
         => Function(contextBase, category, right);
 }
 

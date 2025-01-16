@@ -183,7 +183,7 @@ abstract class TypeBase
 
     [DisableDump]
     internal IEnumerable<IConversion> SymmetricClosureConversions
-        => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
+        => new SymmetricClosureService(this).Results;
 
     internal bool HasIssues => Issues?.Any() ?? false;
 

@@ -41,11 +41,11 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
                 .Select(tsa => tsa.TargetSet)
                 .ToArray();
 
-            if(Target == "")
+            if(Target == null || Target == "")
                 return result;
 
             return result
-                .Concat([new TargetSetData(Target, Output)])
+                .Concat([new(Target, Output)])
                 .ToArray();
         }
     }
@@ -82,7 +82,7 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     internal Compiler CreateFileAndRunCompiler
     (
         string name,
-        string? text,
+        string text,
         string? expectedOutput = null,
         Action<Compiler>? expectedResult = null
     )

@@ -17,7 +17,7 @@ sealed class Pair : TypeBase
         get
         {
             NotImplementedMethod();
-            return null;
+            return null!;
         }
     }
 

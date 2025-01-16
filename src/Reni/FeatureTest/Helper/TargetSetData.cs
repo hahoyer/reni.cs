@@ -2,10 +2,10 @@ namespace Reni.FeatureTest.Helper;
 
 sealed class TargetSetData : DumpableObject
 {
-    internal readonly string? Target;
+    internal readonly string Target;
     internal readonly string Output;
 
-    internal TargetSetData(string? target, string? output)
+    internal TargetSetData(string target, string? output)
     {
         Target = target;
         Output = output ?? "";
@@ -45,5 +45,5 @@ sealed class TargetSetAttribute : Attribute
 {
     internal readonly TargetSetData TargetSet;
 
-    internal TargetSetAttribute(string? target, string? output) => TargetSet = new(target, output);
+    internal TargetSetAttribute(string target, string? output) => TargetSet = new(target, output);
 }

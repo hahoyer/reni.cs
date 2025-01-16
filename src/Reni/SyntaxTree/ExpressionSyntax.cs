@@ -34,7 +34,7 @@ sealed class ExpressionSyntax : ValueSyntax
     }
 
     [Node]
-    public Definable Definable { get; }
+    public Definable? Definable { get; }
 
     [Node]
     [EnableDump(Order = -1)]
@@ -50,7 +50,7 @@ sealed class ExpressionSyntax : ValueSyntax
 
     int CurrentResultDepth;
 
-    internal ExpressionSyntax(ValueSyntax? left, Definable definable, SourcePart token, ValueSyntax? right, Anchor anchor)
+    internal ExpressionSyntax(ValueSyntax? left, Definable? definable, SourcePart token, ValueSyntax? right, Anchor anchor)
         : base(anchor)
     {
         Token = token;
@@ -72,7 +72,7 @@ sealed class ExpressionSyntax : ValueSyntax
     internal override Result GetResultForCache(ContextBase context, Category category)
     {
         if(CurrentResultDepth > 20)
-            throw new EvaluationDepthExhaustedException(Anchor.SourceParts.Combine(), context, CurrentResultDepth);
+            throw new EvaluationDepthExhaustedException(Anchor.SourceParts.Combine()!, context, CurrentResultDepth);
 
         try
         {

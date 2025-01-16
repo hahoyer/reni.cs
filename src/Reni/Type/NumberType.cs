@@ -135,17 +135,16 @@ sealed class NumberType
 
     Result OperationResult(Category category, TypeBase right, IOperation operation)
     {
-        var enumerable = ConversionService.FindPathDestination<NumberType>(right);
-        if(enumerable == null)
-            return null;
+        var destination = ConversionService
+            .FindPathDestination<NumberType>(right)
+            .SingleOrDefault();
 
-        var destination = enumerable.SingleOrDefault();
         if(destination != null)
             return OperationResult(category, operation, destination)
                 .ReplaceArguments(c => right.GetConversion(c, destination.Pointer));
 
         NotImplementedMethod(category, right, operation);
-        return null;
+        return null!;
     }
 
     Result OperationResult(Category category, IOperation operation, NumberType right)

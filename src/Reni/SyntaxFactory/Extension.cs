@@ -6,7 +6,7 @@ namespace Reni.SyntaxFactory;
 
 static class Extension
 {
-    internal static ValueSyntax? GetInfixSyntax
+    internal static ValueSyntax GetInfixSyntax
     (
         this ValueSyntax? left,
         ITokenClass tokenClass, SourcePart token,
@@ -19,7 +19,7 @@ static class Extension
             right == null? new SuffixSyntax(left, (ISuffix)tokenClass, token, anchor) :
             new InfixSyntax(left, (IInfix)tokenClass, right, token, anchor);
 
-    internal static IStatementSyntax[] With(this IStatementSyntax[] statements, Anchor frameItems)
+    internal static IStatementSyntax[] With(this IStatementSyntax[] statements, Anchor? frameItems)
     {
         if(frameItems == null || !frameItems.Items.Any())
             return statements;
@@ -42,7 +42,7 @@ static class Extension
             .Log();
 
         Dumpable.NotImplementedFunction(statements, frameItems);
-        return default;
+        return default!;
     }
 
     static TValue[] T<TValue>(params TValue[] value) => value;

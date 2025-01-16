@@ -227,7 +227,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
             {
                 var targetObject = expressionSyntax.Left;
                 if(targetObject is TerminalSyntax terminalSyntax)
-                    return terminalSyntax.Terminal.Declarations.Filter(expressionSyntax.Definable.Id);
+                    return terminalSyntax.Terminal.Declarations.Filter(expressionSyntax.Definable?.Id);
 
                 NotImplementedFunction(target);
                 return default;

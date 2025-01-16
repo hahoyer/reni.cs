@@ -8,7 +8,7 @@ sealed class GetterFunction : FunctionInstance
 {
     protected override FunctionId FunctionId { get; }
 
-    public GetterFunction(FunctionType parent, int index, ValueSyntax? body)
+    public GetterFunction(FunctionType parent, int index, ValueSyntax body)
         : base(parent, body)
         => FunctionId = FunctionId.Getter(index);
 

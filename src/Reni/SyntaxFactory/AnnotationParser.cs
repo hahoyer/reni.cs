@@ -3,16 +3,20 @@ using Reni.TokenClasses;
 
 namespace Reni.SyntaxFactory;
 
-using Annotation = (BinaryTree annotation, BinaryTree[] anchors);
+sealed class Annotation(BinaryTree? value = null, BinaryTree[]? anchors = null)
+{
+    public readonly BinaryTree? Value = value;
+    public BinaryTree[] Anchors = anchors??[];
+}
 
 static class AnnotationParser
 {
-    internal static(BinaryTree? item, (BinaryTree annotation, BinaryTree[] anchors)[] annotations) CheckForAnnotations(this BinaryTree? target)
+    internal static(BinaryTree? item, Annotation[] annotations) CheckForAnnotations(this BinaryTree? target)
     {
         if(target == null)
-            return (item: null, annotations: null);
+            return (item: null, annotations: []);
         if(target.TokenClass is not ExclamationBoxToken)
-            return (item: target, annotations: null);
+            return (item: target, annotations: []);
 
         var (item, leftAnnotations) = target.Left.CheckForAnnotations();
         var rightAnnotations = ParseAnnotations(target.Right);
@@ -22,15 +26,15 @@ static class AnnotationParser
         return (item, annotations);
     }
 
-    static Annotation[] ParseAnnotations(BinaryTree target)
+    static Annotation[] ParseAnnotations(BinaryTree? target)
     {
         if(target == null)
-            return T(((BinaryTree)null, T((BinaryTree)null)));
+            return T(new Annotation());
 
         if(target.BracketKernel is { } bracketKernel)
         {
             var annotations = ParseAnnotations(bracketKernel.Center);
-            AddAnchors(annotations, T(bracketKernel.Left, bracketKernel.Right));
+            AddAnchors(annotations, T(bracketKernel.Left!, bracketKernel.Right!));
             return annotations;
         }
 
@@ -45,10 +49,9 @@ static class AnnotationParser
 
         target.Right.AssertIsNull();
         if(target.Left == null)
-            return T((target, (BinaryTree[])null));
+            return T(new Annotation(target));
 
-        return T(((BinaryTree)null, T(target.Left, target)));
-
+        return T(new Annotation(anchors:T(target.Left, target)));
     }
 
     static void AddAnchors
@@ -65,7 +68,7 @@ static class AnnotationParser
             return;
         }
 
-        target[0].anchors = T(target[0].anchors, anchors).ConcatMany().ToArray();
+        target[0].Anchors = T(target[0].Anchors, anchors).ConcatMany().ToArray();
     }
 
     public static TValue[] T<TValue>(params TValue[] value) => value;

@@ -170,7 +170,7 @@ sealed class Expression : LikeSyntax
     {
         var ex = (ExpressionSyntax)syntax!;
         AssertLike(S1, ex.Left);
-        (ex.Definable.Id == S2).Assert();
+        (ex.Definable!.Id == S2).Assert();
         AssertLike(S3, ex.Right);
     }
 

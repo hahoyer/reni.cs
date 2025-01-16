@@ -58,7 +58,7 @@ sealed class FunctionBodyType
 
     bool IFunction.IsImplicit => Syntax.IsImplicit;
 
-    IMeta IMetaImplementation.Function => null;
+    IMeta? IMetaImplementation.Function => null;
 
     IImplementation ISymbolProvider<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
@@ -85,7 +85,7 @@ sealed class FunctionBodyType
     TypeBase GetTemplate()
     {
         var argumentsType = Syntax.IsImplicit? Root.VoidType : TemplateArguments;
-        return GetResult(Category.Type, argumentsType).Type;
+        return GetResult(Category.Type, argumentsType).Type!;
     }
 
     Result GetResult(Category category, TypeBase argumentsType)
