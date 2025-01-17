@@ -111,7 +111,7 @@ sealed class ExpressionSyntax : ValueSyntax
         return Create(left ?? Left, Definable, Token, right ?? Right, Anchor);
     }
 
-    internal static ExpressionSyntax? Create
-        (ValueSyntax? left, Definable definable, SourcePart token, ValueSyntax? right, Anchor frameItems)
+    internal static ExpressionSyntax Create
+        (ValueSyntax? left, Definable? definable, SourcePart token, ValueSyntax? right, Anchor frameItems)
         => new(left, definable, token, right, frameItems);
 }

@@ -5,6 +5,6 @@ namespace Reni.SyntaxFactory;
 
 sealed class DefinableHandler : DumpableObject, IValueProvider
 {
-    ValueSyntax? IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
+    ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         => factory.GetExpressionSyntax(target, frameItems);
 }

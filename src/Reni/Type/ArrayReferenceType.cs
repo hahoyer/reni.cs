@@ -40,7 +40,7 @@ sealed class ArrayReferenceType
 
         internal static Options Create(string optionsId) => new(optionsId);
 
-        internal static string? ForceMutable(bool value)
+        internal static string ForceMutable(bool value)
             => Create("").IsForceMutable.SetTo(value);
     }
 
@@ -81,7 +81,7 @@ sealed class ArrayReferenceType
     internal ArrayReferenceType EnableReinterpretation
         => ValueType.GetArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
 
-    internal ArrayReferenceType(TypeBase valueType, string? optionsId)
+    internal ArrayReferenceType(TypeBase valueType, string optionsId)
     {
         Order = Closures.NextOrder++;
         OptionsValue = Options.Create(optionsId);

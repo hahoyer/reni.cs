@@ -725,9 +725,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         var result = (this & category).ExpectNotNull();
         var copier = Type!.GetCopier(category);
         if(category.HasCode())
-            result.Code = Code!.GetLocalBlock(copier?.Code!);
+            result.Code = Code!.GetLocalBlock(copier.Code!);
         if(category.HasClosures())
-            result.Closures = Closures!.Sequence(copier?.Closures!);
+            result.Closures = Closures!.Sequence(copier.Closures!);
         return result;
     }
 

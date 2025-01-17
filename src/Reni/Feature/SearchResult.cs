@@ -63,8 +63,7 @@ sealed class SearchResult : DumpableObject, IImplementation
 
     public static SearchResult Create(IImplementation feature, TypeBase definingItem)
     {
-        var searchResult = feature as SearchResult;
-        if(searchResult == null)
+        if(feature is not SearchResult searchResult)
             return new(feature, definingItem);
         var source = searchResult.Source;
         (source == definingItem).Assert();

@@ -159,7 +159,7 @@ sealed class ConversionPath
         return result;
     }
 
-    internal IEnumerable<SearchResult> CloseRelativeSearchResults(Definable tokenClass)
+    internal IEnumerable<SearchResult> CloseRelativeSearchResults(Definable? tokenClass)
         => Destination
             .GetDeclarationsForType(tokenClass)
             .Select(result => new SearchResult(result, this));

@@ -113,8 +113,7 @@ static class Extension
 
         if(valueResult != null)
             return valueResult
-                .Type
-                .AssertNotNull()
+                .Type!
                 .GetResult(category, valueResult, currentTarget, null, context, right);
         
         //Todo: Provide context information like this to "Expect"

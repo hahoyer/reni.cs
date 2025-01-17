@@ -22,7 +22,7 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
 
     int DirectChildCountOfDeclarer => Declarer?.DirectChildCount ?? 0;
 
-    DeclarationSyntax(DeclarerSyntax? declarer, ValueSyntax? value, Anchor anchor)
+    DeclarationSyntax(DeclarerSyntax? declarer, ValueSyntax value, Anchor anchor)
         : base(anchor)
     {
         Declarer = declarer;
@@ -62,6 +62,6 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
             , var _ => null
         };
 
-    internal static IStatementSyntax Create(DeclarerSyntax? declarer, ValueSyntax? value, Anchor anchor)
+    internal static IStatementSyntax Create(DeclarerSyntax? declarer, ValueSyntax value, Anchor anchor)
         => new DeclarationSyntax(declarer, value, anchor);
 }

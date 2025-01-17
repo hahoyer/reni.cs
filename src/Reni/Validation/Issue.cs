@@ -40,11 +40,10 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
         IssueId = issueId;
         Position = position;
         AdditionalInformation = additionalInformation;
-        AssertValid();
         StopByObjectIds();
     }
 
-    bool IEquatable<Issue>.Equals(Issue other)
+    bool IEquatable<Issue>.Equals(Issue? other)
     {
         if(ReferenceEquals(null, other))
             return false;
@@ -59,7 +58,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
     protected override string GetNodeDump()
         => base.GetNodeDump() + IssueId.NodeDump().Surround("{", "}");
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if(ReferenceEquals(null, obj))
             return false;
@@ -78,8 +77,6 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
             return hashCode;
         }
     }
-
-    void AssertValid() => (Position != null).Assert();
 
     public static bool operator ==(Issue? left, Issue? right) => Equals(left, right);
     public static bool operator !=(Issue? left, Issue? right) => !Equals(left, right);

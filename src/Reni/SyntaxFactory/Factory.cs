@@ -62,11 +62,11 @@ sealed class Factory : DumpableObject
             case IStatementsToken statementsToken when target.TokenClass.IsBelongingTo(master ?? target.TokenClass):
                 return statementsToken.Provider.Get(target, factory, anchor);
             default:
-                return T((IStatementSyntax?)GetValueSyntax(target, anchor!));
+                return T((IStatementSyntax)GetValueSyntax(target, anchor!));
         }
     }
 
-    internal ValueSyntax? GetValueSyntax(BinaryTree? target, Anchor anchor)
+    internal ValueSyntax GetValueSyntax(BinaryTree? target, Anchor anchor)
     {
         if(target == null)
             return new EmptyList(anchor);
@@ -102,7 +102,7 @@ sealed class Factory : DumpableObject
         return CompoundSyntax.Create(node, null, anchor);
     }
 
-    ValueSyntax? GetIssueSyntax(IssueId issueId, BinaryTree target, Anchor anchor)
+    ValueSyntax GetIssueSyntax(IssueId issueId, BinaryTree target, Anchor anchor)
     {
         var resultingAnchor = Anchor.Create(target).Combine(anchor);
 
@@ -140,10 +140,9 @@ sealed class Factory : DumpableObject
                 : new(!MeansPublic);
     }
 
-    internal ExpressionSyntax? GetExpressionSyntax(BinaryTree target, Anchor anchor)
+    internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, Anchor anchor)
     {
-        var definable = target.TokenClass as Definable;
-        (definable != null).Assert();
+        var definable = (Definable)target.TokenClass;
         return ExpressionSyntax
             .Create
             (
@@ -154,4 +153,6 @@ sealed class Factory : DumpableObject
                 , Anchor.Create(target).Combine(anchor)
             );
     }
+
+    new static TValue[] T<TValue>(params TValue[] value) where TValue: class? => value;
 }

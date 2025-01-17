@@ -11,10 +11,8 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
     {
         var (item, annotations) = target.Left.CheckForAnnotations();
         var declarer = DeclarerSyntax.Create(item, annotations, factory.MeansPublic);
-        var value = factory.GetValueSyntax(target.Right);
-
-        var result = DeclarationSyntax
-            .Create(declarer, value, Anchor.Create(target));
+        var value = factory.GetValueSyntax(target.Right!);
+        var result = DeclarationSyntax.Create(declarer, value!, Anchor.Create(target));
         return result;
     }
 

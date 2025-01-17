@@ -160,7 +160,7 @@ sealed class Root
 
         var result = rawResult
             .Code?
-            .GetLocalBlock(rawResult.Type!.GetCopier(Category.Code)?.Code!)
+            .GetLocalBlock(rawResult.Type!.GetCopier(Category.Code).Code!)
             .GetAlign();
 
         return new(result, rawResult.Issues.ToArray(), description);

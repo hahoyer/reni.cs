@@ -33,7 +33,7 @@ sealed class CompoundType
 
     IImplementation? ISymbolProvider<DumpPrintToken>.Feature => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
 
-    IImplementation IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable? tokenClass)
+    IImplementation? IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, true);
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
@@ -85,9 +85,9 @@ sealed class CompoundType
     internal override ContextBase ToContext => View.Context;
 
     [DisableDump]
-    internal override Issue[]? Issues => View.Issues;
+    internal override Issue[] Issues => View.Issues;
 
-    protected override Size GetSize() => View.CompoundViewSize;
+    protected override Size GetSize() => View.CompoundViewSize!;
 
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";

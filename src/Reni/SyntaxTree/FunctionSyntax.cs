@@ -59,7 +59,7 @@ sealed class FunctionSyntax : ValueSyntax
 
     protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
 
-    internal IMeta MetaFunctionFeature(CompoundView compoundView)
+    internal IMeta? MetaFunctionFeature(CompoundView compoundView)
     {
         if(!IsMetaFunction)
             return null;
@@ -68,7 +68,7 @@ sealed class FunctionSyntax : ValueSyntax
         return null;
     }
 
-    internal IFunction FunctionFeature(CompoundView compoundView)
+    internal IFunction? FunctionFeature(CompoundView compoundView)
     {
         if(IsMetaFunction)
             return null;

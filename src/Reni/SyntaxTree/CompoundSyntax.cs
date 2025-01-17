@@ -197,6 +197,6 @@ interface IStatementSyntax
     ValueSyntax Value { get; }
     DeclarerSyntax? Declarer { get; }
     SourcePart SourcePart { get; }
-    ValueSyntax? ToValueSyntax(Anchor anchor);
+    ValueSyntax ToValueSyntax(Anchor anchor);
     IStatementSyntax With(Anchor? frameItems);
 }

@@ -54,9 +54,9 @@ sealed class AlignType
     internal override int? GetSmartArrayLength(TypeBase elementType)
         => Parent.GetSmartArrayLength(elementType);
 
-    internal override Result? GetCopier(Category category) => Parent.GetCopier(category);
+    internal override Result GetCopier(Category category) => Parent.GetCopier(category);
 
-    internal override Result? GetTypeOperatorApply(Result argResult)
+    internal override Result GetTypeOperatorApply(Result argResult)
         => Parent.GetTypeOperatorApply(argResult);
 
     protected override string GetNodeDump() => base.GetNodeDump() + "(" + Parent.NodeDump + ")";

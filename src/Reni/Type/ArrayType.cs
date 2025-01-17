@@ -24,7 +24,7 @@ sealed class ArrayType
 {
     internal sealed class Options : DumpableObject
     {
-        internal static readonly string? DefaultOptionsId = Create().Data.Id;
+        internal static readonly string DefaultOptionsId = Create().Data.Id;
 
         public Flag IsMutable { get; }
         public Flag IsTextItem { get; }
@@ -207,7 +207,7 @@ sealed class ArrayType
         get { yield return Feature.Extension.Conversion(NoTextItemResult); }
     }
 
-    internal override Result? GetConstructorResult(Category category, TypeBase argumentsType)
+    internal override Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
         if(category == Category.None)
             return new(Category.None);

@@ -67,7 +67,7 @@ abstract class TypeBase
 
         [Node]
         [SmartNode]
-        internal readonly FunctionCache<string?, ArrayReferenceType> ArrayReferenceCache;
+        internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
 
         public CacheContainer(TypeBase parent)
         {
@@ -185,7 +185,7 @@ abstract class TypeBase
     internal IEnumerable<IConversion> SymmetricClosureConversions
         => new SymmetricClosureService(this).Results;
 
-    internal bool HasIssues => Issues?.Any() ?? false;
+    internal bool HasIssues => Issues.Any();
 
     public Size? SmartSize => Cache.Size.IsBusy? null : Size;
 
@@ -284,7 +284,7 @@ abstract class TypeBase
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
         => Root
-            .DefinedNames!
+            .DefinedNames
             .Where(IsDeclarationOption)
             .Select(item => item.Id)
             .OrderBy(item => item)
@@ -334,7 +334,7 @@ abstract class TypeBase
     [DisableDump]
     internal virtual TypeBase? Weaken => null;
 
-    internal virtual Issue[]? Issues => null;
+    internal virtual Issue[] Issues => [];
 
     protected virtual Size GetSize()
     {
@@ -357,9 +357,9 @@ abstract class TypeBase
     internal virtual Result GetCleanup(Category category)
         => GetVoidCodeAndRefs(category);
 
-    internal virtual Result? GetCopier(Category category) => GetVoidCodeAndRefs(category);
+    internal virtual Result GetCopier(Category category) => GetVoidCodeAndRefs(category);
 
-    internal virtual Result? GetTypeOperatorApply(Result argResult)
+    internal virtual Result GetTypeOperatorApply(Result argResult)
         => argResult
             .Type
             .ExpectNotNull(()
@@ -399,7 +399,7 @@ abstract class TypeBase
         }
     }
 
-    internal virtual Result GetInstanceResult(Category category, Func<Category, Result?> getRightResult)
+    internal virtual Result GetInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
         NotImplementedMethod(category, getRightResult(Category.All));
         return null!;
@@ -460,12 +460,12 @@ abstract class TypeBase
     internal ArrayType GetArray(int count, string? options = null)
         => Cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
 
-    internal ArrayReferenceType GetArrayReference(string? optionsId)
+    internal ArrayReferenceType GetArrayReference(string optionsId)
         => Cache.ArrayReferenceCache[optionsId];
 
     internal Result GetArrayCopier(Category category)
     {
-        GetCopier(category)?.IsEmpty.Assert();
+        GetCopier(category).IsEmpty.Assert();
         return GetVoidCodeAndRefs(category);
     }
 

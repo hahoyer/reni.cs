@@ -39,14 +39,14 @@ sealed class TerminalSyntax : ValueSyntax.NoChildren
 sealed class PrefixSyntax : ValueSyntax
 {
     [Node]
-    internal readonly ValueSyntax? Right;
+    internal readonly ValueSyntax Right;
 
     [Node]
     readonly IPrefix Prefix;
 
     readonly SourcePart Token;
 
-    public PrefixSyntax(IPrefix prefix, ValueSyntax? right, SourcePart token, Anchor brackets)
+    public PrefixSyntax(IPrefix prefix, ValueSyntax right, SourcePart token, Anchor brackets)
         : base(brackets)
     {
         Prefix = prefix;
@@ -63,17 +63,17 @@ sealed class PrefixSyntax : ValueSyntax
         => Prefix.GetResult(context, category, Right, Token);
 
     public static Result<ValueSyntax> Create
-        (IPrefix prefix, Result<ValueSyntax?> right, SourcePart token, Anchor brackets)
+        (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
         => new PrefixSyntax(prefix, right.Target, token, brackets).AddIssues<ValueSyntax>(right.Issues);
 }
 
 sealed class InfixSyntax : ValueSyntax
 {
     [Node]
-    internal readonly ValueSyntax? Left;
+    internal readonly ValueSyntax Left;
 
     [Node]
-    internal readonly ValueSyntax? Right;
+    internal readonly ValueSyntax Right;
 
     [Node]
     internal readonly IInfix Infix;
@@ -81,7 +81,7 @@ sealed class InfixSyntax : ValueSyntax
     [PublicAPI]
     internal readonly SourcePart Token;
 
-    public InfixSyntax(ValueSyntax? left, IInfix infix, ValueSyntax? right, SourcePart token, Anchor brackets)
+    public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, SourcePart token, Anchor brackets)
         : base(brackets)
     {
         Left = left;
@@ -105,7 +105,7 @@ sealed class InfixSyntax : ValueSyntax
 
     public static Result<ValueSyntax> Create
     (
-        Result<ValueSyntax?> left, IInfix infix, Result<ValueSyntax?> right, SourcePart token
+        Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, SourcePart token
         , Anchor brackets
     )
     {
@@ -122,7 +122,7 @@ interface IPendingProvider
 sealed class SuffixSyntax : ValueSyntax
 {
     [Node]
-    internal readonly ValueSyntax? Left;
+    internal readonly ValueSyntax Left;
 
     [Node]
     readonly ISuffix Suffix;
@@ -131,7 +131,7 @@ sealed class SuffixSyntax : ValueSyntax
     [EnableDump]
     readonly SourcePart Token;
 
-    internal SuffixSyntax(ValueSyntax? left, ISuffix suffix, SourcePart token, Anchor brackets)
+    internal SuffixSyntax(ValueSyntax left, ISuffix suffix, SourcePart token, Anchor brackets)
         : base(brackets)
     {
         Left = left;
@@ -149,7 +149,7 @@ sealed class SuffixSyntax : ValueSyntax
         => Suffix.GetResult(context, category, Left);
 
     public static Result<ValueSyntax> Create
-        (Result<ValueSyntax?> left, ISuffix suffix, SourcePart token, Anchor brackets)
+        (Result<ValueSyntax> left, ISuffix suffix, SourcePart token, Anchor brackets)
     {
         ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, token, brackets);
         return syntax.AddIssues(left.Issues);

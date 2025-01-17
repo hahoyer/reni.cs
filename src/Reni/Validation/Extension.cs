@@ -10,7 +10,7 @@ namespace Reni.Validation;
 
 static class Extension
 {
-    internal static string? GetMessage(this IssueId issueId, object[] additionalInformation)
+    internal static string GetMessage(this IssueId issueId, object[] additionalInformation)
     {
         switch(issueId)
         {
@@ -72,7 +72,7 @@ static class Extension
         }
 
         Dumpable.NotImplementedFunction(issueId, additionalInformation.Dump());
-        return default;
+        return default!;
     }
 
 

@@ -35,10 +35,10 @@ sealed class TypeType
             Value is ArrayReferenceType? Feature.Extension.Value(MutableReferenceResult) : null;
 
     IImplementation ISymbolProvider<Slash>.Feature
-        => Feature.Extension.MetaFeature(SlashResult);
+        => Feature.Extension.MetaFeature(SlashResult!);
 
     IImplementation ISymbolProvider<Star>.Feature
-        => Feature.Extension.MetaFeature(StarResult);
+        => Feature.Extension.MetaFeature(StarResult!);
 
     [DisableDump]
     internal override Root Root => Value.Root;
@@ -78,8 +78,7 @@ sealed class TypeType
         return type.GetResult(category);
     }
 
-    Result SlashResult
-        (Category category, ResultCache left, ContextBase context, ValueSyntax right)
+    Result SlashResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         var rightType = right
             .GetTypeBase(context)
@@ -89,14 +88,14 @@ sealed class TypeType
         if(rightType is not TypeType rightTypeType)
         {
             NotImplementedMethod(context, category, left, right, "rightType", rightType);
-            return null;
+            return null!;
         }
 
         var count = Value.GetSmartArrayLength(rightTypeType.Value);
         if(count == null)
         {
             NotImplementedMethod(context, category, left, right, "rightType", rightType);
-            return null;
+            return null!;
         }
 
         return Root.BitType.GetResult(category, BitsConst.Convert(count.Value));
