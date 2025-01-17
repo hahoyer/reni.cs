@@ -9,7 +9,7 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     internal readonly DeclarerSyntax? Declarer;
 
     [EnableDumpExcept(null)]
-    internal readonly ValueSyntax? Value;
+    internal readonly ValueSyntax Value;
 
     [DisableDump]
     internal string? NameOrNull => Declarer?.Name?.Value;
@@ -38,7 +38,7 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
         => CompoundSyntax.Create([this], null, anchor);
 
     [DisableDump]
-    ValueSyntax? IStatementSyntax.Value => Value;
+    ValueSyntax IStatementSyntax.Value => Value;
 
     IStatementSyntax IStatementSyntax.With(Anchor? anchor)
         => anchor == null || !anchor.Items.Any()
@@ -49,8 +49,6 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     {
         if(Declarer == null)
             yield return IssueId.MissingDeclarationDeclarer.GetIssue(Anchor.Main.SourcePart);
-        if(Value == null)
-            yield return IssueId.MissingDeclarationValue.GetIssue(Anchor.Main.SourcePart);
     }
 
     [DisableDump]

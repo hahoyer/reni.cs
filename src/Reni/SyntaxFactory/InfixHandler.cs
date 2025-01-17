@@ -73,8 +73,8 @@ sealed class InfixHandler : DumpableObject, IValueProvider
         public InfixErrorTokenClass(ITokenClass tokenClass)
             : base(IssueId.InvalidInfixExpression, tokenClass) { }
 
-        Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax? left, ValueSyntax? right)
-            => new(category, GetIssue(left.Anchor.SourcePart + right.Anchor.SourcePart));
+        Result IInfix.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
+            => new(category, GetIssue((left.Anchor.SourcePart + right.Anchor.SourcePart)!));
     }
 
     sealed class SuffixErrorTokenClass : InfixTypeErrorTokenClass, ISuffix

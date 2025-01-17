@@ -292,7 +292,7 @@ public sealed class Compiler
 
     ValueSyntax? GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
 
-    static ValueSyntax? GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
+    static ValueSyntax GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
 
     void AssertValidSyntaxLinkForBinaryTree()
     {

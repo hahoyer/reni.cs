@@ -282,7 +282,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump()))
             .CheckedReference
             .ExpectNotNull(() => (null, $"Type {Type!.DumpPrintText} is not a reference type."))
-            .Converter.GetResult(CompleteCategory)!
+            .Converter.GetResult(CompleteCategory)
             .ReplaceArguments(this);
 
     [DisableDump]
@@ -832,7 +832,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         var result = ((IConversion)Type.ExpectNotNull(() => (null, "Un requires type category:\n " + Dump())))
             .GetResult(CompleteCategory);
-        return result!.ReplaceArguments(this);
+        return result.ReplaceArguments(this);
     }
 
     internal Result GetSmartUn<T>()

@@ -36,7 +36,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 return;
             if(!item.IsLineSplitRight)
                 return;
-            item.RightNeighbor.SetPosition(Position.RightCoupling);
+            item.RightNeighbor!.SetPosition(Position.RightCoupling);
             if(item.Right.IsLineSplit && item.Right.FlatItem.TokenClass is IRightBracket)
                 return;
             item.Right.SetPosition(Position.IndentAll);
@@ -74,7 +74,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             if(last.Right != null)
                 list = T(list, T(last.Right)).ConcatMany().ToArray();
 
-            (((CompoundSyntax)list.First().FlatItem.Syntax).Statements.Length == list.Length).Assert();
+            (((CompoundSyntax)list.First().FlatItem.Syntax!).Statements.Length == list.Length).Assert();
 
             for(var index = 0; index < list.Length; index++)
             {
@@ -93,13 +93,13 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                         var positionParent = hasAdditionalLineSplit
                             ? Position.AfterListTokenWithAdditionalLineBreak
                             : Position.AfterListToken;
-                        node.RightNeighbor.SetPosition(positionParent);
+                        node.RightNeighbor!.SetPosition(positionParent);
                     }
 
                     if(hasAdditionalLineSplit && index > 0)
                     {
                         var neighbor = list[index - 1].RightNeighbor;
-                        (neighbor.LineBreakBehaviour == Position.AfterListToken //
+                        (neighbor!.LineBreakBehaviour == Position.AfterListToken //
                                 || neighbor.LineBreakBehaviour == Position.AfterListTokenWithAdditionalLineBreak)
                             .Assert();
                         neighbor.LineBreakBehaviour = Position.AfterListTokenWithAdditionalLineBreak;
@@ -127,7 +127,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         protected override void SetupPositions(BinaryTreeProxy[] targets)
         {
             var target = targets.Single();
-            target.RightNeighbor.SetPosition(Position.AfterColonToken);
+            target.RightNeighbor!.SetPosition(Position.AfterColonToken);
             if(target.Right.FlatItem.TokenClass is not IRightBracket)
                 target.Right.SetPosition(Position.IndentAll);
 
@@ -157,7 +157,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 item.SetPosition(Position.BeforeToken);
                 if(item.Right != null && item.Right.IsLineSplit)
                 {
-                    item.RightNeighbor.SetPosition(Position.LineBreak);
+                    item.RightNeighbor!.SetPosition(Position.LineBreak);
                     item.Right.SetPosition(Position.IndentAll);
                 }
             }
@@ -182,7 +182,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
                 return;
 
             target.SetPosition(Position.Function);
-            target.RightNeighbor.SetPosition(Position.LineBreak);
+            target.RightNeighbor!.SetPosition(Position.LineBreak);
             if(target.Right.FlatItem.TokenClass is not IRightBracket)
                 target.Right.SetPosition(Position.IndentAll);
         }
@@ -199,7 +199,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             if(target.Right == null)
                 return;
 
-            target.RightNeighbor.SetPosition(Position.LeftBracketInner);
+            target.RightNeighbor!.SetPosition(Position.LeftBracketInner);
             target.Right.SetPosition(Position.IndentAllAndForceLineSplit);
         }
     }
@@ -235,24 +235,24 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             var begin = left.Single();
             var end = right.Single();
 
-            begin.RightNeighbor.SetPosition(Position.Begin);
+            begin.RightNeighbor!.SetPosition(Position.Begin);
             var hasLineBreak = configuration.LineBreakAtEndOfText ?? end.FlatItem.WhiteSpaces.HasLineBreak;
             end.SetPosition(Position.End[hasLineBreak]);
             return;
         }
 
         left.First().SetPosition(Position.LeftBracketOuter);
-        left.Last().RightNeighbor.SetPosition(Position.LeftBracketInner);
+        left.Last().RightNeighbor!.SetPosition(Position.LeftBracketInner);
         left.Last().Right.SetPosition(Position.IndentAll);
         (!configuration.LineBreaksBeforeListToken).Assert();
 
         right.First().SetPosition(Position.RightBracketInner);
-        right.Last().RightNeighbor.SetPosition(Position.RightBracketOuter);
+        right.Last().RightNeighbor!.SetPosition(Position.RightBracketOuter);
     }
 
     static(BinaryTreeProxy[], BinaryTreeProxy[], BinaryTreeProxy[]) SplitFrame(BinaryTreeProxy target)
     {
-        var anchors = target.FlatItem.Syntax.Anchor.Items.Select(target.Convert).ToArray();
+        var anchors = target.FlatItem.Syntax!.Anchor.Items.Select(target.Convert).ToArray();
         var left = anchors.TakeWhile(item => item.FlatItem.TokenClass is ILeftBracket).ToArray();
         var center = anchors.Skip(left.Length).Take(anchors.Length - 2 * left.Length).ToArray();
         var right = anchors.Skip(left.Length + center.Length).ToArray();
@@ -267,7 +267,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
         var syntax = target.Syntax;
         syntax.AssertIsNotNull(() => "Syntax link should be set.");
 
-        if(target != syntax.MainAnchor)
+        if(target != syntax!.MainAnchor)
             return null;
 
         if(target.Left == null && target.Right == null)
@@ -286,7 +286,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
             case PrefixSyntax:
             case SuffixSyntax:
             case TerminalSyntax:
-                return !HasBrackets(syntax) && target.Parent.Syntax.MainAnchor.Formatter is ITrainWreckPart
+                return !HasBrackets(syntax) && target.Parent!.Syntax!.MainAnchor.Formatter is ITrainWreckPart
                     ? TrainWreckPart.Instance
                     : TrainWreck.Instance;
             case DeclarationSyntax:
@@ -309,7 +309,7 @@ abstract class Formatter : DumpableObject, BinaryTree.IFormatter
     }
 
     static bool HasBrackets(IItem flatItem)
-        => flatItem?.Anchor?.Items?.FirstOrDefault()?.TokenClass is LeftParenthesis;
+        => flatItem?.Anchor.Items.FirstOrDefault()?.TokenClass is LeftParenthesis;
 
     static Formatter CreateCompound(CompoundSyntax compound)
         => compound.CleanupSection == null? FlatCompound.Instance :

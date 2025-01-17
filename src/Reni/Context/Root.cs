@@ -76,7 +76,7 @@ sealed class Root
     internal override string ContextIdentificationDump => "r";
 
     static ContextMetaFunction GetCreateArrayFeature(bool isMutable) => new(
-        (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)
+        (context, category, argsType) => context.CreateArrayResult(category, argsType!, isMutable)
     );
 
     IImplementation GetMinusFeature()

@@ -31,63 +31,55 @@ sealed class SymmetricClosureService
 
     static readonly INavigator Forward = new ForwardNavigator();
     static readonly INavigator Backward = new BackwardNavigator();
-    readonly INavigator Navigator;
 
+    readonly INavigator Navigator;
     readonly TypeBase Source;
     readonly ValueCache<IEnumerable<IConversion>> ResultsCache;
-    IEnumerable<IConversion>? AllFeatures;
-    List<TypeBase>? FoundTypes;
-    List<IConversion>? NewFeatures;
+    readonly ValueCache<IEnumerable<IConversion>> AllFeatures;
     internal IEnumerable<IConversion> Results => ResultsCache.Value;
 
     internal SymmetricClosureService(TypeBase source, INavigator? navigator = null)
     {
         Navigator = navigator ?? Forward;
         Source = source;
+        AllFeatures = new(() => Source
+            .SymmetricFeatureClosure()
+            .ToArray());
         ResultsCache = new(Execute);
     }
 
     internal static IEnumerable<IConversion> To(TypeBase source)
         => new SymmetricClosureService(source, Backward).Results;
 
-    IEnumerable<IConversion> Combination(INavigator navigator, IConversion? startFeature = null)
+    IEnumerable<IConversion> Combination(List<TypeBase> foundTypes, IConversion? startFeature = null)
     {
-        var startType = Source;
-        if(startFeature != null)
-            startType = navigator.End(startFeature);
+        var startType = startFeature == null? Source : Navigator.End(startFeature);
 
-        foreach(var feature in AllFeatures.Where(feature => navigator.Start(feature) == startType))
+        foreach(var feature in AllFeatures.Value.Where(feature => Navigator.Start(feature) == startType))
         {
-            var destination = navigator.End(feature);
-            if(FoundTypes!.Contains(destination))
+            var destination = Navigator.End(feature);
+            if(foundTypes.Contains(destination))
                 continue;
-            FoundTypes.Add(destination);
-            var newFeature = navigator.Combine(startFeature, feature);
+            foundTypes.Add(destination);
+            var newFeature = Navigator.Combine(startFeature, feature);
             if(newFeature == null)
                 continue;
             yield return newFeature;
-            NewFeatures!.Add(newFeature);
         }
     }
 
     IEnumerable<IConversion> Execute()
     {
-        FoundTypes = [];
-        NewFeatures = [];
+        var results = new List<IConversion>();
+        var foundTypes = new List<TypeBase>();
+        var newFeatures = Combination(foundTypes).ToArray();
 
-        AllFeatures = Source
-            .SymmetricFeatureClosure()
-            .ToArray();
-
-        foreach(var feature in Combination(Navigator))
-            yield return feature;
-
-        while(NewFeatures.Any())
+        while(newFeatures.Any())
         {
-            var features = NewFeatures;
-            NewFeatures = [];
-            foreach(var feature in features.SelectMany(f => Combination(Navigator, f)))
-                yield return feature;
+            results.AddRange(newFeatures);
+            newFeatures = newFeatures.SelectMany(conversion => Combination(foundTypes, conversion)).ToArray();
         }
+
+        return results.ToArray();
     }
 }

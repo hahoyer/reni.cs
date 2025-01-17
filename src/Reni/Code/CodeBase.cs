@@ -28,7 +28,7 @@ abstract class CodeBase
     internal bool HasArguments => Visit(new HasArgumentVisitor());
 
     [DisableDump]
-    internal TypeBase ArgumentType => Visit(new ArgumentTypeVisitor());
+    internal TypeBase? ArgumentType => Visit(new ArgumentTypeVisitor());
 
     internal static CodeBase Void => BitArray.Void;
 

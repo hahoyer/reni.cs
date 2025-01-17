@@ -39,7 +39,7 @@ sealed class CompoundSyntax : ValueSyntax
         => Statements
             .Select((statement, index) => (Key: statement.Declarer?.Name?.Value, Value: index))
             .Where(pair => pair.Key != null)
-            .ToDictionary(item => item.Key, item => item.Value);
+            .ToDictionary(item => item.Key!, item => item.Value);
 
     [EnableDump(Order = 100)]
     internal int[] MutableDeclarations => GetIndexList(item => item.IsMutableSyntax).ToArray();
@@ -59,13 +59,13 @@ sealed class CompoundSyntax : ValueSyntax
     [DisableDump]
     internal string[] AllNames => Statements
         .Select(s => s.Declarer?.Name?.Value)
-        .Where(name => name != null)
+        .OfType<string>()
         .ToArray();
 
     [DisableDump]
     internal int[] ConverterStatementPositions
         => Statements
-            .SelectMany((s, i) => s.Declarer.IsConverterSyntax? new[] { i } : new int[0])
+            .SelectMany((s, i) => s.Declarer?.IsConverterSyntax == true? new[] { i } : new int[0])
             .ToArray();
 
     CompoundSyntax(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
@@ -120,7 +120,7 @@ sealed class CompoundSyntax : ValueSyntax
         var newCleanupSection
             = cleanupSection == null
                 ? CleanupSection
-                : new(cleanupSection, CleanupSection.Anchor);
+                : new(cleanupSection, CleanupSection!.Anchor);
 
         return Create(newStatements, newCleanupSection, Anchor);
     }
@@ -194,7 +194,7 @@ sealed class CompoundSyntax : ValueSyntax
 
 interface IStatementSyntax
 {
-    ValueSyntax? Value { get; }
+    ValueSyntax Value { get; }
     DeclarerSyntax? Declarer { get; }
     SourcePart SourcePart { get; }
     ValueSyntax? ToValueSyntax(Anchor anchor);

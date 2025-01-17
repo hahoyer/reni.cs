@@ -29,7 +29,7 @@ abstract class TypeBase
 
         [Node]
         [SmartNode]
-        public readonly FunctionCache<int, FunctionCache<string?, ArrayType>> Array;
+        public readonly FunctionCache<int, FunctionCache<string, ArrayType>> Array;
 
         [Node]
         [SmartNode]
@@ -384,7 +384,7 @@ abstract class TypeBase
 
     protected virtual ArrayType GetArrayForCache(int count, string optionsId) => new(this, count, optionsId);
 
-    internal virtual Result? GetConstructorResult(Category category, TypeBase argumentsType)
+    internal virtual Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
         StartMethodDump(false, category, argumentsType);
         try

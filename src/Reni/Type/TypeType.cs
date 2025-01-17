@@ -25,12 +25,12 @@ sealed class TypeType
         StopByObjectIds(-61);
     }
 
-    IImplementation ISymbolProvider<ArrayReference>.Feature
+    IImplementation? ISymbolProvider<ArrayReference>.Feature
         => Value is ArrayType? Feature.Extension.Value(ArrayReferenceResult) : null;
 
     IImplementation ISymbolProvider<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
 
-    IImplementation ISymbolProvider<Mutable>.Feature
+    IImplementation? ISymbolProvider<Mutable>.Feature
         => Value is ArrayType? Feature.Extension.Value(MutableArrayResult) :
             Value is ArrayReferenceType? Feature.Extension.Value(MutableReferenceResult) : null;
 
@@ -59,7 +59,7 @@ sealed class TypeType
             return Value.GetResult(category | Category.Type);
         var constructorResult = Value
             .GetConstructorResult(category, getRightResult(Category.Type).Type!);
-        return constructorResult?.ReplaceArguments(getRightResult);
+        return constructorResult.ReplaceArguments(getRightResult);
     }
 
     new Result GetDumpPrintTokenResult(Category category)

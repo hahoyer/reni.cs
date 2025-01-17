@@ -55,7 +55,7 @@ static class Extension
         => MetaFunctionCache[function];
 
     internal static TypeBase ResultType(this IConversion conversion)
-        => conversion.GetResult(Category.Type)!.Type;
+        => conversion.GetResult(Category.Type).Type!;
 
     internal static Result GetResult(this IConversion conversion, Category category)
     {

@@ -10,8 +10,6 @@ sealed class BinaryTreeProxy
         , ValueCache.IContainer
         , BinaryTree.IPositionTarget
 {
-    static readonly BinaryTreeProxy YetUnknown = new();
-
     [DisableDump]
     public readonly Configuration Configuration;
 
@@ -87,11 +85,11 @@ sealed class BinaryTreeProxy
 
     [EnableDump(Order = 4)]
     [EnableDumpExcept(null)]
-    internal BinaryTreeProxy Left => DirectChildren == null? YetUnknown : DirectChildren[0];
+    internal BinaryTreeProxy Left => DirectChildren[0];
 
     [EnableDump(Order = 5)]
     [EnableDumpExcept(null)]
-    internal BinaryTreeProxy Right => DirectChildren == null? YetUnknown : DirectChildren[1];
+    internal BinaryTreeProxy Right => DirectChildren[1];
 
     ISourcePartEdit[] AnchorEdits
         => WhiteSpaces
@@ -117,9 +115,6 @@ sealed class BinaryTreeProxy
         StopByObjectIds();
     }
 
-    BinaryTreeProxy()
-        : base(null, null) { }
-
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
@@ -131,7 +126,7 @@ sealed class BinaryTreeProxy
     bool GetIsLineSplit()
     {
         if(FlatItem.TokenClass is ILeftBracket)
-            return Parent.IsLineSplit;
+            return Parent!.IsLineSplit;
         return HasAlreadyLineBreakOrIsTooLong || ForceLineSplit || HasLineBreaksBySyntax;
     }
 

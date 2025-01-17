@@ -26,7 +26,7 @@ sealed class CompoundContext : Child, IMultiSymbolProviderForPointer<Definable>,
 
     int IContextReference.Order => Order;
 
-    IImplementation IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable? tokenClass)
+    IImplementation? IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, false);
 
     protected override string ContextChildIdentificationDump => GetCompoundIdentificationDump();

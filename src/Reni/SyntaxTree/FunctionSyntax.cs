@@ -8,7 +8,7 @@ namespace Reni.SyntaxTree;
 sealed class FunctionSyntax : ValueSyntax
 {
     [EnableDumpExcept(null)]
-    internal ValueSyntax? Getter { get; }
+    internal ValueSyntax Getter { get; }
 
     [EnableDump]
     [EnableDumpExcept(false)]
@@ -28,7 +28,8 @@ sealed class FunctionSyntax : ValueSyntax
         ValueSyntax? setter,
         bool isImplicit,
         bool isMetaFunction,
-        ValueSyntax? getter, Anchor anchor
+        ValueSyntax getter,
+        Anchor anchor
     )
         : base(anchor)
     {

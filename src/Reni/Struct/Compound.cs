@@ -258,13 +258,13 @@ sealed class Compound
     {
         var statement = Syntax.PureStatements[position];
         // if there is no statement (f.i. because of errors) it is granted to be hollow.
-        return statement == null? true : statement.IsHollow;
+        return statement.IsHollow;
     }
 
     internal Result Cleanup(Category category)
     {
         var uniqueChildContext = Parent.GetCompoundPositionContext(Syntax);
-        var cleanup = Syntax.GetCleanup(uniqueChildContext, category)!;
+        var cleanup = Syntax.GetCleanup(uniqueChildContext, category);
         var aggregate = EndPosition
             .Select()
             .Reverse()
@@ -276,7 +276,7 @@ sealed class Compound
 
     Result GetCleanup(Category category, int index)
     {
-        var result = AccessType(EndPosition, index).GetCleanup(category)!;
+        var result = AccessType(EndPosition, index).GetCleanup(category);
         result.CompleteCategory.Contains(category).Assert();
         return result;
     }

@@ -40,7 +40,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
         var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).Single();
         var startAddress = (StartAddress + leftSize + rightSize - size).ToInt();
         var element = FormalValueAccess.BitArrayBinaryOp
-            (opToken, formalLeftSubValue, formalRightSubValue);
+            (opToken, formalLeftSubValue!, formalRightSubValue!);
         SetFormalValues(element, startAddress, size);
     }
 
@@ -52,7 +52,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
         var formalSubValue = GetInputValuesFromData(significantSize).Single();
         var startAddress = (StartAddress + targetSize - size).ToInt();
         var element = FormalValueAccess.BitCast
-            (formalSubValue, (size - significantSize).ToInt());
+            (formalSubValue!, (size - significantSize).ToInt());
         SetFormalValues(element, startAddress, size);
     }
 
@@ -67,7 +67,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
     {
         var formalSubValues = PullInputValuesFromData(argsAndRefsSize);
         var startAddress = (StartAddress + argsAndRefsSize - size).ToInt();
-        var element = FormalValueAccess.Call(formalSubValues, functionId);
+        var element = FormalValueAccess.Call(formalSubValues!, functionId);
         SetFormalValues(element, startAddress, size);
     }
 
@@ -75,7 +75,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
     {
         var formalSubValue = PullInputValuesFromData(RefSize).Single();
         var startAddress = (StartAddress + RefSize - size).ToInt();
-        var element = FormalValueAccess.Dereference(formalSubValue);
+        var element = FormalValueAccess.Dereference(formalSubValue!);
         SetFormalValues(element, startAddress, dataSize);
     }
 
@@ -99,7 +99,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
     {
         var formalSubValue = PullInputValuesFromData(RefSize).Single();
         var startAddress = StartAddress.ToInt();
-        var element = FormalValueAccess.RefPlus(formalSubValue, right.ToInt());
+        var element = FormalValueAccess.RefPlus(formalSubValue!, right.ToInt());
         SetFormalValues(element, startAddress, RefSize);
     }
 
@@ -110,7 +110,7 @@ sealed class FormalMachine : DumpableObject, IVisitor
     {
         var source = GetInputValuesFromData(offset, dataSize).Single();
         var startAddress = (StartAddress - size).ToInt();
-        SetFormalValues(source, startAddress, dataSize);
+        SetFormalValues(source!, startAddress, dataSize);
     }
 
     void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
@@ -180,9 +180,9 @@ sealed class FormalMachine : DumpableObject, IVisitor
         return FormalValueAccess.Transpose(accesses.ToArray());
     }
 
-    IFormalValue[] PullInputValuesFromData(Size offset, Size inputSize)
+    IFormalValue?[] PullInputValuesFromData(Size offset, Size inputSize)
     {
-        var accesses = new List<FormalValueAccess>();
+        var accesses = new List<FormalValueAccess?>();
         var start = (StartAddress + offset).ToInt();
         for(var i = 0; i < inputSize.ToInt(); i++)
         {
@@ -193,18 +193,18 @@ sealed class FormalMachine : DumpableObject, IVisitor
         return FormalValueAccess.Transpose(accesses.ToArray());
     }
 
-    IFormalValue[] GetInputValuesFromData(Size inputSize) => GetInputValuesFromData(Size.Zero, inputSize);
+    IFormalValue?[] GetInputValuesFromData(Size inputSize) => GetInputValuesFromData(Size.Zero, inputSize);
 
-    IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
+    IFormalValue?[] GetInputValuesFromData(Size offset, Size inputSize)
     {
-        var accesses = new List<FormalValueAccess>();
+        var accesses = new List<FormalValueAccess?>();
         var start = (StartAddress + offset).ToInt();
         for(var i = 0; i < inputSize.ToInt(); i++)
             accesses.Add(Data[i + start]);
         return FormalValueAccess.Transpose(accesses.ToArray());
     }
 
-    IFormalValue[] PullInputValuesFromData(Size inputSize) => PullInputValuesFromData(Size.Zero, inputSize);
+    IFormalValue?[] PullInputValuesFromData(Size inputSize) => PullInputValuesFromData(Size.Zero, inputSize);
 
     void ResetInputValuesOfData(Size inputSize)
     {

@@ -10,7 +10,7 @@ sealed class CondSyntax : ValueSyntax
 {
     [Node]
     [EnableDump]
-    readonly ValueSyntax? Cond;
+    readonly ValueSyntax Cond;
 
     [Node]
     [EnableDump]
@@ -21,7 +21,7 @@ sealed class CondSyntax : ValueSyntax
     readonly ValueSyntax? Then;
 
     internal CondSyntax
-        (ValueSyntax? condSyntax, ValueSyntax? thenSyntax, ValueSyntax? elseSyntax, Anchor anchor)
+        (ValueSyntax condSyntax, ValueSyntax? thenSyntax, ValueSyntax? elseSyntax, Anchor anchor)
         : base(anchor)
     {
         Cond = condSyntax;

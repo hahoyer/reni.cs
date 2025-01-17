@@ -6,9 +6,9 @@ namespace Reni.SyntaxTree;
 
 sealed class EmptyList : ValueSyntax.NoChildren
 {
-    readonly Issue Issue;
+    readonly Issue? Issue;
 
-    public EmptyList(Anchor anchor, Issue issue = null)
+    public EmptyList(Anchor anchor, Issue? issue = null)
         : base(anchor)
     {
         Issue = issue;

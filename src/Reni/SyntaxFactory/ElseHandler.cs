@@ -20,7 +20,7 @@ sealed class ElseHandler : DumpableObject, IValueProvider
 
         return new CondSyntax
         (
-            factory.GetValueSyntax(condTarget)
+            factory.GetValueSyntax(condTarget)!
             , factory.GetValueSyntax(thenTarget)
             , factory.GetValueSyntax(target.Right)
             , Anchor.Create(thenAnchor, target).Combine(frameItems)

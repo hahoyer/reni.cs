@@ -169,7 +169,7 @@ sealed class DeclarerSyntax : DumpableObject
 
         return new
         (
-            tags.Where(tag=>tag.Value != null).Select(GetTagSyntax).OfType<TagSyntax>().ToArray()
+            tags.Where(tag=>tag.Value != null).Select(GetTagSyntax).ToArray()
             , nameSyntax
             , issueSyntax
             , meansPublic
@@ -179,7 +179,7 @@ sealed class DeclarerSyntax : DumpableObject
     static NameSyntax? GetNameSyntax(BinaryTree? name)
         => name == null? null : new NameSyntax(name.Token.Id, Anchor.Create(name));
 
-    static TagSyntax? GetTagSyntax(Annotation target)
+    static TagSyntax GetTagSyntax(Annotation target)
     {
         var tag = target.Value!;
         var tagToken = tag.TokenClass as DeclarationTagToken;

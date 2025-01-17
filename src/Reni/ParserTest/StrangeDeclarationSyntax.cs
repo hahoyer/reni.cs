@@ -22,8 +22,6 @@ public sealed class StrangeDeclarationSyntax : CompilerTest
     {
         var issueArray = issues.ToArray();
         var i = 0;
-        (issueArray[i].IssueId == IssueId.MissingDeclarationValue).Assert(issueArray[i].Dump);
-        i++;
         (issueArray[i].IssueId == IssueId.InvalidDeclaration).Assert(issueArray[i].Dump);
         i++;
         (i == issueArray.Length).Assert();

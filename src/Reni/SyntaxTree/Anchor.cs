@@ -31,7 +31,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         Items = items
             .OfType<BinaryTree>()
             .Distinct()
-            .OrderBy(item => item!.Token.Position)
+            .OrderBy(item => item.Token.Position)
             .ToArray();
 
         Items.Any().Assert();
