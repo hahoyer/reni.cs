@@ -5,25 +5,35 @@ namespace Reni.TokenClasses.Whitespace;
 static class Extension
 {
     static( (WhiteSpaceItem[] Head, WhiteSpaceItem? Main)[] Items, WhiteSpaceItem[] Tail) SplitAndTail
-        (this IEnumerable<WhiteSpaceItem> items, Func<WhiteSpaceItem, bool> tailCondition)
+    (
+        this IEnumerable<WhiteSpaceItem> items,
+        Func<WhiteSpaceItem, bool> tailCondition
+    )
     {
         items.AssertIsNotNull();
         if(!items.Any())
-            return ([], []);
+            return (Items: [], Tail: []);
 
         var result = items.Split(tailCondition, LinqExtension.SeparatorTreatmentForSplit.EndOfSubList)
-            .Select(items => items.ToArray().SplitMore(tailCondition))
-            .ToArray()
-            .SplitMore(item => item.Item2 == default);
+            .Select(items1 => items1.ToArray().SplitToÍtemsAndTail(tailCondition))
+            .SplitToÍtemsAndTail(item => item.Tail == default, ([], null));
 
-        var tail = result.Item2.Item1 ?? [];
-        return (Items: result.Item1, Tail: tail);
+        var tail = result.Tail.Items;
+        return (result.Items, Tail: tail);
     }
 
-    static(TItem[], TItem?) SplitMore<TItem>(this TItem[] items, Func<TItem, bool> tailCondition)
+    static(TItem[] Items, TItem? Tail) SplitToÍtemsAndTail<TItem>
+    (
+        this IEnumerable<TItem> items1, Func<TItem, bool> tailCondition,
+        TItem? defaultValue = default
+    )
     {
+        var items = items1.ToArray();
         var last = items.Last();
-        return tailCondition(last)? (items.Take(items.Length - 1).ToArray(), last) : (items, default);
+
+        return tailCondition(last)
+            ? (Items: items[..^1], Tail: last)
+            : (Items: items, Tail: defaultValue);
     }
 
     static
@@ -33,10 +43,12 @@ static class Extension
         SplitAndTail(IEnumerable<WhiteSpaceItem> allItems)
     {
         var groups = allItems.SplitAndTail(CommentTailCondition);
-        var comments = groups.Items.Select(item => (Lines: item.Head.SplitAndTail(LineBreakTailCondition), item.Main))
+        var comments = groups
+            .Items
+            .Select(item => (Lines: item.Head.SplitAndTail(LineBreakTailCondition), item.Main))
             .ToArray();
         var tailLines = groups.Tail.SplitAndTail(LineBreakTailCondition);
-        return (comments, tailLines);
+        return (Comments: comments, TailLines: tailLines);
     }
 
 

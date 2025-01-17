@@ -9,14 +9,10 @@ abstract class VariantListType : DumpableObject, IItemsType, IItemType
         var sourcePosition = sourcePart.Start.Clone;
         while(sourcePosition < sourcePart.End)
         {
-            var valueTuples = VariantPrototypes
+            var result = VariantPrototypes
                 .Select(p => (p.Type, Length: sourcePosition.Span(sourcePart.End).Match(p.Match)))
-                .ToArray();
-            var result = valueTuples
-                .FirstOrDefault(p => p.Length != null);
+                .First(p => p.Length != null);
 
-            result.AssertIsNotNull();
-            result.Length.AssertIsNotNull();
             (result.Length == 0).ConditionalBreak();
 
             var resultingSourcePart = sourcePosition.Span(T(result.Length!.Value, sourcePart.EndPosition).Min());
