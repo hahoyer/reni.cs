@@ -10,16 +10,18 @@ public sealed class EnumDevelop : DependenceProvider
     [UnitTest]
     public void Start()
     {
-        const string text = @"Auswahl: @
-{
-  Ja: (Type: ^^, Value: ""Ja""),
-  Nein: (Type: ^^, Value: ""Nein""),
-  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
-};
+        const string text = """
+                            Auswahl: @
+                            {
+                              Ja: (Type: ^^, Value: "Ja"),
+                              Nein: (Type: ^^, Value: "Nein"),
+                              Vielleicht: (Type: ^^, Value: "Vielleicht")
+                            };
 
-x: Auswahl Ja;
-x = Auswahl Nein then ""No match"" dumpprint
-";
+                            x: Auswahl Ja;
+                            x = Auswahl Nein then "No match" dumpprint
+
+                            """;
         var compiler = CompilerBrowser.FromText(text);
         var issues = compiler.Issues.ToArray();
 
@@ -40,16 +42,19 @@ x = Auswahl Nein then ""No match"" dumpprint
     [UnitTest]
     public void DumpPrintCorrected()
     {
-        const string text = @"Auswahl: @
-{
-  Ja: (Type: ^^, Value: ""Ja""),
-  Nein: (Type: ^^, Value: ""Nein""),
-  Vielleicht: (Type: ^^, Value: ""Vielleicht"")
-};
+        const string text =
+            """
+            Auswahl: @
+            {
+              Ja: (Type: ^^, Value: "Ja"),
+              Nein: (Type: ^^, Value: "Nein"),
+              Vielleicht: (Type: ^^, Value: "Vielleicht")
+            };
 
-x: Auswahl Ja;
-x = Auswahl Nein then ""No match"" dump_print
-";
+            x: Auswahl Ja;
+            x = Auswahl Nein then "No match" dump_print
+
+            """;
         var compiler = CompilerBrowser.FromText(text);
         var issues = compiler.Issues.ToArray();
 
@@ -67,17 +72,20 @@ x = Auswahl Nein then ""No match"" dump_print
     [UnitTest]
     public void Corrected()
     {
-        const string text = @"Auswahl: @!
-  {
-Ja!public : (Type: ^^, Value: ""Ja""),
-Nein!public  : (Type: ^^, Value: ""Nein""),
-Vielleicht!public  : (Type: ^^, Value: ""Vielleicht"")
-};
+        const string text =
+            """
+            Auswahl: @!
+              {
+            Ja!public : (Type: ^^, Value: "Ja"),
+            Nein!public  : (Type: ^^, Value: "Nein"),
+            Vielleicht!public  : (Type: ^^, Value: "Vielleicht")
+            };
 
-x: Auswahl Ja;
-x == Auswahl Ja then ""Match"" dump_print;
-x == Auswahl Nein then ""No match"" dump_print
-";
+            x: Auswahl Ja;
+            x == Auswahl Ja then "Match" dump_print;
+            x == Auswahl Nein then "No match" dump_print
+
+            """;
         var compiler = CompilerBrowser.FromText(text);
         var issues = compiler.Issues.ToArray();
 
@@ -88,15 +96,18 @@ x == Auswahl Nein then ""No match"" dump_print
 }
 
 [UnitTest]
-[TargetSet(@"Auswahl: @!
-  {
-Ja!public : (Type: ^^, Value: ""Ja""),
-Nein!public  : (Type: ^^, Value: ""Nein""),
-Vielleicht!public  : (Type: ^^, Value: ""Vielleicht"")
-};
+[TargetSet(
+    """
+    Auswahl: @!
+      {
+    Ja!public : (Type: ^^, Value: "Ja"),
+    Nein!public  : (Type: ^^, Value: "Nein"),
+    Vielleicht!public  : (Type: ^^, Value: "Vielleicht")
+    };
 
-x: Auswahl Ja;
-x == Auswahl Ja then ""Match"" dump_print;
-x == Auswahl Nein then ""No match"" dump_print",
+    x: Auswahl Ja;
+    x == Auswahl Ja then "Match" dump_print;
+    x == Auswahl Nein then "No match" dump_print
+    """,
     "MatchNo match")]
 public sealed class EnumExample : CompilerTest;
