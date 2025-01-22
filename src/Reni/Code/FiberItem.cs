@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Reni.Basics;
+﻿using Reni.Basics;
 
 namespace Reni.Code;
 
