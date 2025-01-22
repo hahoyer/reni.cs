@@ -4,7 +4,7 @@
   </PropertyGroup>
   <Import Project="sys.targets" />
   <ItemGroup>
-    <PackageReference Include="hw.CompilerTools" Version="25.0.0.9" />
+    <PackageReference Include="hw.CompilerTools" Version="25.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Reni\Reni.csproj" />

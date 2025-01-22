@@ -29,9 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="hw.CompilerTools" Version="25.0.0.9" />
+    <PackageReference Include="hw.CompilerTools" Version="25.0.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
     <PackageReference Include="Microsoft.VisualStudio.Extensibility" Version="17.12.2051" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
