@@ -1,0 +1,26 @@
+﻿systemdata:
+    {
+    Memory: 
+        ((0 type *(125)) mutable) instance();
+
+    FreePointer !(mutable, public) : 
+        Memory array_reference mutable;
+    };
+
+system:
+    {
+    NewMemory!public : 
+        @
+        {
+        result!public :
+            (((^ elementType) * 1) array_reference mutable)
+                instance(systemdata FreePointer enable_reinterpretation).
+
+        initializer: 
+            ^ initializer.
+
+            result(0) := initializer(0).
+            result(1) := initializer(1).
+        }
+        result
+    };

@@ -1,0 +1,23 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#
+    var title = "Command line tool";
+    var product = "Reni Compiler";
+    var company = "HoyerWare";
+    var now = DateTime.Now;
+    var major = now.Year-2000;
+    var minor = 0;
+    var build = $"{now:MMdd}";
+    var revision = $"{now:HHmm}";
+    var versionString = $"{major}.{minor}";
+    var fileVersionString = $"{major}.{minor}.{build}.{revision}";
+#>
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+[assembly: AssemblyVersion("<#=versionString #>")]
+[assembly: AssemblyFileVersion("<#=fileVersionString #>")]
+[assembly: AssemblyTitle("<#=product #>: <#=title #>")]
+[assembly: AssemblyCompany("<#=company #>")]
+[assembly: AssemblyProduct("<#=product #>")]
+[assembly: AssemblyCopyright("Copyright © Harald Hoyer <#=DateTime.Today.ToString("yyyy") #>")]
