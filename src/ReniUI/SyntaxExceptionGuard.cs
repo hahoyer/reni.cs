@@ -1,31 +1,34 @@
+using ReniUI.Helper;
+
 namespace ReniUI;
 
-sealed class SyntaxExceptionGuard : GuiExceptionGuard<Helper.Syntax>
+sealed class SyntaxExceptionGuard : GuiExceptionGuard<Syntax>
 {
-	public SyntaxExceptionGuard(CompilerBrowser parent)
-		: base(parent) { }
+    public SyntaxExceptionGuard(CompilerBrowser parent)
+        : base(parent) { }
 
-	protected override string GetTestCode(string folderName) => @$"
-using hw.UnitTest;
-using Reni.FeatureTest.Helper;
-using Reni.Validation;
+    protected override string GetTestCode(string folderName) =>
+        $$"""
+          using hw.UnitTest;
+          using Reni.FeatureTest.Helper;
+          using Reni.Validation;
 
-namespace ReniUI.Generated.{folderName};
+          namespace ReniUI.Generated.{{folderName}};
 
-[UnitTest]
-public sealed class Test : CompilerTest
-{{
-    protected override string Target => (SmbFile.SourceFolder / ""Test.reni"").String;
+          [UnitTest]
+          public sealed class Test : CompilerTest
+          {
+              protected override string Target => (SmbFile.SourceFolder / "Test.reni").String;
 
-    protected override void Run()
-    {{
-        base.Run<()>()
-}}
-";
+              protected override void Run()
+              {
+                  base.Run<()>()
+          }
+          """;
 
-	public override Helper.Syntax OnException(Exception exception)
-	{
-		CreateDiscriminatingTest(exception);
-		return default;
-	}
+    public override Syntax OnException(Exception exception)
+    {
+        CreateDiscriminatingTest(exception);
+        return default;
+    }
 }

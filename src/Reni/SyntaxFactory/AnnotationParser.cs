@@ -71,5 +71,5 @@ static class AnnotationParser
         target[0].Anchors = T(target[0].Anchors, anchors).ConcatMany().ToArray();
     }
 
-    public static TValue[] T<TValue>(params TValue[] value) => value;
+    static TValue[] T<TValue>(params TValue[] value) => value;
 }
