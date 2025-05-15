@@ -1,4 +1,5 @@
 using hw.Scanner;
+using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -12,7 +13,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     readonly string? ReasonForEmptiness;
 
     [DisableDump]
-    internal SourcePart[] SourceParts => Items.SourceParts();
+    internal SourcePart[] SourceParts => Items.GetSourceParts();
 
     [DisableDump]
     internal SourcePart SourcePart => SourceParts.Combine()!;
@@ -26,6 +27,8 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     [DisableDump]
     internal BinaryTree Main => this.CachedValue(GetMain);
 
+    public Root Root => Main.Root;
+
     Anchor(params BinaryTree?[] items)
     {
         Items = items
@@ -35,6 +38,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
             .ToArray();
 
         Items.Any().Assert();
+        Items.GetRoot().AssertIsNotNull();
         Main.AssertIsNotNull();
     }
 
@@ -72,6 +76,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     internal static Anchor Create(BinaryTree? leftAnchor)
         => new(leftAnchor.AssertNotNull());
 
+    internal static Anchor CreateFromKnown(params BinaryTree?[] items) => new(items);
     internal static Anchor Create(params BinaryTree?[] items) => new(items);
 
     internal static Anchor? CheckedCreate(BinaryTree?[]? items)
@@ -96,10 +101,10 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
         => Items
             .Single(node => Items.All(parent => !node.HasAsParent(parent)));
 
-    public void SetSyntax(Syntax syntax)
+    public void SetSyntax(Syntax syntax, Root root)
     {
         foreach(var item in Items)
-            item.SetSyntax(syntax);
+            item.SetSyntax(syntax, root);
     }
 
     public static Anchor CreateAll(BinaryTree? target)

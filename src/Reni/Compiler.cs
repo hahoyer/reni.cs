@@ -283,6 +283,12 @@ public sealed class Compiler
         return new(new(fileName.ToSmbFile()), moduleName, parameters);
     }
 
+    public static Compiler FromFiles(string[] fileNames, CompilerParameters? parameters = null)
+    {
+        var moduleName = ModuleNameFromFileName(fileNames.Last());
+        return new(new(new SourceList(fileNames.Select(f=>new FileSourceProvider(f.ToSmbFile())))), moduleName, parameters);
+    }
+
     public static Compiler FromText
         (string text, CompilerParameters? parameters = null, string? sourceIdentifier = null)
         => new(
@@ -371,7 +377,12 @@ public sealed class Compiler
         IsInExecutionPhase = false;
     }
 
-    BinaryTree Parse(Source source) => this["Main"].Parser.Execute(source)!;
+    BinaryTree Parse(Source source)
+    {
+        var result = this["Main"].Parser.Execute(source)!;
+        result.SetRoot(Root);
+        return result;
+    }
 
     void RunFromCode() => CodeContainer!.Execute(this, TraceCollector.Instance);
 

@@ -88,7 +88,7 @@ sealed class Factory : DumpableObject
                 return new EmptyList
                 (
                     Anchor.CreateAll(target).Combine(anchor, true)
-                    , IssueId.InvalidExpression.GetIssue(target.Token)
+                    , IssueId.InvalidExpression.GetIssue(anchor.Root, target.Token)
                 );
         }
     }

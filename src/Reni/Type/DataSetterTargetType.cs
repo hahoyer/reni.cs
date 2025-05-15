@@ -6,6 +6,9 @@ namespace Reni.Type;
 
 abstract class DataSetterTargetType : SetterTargetType
 {
+    protected DataSetterTargetType(Root root)
+        : base(root) { }
+
     protected abstract CodeBase GetSetterCode();
     protected abstract CodeBase GetGetterCode();
 

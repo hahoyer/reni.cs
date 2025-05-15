@@ -10,6 +10,7 @@ namespace Reni.Validation;
 
 static class Extension
 {
+    
     internal static string GetMessage(this IssueId issueId, object[] additionalInformation)
     {
         switch(issueId)
@@ -34,7 +35,7 @@ static class Extension
                 return $"Using {additionalInformation[0]} as suffix is invalid.";
 
             case IssueId.InvalidTerminalExpression:
-                return $"Invalid termainal expression.";
+                return "Invalid termainal expression.";
             case IssueId.InvalidExpression:
                 return "Invalid expression.";
 
@@ -76,17 +77,20 @@ static class Extension
     }
 
 
-    internal static Issue GetIssue(this IssueId issueId, IToken position, params object[] additionalInformation)
-        => issueId.GetIssue(position.Characters, additionalInformation);
+    internal static Issue GetIssue(this IssueId issueId, Root root
+        , IToken position, params object[] additionalInformation)
+        => issueId.GetIssue(root, position.Characters, additionalInformation);
 
     internal static Issue GetIssue
     (
         this IssueId issueId
-        , SourcePart position, params object[] additionalInformation
+        , Root? root
+        , SourcePart position
+        , params object[] additionalInformation
     )
     {
         Validate(issueId, additionalInformation);
-        return new(issueId, position, additionalInformation);
+        return new(issueId, root, position, additionalInformation);
     }
 
     static void Validate(IssueId issueId, object[] currentInformation)
@@ -103,11 +107,12 @@ static class Extension
     internal static Issue GetIssue(this IssueId issueId, BinaryTree[] anchors)
     {
         var sourceParts = anchors.Select(anchor => anchor.SourcePart).ToArray();
-        return issueId.GetIssue(sourceParts.First(), sourceParts.Skip(1).ToArray());
+        var root = anchors.First().Root;
+        return issueId.GetIssue(root, sourceParts.First(), sourceParts.Skip(1).ToArray());
     }
 
     internal static Result<BinaryTree> GetSyntax(this IssueId issueId, BinaryTree binaryTree)
-        => new(binaryTree, issueId.GetIssue(binaryTree.SourcePart));
+        => new(binaryTree, issueId.GetIssue(binaryTree.Root, binaryTree.SourcePart));
 
     static string SearchResultFormatter(object rawTarget)
     {

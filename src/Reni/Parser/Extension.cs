@@ -1,5 +1,6 @@
 using hw.Parser;
 using hw.Scanner;
+using Reni.Context;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -223,8 +224,11 @@ static class Extension
     static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth)
         => target.Source.GetDumpBeforeCurrent(target.Position, dumpWidth);
 
-    public static SourcePart[] SourceParts(this BinaryTree[] targets)
+    public static SourcePart[] GetSourceParts(this BinaryTree[] targets)
         => targets.Select(item => item.FullToken).ToArray();
+
+    public static Root GetRoot(this BinaryTree[] targets)
+        => targets.Select(item => item.Root).Distinct().Single();
 
     public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
     {

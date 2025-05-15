@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
@@ -22,15 +23,24 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     internal sealed class BracketNodes
     {
-        internal BinaryTree? Center;
-        internal BinaryTree? Left;
-        internal BinaryTree? Right;
+        internal readonly BinaryTree? Center;
+        internal readonly BinaryTree? Left;
+        internal readonly BinaryTree? Right;
 
         [DisableDump]
-        internal Anchor ToAnchor => Anchor.Create(Left, Right);
+        internal Anchor ToAnchor => Anchor.CreateFromKnown(Left, Right);
 
         [DisableDump]
         internal BinaryTree?[] Anchors => [Left, Right];
+
+        public BracketNodes() { }
+
+        public BracketNodes(BinaryTree? left, BinaryTree? center, BinaryTree? right)
+        {
+            Left = left;
+            Center = center;
+            Right = right;
+        }
     }
 
     static int NextObjectId;
@@ -59,6 +69,8 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     [EnableDump]
     [EnableDumpExcept(null)]
     internal IFormatter? Formatter;
+
+    internal Root? RootValue;
 
     [DisableDump]
     readonly ITokenClass InnerTokenClass;
@@ -111,14 +123,14 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         {
             if(TokenClass is not IIssueTokenClass errorToken || errorToken.IssueId == default)
                 return TokenClass is IRightBracket
-                    ? new BracketNodes { Left = Left, Center = Left!.Right, Right = this }
+                    ? new BracketNodes(Left, Left!.Right, this)
                     : null;
             if(errorToken.IssueId == ExtraLeftBracket)
-                return new() { Left = this, Center = Right, Right = RightMost };
+                return new(this, Right, RightMost);
             if(errorToken.IssueId == ExtraRightBracket)
-                return new() { Left = Left!.LeftMost, Center = Left, Right = this };
+                return new(Left!.LeftMost, Left, this);
             if(errorToken.IssueId == MissingMatchingRightBracket)
-                return new() { Left = Left, Center = Left!.Right, Right = this };
+                return new(Left, Left!.Right, this);
 
             throw new InvalidEnumArgumentException($"Unexpected Bracket issue: {errorToken.IssueId}");
         }
@@ -186,6 +198,8 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     [DisableDumpExcept(true)]
     internal bool HasComplexDeclaration => Formatter?.HasComplexDeclaration(this) ?? false;
 
+    internal Root Root => RootValue.AssertNotNull();
+
     BinaryTree
     (
         BinaryTree? left
@@ -233,11 +247,11 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         return issueId switch
         {
             ExtraLeftBracket
-                => issueId.GetIssue(Token, Right?.SourcePart ?? Token.End.Span(0))
+                => issueId.GetIssue(Root, Token, Right?.SourcePart ?? Token.End.Span(0))
             , ExtraRightBracket or MissingMatchingRightBracket
-                => issueId.GetIssue(Token, LeftMost.SourcePart)
+                => issueId.GetIssue(Root, Token, LeftMost.SourcePart)
             , EOFInComment or EOLInText or EOFInVerbatimText
-                => issueId.GetIssue(Token)
+                => issueId.GetIssue(Root, Token)
             , var _ => throw new InvalidEnumArgumentException($"Unexpected issue: {issueId}")
         };
     }
@@ -402,7 +416,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     /// <returns>The line length calculated or null if target contains line breaks.</returns>
     internal int? GetFlatLength(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible]?.Length;
 
-    internal void SetSyntax(Syntax syntax)
+    internal void SetSyntax(Syntax syntax, Root root)
     {
         if(Token.Source.Identifier == Compiler.PredefinedSource)
             return;
@@ -411,6 +425,22 @@ this: {Dump()}
 Current: {Syntax!.Dump()}
 New: {syntax.Dump()}");
         Syntax = syntax;
+        RootValue = root;
+    }
+
+    internal void SetRoot(Root root)
+    {
+        if(Token.Source.Identifier == Compiler.PredefinedSource)
+            return;
+
+        (RootValue == null || RootValue == root).Assert(() => @$"
+this: {Dump()}
+Current: {RootValue!.NodeDump}
+New: {root.NodeDump}");
+
+        RootValue = root;
+        Left?.SetRoot(root);
+        Right?.SetRoot(root);
     }
 
     internal BinaryTree? GetContainingTreeItem(SourcePosition offset)

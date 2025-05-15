@@ -8,6 +8,7 @@ using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Context;
 
@@ -34,6 +35,10 @@ sealed class Root
     [DisableDump]
     [Node]
     readonly IParent Parent;
+
+    FunctionCache<Issue[],IssueType> IssueTypeCache => new(issues => new IssueType(this, issues));
+
+    internal IssueType GetIssueType(Issue[] issue) => IssueTypeCache[issue];
 
     [DisableDump]
     public IExecutionContext ExecutionContext => Parent.ExecutionContext;
@@ -75,8 +80,9 @@ sealed class Root
 
     internal override string ContextIdentificationDump => "r";
 
-    static ContextMetaFunction GetCreateArrayFeature(bool isMutable) => new(
-        (context, category, argsType) => context.CreateArrayResult(category, argsType!, isMutable)
+    static ContextMetaFunction GetCreateArrayFeature
+        (bool isMutable) => new((context, category, argsType)
+        => context.CreateArrayResult(category, argsType!, isMutable)
     );
 
     IImplementation GetMinusFeature()
@@ -156,7 +162,7 @@ sealed class Root
     {
         var rawResult = syntax.GetResultForAll(this);
 
-        rawResult.Type.ExpectIsNotNull(()=>(syntax.Anchor.SourcePart, "Type is required."));
+        rawResult.Type.ExpectIsNotNull(() => (syntax.Anchor.SourcePart, "Type is required."));
 
         var result = rawResult
             .Code?

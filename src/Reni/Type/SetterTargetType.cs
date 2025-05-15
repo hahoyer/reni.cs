@@ -7,9 +7,19 @@ using Reni.TokenClasses;
 namespace Reni.Type;
 
 abstract class SetterTargetType
-    : TypeBase, IProxyType, IConversion, IValue, IReference, ISymbolProvider<ReassignToken>
+    : TypeBase
+        , IProxyType
+        , IConversion
+        , IValue
+        , IReference
+        , ISymbolProvider<ReassignToken>
 {
+    [DisableDump]
+    internal override Root Root { get; }
+
     readonly int Order = Closures.NextOrder++;
+
+    protected SetterTargetType(Root root) => Root = root;
 
     int IContextReference.Order => Order;
 
@@ -43,9 +53,6 @@ abstract class SetterTargetType
 
     [DisableDump]
     internal override bool IsPointerPossible => false;
-
-    [DisableDump]
-    internal override Root Root => ValueType.Root;
 
     [DisableDump]
     internal override TypeBase TypeForTypeOperator => ValueType.TypeForTypeOperator;

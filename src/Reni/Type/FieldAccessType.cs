@@ -17,6 +17,7 @@ sealed class FieldAccessType : DataSetterTargetType
     Size FieldOffset => View.FieldOffset(Position);
 
     internal FieldAccessType(CompoundView compoundView, int position)
+        : base(compoundView.Root)
     {
         View = compoundView;
         Position = position;

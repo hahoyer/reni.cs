@@ -1,4 +1,5 @@
 using hw.Scanner;
+using Reni.Context;
 
 namespace Reni.Validation;
 
@@ -12,6 +13,8 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
 
     [DisableDump]
     internal readonly IssueId IssueId;
+
+    internal readonly Root Root;
 
     [EnableDump]
     readonly object[] AdditionalInformation;
@@ -34,10 +37,11 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
     [DisableDump]
     internal string Message => IssueId.GetMessage(AdditionalInformation);
 
-    internal Issue(IssueId issueId, SourcePart position, params object[] additionalInformation)
+    internal Issue(IssueId issueId, Root? root, SourcePart position,  params object[] additionalInformation)
         : base(NextObjectId++)
     {
         IssueId = issueId;
+        Root = root.AssertNotNull();
         Position = position;
         AdditionalInformation = additionalInformation;
         StopByObjectIds();

@@ -109,7 +109,7 @@ static class Extension
 
         if(right == null)
             return valueResult 
-                ?? new(category, IssueId.MissingRightExpression.GetIssue(currentTarget, context));
+                ?? new(category, IssueId.MissingRightExpression.GetIssue(context.RootContext, currentTarget, context));
 
         if(valueResult != null)
             return valueResult

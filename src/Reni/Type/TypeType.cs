@@ -22,7 +22,7 @@ sealed class TypeType
     public TypeType(TypeBase value)
     {
         Value = value;
-        StopByObjectIds(-61);
+        StopByObjectIds(83);
     }
 
     IImplementation? ISymbolProvider<ArrayReference>.Feature
@@ -41,7 +41,7 @@ sealed class TypeType
         => Feature.Extension.MetaFeature(StarResult!);
 
     [DisableDump]
-    internal override Root Root => Value.Root;
+    internal override Root? Root => Value.Root;
 
     [DisableDump]
     internal override bool IsHollow => true;
@@ -98,7 +98,7 @@ sealed class TypeType
             return null!;
         }
 
-        return Root.BitType.GetResult(category, BitsConst.Convert(count.Value));
+        return Root!.BitType.GetResult(category, BitsConst.Convert(count.Value));
     }
 
     Result MutableArrayResult(Category category)

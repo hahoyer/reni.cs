@@ -47,7 +47,7 @@ sealed class PointerType
         => Feature.Extension.Value(GetConversionToStableReference);
 
     [DisableDump]
-    internal override Root Root => ValueType.Root;
+    internal override Root? Root => ValueType.Root;
 
     internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")[Pointer]";
 

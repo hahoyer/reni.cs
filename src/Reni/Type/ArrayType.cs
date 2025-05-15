@@ -122,6 +122,7 @@ sealed class ArrayType
     TypeBase IRepeaterType.ElementType => ElementType;
     TypeBase IRepeaterType.IndexType => Root.BitType.Number(IndexSize.ToInt());
     bool IRepeaterType.IsMutable => IsMutable;
+    Root IRepeaterType.Root => Root;
 
     IImplementation ISymbolProviderForPointer<ArrayReference>.Feature
         => Feature.Extension.Value(ReferenceResult);
@@ -222,7 +223,7 @@ sealed class ArrayType
     }
 
     [DisableDump]
-    internal override Root Root => ElementType.Root;
+    internal override Root Root => ElementType.Root!;
 
     protected override string GetNodeDump()
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;

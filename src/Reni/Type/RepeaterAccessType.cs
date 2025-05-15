@@ -17,6 +17,7 @@ sealed class RepeaterAccessType
     TypeBase IndexType { get; }
 
     internal RepeaterAccessType(IRepeaterType repeaterType)
+        : base(repeaterType.Root)
     {
         IsMutable = repeaterType.IsMutable;
         ValueType = repeaterType.ElementType;

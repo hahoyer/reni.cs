@@ -1,4 +1,5 @@
 using hw.Scanner;
+using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxFactory;
@@ -23,7 +24,7 @@ sealed class DeclarerSyntax : DumpableObject
         protected override IEnumerable<Issue> GetIssues()
         {
             if(Value == null)
-                yield return IssueId.InvalidDeclarationTag.GetIssue(Anchor.Main.SourcePart);
+                yield return IssueId.InvalidDeclarationTag.GetIssue(Anchor.Main.Root, Anchor.Main.SourcePart);
         }
 
         internal override void AssertValid(Level? level, BinaryTree? target = null)
@@ -142,6 +143,7 @@ sealed class DeclarerSyntax : DumpableObject
         BinaryTree? name
         , Annotation[] tags
         , bool meansPublic
+        , Root root
     )
     {
         var nameIssueAnchors = name.GetNodesFromLeftToRight().Where(a => a != name).ToArray();
@@ -158,12 +160,12 @@ sealed class DeclarerSyntax : DumpableObject
             .Distinct()
             .ToArray();
 
-        var issueAnchor = issueAnchors.SourceParts().Combine();
+        var issueAnchor = issueAnchors.GetSourceParts().Combine();
         var issueSyntax = issueAnchor == null
             ? null
             : new Syntax.IssueSyntax
             (
-                IssueId.InvalidDeclaration.GetIssue(issueAnchor)
+                IssueId.InvalidDeclaration.GetIssue(root, issueAnchor)
                 , Anchor.Create(issueAnchors)
             );
 

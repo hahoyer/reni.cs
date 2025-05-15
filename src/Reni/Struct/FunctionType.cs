@@ -71,6 +71,7 @@ sealed class FunctionType : SetterTargetType
     Closures GetterClosures => Getter.Closures; //CheckClosureValue(Getter.Closures);
 
     internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argumentsType)
+        : base(compoundView.Root)
     {
         Getter = new(this, index, body.Getter);
         Setter = body.Setter == null? null : new SetterFunction(this, index, body.Setter);

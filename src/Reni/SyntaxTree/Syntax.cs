@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -96,7 +97,7 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
         Anchor = anchor;
         if(!Anchor.IsEmpty)
             Anchor.SourceParts.AssertIsNotNull();
-        Anchor.SetSyntax(this);
+        Anchor.SetSyntax(this, null!);
     }
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();

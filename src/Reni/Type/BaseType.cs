@@ -1,3 +1,5 @@
+#if false
+
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -11,95 +13,16 @@ using Reni.Validation;
 
 namespace Reni.Type;
 
-abstract class TypeBase
+abstract class BaseType
     : DumpableObject
         , IContextReferenceProvider
         , IIconKeyProvider
         , ISearchTarget
         , ValueCache.IContainer
-        , IRootProvider
         , IMultiSymbolProviderForPointer<IdentityOperation>
 
 {
-    sealed class CacheContainer
-    {
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<int, AlignType> Aligner;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<int, FunctionCache<string, ArrayType>> Array;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<EnableCut> EnableCut;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<IReference> ForcedReference;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<FunctionInstanceType> FunctionInstanceType;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<TypeBase, ResultCache> Mutation;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<TypeBase, Pair> Pair;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<PointerType> Pointer;
-
-        public readonly ValueCache<Size> Size;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<IEnumerable<IConversion>> SymmetricConversions;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<TypeType> TypeType;
-
-        [Node]
-        [SmartNode]
-        internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
-
-        public CacheContainer(TypeBase parent)
-        {
-            EnableCut = new(() => new(parent));
-            Mutation = new(destination =>
-                ResultCache.CreateInstance(category => parent.GetMutation(category, destination))
-            );
-            ForcedReference = new(parent.GetForcedReferenceForCache);
-            Pointer = new(parent.GetPointerForCache);
-            Pair = new(first => new(first, parent));
-            Array = new(count
-                =>
-                new(optionsId
-                    =>
-                    parent.GetArrayForCache(count, optionsId)
-                )
-            );
-
-            Aligner = new(alignBits => new(parent, alignBits));
-            FunctionInstanceType = new(() => new(parent));
-            TypeType = new(() => new(parent));
-            Size = new(parent.GetSizeForCache);
-            SymmetricConversions = new(parent.GetSymmetricConversionsForCache);
-            ArrayReferenceCache = new(id => new(parent, id));
-        }
-    }
-
     static int NextObjectId;
-
-    [Node]
-    [SmartNode]
-    readonly CacheContainer Cache;
 
     [Node]
     internal Size Size => Cache.Size.Value;
@@ -108,26 +31,23 @@ abstract class TypeBase
     internal EnableCut EnableCut => Cache.EnableCut.Value;
 
     [DisableDump]
-    internal TypeBase Pointer => ForcedReference.Type();
+    internal BaseType Pointer => ForcedReference.Type();
 
     [DisableDump]
     internal IReference ForcedReference => Cache.ForcedReference.Value;
 
     [DisableDump]
-    internal CodeBase ArgumentCode => this.GetArgumentCode();
-
-    [DisableDump]
-    internal TypeBase AutomaticDereferenceType
+    internal BaseType AutomaticDereferenceType
         =>
             IsWeakReference
                 ? CheckedReference!.Converter.ResultType().AutomaticDereferenceType
                 : this;
 
     [DisableDump]
-    internal TypeBase SmartPointer => IsHollow? this : Pointer;
+    internal BaseType SmartPointer => IsHollow? this : Pointer;
 
     [DisableDump]
-    internal TypeBase Align
+    internal BaseType Align
     {
         get
         {
@@ -137,10 +57,10 @@ abstract class TypeBase
     }
 
     [DisableDump]
-    internal virtual TypeBase TypeType => Cache.TypeType.Value;
+    internal TypeType TypeType => Cache.TypeType.Value;
 
     [DisableDump]
-    internal TypeBase FunctionInstance => Cache.FunctionInstanceType.Value;
+    internal BaseType FunctionInstance => Cache.FunctionInstanceType.Value;
 
     [DisableDump]
     internal PointerType ForcedPointer => Cache.Pointer.Value;
@@ -155,10 +75,10 @@ abstract class TypeBase
     internal BitType BitType => Root!.BitType;
 
     [DisableDump]
-    internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type!;
+    internal BaseType TypeForStructureElement => GetDeAlign(Category.Type).Type!;
 
     [DisableDump]
-    internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type!;
+    internal BaseType TypeForArrayElement => GetDeAlign(Category.Type).Type!;
 
     [DisableDump]
     IEnumerable<SearchResult> FunctionDeclarationsForType
@@ -186,7 +106,7 @@ abstract class TypeBase
 
     public Size? SmartSize => Cache.Size.IsBusy? null : Size;
 
-    protected TypeBase()
+    protected BaseType()
         : base(NextObjectId++) => Cache = new(this);
 
     ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -203,12 +123,6 @@ abstract class TypeBase
         => Feature.Extension.FunctionFeature(
             (category, right, operation) => GetIdentityOperationResult(category, right, operation.IsEqual), tokenClass);
 
-    Root IRootProvider.Value => Root!;
-
-    [DisableDump]
-    [Node]
-    internal abstract Root? Root { get; }
-
     /// <summary>
     ///     Is this a hollow type? With no data?
     /// </summary>
@@ -224,7 +138,7 @@ abstract class TypeBase
 
 
     [DisableDump]
-    internal virtual TypeBase[] ToList => [this];
+    internal virtual BaseType[] ToList => [this];
 
 
     [DisableDump]
@@ -259,14 +173,14 @@ abstract class TypeBase
     internal virtual bool HasQuickSize => true;
 
     [DisableDump]
-    internal virtual TypeBase TagTargetType => this;
+    internal virtual BaseType CoreType => this;
 
     [DisableDump]
-    internal virtual TypeBase TypeForTypeOperator
+    internal virtual BaseType TypeForTypeOperator
         => GetDePointer(Category.Type).Type.GetDeAlign(Category.Type).Type!;
 
     [DisableDump]
-    internal virtual TypeBase ElementTypeForReference
+    internal virtual BaseType ElementTypeForReference
         => GetDePointer(Category.Type)
             .Type
             .GetDeAlign(Category.Type)
@@ -280,12 +194,14 @@ abstract class TypeBase
 
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
-        => Root!
+        => (this as IRootProvider)
+            ?.Value
             .DefinedNames
             .Where(IsDeclarationOption)
             .Select(item => item.Id)
             .OrderBy(item => item)
-            .ToArray();
+            .ToArray()
+            ?? [];
 
     [DisableDump]
     protected virtual IEnumerable<IGenericProviderForType> GenericList
@@ -329,7 +245,7 @@ abstract class TypeBase
     }
 
     [DisableDump]
-    internal virtual TypeBase? Weaken => null;
+    internal virtual BaseType? Weaken => null;
 
     internal virtual Issue[] Issues => [];
 
@@ -339,7 +255,7 @@ abstract class TypeBase
         return Size.Zero;
     }
 
-    internal virtual int? GetSmartArrayLength(TypeBase elementType)
+    internal virtual int? GetSmartArrayLength(BaseType elementType)
     {
         if(IsConvertible(elementType))
             return 1;
@@ -348,8 +264,8 @@ abstract class TypeBase
         return null;
     }
 
-    protected virtual TypeBase GetReversePair(TypeBase first) => first.Cache.Pair[this];
-    internal virtual TypeBase GetPair(TypeBase second) => second.GetReversePair(this);
+    protected virtual BaseType GetReversePair(BaseType first) => first.Cache.Pair[this];
+    internal virtual BaseType GetPair(BaseType second) => second.GetReversePair(this);
 
     internal virtual Result GetCleanup(Category category)
         => GetVoidCodeAndRefs(category);
@@ -382,7 +298,7 @@ abstract class TypeBase
     protected virtual ArrayType GetArrayForCache(int count, string optionsId)
         => new(this, count, optionsId);
 
-    internal virtual Result GetConstructorResult(Category category, TypeBase argumentsType)
+    internal virtual Result GetConstructorResult(Category category, BaseType argumentsType)
     {
         StartMethodDump(false, category, argumentsType);
         try
@@ -444,7 +360,7 @@ abstract class TypeBase
     }
 
     protected virtual Issue GetMissingDeclarationIssue(SourcePart position)
-        => IssueId.MissingDeclarationForType.GetIssue(Root, position, this);
+        => IssueId.MissingDeclarationForType.GetIssue(position, this);
 
     Size GetSizeForCache()
     {
@@ -513,7 +429,7 @@ abstract class TypeBase
     internal Result GetResult(Category category, Func<CodeBase?>? getCode = null, Func<Closures?>? getClosures = null)
         => new(category, getClosures, getCode, () => this);
 
-    internal TypeBase GetCommonType(TypeBase elseType)
+    internal BaseType GetCommonType(BaseType elseType)
     {
         if(elseType.IsConvertible(this))
             return this;
@@ -543,7 +459,7 @@ abstract class TypeBase
         return null!;
     }
 
-    internal int GetArrayLength(TypeBase elementType)
+    internal int GetArrayLength(BaseType elementType)
     {
         var length = GetSmartArrayLength(elementType);
         if(length != null)
@@ -598,10 +514,10 @@ abstract class TypeBase
         return searchResults.SpecialExecute(category);
     }
 
-    internal bool IsConvertible(TypeBase destination)
+    internal bool IsConvertible(BaseType destination)
         => ConversionService.FindPath(this, destination) != null;
 
-    internal Result GetConversion(Category category, TypeBase destination)
+    internal Result GetConversion(Category category, BaseType destination)
     {
         if(Category.Type.Replenished().Contains(category))
             return destination.SmartPointer.GetResult(category);
@@ -626,7 +542,7 @@ abstract class TypeBase
             Closures.GetVoid
         );
 
-    internal TypeBase GetSmartUn<T>()
+    internal BaseType GetSmartUn<T>()
         where T : IConversion
         => this is T? ((IConversion)this).GetResult(Category.Type).Type! : this;
 
@@ -734,12 +650,12 @@ abstract class TypeBase
 
         var issue = count == 0
             ? GetMissingDeclarationIssue(currentTarget)
-            : IssueId.AmbiguousSymbol.GetIssue(Root,currentTarget, this, searchResults);
+            : IssueId.AmbiguousSymbol.GetIssue(currentTarget, this, searchResults);
 
         return new(category, [..left.Issues, issue]);
     }
 
-    Result GetIdentityOperationResult(Category category, TypeBase right, bool isEqual)
+    Result GetIdentityOperationResult(Category category, BaseType right, bool isEqual)
     {
         if(AutomaticDereferenceType == right.AutomaticDereferenceType)
             return GetIdentityOperationResult(category, isEqual)
@@ -772,6 +688,4 @@ abstract class TypeBase
         .Concat(new IdentityTestCode(isEqual, Size.Bit, Align.Size));
 }
 
-// ReSharper disable CommentTypo
-// Krautpuster
-// Gurkennudler
+#endif

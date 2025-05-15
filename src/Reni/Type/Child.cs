@@ -24,5 +24,5 @@ abstract class Child<TParent>
     protected abstract Result ParentConversionResult(Category category);
 
     [DisableDump]
-    internal override Root Root => Parent.Root;
+    internal override Root? Root => Parent.Root;
 }

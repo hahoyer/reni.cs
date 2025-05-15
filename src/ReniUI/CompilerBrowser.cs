@@ -250,9 +250,9 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
         if(exception is Expectations.ExpectationFailedException efe)
             return IssueId
                 .ExpectationFailedException
-                .GetIssue(efe.Position ?? Compiler.Source.All, exception.Message);
+                .GetIssue(Compiler.Root, efe.Position ?? Compiler.Source.All, exception.Message);
         return IssueId
             .UnexpectedException
-            .GetIssue(Compiler.Source.All, exception.GetType().PrettyName(), exception.Message);
+            .GetIssue(Compiler.Root, Compiler.Source.All, exception.GetType().PrettyName(), exception.Message);
     }
 }

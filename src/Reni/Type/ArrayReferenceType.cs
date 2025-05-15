@@ -88,7 +88,7 @@ sealed class ArrayReferenceType
         RepeaterAccessTypeCache = new(() => new(this));
         ValueType = valueType;
         (!valueType.IsHollow).Assert(valueType.Dump);
-        (!(valueType.CoreType is PointerType)).Assert(valueType.Dump);
+        (valueType.TagTargetType is not PointerType).Assert(valueType.Dump);
 
         StopByObjectIds(-10);
     }
@@ -101,6 +101,7 @@ sealed class ArrayReferenceType
 
     TypeBase IRepeaterType.ElementType => ValueType;
     TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
+    Root IRepeaterType.Root => Root;
     bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
@@ -118,7 +119,7 @@ sealed class ArrayReferenceType
         => Feature.Extension.FunctionFeature(PlusResult);
 
     [DisableDump]
-    internal override Root Root => ValueType.Root;
+    internal override Root Root => ValueType.Root!;
 
     internal override string DumpPrintText
         => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
