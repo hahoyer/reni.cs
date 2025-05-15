@@ -88,6 +88,14 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     )
         => CreateFileAndRunCompiler(name, new(text, expectedOutput), expectedResult);
 
+    internal Compiler GetFilesAndRunCompiler
+        (string[] names, string? expectedOutput = null, Action<Compiler>? expectedResult = null)
+    {
+        var fileNames = names.Select(name => name + ".reni").ToArray();
+        return RunCompiler(fileNames, expectedOutput, expectedResult);
+    }
+
+
     Compiler CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler>? expectedResult)
     {
         var fileName = name + ".reni";
@@ -97,10 +105,15 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
     }
 
     Compiler RunCompiler(string fileName, Action<Compiler>? expectedResult, TargetSetData targetSet)
+        => RunCompiler(Compiler.FromFile(fileName, Parameters), targetSet.Output, expectedResult);
+
+    Compiler RunCompiler(string[] fileNames, string? expectedOutput, Action<Compiler>? expectedResult)
+        => RunCompiler(Compiler.FromFiles(fileNames, Parameters), expectedOutput, expectedResult);
+
+    Compiler RunCompiler(Compiler compiler, string? expectedOutput, Action<Compiler>? expectedResult)
     {
         var outStream = new OutStream();
         Parameters.OutStream = outStream;
-        var compiler = Compiler.FromFile(fileName, Parameters);
 
         try
         {
@@ -112,14 +125,18 @@ public abstract class CompilerTest : DependenceProvider, ITestFixture
 
             compiler.Execute();
 
-            if(outStream.Data != targetSet.Output)
+            if(expectedOutput != null)
             {
-                ("---------------------\n" + outStream.Data + "\n---------------------").Log();
-                Tracer.ThrowAssertionFailed
-                (
-                    "outStream.Data != targetSet.Output",
-                    () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output
-                );
+                var result = outStream.Data;
+                if(result != expectedOutput)
+                {
+                    ("---------------------\n" + result + "\n---------------------").Log();
+                    Tracer.ThrowAssertionFailed
+                    (
+                        "outStream.Data != expected",
+                        () => "outStream.Data:" + result + " expected: " + expectedOutput
+                    );
+                }
             }
 
             foreach(var issue in compiler.Issues)

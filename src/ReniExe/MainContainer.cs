@@ -1,30 +1,40 @@
+using CommandLine;
 using Reni;
 
 namespace ReniExe;
 
 static class MainContainer
 {
+    [UsedImplicitly]
+    public sealed class Options
+    {
+        [Option('f', "fileName", Required = true, HelpText = "The path to file to compile.")]
+        public string FileName { get; set; }
+    }
+
     public static void Main(string[] args)
     {
-        if(args.Length != 1)
-        {
-            Console.WriteLine("usage: ReniExe <filename>");
-            return;
-        }
+        Parser.Default.ParseArguments<Options>(args)
+            .WithParsed(options =>
+            {
+                options.FileName.AssertIsNotNull();
+                var p = new CompilerParameters
+                {
+                    OutStream = new ConsoleStream(), TraceOptions = { Parser = true }
+                };
 
-        var p = new CompilerParameters
-        {
-            OutStream = new ConsoleStream()
-        };
-        var c = Compiler.FromFile(args[0], p);
-        try
-        {
-            c.Execute();
-        }
-        catch(Exception exception)
-        {
-            Console.WriteLine(exception.Message);
-        }
+                var c = Compiler.FromFile(options.FileName, p);
+                try
+                {
+                    c.Execute();
+                }
+                catch(Exception exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+            });
+
+        return;
     }
 }
 

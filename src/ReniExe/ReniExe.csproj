@@ -4,9 +4,25 @@
   </PropertyGroup>
   <Import Project="sys.targets" />
   <ItemGroup>
-    <PackageReference Include="hw.CompilerTools" Version="25.0.1" />
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Reni\Reni.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="AssemblyInfo.tt">
+      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AssemblyInfo.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

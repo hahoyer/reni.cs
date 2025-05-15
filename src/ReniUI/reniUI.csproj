@@ -10,9 +10,6 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="hw.CompilerTools" Version="25.0.1" />
-    </ItemGroup>
-    <ItemGroup>
       <None Update="AssemblyInfo.tt">
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
