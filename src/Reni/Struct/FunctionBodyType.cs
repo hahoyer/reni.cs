@@ -80,7 +80,7 @@ sealed class FunctionBodyType
     internal override IImplementation FunctionDeclarationForType => this;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Syntax.Tag.GetDumpPrintTextCode();
+    protected override CodeBase DumpPrintCode => Syntax.FunctionKindDump.GetDumpPrintTextCode();
 
     TypeBase GetTemplate()
     {

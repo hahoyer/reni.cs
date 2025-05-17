@@ -20,8 +20,8 @@ sealed class FunctionSyntax : ValueSyntax
     bool IsMetaFunction { get; }
 
     [DisableDump]
-    internal string Tag
-        => "@" + (IsMetaFunction? "@" : "") + (IsImplicit? "!" : "");
+    internal string FunctionKindDump
+        => TokenClasses.Function.TokenId(IsImplicit, IsMetaFunction);
 
     internal FunctionSyntax
     (
@@ -57,7 +57,7 @@ sealed class FunctionSyntax : ValueSyntax
             .FunctionalType(this)
             .GetResult(category);
 
-    protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
+    protected override string GetNodeDump() => Setter?.NodeDump ?? "" + FunctionKindDump + Getter.NodeDump;
 
     internal IMeta? MetaFunctionFeature(CompoundView compoundView)
     {
