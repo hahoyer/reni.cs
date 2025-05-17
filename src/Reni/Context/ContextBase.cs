@@ -209,7 +209,7 @@ abstract class ContextBase
         {
             BreakExecution();
             var result = syntax.GetResultForCache(this, category.Replenished());
-            (result.IsValidOrIssue(category)).Assert();
+            result.IsValidOrIssue(category).Assert();
             return ReturnMethodDump(result);
         }
         finally
