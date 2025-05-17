@@ -172,8 +172,10 @@ this.Write("\r\n            return data;\r\n\t\t}\r\n\t");
         #line 44 "A:\develop\Reni\dev\src\Reni\Code\CSharp_Generated.tt"
 }
 
+// These pragmas are required so that the generator can generate warning-free code
         // ReSharper disable FieldCanBeMadeReadOnly.Local
-
+#pragma warning disable IDE0001
+#pragma warning disable IDE0002
 
         
         #line default
