@@ -196,21 +196,19 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     string PositionDump()
     {
-        if(IsEndPosition)
-            return "{}";
-
         var names =
             Compound
                 .Syntax
                 .NameIndex
                 .Where(item => item.Value == ViewPosition)
-                .Select(item => item.Key)
-                .Stringify("/");
+                .Select(item => item.Key.Quote())
+                .Stringify("|");
+
 
         if(names == "")
-            return "@" + ViewPosition;
+            return ViewPosition + (IsEndPosition? "e" : "") + "v";
 
-        return ":" + names;
+        return names + "n";
     }
 
     public string GetCompoundIdentificationDump()
