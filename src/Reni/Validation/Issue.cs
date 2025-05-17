@@ -1,4 +1,5 @@
 using hw.Scanner;
+
 using Reni.Context;
 
 namespace Reni.Validation;
@@ -14,10 +15,11 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
     [DisableDump]
     internal readonly IssueId IssueId;
 
+    [DisableDump]
     internal readonly Root Root;
 
     [EnableDump]
-    readonly object[] AdditionalInformation;
+    internal readonly object[] AdditionalInformation;
 
     [DisableDump]
     internal string Tag => $"{IssueId}";
