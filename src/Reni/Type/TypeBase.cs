@@ -152,7 +152,7 @@ abstract class TypeBase
     internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
 
     [DisableDump]
-    internal BitType BitType => Root!.BitType;
+    internal BitType BitType => Root.BitType;
 
     [DisableDump]
     internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type!;
@@ -203,11 +203,11 @@ abstract class TypeBase
         => Feature.Extension.FunctionFeature(
             (category, right, operation) => GetIdentityOperationResult(category, right, operation.IsEqual), tokenClass);
 
-    Root IRootProvider.Value => Root!;
+    Root IRootProvider.Value => Root;
 
     [DisableDump]
     [Node]
-    internal abstract Root? Root { get; }
+    internal abstract Root Root { get; }
 
     /// <summary>
     ///     Is this a hollow type? With no data?
@@ -280,7 +280,7 @@ abstract class TypeBase
 
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
-        => Root!
+        => Root
             .DefinedNames
             .Where(IsDeclarationOption)
             .Select(item => item.Id)
@@ -745,7 +745,7 @@ abstract class TypeBase
             return GetIdentityOperationResult(category, isEqual)
                 .ReplaceArguments(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
 
-        return Root!.BitType.GetResult
+        return Root.BitType.GetResult
         (
             category,
             () => Code.Extension.GetCode(BitsConst.Convert(isEqual))
@@ -754,7 +754,7 @@ abstract class TypeBase
 
     Result GetIdentityOperationResult(Category category, bool isEqual)
     {
-        var result = Root!.BitType.GetResult
+        var result = Root.BitType.GetResult
         (
             category,
             () => GetIdentityOperationCode(isEqual),

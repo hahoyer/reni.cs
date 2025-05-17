@@ -25,14 +25,13 @@ sealed class Pair : TypeBase
     {
         First = first;
         Second = second;
-        Root = GetRoot();
+        (First.Root == Second.Root).Assert();
     }
+
+    internal override Root Root => First.Root;
 
     [DisableDump]
     internal override bool IsHollow => First.IsHollow && Second.IsHollow;
-
-    [DisableDump]
-    internal override Root Root { get; }
 
     protected override Size GetSize() => First.Size + Second.Size;
 
@@ -69,15 +68,4 @@ sealed class Pair : TypeBase
     }
 
     protected override string GetNodeDump() => "pair." + ObjectId;
-
-    Root GetRoot()
-    {
-        var first = First.Root;
-        var second = Second.Root;
-
-        (first == null || second == null || first == second).Assert();
-        var result = first ?? second;
-        result.AssertIsNotNull();
-        return result!;
-    }
 }

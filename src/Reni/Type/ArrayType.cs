@@ -223,7 +223,7 @@ sealed class ArrayType
     }
 
     [DisableDump]
-    internal override Root Root => ElementType.Root!;
+    internal override Root Root => ElementType.Root;
 
     protected override string GetNodeDump()
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;

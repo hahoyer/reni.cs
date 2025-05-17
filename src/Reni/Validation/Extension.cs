@@ -84,7 +84,7 @@ static class Extension
     internal static Issue GetIssue
     (
         this IssueId issueId
-        , Root? root
+        , Root root
         , SourcePart position
         , params object[] additionalInformation
     )

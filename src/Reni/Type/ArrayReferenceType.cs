@@ -119,7 +119,7 @@ sealed class ArrayReferenceType
         => Feature.Extension.FunctionFeature(PlusResult);
 
     [DisableDump]
-    internal override Root Root => ValueType.Root!;
+    internal override Root Root => ValueType.Root;
 
     internal override string DumpPrintText
         => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
