@@ -70,6 +70,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     [EnableDumpExcept(null)]
     internal IFormatter? Formatter;
 
+    [DisableDump]
     internal Root? RootValue;
 
     [DisableDump]
@@ -198,6 +199,7 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     [DisableDumpExcept(true)]
     internal bool HasComplexDeclaration => Formatter?.HasComplexDeclaration(this) ?? false;
 
+    [DisableDump]
     internal Root Root => RootValue.AssertNotNull();
 
     BinaryTree
