@@ -17,7 +17,6 @@ abstract class TypeBase
         , IIconKeyProvider
         , ISearchTarget
         , ValueCache.IContainer
-        , IRootProvider
         , IMultiSymbolProviderForPointer<IdentityOperation>
 
 {
@@ -202,8 +201,6 @@ abstract class TypeBase
     IImplementation IMultiSymbolProviderForPointer<IdentityOperation>.GetFeature(IdentityOperation tokenClass)
         => Feature.Extension.FunctionFeature(
             (category, right, operation) => GetIdentityOperationResult(category, right, operation.IsEqual), tokenClass);
-
-    Root IRootProvider.Value => Root;
 
     [DisableDump]
     [Node]

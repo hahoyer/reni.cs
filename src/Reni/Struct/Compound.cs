@@ -10,7 +10,7 @@ using Reni.Validation;
 namespace Reni.Struct;
 
 sealed class Compound
-    : DumpableObject, IContextReference, IChild<ContextBase>, ValueCache.IContainer, IRootProvider
+    : DumpableObject, IContextReference, IChild<ContextBase>, ValueCache.IContainer
 
 {
     static int NextObjectId;
@@ -66,8 +66,6 @@ sealed class Compound
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
     int IContextReference.Order { get; } = Closures.NextOrder++;
-
-    Root IRootProvider.Value => Root;
 
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";

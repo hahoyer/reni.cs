@@ -14,7 +14,10 @@ namespace Reni.Context;
 ///     Base class for compiler environments
 /// </summary>
 abstract class ContextBase
-    : DumpableObject, ResultCache.IResultProvider, IIconKeyProvider, ValueCache.IContainer, IRootProvider
+    : DumpableObject
+        , ResultCache.IResultProvider
+        , IIconKeyProvider
+        , ValueCache.IContainer
 {
     internal sealed class ResultProvider
         : DumpableObject
@@ -116,8 +119,6 @@ abstract class ContextBase
 
     Result ResultCache.IResultProvider.Execute(Category category)
         => FindRecentCompoundView.ObjectPointerViaContext(category);
-
-    Root IRootProvider.Value => RootContext;
 
     [DisableDump]
     [Node]

@@ -1,6 +1,6 @@
 namespace Reni.Context;
 
-interface IRootProvider
+interface IRootProvider1
 {
     [DisableDump]
     Root Value { get; }
