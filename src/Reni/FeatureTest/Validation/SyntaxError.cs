@@ -53,7 +53,7 @@ static class SyntaxErrorExtension
     const string Pattern = ".reni({0},{1},{2},{3}): error {4}: ";
 
     [UsedImplicitly]
-    const string RegExPattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
+    const string RegExPattern = @".*\.reni\({0},{1}\): error {2}: (.*)";
 
     internal static bool IsLogDumpLike
     (
@@ -78,10 +78,6 @@ static class SyntaxErrorExtension
         if(start == null)
             return false;
 
-        var logText = logDump.Substring(start.Value).Replace("\r\n", "\n");
-        if(logText.StartsWith(expectedText))
-            return true;
-
-        return false;
+        return logDump[start.Value..].Replace("\r\n", "\n").StartsWith(expectedText);
     }
 }
