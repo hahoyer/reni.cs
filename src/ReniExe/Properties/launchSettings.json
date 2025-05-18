@@ -2,8 +2,8 @@
   "profiles": {
     "ReniExe": {
       "commandName": "Project",
-      "commandLineArgs": "-f A://develop/reni.reni/.reni\r\n",
-      "workingDirectory": "A://develop/reni.reni/"
+      "commandLineArgs": "-f A://develop/reni.reni/dev/.reni -s A://develop/reni.reni/ReniSystem/.reni \r\n",
+      "workingDirectory": "A://develop/reni.reni/dev"
     }
   }
 }

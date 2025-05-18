@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommandLine;
 using Reni;
 
@@ -10,6 +11,10 @@ static class MainContainer
     {
         [Option('f', "fileName", Required = true, HelpText = "The path to file to compile.")]
         public string FileName { get; set; }
+        [Option('s', "reniSystem", Required = true, HelpText = "The path to file to the system directory.")]
+        public string ReniSystem { get; set; }
+        [Option('P', "trace.Parser", Required = false, HelpText = "Trace parser.")]
+        public bool TraceParser { get; set; }
     }
 
     public static void Main(string[] args)
@@ -20,10 +25,10 @@ static class MainContainer
                 options.FileName.AssertIsNotNull();
                 var p = new CompilerParameters
                 {
-                    OutStream = new ConsoleStream(), TraceOptions = { Parser = true }
+                    OutStream = new ConsoleStream(), TraceOptions = { Parser = options.TraceParser}
                 };
 
-                var c = Compiler.FromFile(options.FileName, p);
+                var c = Compiler.FromFiles([options.ReniSystem, options.FileName], p);
                 try
                 {
                     c.Execute();
