@@ -10,7 +10,6 @@ namespace Reni.Validation;
 
 static class Extension
 {
-    
     internal static string GetMessage(this IssueId issueId, object[] additionalInformation)
     {
         switch(issueId)
@@ -77,8 +76,13 @@ static class Extension
     }
 
 
-    internal static Issue GetIssue(this IssueId issueId, Root root
-        , IToken position, params object[] additionalInformation)
+    internal static Issue GetIssue
+    (
+        this IssueId issueId
+        , Root root
+        , IToken position
+        , params object[] additionalInformation
+    )
         => issueId.GetIssue(root, position.Characters, additionalInformation);
 
     internal static Issue GetIssue
@@ -141,4 +145,26 @@ static class Extension
     }
 
     static TValue[] T<TValue>(params TValue[] value) => value;
+
+    static string GetKey(Issue issue)
+    {
+        var p = issue.Position;
+        return $"{p.Position}/{p.Length}/{issue.IssueId}/{p.Source.GetObjectId()}/{issue.Root.ObjectId}";
+    }
+
+    static Issue Aggregate(IGrouping<string, Issue> grouping)
+    {
+        var issues = grouping.ToArray();
+        if(issues.Length == 1)
+            return issues.First();
+
+        var head = issues.First();
+        var additionalInformation = issues.SelectMany(i => i.AdditionalInformation).ToArray();
+        return new(head.IssueId, head.Root, head.Position, additionalInformation);
+    }
+
+    public static IEnumerable<Issue> GroupIssues(this IEnumerable<Issue> value) => value
+        .Distinct(Reni.Extension.Comparer<Issue>((x, y) => x == y))
+        .GroupBy(GetKey)
+        .Select(Aggregate);
 }

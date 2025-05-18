@@ -97,7 +97,9 @@ public sealed class Compiler
             var syntax = ValueSyntaxCache.Value?.AllIssues.ToArray() ?? [];
             var code = CodeContainer?.Issues.ToArray() ?? [];
             //$"binaryTree: {binaryTree.Length}, syntax: {syntax.Length}, code: {code.Length}".Log(FilePositionTag.Debug);
-            return T(binaryTree, syntax, code).ConcatMany();
+            return T(binaryTree, syntax, code)
+                .ConcatMany()
+                .GroupIssues();
         }
     }
 
@@ -286,7 +288,8 @@ public sealed class Compiler
     public static Compiler FromFiles(string[] fileNames, CompilerParameters? parameters = null)
     {
         var moduleName = ModuleNameFromFileName(fileNames.Last());
-        return new(new(new SourceList(fileNames.Select(f=>new FileSourceProvider(f.ToSmbFile())))), moduleName, parameters);
+        return new(new(new SourceList(fileNames.Select(f => new FileSourceProvider(f.ToSmbFile())))), moduleName
+            , parameters);
     }
 
     public static Compiler FromText
@@ -395,10 +398,9 @@ public sealed class Compiler
 
 sealed class DefaultOutStream : DumpableObject, IOutStream
 {
-    void IOutStream.AddData(string text) {}
-    void IOutStream.AddLog(string text) {}
+    void IOutStream.AddData(string text) { }
+    void IOutStream.AddLog(string text) { }
 }
-
 
 public sealed class TraceCollector : DumpableObject, ITraceCollector
 {
