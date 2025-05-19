@@ -6,7 +6,10 @@ using Reni.TokenClasses;
 
 namespace Reni.Struct;
 
-sealed class CompoundContext : Child, IMultiSymbolProviderForPointer<Definable>, IContextReference
+sealed class CompoundContext
+    : Child
+        , IMultiSymbolProviderForPointer<Definable>
+        , IContextReference
 {
     [DisableDump]
     internal CompoundView View { get; }
