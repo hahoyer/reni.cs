@@ -1,3 +1,4 @@
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.SyntaxTree;
@@ -48,12 +49,13 @@ abstract class ContextMetaFeatureImplementation
     IFunction? IEvalImplementation.Function => null;
     IValue? IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right)
-        => GetResult(contextBase, category, right);
+    Result IMeta.GetResult
+        (Category category, ResultCache left, SourcePart _, ContextBase contextBase, ValueSyntax? right)
+        => GetResult(category, contextBase, right);
 
     IMeta IMetaImplementation.Function => this;
 
-    protected abstract Result GetResult(ContextBase contextBase, Category category, ValueSyntax? right);
+    protected abstract Result GetResult(Category category, ContextBase contextBase, ValueSyntax? right);
 }
 
 /// <summary>
@@ -92,7 +94,14 @@ interface IFunction
 
 interface IMeta
 {
-    Result GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right);
+    Result GetResult
+    (
+        Category category
+        , ResultCache left
+        , SourcePart token
+        , ContextBase contextBase
+        , ValueSyntax? right
+    );
 }
 
 interface ISearchTarget;
@@ -172,7 +181,8 @@ sealed class MetaFunction : DumpableObject, IImplementation, IMeta
     IFunction? IEvalImplementation.Function => null;
     IValue? IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult(Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right)
+    Result IMeta.GetResult
+        (Category category, ResultCache left, SourcePart token, ContextBase contextBase, ValueSyntax? right)
         => Function(category, left, contextBase, right);
 
     IMeta IMetaImplementation.Function => this;
@@ -184,7 +194,7 @@ sealed class ContextMetaFunction : ContextMetaFeatureImplementation
 
     public ContextMetaFunction(Func<ContextBase, Category, ValueSyntax?, Result> function) => Function = function;
 
-    protected override Result GetResult(ContextBase contextBase, Category category, ValueSyntax? right)
+    protected override Result GetResult(Category category, ContextBase contextBase, ValueSyntax? right)
         => Function(contextBase, category, right);
 }
 
@@ -198,7 +208,14 @@ sealed class ContextMetaFunctionFromSyntax
     IFunction? IEvalImplementation.Function => null;
     IValue? IEvalImplementation.Value => null;
 
-    Result IMeta.GetResult(Category category, ResultCache left, ContextBase callContext, ValueSyntax? right)
+    Result IMeta.GetResult
+    (
+        Category category
+        , ResultCache left
+        , SourcePart token
+        , ContextBase callContext
+        , ValueSyntax? right
+    )
         => callContext.GetResult(category, Definition.ReplaceArg(right));
 
     IMeta IMetaImplementation.Function => this;

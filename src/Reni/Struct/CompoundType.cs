@@ -31,12 +31,14 @@ sealed class CompoundType
     IImplementation? IMultiSymbolProvider<Definable>.GetFeature(Definable tokenClass)
         => IsHollow? View.Find(tokenClass, true) : null;
 
-    IImplementation? ISymbolProvider<DumpPrintToken>.Feature => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
-
     IImplementation? IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, true);
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult);
+    IImplementation? ISymbolProvider<DumpPrintToken>.Feature
+        => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
+
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        => Feature.Extension.Value(GetDumpPrintTokenResult);
 
     [DisableDump]
     internal override Root Root => View.Root;

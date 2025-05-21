@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;

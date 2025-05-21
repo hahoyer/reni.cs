@@ -69,6 +69,9 @@ static class Extension
 
             case IssueId.ExpectationFailedException:
                 return $"Expected {((string)additionalInformation[0]).Quote()}.";
+
+            case IssueId.MissingForeignFunctionSpecification:
+                return $"Missing foreign function specification: {TypeFormatter(additionalInformation[0])}\r\n";
         }
 
         Dumpable.NotImplementedFunction(issueId, additionalInformation.Dump());

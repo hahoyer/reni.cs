@@ -162,7 +162,7 @@ static class Extension
     {
         var metaFeature = ((IMetaImplementation)feature).Function;
         if(metaFeature != null)
-            return metaFeature.GetResult(category, left, context, right);
+            return metaFeature.GetResult(category, left, token, context, right);
 
         return feature
             .GetResult(category, token, context, right)

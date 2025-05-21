@@ -85,7 +85,7 @@ sealed class SearchResult : DumpableObject, IImplementation
         {
             var metaFeature = ((IMetaImplementation)Feature).Function;
             if(metaFeature != null)
-                return metaFeature.GetResult(category, left, context, right);
+                return metaFeature.GetResult(category, left, currentTarget, context, right);
 
             BreakExecution();
             var result = Feature.GetResult(category | Category.Type, currentTarget, context, right);

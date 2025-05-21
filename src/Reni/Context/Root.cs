@@ -17,6 +17,8 @@ sealed class Root
         , ISymbolProviderForPointer<Minus>
         , ISymbolProviderForPointer<ConcatArrays>
         , ISymbolProviderForPointer<MutableConcatArrays>
+        , ISymbolProviderForPointer<ForeignCode>
+        , ISymbolProvider<ForeignCode>
 {
     internal interface IParent
     {
@@ -36,9 +38,7 @@ sealed class Root
     [Node]
     readonly IParent Parent;
 
-    FunctionCache<Issue[],IssueType> IssueTypeCache => new(issues => new IssueType(this, issues));
-
-    internal IssueType GetIssueType(Issue[] issue) => IssueTypeCache[issue];
+    FunctionCache<Issue[], IssueType> IssueTypeCache => new(issues => new(this, issues));
 
     [DisableDump]
     public IExecutionContext ExecutionContext => Parent.ExecutionContext;
@@ -60,6 +60,12 @@ sealed class Root
 
     internal Root(IParent parent) => Parent = parent;
 
+    IImplementation ISymbolProviderForPointer<ForeignCode>.Feature 
+        => this.CachedValue(()=>new ForeignCodeFeature(this));
+
+    IImplementation ISymbolProvider<ForeignCode>.Feature 
+        => this.CachedValue(()=>new ForeignCodeFeature(this));
+
     IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature
         => this.CachedValue(() => GetCreateArrayFeature(false));
 
@@ -79,6 +85,8 @@ sealed class Root
     protected override string LevelFormat => "root context";
 
     internal override string ContextIdentificationDump => "r";
+
+    internal IssueType GetIssueType(Issue[] issue) => IssueTypeCache[issue];
 
     static ContextMetaFunction GetCreateArrayFeature
         (bool isMutable) => new((context, category, argsType)

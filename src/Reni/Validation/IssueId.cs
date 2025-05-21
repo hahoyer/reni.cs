@@ -1,6 +1,8 @@
+using System.Data;
 using hw.Scanner;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Validation;
@@ -61,6 +63,9 @@ enum IssueId
     MissingDeclarationInContext
 
     , MissingDeclarationValue
+    , [Setup(typeof(CompoundType))]
+    MissingForeignFunctionSpecification
+
     , [Setup(typeof(SourcePart))]
     MissingMatchingRightBracket
 

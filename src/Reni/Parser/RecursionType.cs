@@ -1,3 +1,4 @@
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -39,13 +40,6 @@ sealed class RecursionType
 
     bool IFunction.IsImplicit => false;
 
-    Result IMeta.GetResult
-        (Category category, ResultCache left, ContextBase contextBase, ValueSyntax? right)
-    {
-        NotImplementedMethod(contextBase, left, category, right);
-        return null!;
-    }
-
 
     IMeta IMetaImplementation.Function => this;
 
@@ -57,4 +51,17 @@ sealed class RecursionType
 
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+    Result IMeta.GetResult
+    (
+        Category category
+        , ResultCache left
+        , SourcePart token
+        , ContextBase contextBase
+        , ValueSyntax? right
+    )
+    {
+        NotImplementedMethod(category, left, token, contextBase, right);
+        return null!;
+    }
 }
