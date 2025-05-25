@@ -1,0 +1,35 @@
+{
+    "name": "reni",
+    "displayName": "reni",
+    "private": true,
+    "description": "",
+    "version": "0.0.2",
+    "engines": {
+        "vscode": "^1.100.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "reni",
+                "aliases": [
+                    "Reni",
+                    "reni"
+                ],
+                "extensions": [
+                    ".reni"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "reni",
+                "scopeName": "source.reni",
+                "path": "./syntaxes/reni.tmLanguage.json"
+            }
+        ]
+    }
+}
