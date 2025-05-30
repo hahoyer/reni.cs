@@ -1,9 +1,14 @@
 {
-    "name": "reni",
-    "displayName": "reni",
-    "private": true,
-    "description": "",
-    "version": "0.0.2",
+    "name": "reni-tm",
+    "displayName": "reni.TM",
+    "description": "TextMate grammar for the Reni programming language",
+    "version": "0.0.1",
+    "publisher": "hahoyer",
+    "repository": {
+        "type": "",
+        "url": ""
+    },
+    "license": "MIT",
     "engines": {
         "vscode": "^1.100.0"
     },
