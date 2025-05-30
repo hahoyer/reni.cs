@@ -79,6 +79,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reni.LSPVSIX", "Reni.LSPVSI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hw.CompilerTools", "..\..\..\HWClassLibrary.cs\net9\src\hw.CompilerTools\hw.CompilerTools.csproj", "{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni.vs.Textmate", "A:\develop\Reni\dev\src\Reni.vs.Textmate\Reni.vs.Textmate.csproj", "{30F1DB4A-4B3C-454B-A226-D2362359EC09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +175,18 @@ Global
 		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|arm64.Build.0 = Release|Any CPU
 		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|x86.ActiveCfg = Release|Any CPU
 		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|x86.Build.0 = Release|Any CPU
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|arm64.ActiveCfg = Debug|arm64
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|arm64.Build.0 = Debug|arm64
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|x86.ActiveCfg = Debug|x86
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|x86.Build.0 = Debug|x86
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Release|arm64.ActiveCfg = Release|arm64
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Release|arm64.Build.0 = Release|arm64
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Release|x86.ActiveCfg = Release|x86
+		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

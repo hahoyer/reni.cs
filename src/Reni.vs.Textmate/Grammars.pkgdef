@@ -1,0 +1,13 @@
+﻿; Registering the package
+[$RootKey$\InstalledProducts\reni.textmatePackage]
+"Package"="{30f1db4a-4b3c-454b-a226-d2362359ec09}"
+[$RootKey$\BindingPaths\{30f1db4a-4b3c-454b-a226-d2362359ec09}]
+"$PackageFolder$"=""
+
+; Registering the TextMate grammar
+[$RootKey$\TextMate\Repositories]
+"reni.textmate"="$PackageFolder$\Syntaxes"
+
+; Match file extensions with icons. See full icon list at https://glyphlist.azurewebsites.net/knownmonikers/
+[$RootKey$\ShellFileAssociations\.reni]
+"DefaultIconMoniker"="KnownMonikers.ConfigurationEditor"
