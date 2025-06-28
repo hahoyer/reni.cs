@@ -68,8 +68,9 @@ sealed class TypeType
     Result StarResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
         var countResult = right.GetResultForAll(context).AutomaticDereferenceResult;
-        var count = countResult
-            .GetValue(context.RootContext.ExecutionContext)
+        var typedData = countResult
+            .GetValue(context.RootContext.ExecutionContext);
+        var count = typedData.Value
             .ToInt32();
         var type = Value
             .Align

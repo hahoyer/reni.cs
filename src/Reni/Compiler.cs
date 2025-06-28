@@ -24,6 +24,7 @@ public sealed class Compiler
     const string DefaultSourceIdentifier = "source";
     const string DefaultModuleName = "ReniModule";
 
+
     [UsedImplicitly]
     public Exception? Exception;
 
@@ -112,7 +113,8 @@ public sealed class Compiler
             (
                 AtToken.TokenId,
                 "_N_E_X_T_",
-                ToNumberOfBase.TokenId
+                ToNumberOfBase.TokenId,
+                ForeignCode.TokenId
             );
 
             result += PrioTable.Left(ConcatArrays.TokenId, MutableConcatArrays.TokenId);

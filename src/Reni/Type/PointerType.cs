@@ -79,6 +79,8 @@ sealed class PointerType
 
     protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
+    protected override PointerType GetPointerForCache() => this;
+
     protected override ArrayType GetArrayForCache(int count, string optionsId)
         => ValueType.GetArray(count, optionsId);
 

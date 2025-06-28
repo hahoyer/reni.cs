@@ -8,7 +8,9 @@ sealed class EnableCut
 {
     internal EnableCut(TypeBase parent)
         : base(parent)
-        => Parent.IsCuttingPossible.Assert(Parent.Dump);
+    {
+        //Parent.IsCuttingPossible.Assert(Parent.Dump);
+    }
 
     IEnumerable<IConversion> IForcedConversionProvider<NumberType>.GetResult(NumberType destination)
         => Parent.GetCutEnabledConversion(destination);

@@ -21,7 +21,7 @@ sealed class ForeignCodeFeature : DumpableObject, IImplementation, IMeta
         Category category
         , ResultCache left
         , SourcePart token
-        , ContextBase contextBase
+        , ContextBase context
         , ValueSyntax? right
     )
     {
@@ -32,13 +32,10 @@ sealed class ForeignCodeFeature : DumpableObject, IImplementation, IMeta
                         .MissingForeignFunctionSpecification
                         .GetIssue(Root, token, left.Type));
         var args = right.AssertNotNull();
+        var module = left.Get(Category.All).GetValueAsText(Root.ExecutionContext).ToString(Size.TextItemSize);
+        var entry = args.GetResultForAll(context).GetValueAsText(Root.ExecutionContext).ToString(Size.TextItemSize);
 
-
-        var modul = args.Evaluate(contextBase);
-
-
-        NotImplementedMethod(category, left, token, contextBase, right);
-        return default!;
+        return Root.GetForeignCodeType(module, entry).GetResult(category);
     }
 
     IMeta IMetaImplementation.Function => this;

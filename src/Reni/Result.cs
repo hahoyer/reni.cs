@@ -270,13 +270,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             HasType.Expect(() => (null, "Dereference requires type category:\n " + Dump()));
 
             var result = this;
-            while(result.HasIssue != true && result.Type!.IsWeakReference)
+            while(!result.HasIssue && result.Type!.IsWeakReference)
                 result = result.DereferenceResult;
             return result;
         }
     }
 
     [DisableDump]
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Result DereferenceResult
         => Type
             .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump()))
@@ -737,13 +738,31 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             .GetConversion(CompleteCategory, target)
             .ReplaceArguments(this);
 
-    internal BitsConst GetValue(IExecutionContext context)
+    internal TypedData GetValue(IExecutionContext context)
     {
         (Closures?.IsNone != false).Assert(Dump);
         var result = Align.GetLocalBlock(CompleteCategory);
+        return new
+        (
+            result.Type!
+            , result
+                .Code
+                .ExpectNotNull(() => (null, "GetValue requires code category:\n " + Dump()))
+                .GetValue(context)
+        );
+    }
+
+    internal BitsConst GetValueAsText(IExecutionContext context)
+    {
+
+        var a = Type.ExpectNotNull()
+            .GetConversionToText()
+            .ReplaceArguments(this);
+
+        var result = a.Align.GetLocalBlock(CompleteCategory);
+
         return result
-            .Code
-            .ExpectNotNull(() => (null, "GetValue requires code category:\n " + Dump()))
+            .Code.ExpectNotNull()
             .GetValue(context);
     }
 

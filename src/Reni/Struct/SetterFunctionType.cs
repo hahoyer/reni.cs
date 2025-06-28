@@ -13,6 +13,8 @@ sealed class SetterFunction : FunctionInstance
         : base(parent, body) 
         => FunctionId = FunctionId.Setter(index);
 
+    [DisableDump]
     protected override TypeBase CallType => base.CallType.GetPair(Parent.ValueType.Pointer);
+    [DisableDump]
     protected override Size RelevantValueSize => Root.DefaultRefAlignParam.RefSize;
 }

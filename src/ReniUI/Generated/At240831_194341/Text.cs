@@ -7,7 +7,7 @@ namespace ReniUI.Generated.At240831_194341;
 [UnitTest]
 public sealed class Test : CompilerTest
 {
-    protected override string Target => (SmbFile.SourceFolder / "Test.reni").String;
+    protected override string Target => (SmbFile.SourceFolder! / "Test.reni").String;
 
     protected override void Verify(IEnumerable<Issue> issues)
     {

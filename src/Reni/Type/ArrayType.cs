@@ -3,6 +3,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Helper;
+using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -50,6 +51,7 @@ sealed class ArrayType
     internal TypeBase ElementType { get; }
 
     [UsedImplicitly]
+    [DisableDump]
     internal int Count { get; }
 
     [Node]
@@ -182,6 +184,9 @@ sealed class ArrayType
             OptionsValue.IsTextItem.Value
                 ? ElementType.SimpleItemSize ?? Size
                 : base.SimpleItemSize;
+
+    [DisableDump]
+    internal override CompoundView FindRecentCompoundView => ElementType.FindRecentCompoundView;
 
     [DisableDump]
     internal override IImplementation FunctionDeclarationForPointerType
@@ -322,11 +327,12 @@ sealed class ArrayType
     Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
     {
         var target = (left & Category.All).AutomaticDereferencedAlignedResult
-            .GetValue(context.RootContext.ExecutionContext)
-            .ToString(ElementType.Size);
-        var conversionBase = right!.Evaluate(context).ExpectNotNull().ToInt32();
+            .GetValue(context.RootContext.ExecutionContext);
+        //.ToString(ElementType.Size);
+        //todo: Error handling:
+        var conversionBase = ReflectionExtender.ToInt32(right!.Evaluate(context).ExpectNotNull());
         (conversionBase >= 2).Assert(conversionBase.ToString);
-        var result = BitsConst.Convert(target, conversionBase);
+        var result = BitsConst.Convert((string)target.Value, conversionBase);
         return Root.BitType.GetResult(category, result).Align;
     }
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -88,10 +89,10 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 
     internal Result GetResultForAll(ContextBase context) => context.GetResult(Category.All, this);
 
-    internal BitsConst Evaluate(ContextBase context)
+    internal TypedData Evaluate(ContextBase context)
         => GetResultForAll(context).GetValue(context.RootContext.ExecutionContext);
 
-    //[DebuggerHidden]
+    [DebuggerHidden]
     internal TypeBase GetTypeBase(ContextBase context) => context.GetResult(Category.Type, this).Type!;
 
     internal bool GetIsHollowStructureElement(ContextBase context)

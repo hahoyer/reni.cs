@@ -19,6 +19,7 @@ static class MainContainer
 
     public static void Main(string[] args)
     {
+        Tracer.IsBreakDisabled = false;
         Parser.Default.ParseArguments<Options>(args)
             .WithParsed(options =>
             {

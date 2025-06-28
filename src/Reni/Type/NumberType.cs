@@ -32,7 +32,7 @@ sealed class NumberType
     NumberType ZeroType => (NumberType)ZeroResult.Value.Type!;
 
     [EnableDump]
-    internal int Bits => IsInDump? -1 : Size.ToInt();
+    internal int Bits => Size.ToInt();
 
     static IEnumerable<string> InternalDeclarationOptions
         => new[]
@@ -43,7 +43,10 @@ sealed class NumberType
 
     public NumberType(ArrayType parent)
         : base(parent)
-        => ZeroResult = new(GetZeroResult);
+    {
+        ZeroResult = new(GetZeroResult);
+        StopByObjectIds();
+    }
 
     IEnumerable<IConversion> IForcedConversionProvider<NumberType>.GetResult(NumberType destination)
     {
@@ -102,6 +105,8 @@ sealed class NumberType
 
     [DisableDump]
     protected override CodeBase DumpPrintCode => Align.ArgumentCode.GetDumpPrintNumber(Align.Size);
+
+    internal override object GetDataValue(BitsConst data) => data.ToInt32();
 
     Result GetZeroResult() => Root
         .BitType

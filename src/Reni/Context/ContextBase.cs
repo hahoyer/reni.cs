@@ -68,6 +68,7 @@ abstract class ContextBase
 
         [Node]
         [DisableDump]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal readonly ValueCache<CompoundView> RecentStructure;
 
         [Node]
@@ -188,7 +189,7 @@ abstract class ContextBase
 
     internal Compound GetCompound(CompoundSyntax context) => CacheObject.Compounds[context];
 
-    //[DebuggerHidden]
+    [DebuggerHidden]
     internal Result GetResult(Category category, ValueSyntax syntax)
         => GetResultCache(syntax).Get(category);
 
@@ -201,7 +202,7 @@ abstract class ContextBase
     internal TypeBase? GetTypeIfKnown(ValueSyntax syntax)
         => CacheObject.ResultCache[syntax].Data.Type;
 
-    //[DebuggerHidden]
+    [DebuggerHidden]
     Result GetResultForCache(Category category, ValueSyntax? syntax)
     {
         var trace = syntax!.ObjectId.In() && ObjectId.In(7) && category.HasType();
@@ -278,7 +279,7 @@ abstract class ContextBase
             return result;
 
         NotImplementedMethod(tokenClass);
-        return null;
+        return result;
     }
 
     internal Result GetPrefixResult

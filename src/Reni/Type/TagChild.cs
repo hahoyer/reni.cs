@@ -1,5 +1,6 @@
 using Reni.Basics;
 using Reni.Feature;
+using Reni.Struct;
 
 namespace Reni.Type;
 

@@ -231,11 +231,10 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result AccessViaPositionExpression(Category category, Result rightResult)
     {
-        var position = rightResult
-            .GetConversion(IndexType)
-            .GetSmartUn<PointerType>()
-            .GetValue(Compound.Root.ExecutionContext)
-            .ToInt32();
+        var position = ReflectionExtender.ToInt32(rightResult
+                .GetConversion(IndexType)
+                .GetSmartUn<PointerType>()
+                .GetValue(Compound.Root.ExecutionContext));
         return AccessViaObjectPointer(category, position);
     }
 

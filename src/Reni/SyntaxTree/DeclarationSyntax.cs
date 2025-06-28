@@ -11,13 +11,13 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
     [EnableDumpExcept(null)]
     internal readonly ValueSyntax Value;
 
-    [DisableDump]
+    [EnableDumpExcept(null)]
     internal string? NameOrNull => Declarer?.Name?.Value;
 
-    [DisableDump]
+    [EnableDumpExcept(false)]
     internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
 
-    [DisableDump]
+    [EnableDumpExcept(false)]
     internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
     int DirectChildCountOfDeclarer => Declarer?.DirectChildCount ?? 0;

@@ -77,3 +77,15 @@ sealed class ArrayReference : Definable
 
     public override string Id => TokenId;
 }
+
+[BelongsTo(typeof(MainTokenFactory))]
+sealed class SystemText : Definable
+{
+    public const string TokenId = "Text";
+
+    [DisableDump]
+    internal override IEnumerable<IDeclarationProvider> MakeGeneric
+        => this.GenericListFromDefinable(base.MakeGeneric);
+
+    public override string Id => TokenId;
+}

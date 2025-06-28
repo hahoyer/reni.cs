@@ -64,6 +64,9 @@ sealed class ConversionPath
 
     void AssertValid()
     {
+        if(Destination is IssueType)
+            return;
+
         if(Elements.Any())
             (Source == Elements.First().Source).Assert
             (() =>

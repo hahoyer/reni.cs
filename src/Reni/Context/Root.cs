@@ -28,7 +28,11 @@ sealed class Root
         Result<ValueSyntax?> ParsePredefinedItem(string source);
     }
 
+    [DisableDump]
     internal static readonly VoidType VoidType = new();
+
+    [DisableDump]
+    internal readonly FunctionCache<string, ForeignCodeType.Entry> ForeignLibrariesCache;
 
     [DisableDump]
     [Node]
@@ -37,6 +41,8 @@ sealed class Root
     [DisableDump]
     [Node]
     readonly IParent Parent;
+
+    readonly FunctionCache<string, FunctionCache<string, ForeignCodeType>> ForeignCodeTypeCache;
 
     FunctionCache<Issue[], IssueType> IssueTypeCache => new(issues => new(this, issues));
 
@@ -58,16 +64,21 @@ sealed class Root
     [DisableDump]
     internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
 
-    internal Root(IParent parent) => Parent = parent;
+    internal Root(IParent parent)
+    {
+        Parent = parent;
+        ForeignCodeTypeCache = new(module => new(entry => new(module, entry, this)));
+        ForeignLibrariesCache = new(s => ForeignCodeType.CreateEntries(s, this));
+    }
 
-    IImplementation ISymbolProviderForPointer<ForeignCode>.Feature 
-        => this.CachedValue(()=>new ForeignCodeFeature(this));
-
-    IImplementation ISymbolProvider<ForeignCode>.Feature 
-        => this.CachedValue(()=>new ForeignCodeFeature(this));
+    IImplementation ISymbolProvider<ForeignCode>.Feature
+        => this.CachedValue(() => new ForeignCodeFeature(this));
 
     IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature
         => this.CachedValue(() => GetCreateArrayFeature(false));
+
+    IImplementation ISymbolProviderForPointer<ForeignCode>.Feature
+        => this.CachedValue(() => new ForeignCodeFeature(this));
 
     IImplementation ISymbolProviderForPointer<Minus>.Feature
         => this.CachedValue(GetMinusFeature);
@@ -179,4 +190,7 @@ sealed class Root
 
         return new(result, rawResult.Issues.ToArray(), description);
     }
+
+    internal TypeBase GetForeignCodeType(string module, string entry)
+        => ForeignCodeTypeCache[module][entry];
 }

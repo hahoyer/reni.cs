@@ -73,13 +73,13 @@ sealed class FunctionType : SetterTargetType
     internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argumentsType)
         : base(compoundView.Root)
     {
+        StopByObjectIds();
         Getter = new(this, index, body.Getter);
         Setter = body.Setter == null? null : new SetterFunction(this, index, body.Setter);
         Index = index;
         Body = body;
         CompoundView = compoundView;
         ArgumentsType = argumentsType;
-        StopByObjectIds();
     }
 
     protected override bool IsMutable => Setter != null;
@@ -107,7 +107,8 @@ sealed class FunctionType : SetterTargetType
 
     internal override string DumpPrintText => $"@({ArgumentsType.DumpPrintText})=>{ValueType.DumpPrintText}";
 
-    protected override Result GetSetterResult(Category category) => Setter?.GetCallResult(category) ?? Root.VoidType.GetResult(category);
+    protected override Result GetSetterResult
+        (Category category) => Setter?.GetCallResult(category) ?? Root.VoidType.GetResult(category);
 
     protected override Result GetGetterResult(Category category) => Getter.GetCallResult(category);
     protected override Size GetSize() => ArgumentsType.Size + GetterClosures.Size;

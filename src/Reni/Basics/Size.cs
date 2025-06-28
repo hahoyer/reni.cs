@@ -51,6 +51,7 @@ public sealed class Size
     public bool IsPositive => Value > 0;
     public int ByteCount => GetPacketCount(BitsConst.SegmentAlignBits);
     public Size ByteAlignedSize => GetNextPacketSize(BitsConst.SegmentAlignBits);
+    public static Size TextItemSize => Create(8);
 
     internal bool IsNegative => !(IsPositive || IsZero);
 

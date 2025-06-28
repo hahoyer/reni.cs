@@ -44,6 +44,9 @@ sealed class CompoundType
     internal override Root Root => View.Root;
 
     [DisableDump]
+    internal int Count => View.Compound.Syntax.EndPosition;
+
+    [DisableDump]
     internal override CompoundView FindRecentCompoundView => View;
 
     [DisableDump]

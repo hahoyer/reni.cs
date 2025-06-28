@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -18,6 +19,7 @@ abstract class TypeBase
         , ISearchTarget
         , ValueCache.IContainer
         , IMultiSymbolProviderForPointer<IdentityOperation>
+        , ISymbolProviderForPointer<ForeignCode>
 
 {
     sealed class CacheContainer
@@ -136,9 +138,6 @@ abstract class TypeBase
     }
 
     [DisableDump]
-    internal virtual TypeBase TypeType => Cache.TypeType.Value;
-
-    [DisableDump]
     internal TypeBase FunctionInstance => Cache.FunctionInstanceType.Value;
 
     [DisableDump]
@@ -202,9 +201,15 @@ abstract class TypeBase
         => Feature.Extension.FunctionFeature(
             (category, right, operation) => GetIdentityOperationResult(category, right, operation.IsEqual), tokenClass);
 
+    IImplementation ISymbolProviderForPointer<ForeignCode>.Feature
+        => this.CachedValue(() => new ForeignCodeFeature(Root));
+
     [DisableDump]
     [Node]
     internal abstract Root Root { get; }
+
+    [DisableDump]
+    internal virtual TypeBase TypeType => Cache.TypeType.Value;
 
     /// <summary>
     ///     Is this a hollow type? With no data?
@@ -240,6 +245,7 @@ abstract class TypeBase
     internal virtual Size? SimpleItemSize => null;
 
     [DisableDump]
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal virtual CompoundView FindRecentCompoundView
     {
         get
@@ -431,6 +437,7 @@ abstract class TypeBase
     internal virtual IEnumerable<IConversion> GetCutEnabledConversion(NumberType destination) { yield break; }
 
     [DisableDump]
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     protected virtual CodeBase DumpPrintCode
     {
         get
@@ -731,7 +738,7 @@ abstract class TypeBase
 
         var issue = count == 0
             ? GetMissingDeclarationIssue(currentTarget)
-            : IssueId.AmbiguousSymbol.GetIssue(Root,currentTarget, this, searchResults);
+            : IssueId.AmbiguousSymbol.GetIssue(Root, currentTarget, this, searchResults);
 
         return new(category, [..left.Issues, issue]);
     }
@@ -767,6 +774,38 @@ abstract class TypeBase
         .GetPair(Align)
         .ArgumentCode
         .Concat(new IdentityTestCode(isEqual, Size.Bit, Align.Size));
+
+    internal Result GetConversionToText()
+    {
+        StartMethodDump(false);
+        try
+        {
+            var textItemType = Root.BitType.GetArray(Size.TextItemSize.ToInt()).TextItem;
+            var count = GetArrayLength(textItemType);
+            var textType = textItemType.GetArray(count).TextItem;
+            var result = GetConversion(Category.All, textType);
+            return ReturnMethodDump(result);
+        }
+        finally
+        {
+            EndMethodDump();
+        }
+    }
+
+    internal Result GetConversionToNumber(int count)
+    {
+        var targetType = (Root.BitType*count).Number;
+        var result = GetConversion(Category.All, targetType);
+        return result!;
+    }
+
+    public static ArrayType operator *(TypeBase target, int count) => target.GetArray(count);
+
+    internal virtual object GetDataValue(BitsConst data)
+    {
+        NotImplementedMethod(data);
+        return default!;
+    }
 }
 
 // ReSharper disable CommentTypo

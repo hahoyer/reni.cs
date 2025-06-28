@@ -44,7 +44,7 @@ static class Generator
         var directoryName
             = Environment.GetEnvironmentVariable
                 ("temp")
-            + "\\reni.compiler\\"
+            + @"\reni.compiler\"
             + Process.GetCurrentProcess().Id
             + "."
             + Thread.CurrentThread.ManagedThreadId;

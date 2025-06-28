@@ -21,7 +21,8 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
 
     internal BitType(Root root) => Root = root;
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => Feature.Extension.Value(GetDumpPrintTokenResult, this);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
     [DisableDump]
     internal override string DumpPrintText => "bit";

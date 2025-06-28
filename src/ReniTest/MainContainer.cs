@@ -38,7 +38,7 @@ static class MainContainer
             PendingTests.Run();
         }
 
-        configuration.TestsFileName = (SmbFile.SourceFolder / "PendingTests.cs").FullName;
+        configuration.TestsFileName = (SmbFile.SourceFolder! / "PendingTests.cs").FullName;
         Assembly.GetExecutingAssembly().RunTests();
     }
 

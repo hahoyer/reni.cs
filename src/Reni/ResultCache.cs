@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Type;
 using Reni.Validation;
 
@@ -81,7 +81,7 @@ sealed class ResultCache : DumpableObject
     }
 
     [DisableDump]
-    const string FunctionDump = "";
+    readonly bool InConstruction;
 
     [DisableDump]
     static CallStack? Current;
@@ -138,24 +138,29 @@ sealed class ResultCache : DumpableObject
     internal Issue[] Issues => Get(Category.IsHollow).Issues;
 
     internal ResultCache(IResultProvider obtainResult)
-    {
-        Data = new(Category.None);
-        Provider = obtainResult;
-    }
+        : this(new(Category.None), obtainResult) { }
 
-    ResultCache(Func<Category, Result>? obtainResult, Result? data)
+
+    ResultCache(Result data)
+        : this(data, NotSupported) { }
+
+    ResultCache(Func<Category, Result> obtainResult)
+        : this(new(Category.None), new SimpleProvider(obtainResult)) { }
+
+    ResultCache(Result data, IResultProvider provider)
         : base(NextObjectId++)
     {
-        Data = data ?? new(Category.None);
-        Provider = obtainResult == null? NotSupported : new SimpleProvider(obtainResult);
+        InConstruction = true;
+        Data = data;
+        Provider = provider;
+
+        InConstruction = false;
         StopByObjectIds();
     }
 
     public override string DumpData()
     {
-        var result = FunctionDump;
-        if(result != "")
-            result += "\n";
+        var result = "";
         if(PendingCategory != Category.None)
             result += $"PendingCategory={PendingCategory.Dump()}\n";
         result += Data.DumpData();
@@ -163,9 +168,9 @@ sealed class ResultCache : DumpableObject
     }
 
     public static ResultCache CreateInstance(Func<Category, Result> obtainResult)
-        => new(obtainResult, null);
+        => new(obtainResult);
 
-    public static implicit operator ResultCache(Result x) => new(null, x);
+    public static implicit operator ResultCache(Result x) => new(x);
 
     /// <summary>
     ///     Try to update all categories according to <see cref="category" />.
@@ -173,7 +178,7 @@ sealed class ResultCache : DumpableObject
     ///     Pending categories are treated by recursion handlers
     /// </summary>
     /// <param name="category"></param>
-    //[DebuggerHidden]
+    [DebuggerHidden]
     void Update(Category category)
     {
         var availableCategory = category.Without(PendingCategory);
@@ -189,7 +194,7 @@ sealed class ResultCache : DumpableObject
     }
 
     /// <summary>
-    ///     Try to update simple cases that provider independent.
+    ///     Try to update simple cases that are provider independent.
     ///     For instance <see cref="IsHollow" /> may be obvious if size has been obtained already.
     /// </summary>
     /// <param name="category"></param>
@@ -240,6 +245,8 @@ sealed class ResultCache : DumpableObject
     /// <param name="category"></param>
     void RecursiveUpdate(Category category)
     {
+        if(InConstruction || ObjectId == 3)
+            return;
         if(category == Category.None)
             return;
 
@@ -254,19 +261,23 @@ sealed class ResultCache : DumpableObject
     }
 
     public static Result operator &(ResultCache resultCache, Category category)
-        => resultCache.Get(category);
+        =>  resultCache.Get(category);
 
+    bool InGet;
     /// <summary>
     ///     Obtain the categories requested.
     ///     This will also try to obtain categories that are not yet obtained.
     /// </summary>
     /// <param name="category"></param>
     /// <returns></returns>
-    //[DebuggerHidden]
+    [DebuggerHidden]
     internal Result Get(Category category)
     {
-        var trace = ObjectId.In();
-        StartMethodDump(trace, category);
+        var inGet = InGet;
+        InGet = true;
+
+        var trace = ObjectId.In() ;
+        StartMethodDump(trace, category, "inGet", inGet);
         try
         {
             BreakExecution();
@@ -274,7 +285,7 @@ sealed class ResultCache : DumpableObject
             Dump(nameof(Provider), Provider);
             var t = Data.Type;
             var completeCategory = Data.CompleteCategory;
-            completeCategory
+if(ObjectId != 3)            completeCategory
                 .Contains(category)
                 .Assert(() => $"{ObjectId}i: {Data.Dump()}\nPendingCategory={PendingCategory.Dump()}");
             return ReturnMethodDump(Data & category);
@@ -282,6 +293,7 @@ sealed class ResultCache : DumpableObject
         finally
         {
             EndMethodDump();
+            InGet = inGet;
         }
     }
 
@@ -306,4 +318,6 @@ sealed class ResultCache : DumpableObject
             Current = Current.AssertNotNull().Former;
         }
     }
+
+    internal TypedData Evaluate(Root root) => Get(Category.All).GetValue(root.ExecutionContext);
 }
