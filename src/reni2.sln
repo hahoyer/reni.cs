@@ -77,8 +77,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReniLSP", "ReniLSP\ReniLSP.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reni.LSPVSIX", "Reni.LSPVSIX\Reni.LSPVSIX.csproj", "{EBA27910-302E-4EA6-B5FC-9B52875B394C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hw.CompilerTools", "..\..\..\HWClassLibrary.cs\net9\src\hw.CompilerTools\hw.CompilerTools.csproj", "{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni.vs.Textmate", "A:\develop\Reni\dev\src\Reni.vs.Textmate\Reni.vs.Textmate.csproj", "{30F1DB4A-4B3C-454B-A226-D2362359EC09}"
 EndProject
 Global
@@ -163,18 +161,6 @@ Global
 		{EBA27910-302E-4EA6-B5FC-9B52875B394C}.Release|arm64.Build.0 = Release|Any CPU
 		{EBA27910-302E-4EA6-B5FC-9B52875B394C}.Release|x86.ActiveCfg = Release|Any CPU
 		{EBA27910-302E-4EA6-B5FC-9B52875B394C}.Release|x86.Build.0 = Release|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Debug|arm64.ActiveCfg = Debug|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Debug|arm64.Build.0 = Debug|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Debug|x86.Build.0 = Debug|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|arm64.ActiveCfg = Release|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|arm64.Build.0 = Release|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|x86.ActiveCfg = Release|Any CPU
-		{9E3AA033-02DC-95A7-C49F-B4E5F7F75470}.Release|x86.Build.0 = Release|Any CPU
 		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30F1DB4A-4B3C-454B-A226-D2362359EC09}.Debug|arm64.ActiveCfg = Debug|arm64

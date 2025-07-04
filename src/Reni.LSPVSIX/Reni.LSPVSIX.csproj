@@ -29,9 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="3.1.3" />
+    <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="Microsoft.VisualStudio.Extensibility" Version="17.13.2060" />
-    <PackageReference Include="System.Text.Json" Version="10.0.0-preview.3.25171.5" />
+    <PackageReference Include="System.Text.Json" Version="10.0.0-preview.5.25277.114" />
   </ItemGroup>
 
   <ItemGroup>
