@@ -71,9 +71,6 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     internal IFormatter? Formatter;
 
     [DisableDump]
-    internal Root? RootValue;
-
-    [DisableDump]
     readonly ITokenClass InnerTokenClass;
 
     readonly FunctionCache<bool, string?> FlatFormatCache;
@@ -87,6 +84,10 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
     BinaryTree? RightNeighbor;
 
     int Depth;
+    Root? RootValue;
+
+    [DisableDump]
+    internal Root Root => Parent?.Root ?? RootValue.ExpectNotNull();
 
     [DisableDump]
     internal SourcePart FullToken => WhiteSpaces.SourcePart.Start.Span(Token.End);
@@ -198,9 +199,6 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
 
     [DisableDumpExcept(true)]
     internal bool HasComplexDeclaration => Formatter?.HasComplexDeclaration(this) ?? false;
-
-    [DisableDump]
-    internal Root Root => RootValue.AssertNotNull();
 
     BinaryTree
     (
@@ -427,23 +425,9 @@ this: {Dump()}
 Current: {Syntax!.Dump()}
 New: {syntax.Dump()}");
         Syntax = syntax;
-        RootValue = root;
     }
 
-    internal void SetRoot(Root root)
-    {
-        if(Token.Source.Identifier == Compiler.PredefinedSource)
-            return;
-
-        (RootValue == null || RootValue == root).Assert(() => @$"
-this: {Dump()}
-Current: {RootValue!.NodeDump}
-New: {root.NodeDump}");
-
-        RootValue = root;
-        Left?.SetRoot(root);
-        Right?.SetRoot(root);
-    }
+    internal void SetRoot(Root root) => RootValue = root;
 
     internal BinaryTree? GetContainingTreeItem(SourcePosition offset)
     {
