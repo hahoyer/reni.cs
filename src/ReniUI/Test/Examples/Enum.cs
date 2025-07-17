@@ -31,9 +31,6 @@ public sealed class EnumDevelop : DependenceProvider
         (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
 
         issue = issues[i++];
-        (issue.IssueId == IssueId.ConsequenceError).Assert(issue.Dump);
-
-        issue = issues[i++];
         (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
 
         (i == issues.Length).Assert();
@@ -62,9 +59,6 @@ public sealed class EnumDevelop : DependenceProvider
 
         var issue = issues[i++];
         (issue.IssueId == IssueId.MissingDeclarationForType).Assert(issue.Dump);
-
-        issue = issues[i++];
-        (issue.IssueId == IssueId.ConsequenceError).Assert(issue.Dump);
 
         (i == issues.Length).Assert();
     }

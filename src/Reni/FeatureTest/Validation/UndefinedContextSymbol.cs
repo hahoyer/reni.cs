@@ -52,8 +52,6 @@ public sealed class UseOfUndefinedContextSymbol : CompilerTest
         var i = 0;
         (issueArray[i].IssueId == IssueId.MissingDeclarationInContext).Assert(issueArray[i].Dump);
         i++;
-        (issueArray[i].IssueId == IssueId.ConsequenceError).Assert(issueArray[i].Dump);
-        i++;
         (i == issueArray.Length).Assert();
     }
 }
@@ -71,10 +69,6 @@ public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
         var issueArray = issues.ToArray();
         var i = 0;
         (issueArray[i].IssueId == IssueId.MissingDeclarationInContext).Assert(issueArray[i].Dump);
-        i++;
-        (issueArray[i].IssueId == IssueId.ConsequenceError).Assert(issueArray[i].Dump);
-        i++;
-        (issueArray[i].IssueId == IssueId.ConsequenceError).Assert(issueArray[i].Dump);
         i++;
         (i == issueArray.Length).Assert();
     }
