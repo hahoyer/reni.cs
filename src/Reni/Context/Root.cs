@@ -43,8 +43,7 @@ sealed class Root
     readonly IParent Parent;
 
     readonly FunctionCache<string, FunctionCache<string, ForeignCodeType>> ForeignCodeTypeCache;
-
-    FunctionCache<Issue[], IssueType> IssueTypeCache => new(issues => new(this, issues));
+    readonly FunctionCache<Issue, IssueType> IssueTypeCache;
 
     [DisableDump]
     public IExecutionContext ExecutionContext => Parent.ExecutionContext;
@@ -68,6 +67,7 @@ sealed class Root
     {
         Parent = parent;
         ForeignCodeTypeCache = new(module => new(entry => new(module, entry, this)));
+        IssueTypeCache = new(issue => new(this, issue));
         ForeignLibrariesCache = new(s => ForeignCodeType.CreateEntries(s, this));
     }
 
@@ -97,7 +97,10 @@ sealed class Root
 
     internal override string ContextIdentificationDump => "r";
 
-    internal IssueType GetIssueType(Issue[] issue) => IssueTypeCache[issue];
+    internal TypeBase GetIssueType(Issue[] issues)
+        => issues
+            .Select(issue => IssueTypeCache[issue])
+            .Aggregate((TypeBase)VoidType, (current, next) => current.GetPair(next));
 
     static ContextMetaFunction GetCreateArrayFeature
         (bool isMutable) => new((context, category, argsType)
@@ -177,7 +180,7 @@ sealed class Root
     internal FunctionContainer GetFunctionContainer(int index) => Functions.Container(index);
     internal FunctionType GetFunction(int index) => Functions.Item(index);
 
-    internal Container GetMainContainer(ValueSyntax syntax, string description)
+    internal Container GetMainContainer(ValueSyntax syntax, string? description)
     {
         var rawResult = syntax.GetResultForAll(this);
 

@@ -1,5 +1,4 @@
-﻿using hw.Scanner;
-using Reni.Basics;
+﻿using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Type;
@@ -7,15 +6,24 @@ using Reni.Validation;
 
 namespace Reni;
 
-sealed class IssueType(Root root, Issue[] issues) : TypeBase, IContextReference
+sealed class IssueType : TypeBase, IContextReference
 {
-    internal override Issue[] Issues { get; } = issues;
+    readonly Issue Issue;
+    internal override Issue[] Issues => [Issue];
 
     [DisableDump]
-    internal override Root Root { get; } = root;
+    internal override Root Root { get; }
+
+    public IssueType(Root root, Issue issue)
+    {
+        Issue = issue;
+        Root = root;
+        StopByObjectIds();
+    }
 
     int IContextReference.Order => default;
 
+    [DisableDump]
     internal override TypeBase TypeType => this;
 
     [DisableDump]
@@ -24,10 +32,10 @@ sealed class IssueType(Root root, Issue[] issues) : TypeBase, IContextReference
     protected override Size GetSize() => Size.Zero;
 
     internal override Result GetInstanceResult(Category category, Func<Category, Result> getRightResult)
-        => new(category, Issues.Concat(getRightResult(category).Issues).ToArray());
+        => GetPair(Root.GetIssueType(getRightResult(category).Issues)).GetResult(category);
 
     protected override CodeBase DumpPrintCode => new DumpPrintText(GetType().PrettyName());
 
-    protected override Issue GetMissingDeclarationIssue(SourcePart position)
-        => IssueId.ConsequenceError.GetIssue(Root, position);
+    [DisableDump]
+    protected override IssueId MissingDeclarationIssueId => IssueId.ConsequenceError;
 }

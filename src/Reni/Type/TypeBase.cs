@@ -70,6 +70,11 @@ abstract class TypeBase
         [SmartNode]
         internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
 
+        [Node]
+        [SmartNode]
+        public readonly FunctionCache<SourcePart, Issue> MissingDeclarationIssue;
+
+        
         public CacheContainer(TypeBase parent)
         {
             EnableCut = new(() => new(parent));
@@ -93,6 +98,7 @@ abstract class TypeBase
             Size = new(parent.GetSizeForCache);
             SymmetricConversions = new(parent.GetSymmetricConversionsForCache);
             ArrayReferenceCache = new(id => new(parent, id));
+            MissingDeclarationIssue = new(parent.GetMissingDeclarationIssueForCache);
         }
     }
 
@@ -447,8 +453,11 @@ abstract class TypeBase
         }
     }
 
-    protected virtual Issue GetMissingDeclarationIssue(SourcePart position)
-        => IssueId.MissingDeclarationForType.GetIssue(Root, position, this);
+    Issue GetMissingDeclarationIssue(SourcePart position)
+        => Cache.MissingDeclarationIssue[position];
+
+    Issue GetMissingDeclarationIssueForCache(SourcePart position)
+        => MissingDeclarationIssueId.GetIssue(Root, position, this);
 
     Size GetSizeForCache()
     {
@@ -743,6 +752,10 @@ abstract class TypeBase
         return new(category, [..left.Issues, issue]);
     }
 
+    [DisableDump]
+    protected virtual IssueId MissingDeclarationIssueId 
+        => IssueId.MissingDeclarationForType;
+
     Result GetIdentityOperationResult(Category category, TypeBase right, bool isEqual)
     {
         if(AutomaticDereferenceType == right.AutomaticDereferenceType)
@@ -796,7 +809,7 @@ abstract class TypeBase
     {
         var targetType = (Root.BitType*count).Number;
         var result = GetConversion(Category.All, targetType);
-        return result!;
+        return result;
     }
 
     public static ArrayType operator *(TypeBase target, int count) => target.GetArray(count);
