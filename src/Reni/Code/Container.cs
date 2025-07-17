@@ -24,12 +24,12 @@ sealed class Container : DumpableObject
 
     [Node]
     [EnableDump]
-    internal string Description { get; }
+    internal string? Description { get; }
 
     bool HasIssues => Issues?.Any() ?? false;
     bool HasCode => Data != null;
 
-    internal Container(CodeBase? data, Issue[]? issues, string description, FunctionId? functionId = null)
+    internal Container(CodeBase? data, Issue[]? issues, string? description = null, FunctionId? functionId = null)
         : base(NextObjectId++)
     {
         Description = description;

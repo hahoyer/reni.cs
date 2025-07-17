@@ -39,7 +39,7 @@ public sealed class CodeContainer : DumpableObject, ValueCache.IContainer
         }
     }
 
-    internal CodeContainer(ValueSyntax syntax, Root root, string moduleName, string description)
+    internal CodeContainer(ValueSyntax syntax, Root root, string moduleName, string? description)
     {
         ModuleName = moduleName;
         Root = root;

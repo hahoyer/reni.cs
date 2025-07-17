@@ -313,7 +313,7 @@ public sealed class Compiler
             item.Syntax.AssertIsNotNull(() => item.LogDump());
     }
 
-    CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data);
+    CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data??"");
 
     static string ModuleNameFromFileName(string fileName)
         => "_" + Path.GetFileName(fileName).Symbolize();
