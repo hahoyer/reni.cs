@@ -18,7 +18,6 @@ sealed class FunctionBodyType
         , ITemplateProvider
 {
     [DisableDump]
-    [EnableDump]
     [Node]
     internal override CompoundView FindRecentCompoundView { get; }
 
