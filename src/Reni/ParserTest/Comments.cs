@@ -5,7 +5,7 @@ using Reni.Parser;
 namespace Reni.ParserTest;
 
 [UnitTest]
-public sealed class Comments
+public static class Comments
 {
     [UnitTest]
     public static void MultiLineMinimal() => PerformTest("#()# outside", 4);
