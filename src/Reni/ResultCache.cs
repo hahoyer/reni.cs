@@ -319,5 +319,5 @@ if(ObjectId != 3)            completeCategory
         }
     }
 
-    internal TypedData Evaluate(Root root) => Get(Category.All).GetValue(root.ExecutionContext);
+    internal TypedData Evaluate(Root root) => Get(Category.All).GetTypedData(root.ExecutionContext);
 }

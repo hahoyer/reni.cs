@@ -9,18 +9,8 @@ namespace Reni.Type;
 
 sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 {
-    static ForeignCodeType()
-    {
-        var handlers = Tracer.Dumper.Configuration.Handlers;
-        handlers.Add(typeof(MethodBase), (_, o) => ((MethodBase)o).DumpMethod(true));
-        handlers.Add(typeof(ParameterInfo), (_, o) =>
-        {
-            var parameter = (ParameterInfo)o;
-            return parameter.ParameterType.PrettyName() + " " + parameter.Name;
-        });
-    }
-
     internal sealed class TransferResult { }
+
     internal sealed class Entry
     {
         internal Method[]? Methods;
@@ -32,7 +22,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
             => Data.TryGetValue(namePart, out var value)? value : Data[namePart] = new();
     }
 
-    internal sealed class Method :DumpableObject
+    internal sealed class Method : DumpableObject
     {
         internal readonly MethodInfo MethodInfo;
         readonly Root Root;
@@ -48,8 +38,8 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         {
             var targetArgsType = GetType(MethodInfo.GetParameters());
             var targetResultType = GetLeftSideType(MethodInfo.ReturnType);
-
-            NotImplementedMethod(argsType);
+            //return FunctionInstanceType()
+            NotImplementedMethod(argsType, "targetResultType", targetResultType, "targetArgsType", targetArgsType);
             return default!;
         }
 
@@ -64,7 +54,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
         TypeBase GetRightSideType(System.Type target)
         {
-            if(target== typeof(string))
+            if(target == typeof(string))
                 return (Root.BitType * 8).TextItem.Pointer;
 
             NotImplementedMethod(target);
@@ -73,12 +63,23 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
         TypeBase GetLeftSideType(System.Type target)
         {
-            if(target== typeof(string))
+            if(target == typeof(string))
                 return (Root.BitType * 8).TextItem.Pointer;
 
             NotImplementedMethod(target);
             return default!;
         }
+    }
+
+    static ForeignCodeType()
+    {
+        var handlers = Tracer.Dumper.Configuration.Handlers;
+        handlers.Add(typeof(MethodBase), (_, o) => ((MethodBase)o).DumpMethod(true));
+        handlers.Add(typeof(ParameterInfo), (_, o) =>
+        {
+            var parameter = (ParameterInfo)o;
+            return parameter.ParameterType.PrettyName() + " " + parameter.Name;
+        });
     }
 
     [DisableDump]
@@ -110,7 +111,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
     Result IFunction.GetResult(Category category, TypeBase argsType)
     {
-        var m = GetMethod().Select(m=>m.Transfer(argsType)).ToArray();
+        var m = GetMethod().Select(m => m.Transfer(argsType)).ToArray();
 
         NotImplementedMethod(category, argsType, "m", m);
         return default!;
@@ -118,7 +119,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
     bool IFunction.IsImplicit => false;
 
-    IMeta? IMetaImplementation.Function => default;                                       
+    IMeta? IMetaImplementation.Function => default;
 
     [DisableDump]
     internal override bool IsHollow => true;
@@ -149,7 +150,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
                 type
                     .GetMethods()
                     .Where(isRelevantMethod)
-                    .Select(m => new Method(m,root))
+                    .Select(m => new Method(m, root))
                     .GroupBy(m => m.MethodInfo.Name))
                 typeEntry.GetOrAdd(group.Key).Methods = group.ToArray();
         }
@@ -165,9 +166,9 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         }
     }
 
-    Method[] GetMethod() 
+    Method[] GetMethod()
         => EntryPath
-        .Aggregate(Root.ForeignLibrariesCache[Module], (current, namePart) => current[namePart])
-        .Methods
-        .ExpectNotNull();
+            .Aggregate(Root.ForeignLibrariesCache[Module], (current, namePart) => current[namePart])
+            .Methods
+            .ExpectNotNull();
 }

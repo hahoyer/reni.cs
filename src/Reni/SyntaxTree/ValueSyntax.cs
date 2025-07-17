@@ -89,8 +89,9 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
 
     internal Result GetResultForAll(ContextBase context) => context.GetResult(Category.All, this);
 
-    internal TypedData Evaluate(ContextBase context)
-        => GetResultForAll(context).GetValue(context.RootContext.ExecutionContext);
+    internal object Evaluate(ContextBase context)
+        => GetResultForAll(context)
+            .GetValue(context.RootContext.ExecutionContext);
 
     [DebuggerHidden]
     internal TypeBase GetTypeBase(ContextBase context) => context.GetResult(Category.Type, this).Type!;

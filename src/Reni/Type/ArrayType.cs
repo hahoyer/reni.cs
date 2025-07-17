@@ -236,6 +236,9 @@ sealed class ArrayType
     [DisableDump]
     protected override CodeBase DumpPrintCode => ArgumentCode.GetDumpPrintText(SimpleItemSize);
 
+    internal override object GetDataValue(BitsConst data) 
+        => IsTextItem? data.ToString(ElementType.Size) : base.GetDataValue(data);
+
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
 
@@ -330,9 +333,9 @@ sealed class ArrayType
             .GetValue(context.RootContext.ExecutionContext);
         //.ToString(ElementType.Size);
         //todo: Error handling:
-        var conversionBase = ReflectionExtender.ToInt32(right!.Evaluate(context).ExpectNotNull());
+        var conversionBase = right!.Evaluate(context).ExpectNotNull().ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);
-        var result = BitsConst.Convert((string)target.Value, conversionBase);
+        var result = BitsConst.Convert((string)target, conversionBase);
         return Root.BitType.GetResult(category, result).Align;
     }
 

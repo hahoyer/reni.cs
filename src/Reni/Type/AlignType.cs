@@ -32,6 +32,7 @@ sealed class AlignType
 
     protected override Result GetDeAlign(Category category) => GetMutation(Parent) & category;
     protected override PointerType GetPointerForCache() => Parent.ForcedPointer;
+    internal override object GetDataValue(BitsConst data) => Parent.GetDataValue(data);
 
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions

@@ -67,16 +67,15 @@ sealed class TypeType
 
     Result StarResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
     {
-        var countResult = right.GetResultForAll(context).AutomaticDereferenceResult;
-        var typedData = countResult
-            .GetValue(context.RootContext.ExecutionContext);
-        var count = typedData.Value
+        var typedData = right
+            .GetResultForAll(context)
+            .AutomaticDereferenceResult
+            .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();
-        var type = Value
+        return Value
             .Align
-            .GetArray(count)
-            .TypeType;
-        return type.GetResult(category);
+            .GetArray(typedData)
+            .TypeType.GetResult(category);
     }
 
     Result SlashResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)

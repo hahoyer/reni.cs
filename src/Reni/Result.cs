@@ -738,7 +738,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             .GetConversion(CompleteCategory, target)
             .ReplaceArguments(this);
 
-    internal TypedData GetValue(IExecutionContext context)
+    internal object GetValue(IExecutionContext context) 
+        => GetTypedData(context).Value;
+
+    internal TypedData GetTypedData(IExecutionContext context)
     {
         (Closures?.IsNone != false).Assert(Dump);
         var result = Align.GetLocalBlock(CompleteCategory);
