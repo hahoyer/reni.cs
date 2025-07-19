@@ -13,7 +13,7 @@ sealed class Conversion : DumpableObject, IConversion
     TypeBase Source { get; }
 
     [EnableDump]
-    TypeBase Destination => Function(Category.Type).Type!;
+    TypeBase Destination => Function(Category.Type).Type;
 
     internal Conversion(Func<Category, Result> function, TypeBase source)
         : base(NextObjectId++)

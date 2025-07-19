@@ -81,9 +81,6 @@ sealed class ResultCache : DumpableObject
     }
 
     [DisableDump]
-    readonly bool InConstruction;
-
-    [DisableDump]
     static CallStack? Current;
 
     [DisableDump]
@@ -99,7 +96,12 @@ sealed class ResultCache : DumpableObject
     internal readonly IResultProvider Provider;
 
     [DisableDump]
+    readonly bool InConstruction;
+
+    [DisableDump]
     Category PendingCategory;
+
+    bool InGet;
 
     [DisableDump]
     [PublicAPI]
@@ -108,23 +110,23 @@ sealed class ResultCache : DumpableObject
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal TypeBase Type => Get(Category.Type).Type!;
+    internal TypeBase Type => Get(Category.Type).Type;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal CodeBase Code => Get(Category.Code).Code!;
+    internal CodeBase Code => Get(Category.Code).Code;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
-    internal Closures Closures => Get(Category.Closures).Closures!;
+    internal Closures Closures => Get(Category.Closures).Closures;
 
     [DisableDump]
     [DebuggerHidden]
     [DebuggerNonUserCode]
     [PublicAPI]
-    internal Size Size => Get(Category.Size).Size!;
+    internal Size Size => Get(Category.Size).Size;
 
     [DisableDump]
     [DebuggerHidden]
@@ -201,13 +203,25 @@ sealed class ResultCache : DumpableObject
     void SimpleUpdate(Category category)
     {
         if(category.HasIsHollow())
-            Data.IsHollow = Data.FindIsHollow;
+        {
+            var isHollow = Data.FindIsHollow;
+            if(isHollow != null)
+                Data.IsHollow = isHollow.Value;
+        }
 
         if(category.HasSize())
-            Data.Size = Data.FindSize;
+        {
+            var size = Data.FindSize;
+            if(size != null)
+                Data.Size = size;
+        }
 
         if(category.HasClosures())
-            Data.Closures = Data.FindClosures;
+        {
+            var closures = Data.FindClosures;
+            if(closures != null)
+                Data.Closures = closures;
+        }
     }
 
     /// <summary>
@@ -261,33 +275,32 @@ sealed class ResultCache : DumpableObject
     }
 
     public static Result operator &(ResultCache resultCache, Category category)
-        =>  resultCache.Get(category);
+        => resultCache.Get(category);
 
-    bool InGet;
     /// <summary>
     ///     Obtain the categories requested.
     ///     This will also try to obtain categories that are not yet obtained.
     /// </summary>
     /// <param name="category"></param>
     /// <returns></returns>
-    [DebuggerHidden]
+    //[DebuggerHidden]
     internal Result Get(Category category)
     {
         var inGet = InGet;
         InGet = true;
 
-        var trace = ObjectId.In() ;
+        var trace = ObjectId.In();
         StartMethodDump(trace, category, "inGet", inGet);
         try
         {
             BreakExecution();
             Update(category);
             Dump(nameof(Provider), Provider);
-            var t = Data.Type;
             var completeCategory = Data.CompleteCategory;
-if(ObjectId != 3)            completeCategory
-                .Contains(category)
-                .Assert(() => $"{ObjectId}i: {Data.Dump()}\nPendingCategory={PendingCategory.Dump()}");
+            if(ObjectId != 3)
+                completeCategory
+                    .Contains(category)
+                    .Assert(() => $"{ObjectId}i: {Data.Dump()}\nPendingCategory={PendingCategory.Dump()}");
             return ReturnMethodDump(Data & category);
         }
         finally

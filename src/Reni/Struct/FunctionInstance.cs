@@ -97,7 +97,7 @@ abstract class FunctionInstance
         if(result.HasIssue != true && category.HasCode())
             result.Code = CallType
                 .ArgumentCode
-                .GetCall(FunctionId, result.Size!);
+                .GetCall(FunctionId, result.Size);
         return result;
     }
 
@@ -179,7 +179,7 @@ abstract class FunctionInstance
             var visitResult = ResultCache & (Category.Code | Category.Closures);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(foreignRefsRef)
-                .Code!;
+                .Code;
             return Parent.ArgumentsType.IsHollow
                 ? result.TryReplacePrimitiveRecursivity(FunctionId) 
                 : result;

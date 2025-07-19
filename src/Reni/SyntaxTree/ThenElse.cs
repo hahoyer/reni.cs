@@ -72,7 +72,7 @@ sealed class CondSyntax : ValueSyntax
             return branchResult;
 
         var commonType = CommonType(context);
-        return branchResult.Type!
+        return branchResult.Type
                 .GetConversion(category | Category.Type, commonType)
                 .ReplaceArguments(branchResult)
             & category;
@@ -98,8 +98,8 @@ sealed class CondSyntax : ValueSyntax
             .GetResult
             (
                 category,
-                () => condResult.Code?.GetThenElse(thenResult.Code!, elseResult.Code!),
-                () => condResult.Closures! + thenResult.Closures! + elseResult.Closures!
+                () => condResult.Code.ExpectNotNull().GetThenElse(thenResult.Code, elseResult.Code),
+                () => condResult.Closures + thenResult.Closures + elseResult.Closures
             );
     }
 

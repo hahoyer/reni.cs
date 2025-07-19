@@ -298,7 +298,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
         var source = result.Source;
         (source == Type.Pointer).Assert(source.Dump);
-        (source == result.GetResult(Category.Code).Code!.ArgumentType).Assert();
+        (source == result.GetResult(Category.Code).Code.ArgumentType).Assert();
         return result;
     }
 

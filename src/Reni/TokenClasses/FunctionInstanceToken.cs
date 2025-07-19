@@ -14,7 +14,7 @@ sealed class FunctionInstanceToken : SuffixSyntaxToken
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax left)
         => context.GetResult(category | Category.Type, left)
-            .Type!
+            .Type
             .FunctionInstance
             .GetResult(category, context.GetResult(category | Category.Type, left));
 }

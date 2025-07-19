@@ -28,7 +28,7 @@ sealed class ConversionPath
     [UsedImplicitly]
     IEnumerable<string> DumpConversions
         => Elements
-            .Select(element => element.GetResult(Category.Code).Code!.DebuggerDump())
+            .Select(element => element.GetResult(Category.Code).Code.DebuggerDump())
             .ToArray();
 
     internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;

@@ -200,7 +200,10 @@ abstract class ContextBase
         => CacheObject.ResultAsReferenceCache[syntax];
 
     internal TypeBase? GetTypeIfKnown(ValueSyntax syntax)
-        => CacheObject.ResultCache[syntax].Data.Type;
+    {
+        var result = CacheObject.ResultCache[syntax].Data;
+        return result.HasType? result.Type : null;
+    }
 
     [DebuggerHidden]
     Result GetResultForCache(Category category, ValueSyntax? syntax)
@@ -299,7 +302,7 @@ abstract class ContextBase
     {
         var target = GetResult(category | Category.Type, argsType).GetSmartUn<PointerType>().Align;
         return target
-                .Type!
+                .Type
                 .GetArray(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
                 .GetResult(category | Category.Type, target)
                 .LocalReferenceResult

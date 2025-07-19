@@ -32,7 +32,7 @@ sealed class Value
     protected override string GetNodeDump()
         => Source.DumpPrintText
             + "-->"
-            + (Function(Category.Type).Type?.DumpPrintText ?? "<unknown>")
+            + Function(Category.Type).Type.DumpPrintText
             + " MethodName="
             + Function.Method.Name;
 }

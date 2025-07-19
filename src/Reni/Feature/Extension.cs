@@ -53,12 +53,12 @@ static class Extension
         => MetaFunctionCache[function];
 
     internal static TypeBase ResultType(this IConversion conversion)
-        => conversion.GetResult(Category.Type).Type!;
+        => conversion.GetResult(Category.Type).Type;
 
     internal static Result GetResult(this IConversion conversion, Category category)
     {
         var result = conversion.Execute(category);
-        if(!result.HasIssue && category.HasCode() && result.Code?.ArgumentType != null)
+        if(!result.HasIssue && category.HasCode() && result.Code.ArgumentType != null)
             (result.Code.ArgumentType == conversion.Source).Assert
                 (() => result.DebuggerDump());
 
@@ -111,7 +111,7 @@ static class Extension
 
         if(valueResult != null)
             return valueResult
-                .Type!
+                .Type
                 .GetResult(category, valueResult, currentTarget, null, context, right);
 
         //Todo: Provide context information like this to "Expect"

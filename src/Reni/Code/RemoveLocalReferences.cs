@@ -136,7 +136,7 @@ sealed class RemoveLocalReferences : Base
                     BreakExecution();
                 }
 
-                var result = (body + cleanup.Code!).GetLocalBlockEnd(Copier, initialSize);
+                var result = (body + cleanup.Code).GetLocalBlockEnd(Copier, initialSize);
                 return ReturnMethodDump(result);
             }
             finally

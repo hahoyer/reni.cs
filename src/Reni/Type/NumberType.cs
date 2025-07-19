@@ -29,7 +29,7 @@ sealed class NumberType
 
     static readonly Minus MinusOperation = new();
     readonly ValueCache<Result> ZeroResult;
-    NumberType ZeroType => (NumberType)ZeroResult.Value.Type!;
+    NumberType ZeroType => (NumberType)ZeroResult.Value.Type;
 
     [EnableDump]
     internal int Bits => Size.ToInt();

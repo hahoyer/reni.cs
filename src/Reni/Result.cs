@@ -25,11 +25,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     bool IsDirtyValue;
 
-    bool HasSize => Size != null;
-    bool HasType => Type != null;
-    bool HasCode => Code != null;
-    bool HasClosures => Closures != null;
-    bool HasIsHollow => IsHollow != null;
+    bool HasSize => SizeRaw != null;
+
+    [DisableDump]
+    internal bool HasType => TypeRaw != null;
+
+    bool HasCode => CodeRaw != null;
+    bool HasClosures => ClosuresRaw != null;
+    bool HasIsHollow => IsHollowRaw != null;
 
     [Node]
     [EnableDumpWithExceptionPredicate]
@@ -53,17 +56,12 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
     }
 
-    /// <summary>
-    ///     Is this a hollow object? With no data?
-    /// </summary>
-    [Node]
-    [DebuggerHidden]
-    public bool? IsHollow
+    bool? IsHollowRaw
     {
         get => IssueData.IsHollow ?? Data.IsHollow;
         set
         {
-            if(IsHollow == value)
+            if(IsHollowRaw == value)
                 return;
 
             Set(Category.IsHollow, value);
@@ -75,14 +73,12 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
     }
 
-    [Node]
-    [DebuggerHidden]
-    public Size? Size
+    Size? SizeRaw
     {
         get => IssueData.Size ?? Data.Size;
         set
         {
-            if(Size == value)
+            if(SizeRaw == value)
                 return;
 
             Set(Category.Size, value);
@@ -92,52 +88,102 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
     }
 
-    [Node]
-    [DebuggerHidden]
-    internal TypeBase? Type
+    TypeBase? TypeRaw
     {
         get => IssueData.Type ?? Data.Type;
         set
         {
-            if(Type == value)
+            if(TypeRaw == value)
                 return;
             (value != null).Assert();
 
             Set(Category.Type, value);
-            Size = Type!.Size;
+            Size = Type.Size;
 
             AssertValid();
         }
     }
 
-    [Node]
-    [DebuggerHidden]
-    internal CodeBase? Code
+    CodeBase? CodeRaw
     {
         get => IssueData.Code ?? Data.Code;
         set
         {
-            if(Code == value)
+            if(CodeRaw == value)
                 return;
-            (value != null).Assert();
             Set(Category.Code, value);
             AssertValid();
         }
     }
 
-    [Node]
-    [DebuggerHidden]
-    internal Closures? Closures
+    Closures? ClosuresRaw
     {
         get => IssueData.Closure ?? Data.Closures;
         set
         {
-            if(Closures == value)
+            if(ClosuresRaw == value)
                 return;
             (value != null).Assert();
             Set(Category.Closures, value);
             AssertValid();
         }
+    }
+
+    /// <summary>
+    ///     Is this a hollow object? With no data?
+    /// </summary>
+    [Node]
+    [DebuggerHidden]
+    internal bool IsHollow
+    {
+        get
+        {
+            switch(IsHollowRaw)
+            {
+                case true:
+                    return true;
+
+                case false:
+                    return false;
+
+                default:
+                    false.Expect();
+                    return false;
+            }
+        }
+        set => IsHollowRaw = value;
+    }
+
+    [Node]
+    [DebuggerHidden]
+    internal Size Size
+    {
+        get => SizeRaw.ExpectNotNull();
+        set => SizeRaw = value;
+    }
+
+    [Node]
+    [DebuggerHidden]
+    internal TypeBase Type
+    {
+        get => TypeRaw.ExpectNotNull();
+        set => TypeRaw = value;
+    }
+
+    [Node]
+    [DebuggerHidden]
+    internal CodeBase Code
+    {
+        get => CodeRaw.ExpectNotNull();
+        set => CodeRaw = value;
+    }
+
+    [Node]
+    [DebuggerHidden]
+    internal Closures Closures
+    {
+        get => ClosuresRaw.ExpectNotNull();
+        set => ClosuresRaw = value;
     }
 
     internal bool? FindIsHollow => HasIsHollow? Data.IsHollow : FindSize?.IsZero;
@@ -160,12 +206,12 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     internal Size? FindSize
         => HasSize? Size :
-            HasCode? Code!.Size :
-            HasType? Type!.Size : null;
+            HasCode? Code.Size :
+            HasType? Type.Size : null;
 
     internal Closures? FindClosures
         => HasClosures? Closures :
-            HasCode? Code!.Closures : null;
+            HasCode? Code.Closures : null;
 
     [DisableDump]
     internal Closures SmartClosures
@@ -197,22 +243,22 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         get
         {
-            if(HasIsHollow && IsHollow == false)
+            if(HasIsHollow && !IsHollow)
                 return false;
-            if(HasSize && !Size!.IsZero)
+            if(HasSize && !Size.IsZero)
                 return false;
-            if(HasType && !(Type! is VoidType))
+            if(HasType && !(Type is VoidType))
                 return false;
-            if(HasCode && !Code!.IsEmpty)
+            if(HasCode && !Code.IsEmpty)
                 return false;
-            if(HasClosures && !Closures!.IsNone)
+            if(HasClosures && !Closures.IsNone)
                 return false;
             return true;
         }
     }
 
     bool HasArguments
-        => HasClosures? Closures!.HasArguments : HasCode && Code!.HasArguments;
+        => HasClosures? Closures.HasArguments : HasCode && Code.HasArguments;
 
     [DisableDump]
     internal Result Align
@@ -234,10 +280,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             var result = new Result
             (
                 CompleteCategory, () => Closures
-                , () => Code?.GetBitCast(alignedSize)
-                , () => Type?.Align
+                , () => Code.GetBitCast(alignedSize)
+                , () => Type.Align
                 , () => alignedSize
-                , () => IsHollow.AssertValue());
+                , () => IsHollow);
             return result;
         }
     }
@@ -249,10 +295,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         get
         {
-            var weakType = Type?.Weaken;
+            var weakType = Type.Weaken;
             return weakType == null
                 ? this
-                : (Type!.GetMutation(weakType) & CompleteCategory).ReplaceArguments(this);
+                : (Type.GetMutation(weakType) & CompleteCategory).ReplaceArguments(this);
         }
     }
 
@@ -270,7 +316,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             HasType.Expect(() => (null, "Dereference requires type category:\n " + Dump()));
 
             var result = this;
-            while(!result.HasIssue && result.Type!.IsWeakReference)
+            while(!result.HasIssue && result.Type.IsWeakReference)
                 result = result.DereferenceResult;
             return result;
         }
@@ -282,7 +328,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         => Type
             .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump()))
             .CheckedReference
-            .ExpectNotNull(() => (null, $"Type {Type!.DumpPrintText} is not a reference type."))
+            .ExpectNotNull(() => (null, $"Type {Type.DumpPrintText} is not a reference type."))
             .Converter.GetResult(CompleteCategory)
             .ReplaceArguments(this);
 
@@ -302,7 +348,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 return this;
             if(!HasCode && !HasType && !HasSize)
                 return this;
-            if(Type!.IsHollow)
+            if(Type.IsHollow)
                 return this;
             if(Type is IReference)
                 return this;
@@ -336,7 +382,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             if(destinationType == Type)
                 return this;
 
-            return Type!
+            return Type
                 .GetConversion(CompleteCategory, destinationType)
                 .ReplaceArguments(this);
         }
@@ -431,15 +477,20 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         AssertValid();
 
-        if(Closures == null && Code != null)
+        if(ClosuresRaw == null && CodeRaw != null)
             Closures = Code.Closures;
 
-        if(Size == null && Type != null)
-            Size = Type.SmartSize;
-        if(Size == null && Code != null)
+        if(SizeRaw == null && TypeRaw != null)
+        {
+            var typeSize = Type.SmartSize;
+            if(typeSize != null)
+                Size = typeSize;
+        }
+
+        if(SizeRaw == null && CodeRaw != null)
             Size = Code.Size;
 
-        if(IsHollow == null && Size != null)
+        if(IsHollowRaw == null && SizeRaw != null)
             IsHollow = Size.IsZero;
     }
 
@@ -489,7 +540,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         (
             CompleteCategory & category,
             Issues,
-            () => IsHollow.AssertValue(),
+            () => IsHollow,
             () => Size,
             () => Type,
             () => Code,
@@ -520,22 +571,22 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         }
 
         if(HasIsHollow && HasSize)
-            (Size!.IsZero == IsHollow).Assert
+            (Size.IsZero == IsHollow).Assert
                 (() => "Size and IsHollow differ: " + Dump());
-        if(HasIsHollow && HasType && Type!.HasQuickSize)
+        if(HasIsHollow && HasType && Type.HasQuickSize)
             (Type.IsHollow == IsHollow).Assert
                 (() => "Type and IsHollow differ: " + Dump());
         if(HasIsHollow && HasCode)
-            (Code!.IsHollow == IsHollow).Assert
+            (Code.IsHollow == IsHollow).Assert
                 (() => "Code and IsHollow differ: " + Dump());
-        if(HasSize && HasType && Type!.HasQuickSize)
+        if(HasSize && HasType && Type.HasQuickSize)
             (Type.Size == Size).Assert(() => "Type and Size differ: " + Dump());
         if(HasSize && HasCode)
-            (Code!.Size == Size).Assert(() => "Code and Size differ: " + Dump());
-        if(HasType && HasCode && Type!.HasQuickSize)
-            (Code!.Size == Type.Size).Assert(() => "Code and Type differ: " + Dump());
+            (Code.Size == Size).Assert(() => "Code and Size differ: " + Dump());
+        if(HasType && HasCode && Type.HasQuickSize)
+            (Code.Size == Type.Size).Assert(() => "Code and Type differ: " + Dump());
         if(HasClosures && HasCode)
-            Code!.Closures.IsEqual(Closures!)
+            Code.Closures.IsEqual(Closures)
                 .Assert(() => "Code and Closures differ: " + Dump());
     }
 
@@ -562,29 +613,29 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             if(category.HasIsHollow())
                 IsHollow = SmartIsHollow && other.SmartIsHollow;
-            else if(HasIsHollow && IsHollow == true)
-                IsHollow = null;
+            else if(HasIsHollow && IsHollow)
+                IsHollowRaw = null;
 
             if(category.HasSize())
-                Size = Size! + other.Size!;
+                Size = Size + other.Size;
             else if(HasSize)
-                Size = null;
+                SizeRaw = null;
 
             if(category.HasType())
-                Type = Type!.GetPair(other.Type!);
+                Type = Type.GetPair(other.Type);
             else if(HasType)
-                Type = null;
+                TypeRaw = null;
 
             if(category.HasCode())
-                Code = Code! + other.Code!;
+                Code = Code + other.Code;
             else if(HasCode)
-                Code = null;
+                CodeRaw = null;
         }
 
         if(category.HasClosures())
-            Closures = Closures.AssertNotNull().Sequence(other.Closures!);
+            Closures = Closures.AssertNotNull().Sequence(other.Closures);
         else if(HasClosures)
-            Closures = null;
+            ClosuresRaw = null;
 
         IsDirty = isDirty;
     }
@@ -628,9 +679,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         result.Issues = T(result.Issues, resultForArgument.Issues).ConcatMany().ToArray();
 
         if(HasCode)
-            result.Code = Code!.ReplaceArgument(resultForArgument);
+            result.Code = Code.ReplaceArgument(resultForArgument);
         if(HasClosures)
-            result.Closures = Closures!.WithoutArgument() + resultForArgument.Closures!;
+            result.Closures = Closures.WithoutArgument() + resultForArgument.Closures;
         result.IsDirty = false;
         return result;
     }
@@ -639,7 +690,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Closures> replacementRefs)
         where TRefInCode : IContextReference
     {
-        if(HasClosures && !Closures!.Contains(refInCode))
+        if(HasClosures && !Closures.Contains(refInCode))
             return this;
 
         if(!HasCode && !HasClosures)
@@ -649,9 +700,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         result.IsDirty = true;
 
         if(HasCode)
-            result.Code = Code!.ReplaceAbsolute(refInCode, replacementCode);
+            result.Code = Code.ReplaceAbsolute(refInCode, replacementCode);
         if(HasClosures)
-            result.Closures = Closures!.Without(refInCode).Sequence(replacementRefs());
+            result.Closures = Closures.Without(refInCode).Sequence(replacementRefs());
         result.IsDirty = false;
         return result;
     }
@@ -659,7 +710,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
         where TRefInCode : IContextReference
     {
-        if(HasClosures && !Closures!.Contains(refInCode))
+        if(HasClosures && !Closures.Contains(refInCode))
             return this;
 
         if(!HasCode && !HasClosures)
@@ -670,9 +721,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         result.IsDirty = true;
 
         if(HasCode)
-            result.Code = Code!.ReplaceAbsolute(refInCode, () => replacement.Code!);
+            result.Code = Code.ReplaceAbsolute(refInCode, () => replacement.Code);
         if(HasClosures)
-            result.Closures = Closures!.Without(refInCode).Sequence(replacement.Closures!);
+            result.Closures = Closures.Without(refInCode).Sequence(replacement.Closures);
         result.IsDirty = false;
         return result;
     }
@@ -681,7 +732,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Closures> replacementRefs)
         where TRefInCode : IContextReference
     {
-        if(HasClosures && !Closures!.Contains(refInCode))
+        if(HasClosures && !Closures.Contains(refInCode))
             return this;
 
         if(!HasCode && !HasClosures)
@@ -690,9 +741,9 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         var result = Clone;
         result.IsDirty = true;
         if(HasCode)
-            result.Code = Code!.ReplaceRelative(refInCode, replacementCode);
+            result.Code = Code.ReplaceRelative(refInCode, replacementCode);
         if(HasClosures)
-            result.Closures = Closures!.Without(refInCode).Sequence(replacementRefs());
+            result.Closures = Closures.Without(refInCode).Sequence(replacementRefs());
         result.IsDirty = false;
         return result;
     }
@@ -705,7 +756,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             return this;
         var result = Clone;
         result.IsDirty = true;
-        result.Code = SmartClosures.ReplaceRefsForFunctionBody(Code!, replacement);
+        result.Code = SmartClosures.ReplaceRefsForFunctionBody(Code, replacement);
         result.Closures = replacement.Closures;
         result.IsDirty = false;
         return result;
@@ -724,11 +775,11 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
         category |= Category.Type;
         var result = (this & category).ExpectNotNull();
-        var copier = Type!.GetCopier(category);
+        var copier = Type.GetCopier(category);
         if(category.HasCode())
-            result.Code = Code!.GetLocalBlock(copier.Code!);
+            result.Code = Code.GetLocalBlock(copier.Code);
         if(category.HasClosures())
-            result.Closures = Closures!.Sequence(copier.Closures!);
+            result.Closures = Closures.Sequence(copier.Closures);
         return result;
     }
 
@@ -738,16 +789,16 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             .GetConversion(CompleteCategory, target)
             .ReplaceArguments(this);
 
-    internal object GetValue(IExecutionContext context) 
+    internal object GetValue(IExecutionContext context)
         => GetTypedData(context).Value;
 
     internal TypedData GetTypedData(IExecutionContext context)
     {
-        (Closures?.IsNone != false).Assert(Dump);
+        Closures.IsNone.Assert(Dump);
         var result = Align.GetLocalBlock(CompleteCategory);
         return new
         (
-            result.Type!
+            result.Type
             , result
                 .Code
                 .ExpectNotNull(() => (null, "GetValue requires code category:\n " + Dump()))
@@ -757,7 +808,6 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     internal BitsConst GetValueAsText(IExecutionContext context)
     {
-
         var a = Type.ExpectNotNull()
             .GetConversionToText()
             .ReplaceArguments(this);
@@ -846,7 +896,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode)
             return this;
         var result = Clone;
-        result.Code = func(Code!);
+        result.Code = func(Code);
         return result;
     }
 
@@ -863,7 +913,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [PublicAPI]
     internal Result GetDereferencedAlignedResult(Size size)
         => HasIssue? this :
-            HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code!.GetDePointer(size)) :
+            HasCode? new(CompleteCategory.Without(Category.Type), getCode: () => Code.GetDePointer(size)) :
             this;
 
     internal Result ConvertToConverter(TypeBase source)
@@ -877,12 +927,12 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode || !HasClosures || cleanup.IsEmpty)
             return this;
 
-        if(HasClosures && !cleanup.Closures!.IsNone)
+        if(HasClosures && !cleanup.Closures.IsNone)
             NotImplementedMethod(cleanup);
 
         var result = Clone;
         if(HasCode)
-            result.Code = result.Code!.GetWithCleanupAdded(cleanup.Code!);
+            result.Code = result.Code.GetWithCleanupAdded(cleanup.Code);
         return result;
     }
 
@@ -891,7 +941,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(!HasCode)
             return this;
 
-        var newCode = Code?.ArrangeCleanupCode();
+        var newCode = Code.ArrangeCleanupCode();
         if(newCode == null)
             return this;
 
@@ -905,7 +955,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             destination.GetResult
             (
                 CompleteCategory
-                , HasCode? () => Code!.GetInvalidConversion(destination.Size) : null
+                , HasCode? () => Code.GetInvalidConversion(destination.Size) : null
                 , HasClosures? () => Closures : null
             );
 

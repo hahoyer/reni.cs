@@ -310,7 +310,7 @@ sealed class ArrayType
         if(category.HasCode())
             //todo: replace strings by TokenId
             result.Code = ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")).GetDumpPrintTextCode()
-                + result.Code!;
+                + result.Code;
         return result;
     }
 

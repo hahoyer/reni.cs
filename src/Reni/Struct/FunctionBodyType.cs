@@ -84,7 +84,7 @@ sealed class FunctionBodyType
     TypeBase GetTemplate()
     {
         var argumentsType = Syntax.IsImplicit? Root.VoidType : TemplateArguments;
-        return GetResult(Category.Type, argumentsType).Type!;
+        return GetResult(Category.Type, argumentsType).Type;
     }
 
     Result GetResult(Category category, TypeBase argumentsType)
