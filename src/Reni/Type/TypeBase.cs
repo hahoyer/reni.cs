@@ -162,7 +162,6 @@ abstract class TypeBase
     internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type;
 
     [DisableDump]
-    internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type!;
     internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type;
 
     [DisableDump]
@@ -280,7 +279,6 @@ abstract class TypeBase
         => GetDePointer(Category.Type)
             .Type
             .GetDeAlign(Category.Type)
-            .Type!;
             .Type;
 
     [DisableDump]
@@ -509,8 +507,8 @@ abstract class TypeBase
         => GetResult
         (
             category,
-            () => codeAndClosures.Code,
-            () => codeAndClosures.Closures
+            () => codeAndClosures.Code.ExpectNotNull(),
+            () => codeAndClosures.Closures.ExpectNotNull()
         );
 
     internal Result GetResult(Category category, Func<Category, Result> getCodeAndRefs)
@@ -520,12 +518,11 @@ abstract class TypeBase
         return GetResult
         (
             category,
-            () => codeAndClosures.Code,
-            () => codeAndClosures.Closures
+            () => codeAndClosures.Code.ExpectNotNull(),
+            () => codeAndClosures.Closures.ExpectNotNull()
         );
     }
 
-    internal Result GetResult(Category category, Func<CodeBase?>? getCode = null, Func<Closures?>? getClosures = null)
     internal Result GetResult(Category category, Func<CodeBase>? getCode = null, Func<Closures>? getClosures = null)
         => new(category, getClosures, getCode, () => this);
 
@@ -644,7 +641,6 @@ abstract class TypeBase
 
     internal TypeBase GetSmartUn<T>()
         where T : IConversion
-        => this is T? ((IConversion)this).GetResult(Category.Type).Type! : this;
         => this is T? ((IConversion)this).GetResult(Category.Type).Type : this;
 
     internal Result GetResultFromPointer(Category category, TypeBase resultType)
