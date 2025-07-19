@@ -465,7 +465,7 @@ abstract class TypeBase
         return IsHollow? Size.Zero : GetSize();
     }
 
-    static Result GetVoidCodeAndRefs(Category category)
+    Result GetVoidCodeAndRefs(Category category)
         => Root.VoidType.GetResult(category & (Category.Code | Category.Closures));
 
     internal ArrayType GetArray(int count, string? options = null)

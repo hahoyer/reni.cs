@@ -29,7 +29,7 @@ sealed class Root
     }
 
     [DisableDump]
-    internal static readonly VoidType VoidType = new();
+    internal VoidType VoidType=> this.CachedValue(() => new VoidType(this));
 
     [DisableDump]
     internal readonly FunctionCache<string, ForeignCodeType.Entry> ForeignLibrariesCache;

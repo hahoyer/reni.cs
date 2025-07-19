@@ -29,6 +29,6 @@ sealed class TypeOperator : SuffixSyntaxToken
                 .GetResult(category);
         }
 
-        return Root.VoidType.GetResult(category);
+        return context.RootContext.VoidType.GetResult(category);
     }
 }

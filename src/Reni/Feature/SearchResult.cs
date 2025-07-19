@@ -9,6 +9,7 @@ namespace Reni.Feature;
 
 sealed class SearchResult : DumpableObject, IImplementation
 {
+    readonly Root Root;
     static int NextObjectId;
 
     IImplementation Feature { get; }
@@ -20,18 +21,19 @@ sealed class SearchResult : DumpableObject, IImplementation
     internal TypeBase Source => ConverterPath.Source;
 
     internal SearchResult(SearchResult searchResult, ConversionPath relativeConversion)
-        : this(searchResult.Feature, relativeConversion + searchResult.ConverterPath)
+        : this(searchResult.Feature, relativeConversion + searchResult.ConverterPath, searchResult.Root)
         => (searchResult.Source == relativeConversion.Destination).Assert();
 
     SearchResult(IImplementation feature, TypeBase definingItem)
-        : this(feature, new ConversionPath(definingItem)) { }
+        : this(feature, new ConversionPath(definingItem), definingItem.Root) { }
 
-    SearchResult(IImplementation feature, ConversionPath converterPath)
+    SearchResult(IImplementation feature, ConversionPath converterPath, Root root)
         : base(NextObjectId++)
     {
         Feature = feature;
         ConverterPath = converterPath;
         StopByObjectIds();
+        Root = root;
     }
 
     IFunction? IEvalImplementation.Function
@@ -110,7 +112,7 @@ sealed class SearchResult : DumpableObject, IImplementation
     }
 
     internal Result SpecialExecute(Category category)
-        => Feature.GetResult(category, null!, null!, null);
+        => Feature.GetResult(category, null!, this.Root, null);
 
     internal bool HasHigherPriority(SearchResult other)
         => Feature is AccessFeature == other.Feature is AccessFeature

@@ -17,14 +17,12 @@ static class Extension
         MetaFunctionCache = new(function => new(function));
 
     static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> ValueCache
-        = new(
-            function =>
-                new(type => new(function, type)));
+        = new(function =>
+            new(type => new(function, type)));
 
     static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>> ConversionCache
-        = new(
-            function =>
-                new(type => new(function, type)));
+        = new(function =>
+            new(type => new(function, type)));
 
     internal static Value Value(Func<Category, Result> function, TypeBase? target = null)
         => ValueCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
@@ -60,7 +58,7 @@ static class Extension
     internal static Result GetResult(this IConversion conversion, Category category)
     {
         var result = conversion.Execute(category);
-        if(result.HasIssue != true && category.HasCode() && result.Code?.ArgumentType != null)
+        if(!result.HasIssue && category.HasCode() && result.Code?.ArgumentType != null)
             (result.Code.ArgumentType == conversion.Source).Assert
                 (() => result.DebuggerDump());
 
@@ -105,21 +103,21 @@ static class Extension
         if(right != null)
             valueCategory = category | Category.Type;
 
-        var valueResult = feature.ValueResult(right, valueCategory);
+        var valueResult = feature.ValueResult(right, valueCategory, context.RootContext);
 
         if(right == null)
-            return valueResult 
+            return valueResult
                 ?? new(category, IssueId.MissingRightExpression.GetIssue(context.RootContext, currentTarget, context));
 
         if(valueResult != null)
             return valueResult
                 .Type!
                 .GetResult(category, valueResult, currentTarget, null, context, right);
-        
+
         //Todo: Provide context information like this to "Expect"
         if(feature.Function == null)
             Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
-        (feature.Function != null).Expect();  
+        (feature.Function != null).Expect();
 
         var argsResult = context.GetResultAsReferenceCache(right);
         var argsType = argsResult.Type;
@@ -128,21 +126,21 @@ static class Extension
             .Function!
             .GetResult(category, argsType)
             .ReplaceArguments(argsResult);
-
     }
 
     static Result? ValueResult
     (
         this IEvalImplementation feature,
         ValueSyntax? right,
-        Category valueCategory
+        Category valueCategory,
+        Root root
     )
     {
         if(feature.Function != null && feature.Function.IsImplicit)
             return feature
                 .Function
-                .GetResult(valueCategory, Root.VoidType)
-                .ReplaceArguments(Root.VoidType.GetResult(Category.All));
+                .GetResult(valueCategory, root.VoidType)
+                .ReplaceArguments(root.VoidType.GetResult(Category.All));
 
         if(right != null && feature.Function != null)
             return null;
@@ -176,6 +174,6 @@ static class Extension
             .Distinct()
             .SingleOrDefault();
 
-    internal static Result GetResult(this Issue[] issues, Category category) 
+    internal static Result GetResult(this Issue[] issues, Category category)
         => new(category, issues);
 }

@@ -55,7 +55,7 @@ sealed class CondSyntax : ValueSyntax
 
     Result ElseResult(ContextBase context, Category category) 
         => Else == null
-        ? Root.VoidType.GetResult(category) 
+        ? context.RootContext.VoidType.GetResult(category) 
         : BranchResult(context, category, Else);
 
     Result ThenResult(ContextBase context, Category category)
@@ -64,7 +64,7 @@ sealed class CondSyntax : ValueSyntax
     Result BranchResult(ContextBase context, Category category, ValueSyntax? syntax)
     {
         var result = syntax == null
-            ? Root.VoidType.GetResult(category| Category.Type)
+            ? context.RootContext.VoidType.GetResult(category| Category.Type)
             : context.GetResult(category | Category.Type, syntax);
 
         var branchResult = result;
@@ -106,7 +106,7 @@ sealed class CondSyntax : ValueSyntax
     TypeBase CommonType(ContextBase context)
     {
         if(Then == null || Else == null)
-            return Root.VoidType;
+            return context.RootContext.VoidType;
 
         var thenType = Then.GetTypeBase(context);
         var elseType = Else.GetTypeBase(context);
