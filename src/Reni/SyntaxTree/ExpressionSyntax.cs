@@ -51,7 +51,13 @@ sealed class ExpressionSyntax : ValueSyntax
     int CurrentResultDepth;
 
     internal ExpressionSyntax
-        (ValueSyntax? left, Definable? definable, SourcePart token, ValueSyntax? right, Anchor anchor)
+    (
+        ValueSyntax? left
+        , Definable? definable
+        , SourcePart token
+        , ValueSyntax? right
+        , Anchor anchor
+    )
         : base(anchor)
     {
         Token = token;
