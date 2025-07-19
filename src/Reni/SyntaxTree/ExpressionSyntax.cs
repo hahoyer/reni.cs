@@ -50,7 +50,8 @@ sealed class ExpressionSyntax : ValueSyntax
 
     int CurrentResultDepth;
 
-    internal ExpressionSyntax(ValueSyntax? left, Definable? definable, SourcePart token, ValueSyntax? right, Anchor anchor)
+    internal ExpressionSyntax
+        (ValueSyntax? left, Definable? definable, SourcePart token, ValueSyntax? right, Anchor anchor)
         : base(anchor)
     {
         Token = token;
@@ -66,7 +67,7 @@ sealed class ExpressionSyntax : ValueSyntax
     protected override Syntax? GetDirectChild(int index)
         => index switch
         {
-            0 => Left, 1 => Right, _ => null
+            0 => Left, 1 => Right, var _ => null
         };
 
     internal override Result GetResultForCache(ContextBase context, Category category)
@@ -112,6 +113,12 @@ sealed class ExpressionSyntax : ValueSyntax
     }
 
     internal static ExpressionSyntax Create
-        (ValueSyntax? left, Definable? definable, SourcePart token, ValueSyntax? right, Anchor frameItems)
+    (
+        ValueSyntax? left
+        , Definable? definable
+        , SourcePart token
+        , ValueSyntax? right
+        , Anchor frameItems
+    )
         => new(left, definable, token, right, frameItems);
 }
