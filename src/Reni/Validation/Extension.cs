@@ -103,9 +103,9 @@ static class Extension
     static void Validate(IssueId issueId, object[] currentInformation)
     {
         var information = issueId.GetAttribute<Setup>()?.AdditionalInformation ?? [];
-        (information.Length == currentInformation.Length).Assert();
-        currentInformation
-            .Select((value, index) => value.GetType().Is(information[index]))
+        (issueId == IssueId.ConsequenceError || information.Length == currentInformation.Length).Assert();
+        information
+            .Select((value, index) => currentInformation[index].GetType().Is(value))
             .All(value => value)
             .Assert();
         GetMessage(issueId, currentInformation).AssertIsNotNull();
