@@ -159,10 +159,11 @@ abstract class TypeBase
     internal BitType BitType => Root.BitType;
 
     [DisableDump]
-    internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type!;
+    internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type;
 
     [DisableDump]
     internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type!;
+    internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type;
 
     [DisableDump]
     IEnumerable<SearchResult> FunctionDeclarationsForType
@@ -272,7 +273,7 @@ abstract class TypeBase
 
     [DisableDump]
     internal virtual TypeBase TypeForTypeOperator
-        => GetDePointer(Category.Type).Type.GetDeAlign(Category.Type).Type!;
+        => GetDePointer(Category.Type).Type.GetDeAlign(Category.Type).Type;
 
     [DisableDump]
     internal virtual TypeBase ElementTypeForReference
@@ -280,6 +281,7 @@ abstract class TypeBase
             .Type
             .GetDeAlign(Category.Type)
             .Type!;
+            .Type;
 
     [DisableDump]
     internal virtual IImplementation? FunctionDeclarationForType => null;
@@ -524,6 +526,7 @@ abstract class TypeBase
     }
 
     internal Result GetResult(Category category, Func<CodeBase?>? getCode = null, Func<Closures?>? getClosures = null)
+    internal Result GetResult(Category category, Func<CodeBase>? getCode = null, Func<Closures>? getClosures = null)
         => new(category, getClosures, getCode, () => this);
 
     internal TypeBase GetCommonType(TypeBase elseType)
@@ -642,6 +645,7 @@ abstract class TypeBase
     internal TypeBase GetSmartUn<T>()
         where T : IConversion
         => this is T? ((IConversion)this).GetResult(Category.Type).Type! : this;
+        => this is T? ((IConversion)this).GetResult(Category.Type).Type : this;
 
     internal Result GetResultFromPointer(Category category, TypeBase resultType)
         => resultType
