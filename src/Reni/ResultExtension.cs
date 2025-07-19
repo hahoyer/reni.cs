@@ -18,11 +18,6 @@ static class ResultExtension
     {
         if(getType != null)
             return getType.Value;
-// ReSharper disable ExpressionIsAlwaysNull
-        var isHollow = TryGetIsHollow(getIsHollow, getSize, getType, getCode);
-// ReSharper restore ExpressionIsAlwaysNull
-        if(isHollow == true)
-            return Root.VoidType;
         Tracer.AssertionFailed($"Type cannot be determined for {getObjectDump!()}");
         return null;
     }
@@ -38,9 +33,7 @@ static class ResultExtension
     {
         if(getCode != null)
             return getCode.Value;
-// ReSharper disable ExpressionIsAlwaysNull
         var isHollow = TryGetIsHollow(getIsHollow, getSize, getType, getCode);
-// ReSharper restore ExpressionIsAlwaysNull
         if(isHollow == true)
             return CodeBase.Void;
         Tracer.AssertionFailed($"Code cannot be determined for {getObjectDump!()}");
