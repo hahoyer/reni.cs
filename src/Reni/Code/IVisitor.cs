@@ -5,6 +5,8 @@ namespace Reni.Code;
 
 interface IVisitor
 {
+    void ArrayGetter(Size elementSize, Size indexSize);
+    void ArraySetter(Size elementSize, Size indexSize);
     void Assign(Size targetSize);
     void BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize);
     void BitArrayPrefixOp(string operation, Size size, Size argSize);
@@ -13,11 +15,11 @@ interface IVisitor
     void Call(Size outputSize, FunctionId functionId, Size argsAndRefsSize);
     void DePointer(Size size, Size dataSize);
     void Drop(Size beforeSize, Size afterSize);
+    void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
+    void List(CodeBase[] data);
     void PrintNumber(Size leftSize, Size rightSize);
     void PrintText(Size leftSize, Size itemSize);
     void PrintText(string dumpPrintText);
-    void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
-    void List(CodeBase[] data);
     void RecursiveCall();
     void RecursiveCallCandidate();
     void ReferencePlus(Size right);
@@ -26,6 +28,4 @@ interface IVisitor
     void TopFrameData(Size offset, Size size, Size dataSize);
     void TopRef(Size offset);
     void TopFrameRef(Size offset);
-    void ArrayGetter(Size elementSize, Size indexSize);
-    void ArraySetter(Size elementSize, Size indexSize);
 }
