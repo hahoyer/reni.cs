@@ -23,9 +23,8 @@ static class ConversionService
         {
             var startType = startFeature?.Destination ?? Source;
 
-            var startTypeNextConversionStepOptions = startType
-                .NextConversionStepOptions;
-            var newFeatures = startTypeNextConversionStepOptions
+            var newFeatures = startType
+                .NextConversionStepOptions
                 .Where(IsRelevantForConversionPathExtension)
                 .Select(feature => startFeature + feature)
                 .ToArray();
@@ -90,8 +89,8 @@ static class ConversionService
                     .SelectMany(GetForcedConversions)
                     .ToArray();
 
-                var length = results.Min(path => (int?)path.Elements.Length);
-                return results.SingleOrDefault(path => path.Elements.Length == length);
+                var weight = results.Select(path => path.Weight).MinEx();
+                return results.SingleOrDefault(path => path.Weight == weight);
             }
         }
 

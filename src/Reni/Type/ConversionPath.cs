@@ -33,6 +33,8 @@ sealed class ConversionPath
 
     internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
+    internal int Weight => DumpConversions.Stringify("").Length;
+
     internal ConversionPath(TypeBase source)
         : this(source, []) { }
 
