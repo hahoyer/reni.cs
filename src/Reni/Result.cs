@@ -134,6 +134,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     /// </summary>
     [Node]
     [DebuggerHidden]
+    [DisableDump]
     internal bool IsHollow
     {
         get
@@ -143,11 +144,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 case true:
                     return true;
 
-                case false:
-                    return false;
-
                 default:
-                    false.Expect();
                     return false;
             }
         }
@@ -158,7 +155,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [DebuggerHidden]
     internal Size Size
     {
-        get => SizeRaw.ExpectNotNull();
+        get => SizeRaw!;
         set => SizeRaw = value;
     }
 
@@ -166,7 +163,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [DebuggerHidden]
     internal TypeBase Type
     {
-        get => TypeRaw.ExpectNotNull();
+        get => TypeRaw!;
         set => TypeRaw = value;
     }
 
@@ -174,7 +171,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [DebuggerHidden]
     internal CodeBase Code
     {
-        get => CodeRaw.ExpectNotNull();
+        get => CodeRaw!;
         set => CodeRaw = value;
     }
 
@@ -182,7 +179,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [DebuggerHidden]
     internal Closures Closures
     {
-        get => ClosuresRaw.ExpectNotNull();
+        get => ClosuresRaw!;
         set => ClosuresRaw = value;
     }
 
