@@ -4,6 +4,7 @@ using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree;
@@ -54,7 +55,7 @@ sealed class DeclarerSyntax : DumpableObject
     [EnableDumpExcept(null)]
     internal readonly Syntax.IssueSyntax? Issue;
 
-    readonly bool? MeansPublic;
+    readonly TokenClasses.Brackets.Setup Setup;
 
     readonly ValueCache<Syntax[]> DirectChildrenCache;
 
@@ -86,17 +87,47 @@ sealed class DeclarerSyntax : DumpableObject
             if(Tags.Any(item => item.Value is NonPublicDeclarationToken))
                 return false;
 
-            return MeansPublic ?? false;
+            return Setup.MeansPublic;
         }
     }
 
-    [DisableDump]
+    [EnableDumpExcept(false)]
+    internal bool IsPositional
+    {
+        get
+        {
+            if(Tags.Any(item => item.Value is PositionalDeclarationToken))
+                return true;
+
+            if(Tags.Any(item => item.Value is NonPositionalDeclarationToken))
+                return false;
+
+            return Setup.MeansPositional;
+        }
+    }
+
+    [EnableDumpExcept(false)]
+    internal bool IsKernelPart
+    {
+        get
+        {
+            if(Tags.Any(item => item.Value is KernelPartDeclarationToken))
+                return true;
+
+            if(Tags.Any(item => item.Value is NonKernelPartDeclarationToken))
+                return false;
+
+            return Setup.MeansKernelPart;
+        }
+    }
+
+    [EnableDumpExcept(false)]
     internal bool IsMixInSyntax => Tags.Any(item => item.Value is MixInDeclarationToken);
 
-    [DisableDump]
+    [EnableDumpExcept(false)]
     internal bool IsConverterSyntax => Tags.Any(item => item.Value is ConverterToken);
 
-    [DisableDump]
+    [EnableDumpExcept(false)]
     internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableAnnotation);
 
     [DisableDump]
@@ -107,12 +138,12 @@ sealed class DeclarerSyntax : DumpableObject
         TagSyntax[] tags
         , NameSyntax? name
         , Syntax.IssueSyntax? issue
-        , bool? meansPublic
+        , TokenClasses.Brackets.Setup setup
     )
     {
         Tags = tags;
         Name = name;
-        MeansPublic = meansPublic;
+        Setup = setup;
         Issue = issue;
         DirectChildrenCache = new(() => DirectChildCount.Select(i => GetDirectChild(i)!).ToArray());
         StopByObjectIds(713);
@@ -142,7 +173,7 @@ sealed class DeclarerSyntax : DumpableObject
     (
         BinaryTree? name
         , Annotation[] tags
-        , bool meansPublic
+        , TokenClasses.Brackets.Setup setup
         , Root root
     )
     {
@@ -151,7 +182,7 @@ sealed class DeclarerSyntax : DumpableObject
         var nameSyntax = GetNameSyntax(name);
 
         if(nameIssueAnchors.Length == 0 && tags.Length == 0)
-            return new([], nameSyntax, null, meansPublic);
+            return new([], nameSyntax, null, setup);
 
         var issueAnchors = tags
             .Where(i => i.Value == null)
@@ -174,7 +205,7 @@ sealed class DeclarerSyntax : DumpableObject
             tags.Where(tag=>tag.Value != null).Select(GetTagSyntax).ToArray()
             , nameSyntax
             , issueSyntax
-            , meansPublic
+            , setup
         );
     }
 
@@ -188,6 +219,6 @@ sealed class DeclarerSyntax : DumpableObject
         return new(tagToken, Anchor.Create(tag).Combine(target.Anchors));
     }
 
-    public bool IsDefining(string? name, bool publicOnly)
+    internal bool IsDefining(string? name, bool publicOnly)
         => name != null && Name?.Value == name && (!publicOnly || IsPublic);
 }

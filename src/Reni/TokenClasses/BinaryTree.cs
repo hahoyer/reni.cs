@@ -5,6 +5,7 @@ using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
+using Reni.TokenClasses.Brackets;
 using Reni.TokenClasses.Whitespace;
 using Reni.Validation;
 using static Reni.Validation.IssueId;
@@ -349,12 +350,14 @@ public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer,
         return new(left == null? Left : left[0], TokenClass, WhiteSpaces, Token, right == null? Right : right[0]);
     }
 
-    internal int? GetBracketLevel()
+    internal Brackets.Setup? GetBracketSetup()
     {
         if(InnerTokenClass is not IRightBracket rightParenthesis)
             return null;
         var leftParenthesis = Left?.InnerTokenClass as ILeftBracket;
-        return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
+        if(leftParenthesis != null)
+            (leftParenthesis.Level <= rightParenthesis.Level).Assert();
+        return rightParenthesis.Setup;
     }
 
     string? GetFlatStringValue(bool areEmptyLinesPossible)

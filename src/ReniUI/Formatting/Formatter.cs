@@ -1,5 +1,6 @@
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 
 namespace ReniUI.Formatting;
 

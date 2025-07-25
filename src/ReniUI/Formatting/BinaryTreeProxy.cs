@@ -2,6 +2,7 @@ using System.Diagnostics;
 using hw.Scanner;
 using Reni.Helper;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 
 namespace ReniUI.Formatting;
 

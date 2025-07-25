@@ -29,7 +29,7 @@ sealed class Root
     }
 
     [DisableDump]
-    internal VoidType VoidType=> this.CachedValue(() => new VoidType(this));
+    internal TypeBase VoidType=> this.CachedValue(() => new VoidType(this));
 
     [DisableDump]
     internal readonly FunctionCache<string, ForeignCodeType.Entry> ForeignLibrariesCache;
@@ -100,7 +100,7 @@ sealed class Root
     internal TypeBase GetIssueType(Issue[] issues)
         => issues
             .Select(issue => IssueTypeCache[issue])
-            .Aggregate((TypeBase)VoidType, (current, next) => current.GetPair(next));
+            .Aggregate(VoidType, (current, next) => current.GetPair(next));
 
     static ContextMetaFunction GetCreateArrayFeature
         (bool isMutable) => new((context, category, argsType)
@@ -129,6 +129,30 @@ sealed class Root
 
     internal IEnumerable<FunctionType> GetFunctionInstances(CompoundView compoundView, FunctionSyntax body)
         => Functions.Find(body, compoundView);
+
+    internal Result ConcatResult(Category category, int count, Func<Category, int, Result> elementResults)
+    {
+        var result = VoidType.GetResult(category|Category.Type);
+
+        for(var position = 0; position < count; position++)
+        {
+            var elementResult = elementResults(category|Category.Type, position);
+
+            result.IsDirty = true;
+
+            result.Type = result.Type.GetPair(elementResult.Type);
+            
+            if(category.HasCode())
+                result.Code = result.Code + elementResult.Code;
+
+            if(category.HasClosures())
+                result.Closures = result.Closures.Sequence(elementResult.Closures);
+            result.IsDirty = false;
+
+        }
+
+        return result;
+    }
 
     internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
     {

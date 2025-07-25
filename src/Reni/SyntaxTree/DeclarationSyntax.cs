@@ -5,32 +5,26 @@ namespace Reni.SyntaxTree;
 
 sealed class DeclarationSyntax : Syntax, IStatementSyntax
 {
-    [EnableDumpExcept(null)]
-    internal readonly DeclarerSyntax? Declarer;
+    internal readonly DeclarerSyntax Declarer;
 
     [EnableDumpExcept(null)]
     internal readonly ValueSyntax Value;
 
     [EnableDumpExcept(null)]
-    internal string? NameOrNull => Declarer?.Name?.Value;
+    internal string? NameOrNull => Declarer.Name?.Value;
 
-    [EnableDumpExcept(false)]
-    internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
+    int DirectChildCountOfDeclarer => Declarer.DirectChildCount;
 
-    [EnableDumpExcept(false)]
-    internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
-
-    int DirectChildCountOfDeclarer => Declarer?.DirectChildCount ?? 0;
-
-    DeclarationSyntax(DeclarerSyntax? declarer, ValueSyntax value, Anchor anchor)
+    DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
         : base(anchor)
     {
         Declarer = declarer;
         Value = value;
     }
 
-    [DisableDump]
-    DeclarerSyntax? IStatementSyntax.Declarer => Declarer;
+    [EnableDump]
+//    [EnableDumpExcept(null)]
+    DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
     SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
@@ -45,23 +39,17 @@ sealed class DeclarationSyntax : Syntax, IStatementSyntax
             ? this
             : Create(Declarer, Value, anchor.Combine(Anchor, true));
 
-    protected override IEnumerable<Issue> GetIssues()
-    {
-        if(Declarer == null)
-            yield return IssueId.MissingDeclarationDeclarer.GetIssue(Anchor.Main.Root, Anchor.Main.SourcePart);
-    }
-
     [DisableDump]
     protected override int DirectChildCount => DirectChildCountOfDeclarer + 1;
 
     protected override Syntax? GetDirectChild(int index)
         => index switch
         {
-            { } when index < DirectChildCountOfDeclarer => Declarer!.GetDirectChild(index)
+            { } when index < DirectChildCountOfDeclarer => Declarer.GetDirectChild(index)
             , { } when index == DirectChildCountOfDeclarer => Value
             , var _ => null
         };
 
-    internal static IStatementSyntax Create(DeclarerSyntax? declarer, ValueSyntax value, Anchor anchor)
+    internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
         => new DeclarationSyntax(declarer, value, anchor);
 }

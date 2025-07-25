@@ -1,6 +1,7 @@
 using hw.Scanner;
 using Reni;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 using Reni.Validation;
 
 namespace ReniUI.Classification;

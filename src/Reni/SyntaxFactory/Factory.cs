@@ -1,6 +1,7 @@
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 using Reni.Validation;
 
 namespace Reni.SyntaxFactory;
@@ -24,13 +25,13 @@ sealed class Factory : DumpableObject
     internal static readonly IValueProvider Annotations = new AnnotationHandler();
 
 
-    internal static readonly Factory Root = new(false);
+    internal static readonly Factory Root = new(TokenClasses.Brackets.Setup.Instances[0]);
 
     [EnableDump]
-    internal readonly bool MeansPublic;
+    internal readonly TokenClasses.Brackets.Setup Setup;
 
 
-    Factory(bool meansPublic) => MeansPublic = meansPublic;
+    Factory(TokenClasses.Brackets.Setup setup) => Setup = setup;
 
     internal ValueSyntax GetFrameSyntax(BinaryTree target)
     {
@@ -43,7 +44,8 @@ sealed class Factory : DumpableObject
         return CompoundSyntax.Create(statements, null, anchor);
     }
 
-    internal IStatementSyntax[] GetStatementsSyntax(BinaryTree? target, Anchor? anchor = null, ITokenClass? master = null)
+    internal IStatementSyntax[] GetStatementsSyntax
+        (BinaryTree? target, Anchor? anchor = null, ITokenClass? master = null)
     {
         if(target == null)
         {
@@ -127,17 +129,8 @@ sealed class Factory : DumpableObject
 
     Factory GetCurrentFactory(BinaryTree target)
     {
-        var level = target.GetBracketLevel();
-        if(level == null)
-            return this;
-
-        return level switch
-            {
-                0 => true, 3 => true, var _ => false
-            }
-            == MeansPublic
-                ? this
-                : new(!MeansPublic);
+        var bracketSetup = target.GetBracketSetup();
+        return bracketSetup == null || bracketSetup == Setup? this : new(bracketSetup);
     }
 
     internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, Anchor anchor)
@@ -154,5 +147,6 @@ sealed class Factory : DumpableObject
             );
     }
 
-    new static TValue[] T<TValue>(params TValue[] value) where TValue: class? => value;
+    new static TValue[] T<TValue>(params TValue[] value)
+        where TValue : class? => value;
 }

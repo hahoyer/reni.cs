@@ -12,6 +12,7 @@ using Reni.Struct;
 using Reni.SyntaxFactory;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 using Reni.Type;
 using Reni.Validation;
 
@@ -163,15 +164,15 @@ public sealed class Compiler
             result += PrioTable.BracketParallels
             (
                 [
-                    LeftParenthesis.TokenId(3)
-                    , LeftParenthesis.TokenId(2)
-                    , LeftParenthesis.TokenId(1)
+                    TokenClasses.Brackets.Setup.Instances[3].OpeningTokenId
+                    , TokenClasses.Brackets.Setup.Instances[2].OpeningTokenId
+                    , TokenClasses.Brackets.Setup.Instances[1].OpeningTokenId
                     , PrioTable.BeginOfText
                 ],
                 [
-                    RightParenthesisBase.TokenId(3)
-                    , RightParenthesisBase.TokenId(2)
-                    , RightParenthesisBase.TokenId(1)
+                    TokenClasses.Brackets.Setup.Instances[3].ClosingTokenId
+                    , TokenClasses.Brackets.Setup.Instances[2].ClosingTokenId
+                    , TokenClasses.Brackets.Setup.Instances[1].ClosingTokenId
                     , PrioTable.EndOfText
                 ]
             );
@@ -193,14 +194,14 @@ public sealed class Compiler
             result += PrioTable.BracketParallels
             (
                 [
-                    LeftParenthesis.TokenId(3)
-                    , LeftParenthesis.TokenId(2)
-                    , LeftParenthesis.TokenId(1)
+                    TokenClasses.Brackets.Setup.Instances[3].OpeningTokenId
+                    , TokenClasses.Brackets.Setup.Instances[2].OpeningTokenId
+                    , TokenClasses.Brackets.Setup.Instances[1].OpeningTokenId
                 ],
                 [
-                    RightParenthesisBase.TokenId(3)
-                    , RightParenthesisBase.TokenId(2)
-                    , RightParenthesisBase.TokenId(1)
+                    TokenClasses.Brackets.Setup.Instances[3].ClosingTokenId
+                    , TokenClasses.Brackets.Setup.Instances[2].ClosingTokenId
+                    , TokenClasses.Brackets.Setup.Instances[1].ClosingTokenId
                 ]
             );
             result.Title = "Declaration";
@@ -313,7 +314,7 @@ public sealed class Compiler
             item.Syntax.AssertIsNotNull(() => item.LogDump());
     }
 
-    CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data??"");
+    CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data ?? "");
 
     static string ModuleNameFromFileName(string fileName)
         => "_" + Path.GetFileName(fileName).Symbolize();

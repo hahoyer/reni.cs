@@ -52,6 +52,8 @@ abstract class DeclarationTagToken
             yield return NonPublicDeclarationToken.TokenId;
             yield return PositionalDeclarationToken.TokenId;
             yield return PublicDeclarationToken.TokenId;
+            yield return KernelPartDeclarationToken.TokenId;
+            yield return NonKernelPartDeclarationToken.TokenId;
         }
     }
 }
@@ -112,6 +114,24 @@ sealed class PositionalDeclarationToken : DeclarationTagToken
 sealed class NonPositionalDeclarationToken : DeclarationTagToken
 {
     internal const string TokenId = "non_positional";
+
+    [DisableDump]
+    public override string Id => TokenId;
+}
+
+[UsedImplicitly]
+sealed class KernelPartDeclarationToken : DeclarationTagToken
+{
+    internal const string TokenId = "kernel_part";
+
+    [DisableDump]
+    public override string Id => TokenId;
+}
+
+[UsedImplicitly]
+sealed class NonKernelPartDeclarationToken : DeclarationTagToken
+{
+    internal const string TokenId = "non_kernel_part";
 
     [DisableDump]
     public override string Id => TokenId;

@@ -1,8 +1,10 @@
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 
 namespace Reni.SyntaxTree;
 
@@ -67,6 +69,9 @@ sealed class CompoundSyntax : ValueSyntax
         => Statements
             .SelectMany((s, i) => s.Declarer?.IsConverterSyntax == true? new[] { i } : new int[0])
             .ToArray();
+
+    [DisableDump]
+    internal Setup BracketsSetup => MainAnchor.GetBracketSetup().ExpectNotNull();
 
     CompoundSyntax(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
         : base(NextObjectId++, anchor)

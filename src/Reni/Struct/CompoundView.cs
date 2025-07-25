@@ -126,6 +126,31 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             .Select(ConversionFunction);
 
     [DisableDump]
+    internal IEnumerable<IConversion> KernelPartConversions
+    {
+        get
+        {
+            var meansKernelPart = Compound.BracketsSetup.MeansKernelPart;
+            var statements = Compound.Syntax.Statements;
+            var kernelPartPositions = Compound
+                .Syntax
+                .EndPosition
+                .Select()
+                .Where(position => IsValidKernelPart(statements[position]) ?? meansKernelPart)
+                .ToArray();
+            if(kernelPartPositions.Any())
+            {
+                var conversion = new Conversion(category => GetPartConverter(category, kernelPartPositions), Type.Pointer);
+                return [conversion];
+            }
+
+            return [];
+
+
+        }
+    }
+
+    [DisableDump]
     internal string DumpPrintTextOfType
         => Compound
             .Syntax
@@ -189,6 +214,27 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(HasIssues)
             result += $".AllIssues[{Issues.Length}]";
         return result;
+    }
+
+    Result GetPartConverter(Category category, int[] kernelPartPositions)
+        => Root
+            .ConcatResult
+            (
+                category
+                , kernelPartPositions.Length
+                , (category, position)
+                    => AccessValueViaObject(category, kernelPartPositions[position])
+            );
+
+    bool? IsValidKernelPart(IStatementSyntax statement)
+    {
+        if(statement is not DeclarationSyntax declarationSyntax)
+            return null;
+        var declarer = declarationSyntax.Declarer;
+        if(declarer.IsConverterSyntax)
+
+            NotImplementedMethod(statement);
+        return default;
     }
 
     public string GetCompoundChildDump()

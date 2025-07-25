@@ -1,7 +1,9 @@
 ﻿using hw.Parser;
 using Reni.Parser;
 using Reni.SyntaxFactory;
+using Reni.TokenClasses.Brackets;
 using Reni.Validation;
+using static Reni.SyntaxTree.Syntax;
 
 namespace Reni.TokenClasses;
 
@@ -42,6 +44,8 @@ sealed class EndOfText
 
     int IBracket.Level => 0;
 
+    Brackets.Setup IBracket.Setup => Brackets.Setup.Instances[0];
+
     IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
     IssueId IIssueTokenClass.IssueId => IssueId;
@@ -74,6 +78,7 @@ sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
     bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
         => otherMatcher is EndOfText;
 
+    Brackets.Setup IBracket.Setup => Brackets.Setup.Instances[0];
     int IBracket.Level => 0;
 
     [DisableDump]

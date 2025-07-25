@@ -141,6 +141,7 @@ interface ISymbolProvider<TDefinable>
 interface IGenericProviderForType
 {
     IEnumerable<IConversion> GetForcedConversions(TypeBase typeBase);
+    IEnumerable<IConversion> GetForcedConversions(Pair typeBase);
 }
 
 interface IDeclarationProvider
@@ -155,6 +156,9 @@ sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
     public GenericProviderForType(T target) => Target = target;
 
     IEnumerable<IConversion> IGenericProviderForType.GetForcedConversions(TypeBase source)
+        => source.GetForcedConversions(Target);
+
+    IEnumerable<IConversion> IGenericProviderForType.GetForcedConversions(Pair source)
         => source.GetForcedConversions(Target);
 }
 

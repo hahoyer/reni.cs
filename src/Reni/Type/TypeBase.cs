@@ -436,9 +436,11 @@ abstract class TypeBase
     }
 
     internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination)
-        => this is IForcedConversionProvider<TDestination> provider
+    {
+        return this is IForcedConversionProvider<TDestination> provider
             ? provider.GetResult(destination)
             : new IConversion[0];
+    }
 
     internal virtual IEnumerable<IConversion> GetCutEnabledConversion(NumberType destination) { yield break; }
 
@@ -611,10 +613,10 @@ abstract class TypeBase
         return searchResults.SpecialExecute(category);
     }
 
-    internal bool IsConvertible(TypeBase destination)
+    internal bool IsConvertible(TypeBase destination) // todo: rename to IsConvertibleTo
         => ConversionService.FindPath(this, destination) != null;
 
-    internal Result GetConversion(Category category, TypeBase destination)
+    internal Result GetConversion(Category category, TypeBase destination) // todo: rename to GetConversionTo
     {
         if(Category.Type.Replenished().Contains(category))
             return destination.SmartPointer.GetResult(category);
@@ -819,6 +821,7 @@ abstract class TypeBase
         NotImplementedMethod(data);
         return default!;
     }
+
 }
 
 // ReSharper disable CommentTypo

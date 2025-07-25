@@ -70,7 +70,7 @@ sealed class CompoundType
 
     [DisableDump]
     internal override IEnumerable<IConversion> StripConversionsFromPointer
-        => View.ConverterFeatures.Union(View.MixinConversions);
+        => View.ConverterFeatures.Union(View.MixinConversions).Union(View.KernelPartConversions);
 
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
@@ -83,6 +83,7 @@ sealed class CompoundType
         {
             if(IsHollow)
                 yield return Feature.Extension.Conversion(VoidConversion);
+
         }
     }
 

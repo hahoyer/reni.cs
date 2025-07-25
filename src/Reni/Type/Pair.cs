@@ -1,9 +1,12 @@
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 
 namespace Reni.Type;
 
-sealed class Pair : TypeBase
+sealed class Pair
+    : TypeBase
+        , IForcedConversionProvider<Pair>
 {
     [EnableDump]
     readonly TypeBase First;
@@ -26,8 +29,25 @@ sealed class Pair : TypeBase
         First = first;
         Second = second;
         (First.Root == Second.Root).Assert();
+        StopByObjectIds();
     }
 
+    IEnumerable<IConversion> IForcedConversionProvider<Pair>.GetResult(Pair destination)
+    {
+        var sourceList = ToList;
+        var destinationList = destination.ToList;
+        if(sourceList.Length != destinationList.Length)
+            return [];
+
+        var results = sourceList
+            .Select((element, index) => ConversionService.FindPath(element, destinationList[index]))
+            .ToArray();
+
+        NotImplementedMethod(destination);
+        return [];
+    }
+
+    [DisableDump]
     internal override Root Root => First.Root;
 
     [DisableDump]
@@ -56,6 +76,9 @@ sealed class Pair : TypeBase
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
+    [DisableDump]
+    protected override IEnumerable<IGenericProviderForType> GenericList
+        => this.GenericListFromType(base.GenericList);
 
     [DisableDump]
     internal override TypeBase[] ToList

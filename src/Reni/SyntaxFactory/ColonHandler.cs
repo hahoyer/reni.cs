@@ -2,6 +2,7 @@ using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.TokenClasses.Brackets;
 
 namespace Reni.SyntaxFactory;
 
@@ -10,7 +11,7 @@ sealed class ColonHandler : DumpableObject, IStatementProvider
     IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
     {
         var (item, annotations) = target.Left.CheckForAnnotations();
-        var declarer = DeclarerSyntax.Create(item, annotations, factory.MeansPublic, target.Root);
+        var declarer = DeclarerSyntax.Create(item, annotations, factory.Setup, target.Root);
         var value = factory.GetValueSyntax(target.Right!);
         var result = DeclarationSyntax.Create(declarer, value!, Anchor.Create(target));
         return result;

@@ -1,5 +1,6 @@
 ﻿using hw.Parser;
 using Reni.Parser;
+using Reni.TokenClasses.Brackets;
 
 namespace Reni.TokenClasses;
 
@@ -14,14 +15,14 @@ sealed class LeftParenthesis : TokenClass, IBelongingsMatcher, ILeftBracket
 
     public LeftParenthesis(int level) => Level = level;
 
-    [DisableDump]
-    public override string Id => TokenId(Level);
-
     bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
         => (otherMatcher as RightParenthesis)?.Level == Level;
 
+    Setup IBracket.Setup => Setup.Instances[Level];
+
     int IBracket.Level => Level;
 
-    public static string TokenId(int level)
-        => level == 0? PrioTable.BeginOfText : "{[(".Substring(level - 1, 1);
+    [DisableDump]
+    public override string Id => ((IBracket)this).Setup.OpeningTokenId;
+
 }
