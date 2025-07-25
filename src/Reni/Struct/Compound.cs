@@ -2,6 +2,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.FeatureTest.Helper;
 using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.Type;
@@ -14,6 +15,10 @@ sealed class Compound
 
 {
     static int NextObjectId;
+
+    [Node]
+    [DisableDump]
+    internal TokenClasses.Brackets.Setup BracketsSetup => Syntax.BracketsSetup ;
 
     [Node]
     [DisableDump]
@@ -182,11 +187,11 @@ sealed class Compound
 
     Result AccessResult(Category category, int accessPosition, int position)
     {
-        var trace = ObjectId == -10
-                && Syntax.ObjectId.In(1)
-                && accessPosition == 1
+        var trace = ObjectId == -19
+                && Syntax.ObjectId.In(13)
+                && accessPosition == 2
                 && position == 1
-                && category.HasClosures()
+                //&& category.HasClosures()
             ;
         StartMethodDump(trace, category, accessPosition, position);
         try

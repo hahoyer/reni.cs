@@ -1,4 +1,5 @@
-﻿using Reni.Basics;
+﻿using System.Reflection;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;
 
@@ -81,6 +82,10 @@ sealed class FormalMachine : DumpableObject, IVisitor
 
     void IVisitor.Drop(Size beforeSize, Size afterSize) => ResetInputValuesOfData(beforeSize - afterSize);
     void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) => NotImplementedMethod(fiberHead, fiberItems);
+
+    void IVisitor.ForeignCall(Size outputSize, MethodInfo method, Size inputSize) 
+        => NotImplementedMethod(outputSize,method,inputSize);
+
     void IVisitor.List(CodeBase[] data) => NotImplementedMethod(data, "", "");
 
     void IVisitor.PrintNumber(Size leftSize, Size rightSize)

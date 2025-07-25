@@ -49,7 +49,7 @@ sealed class Semantics : DumpableObject
     {
         switch(target)
         {
-            case DeclarationSyntax declaration when declaration.Declarer?.Name == null:
+            case DeclarationSyntax declaration when declaration.Declarer.Name == null:
                 NotImplementedMethod(target);
                 return;
             case DeclarationSyntax declaration:
@@ -75,7 +75,7 @@ sealed class Semantics : DumpableObject
 
     void FlatInitialize(DeclarationSyntax target)
     {
-        var declarations = Dictionary[target.Declarer!.Name!.Value];
+        var declarations = Dictionary[target.Declarer.Name!.Value];
         if(declarations.Any())
         {
             NotImplementedMethod(target);

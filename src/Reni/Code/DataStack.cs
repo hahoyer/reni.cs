@@ -1,4 +1,5 @@
-﻿using Reni.Basics;
+﻿using System.Reflection;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;
 
@@ -177,6 +178,9 @@ sealed class DataStack : DumpableObject, IVisitor
         foreach(var codeBase in fiberItems)
             SubVisit(codeBase);
     }
+
+    void IVisitor.ForeignCall(Size outputSize, MethodInfo method, Size inputSize) 
+        => NotImplementedMethod(outputSize,method,inputSize);
 
     void IVisitor.List(CodeBase[] data)
     {

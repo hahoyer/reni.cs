@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
@@ -13,14 +14,16 @@ abstract class CodeBase
 {
     [Node]
     [DisableDump]
-    [field: AllowNull, MaybeNull]
+    [field: AllowNull]
+    [field: MaybeNull]
     internal Size Size => field ??= GetSize().AssertNotNull();
 
     [DisableDump]
     internal Size TemporarySize => GetTemporarySize();
 
     [DisableDump]
-    [field: AllowNull, MaybeNull]
+    [field: AllowNull]
+    [field: MaybeNull]
     internal Closures Closures => field ??= GetClosures();
 
 
@@ -173,6 +176,12 @@ abstract class CodeBase
     internal CodeBase GetCall(FunctionId index, Size resultSize)
     {
         var subsequentElement = new Call(index, resultSize, Size);
+        return Concat(subsequentElement);
+    }
+
+    internal CodeBase GetForeignCall(MethodInfo methodInfo, Size resultSize)
+    {
+        var subsequentElement = new ForeignCall(methodInfo, resultSize, Size);
         return Concat(subsequentElement);
     }
 

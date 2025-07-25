@@ -1,3 +1,4 @@
+using System.Reflection;
 using Reni.Basics;
 using Reni.Runtime;
 using Reni.Struct;
@@ -80,6 +81,9 @@ sealed class CSharpGenerator : DumpableObject, IVisitor
         foreach(var fiberItem in fiberItems)
             fiberItem.Visit(this);
     }
+
+    void IVisitor.ForeignCall(Size outputSize, MethodInfo method, Size inputSize) 
+        => NotImplementedMethod(outputSize,method,inputSize);
 
     void IVisitor.List(CodeBase[] data)
     {

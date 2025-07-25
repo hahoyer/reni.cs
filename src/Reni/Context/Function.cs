@@ -35,12 +35,13 @@ sealed class Function : Child, IFunctionContext
     {
         if(ValueType == null)
             throw new ValueCannotBeUsedHereException();
-        return ValueType.Pointer
-                .GetContextAccessResult
-                (
-                    category | Category.Type,
-                    this,
-                    () => (ArgumentsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
+
+        return (ValueType.IsHollow? ValueType : ValueType.Pointer)
+            .GetContextAccessResult
+            (
+                category | Category.Type,
+                this,
+                () => (ArgumentsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
             & category;
     }
 

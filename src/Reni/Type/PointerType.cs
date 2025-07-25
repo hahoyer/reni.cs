@@ -72,6 +72,10 @@ sealed class PointerType
             base.RawSymmetricConversions.Concat
                 ([Feature.Extension.Conversion(DereferenceResult)]);
 
+    [DisableDump]
+    protected override IEnumerable<IGenericProviderForType> GenericList
+        => this.GenericListFromType(base.GenericList);
+
     protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 
     internal override int? GetSmartArrayLength(TypeBase elementType)
@@ -136,4 +140,19 @@ sealed class PointerType
                 () => ArgumentCode.GetDePointer(ValueType.Size).GetAlign(),
                 Closures.GetArgument
             );
+
+    internal Result ConversionResult(Category category, ArrayType source)
+    {
+        var trace = ObjectId == -1 && category.HasCode();
+        StartMethodDump(trace, category, source);
+        try
+        {
+            return ReturnMethodDump(source.Pointer.GetMutation(this) & category);
+        }
+        finally
+        {
+            EndMethodDump();
+        }
+    }
+
 }

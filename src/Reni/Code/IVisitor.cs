@@ -1,5 +1,6 @@
 using Reni.Basics;
 using Reni.Struct;
+using System.Reflection;
 
 namespace Reni.Code;
 
@@ -16,6 +17,7 @@ interface IVisitor
     void DePointer(Size size, Size dataSize);
     void Drop(Size beforeSize, Size afterSize);
     void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
+    void ForeignCall(Size outputSize, MethodInfo method, Size inputSize);
     void List(CodeBase[] data);
     void PrintNumber(Size leftSize, Size rightSize);
     void PrintText(Size leftSize, Size itemSize);

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Helper;
@@ -9,8 +10,6 @@ namespace Reni.Type;
 
 sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 {
-    internal sealed class TransferResult { }
-
     internal sealed class Entry
     {
         internal Method[]? Methods;
@@ -22,10 +21,21 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
             => Data.TryGetValue(namePart, out var value)? value : Data[namePart] = new();
     }
 
-    internal sealed class Method : DumpableObject
+    internal sealed class Method : DumpableObject, IFunction
     {
         internal readonly MethodInfo MethodInfo;
         readonly Root Root;
+
+        TypeBase ResultType => GetLeftSideType(MethodInfo.ReturnType);
+
+        TypeBase[] ArgsTypes
+            => MethodInfo
+                .GetParameters()
+                .Select(GetType)
+                .ToArray();
+
+        TypeBase ArgsType
+            => ArgsTypes.Aggregate(Root.VoidType, (c, n) => c.GetPair(n));
 
 
         internal Method(MethodInfo methodInfo, Root root)
@@ -34,23 +44,25 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
             Root = root;
         }
 
-        internal TransferResult Transfer(TypeBase argsType)
+        Result IFunction.GetResult(Category category, TypeBase argsType)
+            => GetResult(category, argsType);
+
+
+        bool IFunction.IsImplicit => false;
+
+        Closures GetClosure()
         {
-            var targetArgsType = GetType(MethodInfo.GetParameters());
-            var targetResultType = GetLeftSideType(MethodInfo.ReturnType);
-            //return FunctionInstanceType()
-            NotImplementedMethod(argsType, "targetResultType", targetResultType, "targetArgsType", targetArgsType);
+            NotImplementedMethod();
             return default!;
         }
 
-        TypeBase GetType(ParameterInfo[] arguments)
-        {
-            if(arguments.Length == 1)
-                return GetRightSideType(arguments[0].ParameterType);
+        CodeBase GetCode()
+            => ArgsType
+                .ArgumentCode
+                .GetForeignCall(MethodInfo, ResultType.Size);
 
-            NotImplementedMethod(arguments);
-            return default!;
-        }
+        TypeBase GetType(ParameterInfo argument)
+            => GetRightSideType(argument.ParameterType);
 
         TypeBase GetRightSideType(System.Type target)
         {
@@ -69,12 +81,26 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
             NotImplementedMethod(target);
             return default!;
         }
+
+        internal bool IsConvertibleFrom(TypeBase argsType) 
+            => argsType.IsConvertible(ArgsType);
+
+        internal Result GetResult(Category category, TypeBase argsType)
+            => ResultType
+                .GetResult(category, GetCode)
+                .ReplaceArguments(argsType.GetConversion(category, ArgsType));
     }
 
     static ForeignCodeType()
     {
         var handlers = Tracer.Dumper.Configuration.Handlers;
-        handlers.Add(typeof(MethodBase), (_, o) => ((MethodBase)o).DumpMethod(true));
+        handlers.Add(typeof(MethodInfo), (_, o)
+                =>
+            {
+                var methodInfo = (MethodInfo)o;
+                return methodInfo.DumpMethod(true) + "=>" + methodInfo.ReturnType.PrettyName();
+            }
+        );
         handlers.Add(typeof(ParameterInfo), (_, o) =>
         {
             var parameter = (ParameterInfo)o;
@@ -111,9 +137,12 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
     Result IFunction.GetResult(Category category, TypeBase argsType)
     {
-        var m = GetMethod().Select(m => m.Transfer(argsType)).ToArray();
+        var methods = GetMethod().Where(me => me.IsConvertibleFrom(argsType)).ToArray();
 
-        NotImplementedMethod(category, argsType, "m", m);
+        if(methods.Length == 1)
+            return methods[0].GetResult(category, argsType);
+
+        NotImplementedMethod(category, argsType, "m", methods, "argsType", argsType.StripConversionsFromPointer);
         return default!;
     }
 

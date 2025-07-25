@@ -20,6 +20,7 @@ sealed class ArrayType
         , ISymbolProviderForPointer<ArrayReference>
         , ISymbolProviderForPointer<Count>
         , IForcedConversionProviderForPointer<ArrayReferenceType>
+        , IForcedConversionProviderForPointer<PointerType>
         , IRepeaterType
         , IChild<TypeBase>
 {
@@ -119,6 +120,10 @@ sealed class ArrayType
 
     IEnumerable<IConversion?> IForcedConversionProviderForPointer<ArrayReferenceType>
         .GetResult(ArrayReferenceType destination)
+        => ForcedConversion(destination).NullableToArray();
+
+    IEnumerable<IConversion?> IForcedConversionProviderForPointer<PointerType>
+        .GetResult(PointerType destination)
         => ForcedConversion(destination).NullableToArray();
 
     TypeBase IRepeaterType.ElementType => ElementType;
@@ -236,7 +241,7 @@ sealed class ArrayType
     [DisableDump]
     protected override CodeBase DumpPrintCode => ArgumentCode.GetDumpPrintText(SimpleItemSize);
 
-    internal override object GetDataValue(BitsConst data) 
+    internal override object GetDataValue(BitsConst data)
         => IsTextItem? data.ToString(ElementType.Size) : base.GetDataValue(data);
 
     internal ArrayReferenceType Reference(bool isForceMutable)
@@ -351,6 +356,15 @@ sealed class ArrayType
             (category => destination.ConversionResult(category, this), SmartPointer);
     }
 
+    IConversion? ForcedConversion(PointerType destination)
+        => HasForcedConversion(destination)
+            ? Feature.Extension.Conversion
+            (
+                category => destination.ConversionResult(category, this)
+                , SmartPointer
+            )
+            : null;
+
     bool HasForcedConversion(ArrayReferenceType destination)
     {
         if(destination.IsMutable && !OptionsValue.IsMutable.Value)
@@ -362,4 +376,6 @@ sealed class ArrayType
         NotImplementedMethod(destination);
         return false;
     }
+
+    bool HasForcedConversion(PointerType destination) => ElementType == destination.ValueType;
 }
