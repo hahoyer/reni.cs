@@ -122,7 +122,7 @@ sealed class Root
 
     internal FunctionType GetFunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
     {
-        var alignedArgsType = argsType.Align;
+        var alignedArgsType = argsType.Make.Align;
         var functionInstance = Functions.Find(body, compoundView, alignedArgsType);
         return functionInstance;
     }

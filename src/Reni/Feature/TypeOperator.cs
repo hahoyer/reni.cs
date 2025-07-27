@@ -5,6 +5,7 @@ using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Feature;
 
@@ -23,9 +24,7 @@ sealed class TypeOperator : SuffixSyntaxToken
             if(leftType.HasIssues)
                 return new(category, leftType.Issues.AssertNotNull());
 
-            return leftType
-                .TypeForTypeOperator
-                .TypeType
+            return leftType.Make.TypeForTypeOperator.Make.TypeType
                 .GetResult(category);
         }
 

@@ -19,8 +19,7 @@ abstract class TagChild<TParent> : Child<TParent>
     [DisableDump]
     internal sealed override bool IsHollow => Parent.IsHollow;
 
-    [DisableDump]
-    internal sealed override TypeBase TagTargetType => Parent.TagTargetType;
+    internal sealed override TypeBase GetTagTargetType() => Parent.GetTagTargetType();
 
     protected sealed override Size GetSize() => Parent.Size;
     protected override string GetNodeDump() => Parent.NodeDump + "[" + TagTitle + "]";

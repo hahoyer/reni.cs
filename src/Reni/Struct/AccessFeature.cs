@@ -37,9 +37,9 @@ sealed class AccessFeature
     }
 
     Result IConversion.Execute(Category category)
-        => GetResult(category).ConvertToConverter(View.Type.Pointer);
+        => GetResult(category).ConvertToConverter(View.Type.Make.Pointer);
 
-    TypeBase IConversion.Source => View.Type.Pointer;
+    TypeBase IConversion.Source => View.Type.Make.Pointer;
 
     IFunction? IEvalImplementation.Function => FunctionFeature.Value;
 

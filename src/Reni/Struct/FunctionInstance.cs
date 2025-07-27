@@ -96,7 +96,7 @@ abstract class FunctionInstance
             result.Closures = Closures.GetArgument();
         if(result.HasIssue != true && category.HasCode())
             result.Code = CallType
-                .ArgumentCode
+                .Make.ArgumentCode
                 .GetCall(FunctionId, result.Size);
         return result;
     }

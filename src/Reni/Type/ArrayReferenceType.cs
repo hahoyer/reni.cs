@@ -88,7 +88,7 @@ sealed class ArrayReferenceType
         RepeaterAccessTypeCache = new(() => new(this));
         ValueType = valueType;
         (!valueType.IsHollow).Assert(valueType.Dump);
-        (valueType.TagTargetType is not PointerType).Assert(valueType.Dump);
+        (valueType.GetTagTargetType() is not PointerType).Assert(valueType.Dump);
 
         StopByObjectIds(-10);
     }
@@ -145,15 +145,14 @@ sealed class ArrayReferenceType
     internal override Size SimpleItemSize => ValueType.Size;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => ArgumentCode.GetDumpPrintText(SimpleItemSize);
+    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(SimpleItemSize);
 
     protected override string GetNodeDump()
         => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
 
-    protected override Size GetSize() => ValueType.Pointer.Size;
+    protected override Size GetSize() => ValueType.Make.Pointer.Size;
 
-    [DisableDump]
-    internal override IImplementation FunctionDeclarationForPointerType
+    internal override IImplementation GetFunctionDeclarationForPointerType()
         => Feature.Extension.FunctionFeature(AccessResult);
 
 
@@ -199,7 +198,7 @@ sealed class ArrayReferenceType
         StartMethodDump(trace, category, source);
         try
         {
-            return ReturnMethodDump(source.Pointer.GetMutation(this) & category);
+            return ReturnMethodDump(source.Make.Pointer.GetMutation(this) & category);
         }
         finally
         {

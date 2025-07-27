@@ -92,12 +92,12 @@ sealed class SearchResult : DumpableObject, IImplementation
             BreakExecution();
             var result = Feature.GetResult(category | Category.Type, currentTarget, context, right);
             Dump(nameof(result), result);
-            Dump("ConverterPath.Destination.CheckedReference", ConverterPath.Destination.CheckedReference);
+            Dump("ConverterPath.Destination.CheckedReference", ConverterPath.Destination.Make.CheckedReference);
             Dump("ConverterPath.Execute", ConverterPath.Execute(Category.Code));
             BreakExecution();
 
             var replaceAbsolute = result
-                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference!, ConverterPath.Execute);
+                .ReplaceAbsolute(ConverterPath.Destination.Make.CheckedReference!, ConverterPath.Execute);
             Dump(nameof(replaceAbsolute), replaceAbsolute);
             if(trace)
                 Dump(nameof(left), left.Code);

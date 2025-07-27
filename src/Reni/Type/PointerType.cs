@@ -102,9 +102,8 @@ sealed class PointerType
     protected override IEnumerable<IConversion> StripConversions
         => ValueType.StripConversionsFromPointer;
 
-    [DisableDump]
-    internal override IImplementation? FunctionDeclarationForType
-        => ValueType.FunctionDeclarationForPointerType ?? base.FunctionDeclarationForType;
+    internal override IImplementation? GetFunctionDeclarationForType()
+        => ValueType.GetFunctionDeclarationForPointerType() ?? base.GetFunctionDeclarationForType();
 
     internal override IEnumerable<SearchResult> GetDeclarations<TDefinable>(TDefinable? tokenClass)
         where TDefinable : class
@@ -124,7 +123,7 @@ sealed class PointerType
             .GetResult
             (
                 category,
-                () => ArgumentCode.GetDePointer(ValueType.Size),
+                () => Make.ArgumentCode.GetDePointer(ValueType.Size),
                 Closures.GetArgument
             );
 
@@ -133,11 +132,11 @@ sealed class PointerType
 
     Result DereferenceResult(Category category)
         => ValueType
-            .Align
+            .Make.Align
             .GetResult
             (
                 category,
-                () => ArgumentCode.GetDePointer(ValueType.Size).GetAlign(),
+                () => Make.ArgumentCode.GetDePointer(ValueType.Size).GetAlign(),
                 Closures.GetArgument
             );
 
@@ -147,7 +146,7 @@ sealed class PointerType
         StartMethodDump(trace, category, source);
         try
         {
-            return ReturnMethodDump(source.Pointer.GetMutation(this) & category);
+            return ReturnMethodDump(source.Make.Pointer.GetMutation(this) & category);
         }
         finally
         {

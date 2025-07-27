@@ -23,8 +23,7 @@ sealed class IssueType : TypeBase, IContextReference
 
     int IContextReference.Order => default;
 
-    [DisableDump]
-    internal override TypeBase TypeType => this;
+    protected override TypeBase GetTypeType() => this;
 
     [DisableDump]
     internal override bool IsHollow => true;

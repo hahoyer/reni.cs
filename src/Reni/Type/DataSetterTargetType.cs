@@ -16,7 +16,6 @@ abstract class DataSetterTargetType : SetterTargetType
         => Root.VoidType.GetResult(category, GetSetterCode);
 
     protected override Result GetGetterResult(Category category)
-        => ValueType
-            .ForcedPointer
+        => ValueType.Make.ForcedPointer
             .GetResult(category, GetGetterCode);
 }

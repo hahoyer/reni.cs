@@ -75,8 +75,7 @@ sealed class FunctionBodyType
     [DisableDump]
     internal override bool IsHollow => true;
 
-    [DisableDump]
-    internal override IImplementation FunctionDeclarationForType => this;
+    internal override IImplementation GetFunctionDeclarationForType() => this;
 
     [DisableDump]
     protected override CodeBase DumpPrintCode => Syntax.FunctionKindDump.GetDumpPrintTextCode();

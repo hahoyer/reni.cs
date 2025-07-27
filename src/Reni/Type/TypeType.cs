@@ -73,9 +73,8 @@ sealed class TypeType
             .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();
         return Value
-            .Align
-            .GetArray(typedData)
-            .TypeType.GetResult(category);
+            .Make.Align
+            .GetArray(typedData).Make.TypeType.GetResult(category);
     }
 
     Result SlashResult(Category category, ResultCache left, ContextBase context, ValueSyntax right)
@@ -102,11 +101,11 @@ sealed class TypeType
     }
 
     Result MutableArrayResult(Category category)
-        => ((ArrayType)Value).Mutable.TypeType.GetResult(category);
+        => ((ArrayType)Value).Mutable.Make.TypeType.GetResult(category);
 
     Result ArrayReferenceResult(Category category)
-        => ((ArrayType)Value).Reference(true).TypeType.GetResult(category);
+        => ((ArrayType)Value).Reference(true).Make.TypeType.GetResult(category);
 
     Result MutableReferenceResult(Category category)
-        => ((ArrayReferenceType)Value).Mutable.TypeType.GetResult(category);
+        => ((ArrayReferenceType)Value).Mutable.Make.TypeType.GetResult(category);
 }

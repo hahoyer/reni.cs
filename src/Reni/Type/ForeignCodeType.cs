@@ -58,7 +58,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
         CodeBase GetCode()
             => ArgsType
-                .ArgumentCode
+                .Make.ArgumentCode
                 .GetForeignCall(MethodInfo, ResultType.Size);
 
         TypeBase GetType(ParameterInfo argument)
@@ -67,7 +67,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         TypeBase GetRightSideType(System.Type target)
         {
             if(target == typeof(string))
-                return (Root.BitType * 8).TextItem.Pointer;
+                return (Root.BitType * 8).TextItem.Make.Pointer;
 
             NotImplementedMethod(target);
             return default!;
@@ -76,7 +76,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         TypeBase GetLeftSideType(System.Type target)
         {
             if(target == typeof(string))
-                return (Root.BitType * 8).TextItem.Pointer;
+                return (Root.BitType * 8).TextItem.Make.Pointer;
 
             NotImplementedMethod(target);
             return default!;
@@ -153,8 +153,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
     [DisableDump]
     internal override bool IsHollow => true;
 
-    [DisableDump]
-    internal override IImplementation FunctionDeclarationForType => this;
+    internal override IImplementation GetFunctionDeclarationForType() => this;
 
     internal static Entry CreateEntries(string name, Root root)
     {

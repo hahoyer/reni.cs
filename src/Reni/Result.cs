@@ -278,7 +278,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             (
                 CompleteCategory, () => Closures
                 , () => Code.GetBitCast(alignedSize)
-                , () => Type.Align
+                , () => Type.Make.Align
                 , () => alignedSize
                 , () => IsHollow);
             return result;
@@ -323,8 +323,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Result DereferenceResult
         => Type
-            .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump()))
-            .CheckedReference
+            .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump())).Make.CheckedReference
             .ExpectNotNull(() => (null, $"Type {Type.DumpPrintText} is not a reference type."))
             .Converter.GetResult(CompleteCategory)
             .ReplaceArguments(this);
@@ -374,7 +373,8 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         {
             var destinationType = Type
                 .ExpectNotNull(() => (null, "AutomaticDereferencedAlignedResult requires type category:\n " + Dump()))
-                .AutomaticDereferenceType.Align;
+                .Make.AutomaticDereferenceType
+                .Make.Align;
 
             if(destinationType == Type)
                 return this;
@@ -916,7 +916,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result ConvertToConverter(TypeBase source)
         => source.IsHollow || (!HasClosures && !HasCode)
             ? this
-            : ReplaceAbsolute(source.CheckedReference!, source.GetArgumentResult);
+            : ReplaceAbsolute(source.Make.CheckedReference!, source.GetArgumentResult);
 
     [PublicAPI]
     internal Result GetWithCleanupAdded(Result cleanup)

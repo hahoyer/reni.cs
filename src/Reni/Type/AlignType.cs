@@ -28,10 +28,10 @@ sealed class AlignType
     [DisableDump]
     internal override bool IsHollow => Parent.IsHollow;
 
-    protected override IReference GetForcedReferenceForCache() => Parent.ForcedReference;
+    protected override IReference GetForcedReferenceForCache() => Parent.Make.ForcedReference;
 
     protected override Result GetDeAlign(Category category) => GetMutation(Parent) & category;
-    protected override PointerType GetPointerForCache() => Parent.ForcedPointer;
+    protected override PointerType GetPointerForCache() => Parent.Make.ForcedPointer;
     internal override object GetDataValue(BitsConst data) => Parent.GetDataValue(data);
 
     [DisableDump]
@@ -66,5 +66,5 @@ sealed class AlignType
         => UnalignedResult(category);
 
     public Result UnalignedResult(Category category)
-        => Parent.GetResult(category, () => ArgumentCode.GetBitCast(Parent.Size));
+        => Parent.GetResult(category, () => Make.ArgumentCode.GetBitCast(Parent.Size));
 }

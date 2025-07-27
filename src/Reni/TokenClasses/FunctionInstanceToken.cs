@@ -3,6 +3,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.SyntaxTree;
+using Reni.Type;
 
 namespace Reni.TokenClasses;
 
@@ -14,7 +15,6 @@ sealed class FunctionInstanceToken : SuffixSyntaxToken
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax left)
         => context.GetResult(category | Category.Type, left)
-            .Type
-            .FunctionInstance
+            .Type.Make.FunctionInstance
             .GetResult(category, context.GetResult(category | Category.Type, left));
 }

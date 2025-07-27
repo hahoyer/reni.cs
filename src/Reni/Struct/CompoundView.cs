@@ -37,12 +37,12 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         Result IConversion.Execute(Category category)
         {
             var innerResult = ((IConversion)Parent).Execute(category);
-            var conversion = Type.Pointer.GetMutation(Parent);
+            var conversion = Type.Make.Pointer.GetMutation(Parent);
             var result = innerResult.ReplaceArguments(conversion);
             return result;
         }
 
-        TypeBase IConversion.Source => Type.Pointer;
+        TypeBase IConversion.Source => Type.Make.Pointer;
     }
 
     static int NextObjectId;
@@ -140,7 +140,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
                 .ToArray();
             if(kernelPartPositions.Any())
             {
-                var conversion = new Conversion(category => GetPartConverter(category, kernelPartPositions), Type.Pointer);
+                var conversion = new Conversion(category => GetPartConverter(category, kernelPartPositions), Type.Make.Pointer);
                 return [conversion];
             }
 
@@ -310,7 +310,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(resultType.IsHollow)
             return resultType.GetResult(category);
 
-        return Type.SmartPointer.GetMutation(resultType) & category;
+        return (Type.IsHollow? Type : Type.Make.Pointer).GetMutation(resultType) & category;
     }
 
     internal Result AccessViaObject(Category category, int position)
@@ -335,7 +335,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result ReplaceObjectPointerByContext(Result target)
     {
-        var reference = Type.SmartPointer.CheckedReference!;
+        var reference = (Type.IsHollow? Type : Type.Make.Pointer).Make.CheckedReference!;
         return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
     }
 
@@ -343,7 +343,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     {
         IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
         var source = result.Source;
-        (source == Type.Pointer).Assert(source.Dump);
+        (source == Type.Make.Pointer).Assert(source.Dump);
         (source == result.GetResult(Category.Code).Code.ArgumentType).Assert();
         return result;
     }
@@ -363,7 +363,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(IsHollow)
             return Type.GetResult(category);
 
-        return Type.SmartPointer
+        return (Type.IsHollow? Type : Type.Make.Pointer)
             .GetResult
             (
                 category,
@@ -379,14 +379,15 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         try
         {
             BreakExecution();
-            var accessType = ValueType(position).SmartPointer;
+            TypeBase tempQualifier = ValueType(position);
+            var accessType = tempQualifier.IsHollow? tempQualifier : tempQualifier.Make.Pointer;
             var genericDumpPrintResult = accessType.GetGenericDumpPrintResult(category);
             Dump("genericDumpPrintResult", genericDumpPrintResult);
             BreakExecution();
             return ReturnMethodDump
             (
                 genericDumpPrintResult.ReplaceAbsolute
-                    (accessType.CheckedReference!, c => AccessValueViaObject(c, position)));
+                    (accessType.Make.CheckedReference!, c => AccessValueViaObject(c, position)));
         }
         finally
         {
@@ -400,8 +401,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal TypeBase ValueType(int position)
         => Compound
             .AccessType(ViewPosition, position)
-            .AssertNotNull()
-            .TypeForStructureElement;
+            .AssertNotNull().Make.TypeForStructureElement;
 
     internal IImplementation? Find(Definable definable, bool publicOnly)
     {
@@ -419,8 +419,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     CodeBase ContextOperatorCode()
         => IsHollow
             ? CodeBase.Void
-            : Type
-                .ForcedReference
+            : Type.Make.ForcedReference
                 .GetCode()
                 .GetReferenceWithOffset(CompoundViewSize!);
 

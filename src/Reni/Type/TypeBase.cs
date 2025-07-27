@@ -12,7 +12,7 @@ using Reni.Validation;
 
 namespace Reni.Type;
 
-abstract class TypeBase
+abstract partial class TypeBase
     : DumpableObject
         , IContextReferenceProvider
         , IIconKeyProvider
@@ -22,87 +22,11 @@ abstract class TypeBase
         , ISymbolProviderForPointer<ForeignCode>
 
 {
-    sealed class CacheContainer
-    {
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<int, AlignType> Aligner;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<int, FunctionCache<string, ArrayType>> Array;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<EnableCut> EnableCut;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<IReference> ForcedReference;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<FunctionInstanceType> FunctionInstanceType;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<TypeBase, ResultCache> Mutation;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<TypeBase, Pair> Pair;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<PointerType> Pointer;
-
-        public readonly ValueCache<Size> Size;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<IEnumerable<IConversion>> SymmetricConversions;
-
-        [Node]
-        [SmartNode]
-        public readonly ValueCache<TypeType> TypeType;
-
-        [Node]
-        [SmartNode]
-        internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
-
-        [Node]
-        [SmartNode]
-        public readonly FunctionCache<SourcePart, Issue> MissingDeclarationIssue;
-
-        
-        public CacheContainer(TypeBase parent)
-        {
-            EnableCut = new(() => new(parent));
-            Mutation = new(destination =>
-                ResultCache.CreateInstance(category => parent.GetMutation(category, destination))
-            );
-            ForcedReference = new(parent.GetForcedReferenceForCache);
-            Pointer = new(parent.GetPointerForCache);
-            Pair = new(first => new(first, parent));
-            Array = new(count
-                =>
-                new(optionsId
-                    =>
-                    parent.GetArrayForCache(count, optionsId)
-                )
-            );
-
-            Aligner = new(alignBits => new(parent, alignBits));
-            FunctionInstanceType = new(() => new(parent));
-            TypeType = new(() => new(parent));
-            Size = new(parent.GetSizeForCache);
-            SymmetricConversions = new(parent.GetSymmetricConversionsForCache);
-            ArrayReferenceCache = new(id => new(parent, id));
-            MissingDeclarationIssue = new(parent.GetMissingDeclarationIssueForCache);
-        }
-    }
-
     static int NextObjectId;
+
+    [Node]
+    [SmartNode]
+    internal readonly LinkedTypes Make;
 
     [Node]
     [SmartNode]
@@ -112,68 +36,7 @@ abstract class TypeBase
     internal Size Size => Cache.Size.Value;
 
     [DisableDump]
-    internal EnableCut EnableCut => Cache.EnableCut.Value;
-
-    [DisableDump]
-    internal TypeBase Pointer => ForcedReference.Type();
-
-    [DisableDump]
-    internal IReference ForcedReference => Cache.ForcedReference.Value;
-
-    [DisableDump]
-    internal CodeBase ArgumentCode => this.GetArgumentCode();
-
-    [DisableDump]
-    internal TypeBase AutomaticDereferenceType
-        =>
-            IsWeakReference
-                ? CheckedReference!.Converter.ResultType().AutomaticDereferenceType
-                : this;
-
-    [DisableDump]
-    internal TypeBase SmartPointer => IsHollow? this : Pointer;
-
-    [DisableDump]
-    internal TypeBase Align
-    {
-        get
-        {
-            var alignBits = Root.DefaultRefAlignParam.AlignBits;
-            return Size.GetAlign(alignBits) == Size? this : Cache.Aligner[alignBits];
-        }
-    }
-
-    [DisableDump]
-    internal TypeBase FunctionInstance => Cache.FunctionInstanceType.Value;
-
-    [DisableDump]
-    internal PointerType ForcedPointer => Cache.Pointer.Value;
-
-    [DisableDump]
-    internal IReference? CheckedReference => this as IReference;
-
-    [DisableDump]
-    internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
-
-    [DisableDump]
-    internal BitType BitType => Root.BitType;
-
-    [DisableDump]
-    internal TypeBase TypeForStructureElement => GetDeAlign(Category.Type).Type;
-
-    [DisableDump]
-    internal TypeBase TypeForArrayElement => GetDeAlign(Category.Type).Type;
-
-    [DisableDump]
-    IEnumerable<SearchResult> FunctionDeclarationsForType
-    {
-        get
-        {
-            var result = FunctionDeclarationForType;
-            if(result != null)
-                yield return SearchResult.Create(result, this);
-        }
-    }
+    internal bool IsWeakReference => Make.CheckedReference != null && Make.CheckedReference.IsWeak;
 
     [DisableDump]
     public IEnumerable<IConversion> SymmetricConversions => Cache.SymmetricConversions.Value;
@@ -191,22 +54,30 @@ abstract class TypeBase
     public Size? SmartSize => Cache.Size.IsBusy? null : Size;
 
     protected TypeBase()
-        : base(NextObjectId++) => Cache = new(this);
+        : base(NextObjectId++)
+    {
+        Cache = new(this);
+        Make = new(this);
+    }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-    IContextReference IContextReferenceProvider.ContextReference => ForcedReference;
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    IContextReference IContextReferenceProvider.ContextReference => Make.ForcedReference;
 
     /// <summary>
     ///     Gets the icon key.
     /// </summary>
     /// <value> The icon key. </value>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     string IIconKeyProvider.IconKey => "Type";
 
     IImplementation IMultiSymbolProviderForPointer<IdentityOperation>.GetFeature(IdentityOperation tokenClass)
         => Feature.Extension.FunctionFeature(
             (category, right, operation) => GetIdentityOperationResult(category, right, operation.IsEqual), tokenClass);
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     IImplementation ISymbolProviderForPointer<ForeignCode>.Feature
         => this.CachedValue(() => new ForeignCodeFeature(Root));
 
@@ -214,8 +85,7 @@ abstract class TypeBase
     [Node]
     internal abstract Root Root { get; }
 
-    [DisableDump]
-    internal virtual TypeBase TypeType => Cache.TypeType.Value;
+    protected virtual TypeBase GetTypeType() => Cache.TypeType.Value;
 
     /// <summary>
     ///     Is this a hollow type? With no data?
@@ -231,8 +101,7 @@ abstract class TypeBase
     }
 
 
-    [DisableDump]
-    internal virtual TypeBase[] ToList => [this];
+    internal virtual IEnumerable<TypeBase> GetToList() => [this];
 
 
     [DisableDump]
@@ -267,25 +136,15 @@ abstract class TypeBase
     [DisableDump]
     internal virtual bool HasQuickSize => true;
 
-    [DisableDump]
-    internal virtual TypeBase TagTargetType => this;
+    internal virtual TypeBase GetTagTargetType() => this;
 
-    [DisableDump]
-    internal virtual TypeBase TypeForTypeOperator
-        => GetDePointer(Category.Type).Type.GetDeAlign(Category.Type).Type;
+    internal virtual TypeBase GetTypeForTypeOperator()
+        => GetDePointer(Category.Type).Type
+            .GetDeAlign(Category.Type).Type;
 
-    [DisableDump]
-    internal virtual TypeBase ElementTypeForReference
-        => GetDePointer(Category.Type)
-            .Type
-            .GetDeAlign(Category.Type)
-            .Type;
+    internal virtual IImplementation? GetFunctionDeclarationForType() => null;
 
-    [DisableDump]
-    internal virtual IImplementation? FunctionDeclarationForType => null;
-
-    [DisableDump]
-    internal virtual IImplementation? FunctionDeclarationForPointerType => null;
+    internal virtual IImplementation? GetFunctionDeclarationForPointerType() => null;
 
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
@@ -308,7 +167,7 @@ abstract class TypeBase
             if(IsHollow)
                 yield break;
 
-            if(IsAligningPossible && Align.Size != Size)
+            if(IsAligningPossible && Make.Align.Size != Size)
                 yield return Feature.Extension.Conversion(GetAlignedResult);
             if(IsPointerPossible)
                 yield return Feature.Extension.Conversion(GetLocalReferenceResult);
@@ -379,7 +238,7 @@ abstract class TypeBase
     protected virtual IReference GetForcedReferenceForCache()
     {
         (!IsHollow).Assert();
-        return CheckedReference ?? ForcedPointer;
+        return Make.CheckedReference ?? Make.ForcedPointer;
     }
 
     protected virtual PointerType GetPointerForCache()
@@ -435,12 +294,10 @@ abstract class TypeBase
             yield return SearchResult.Create(multiFeature, this);
     }
 
-    internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination)
-    {
-        return this is IForcedConversionProvider<TDestination> provider
-            ? provider.GetResult(destination)
-            : new IConversion[0];
-    }
+    internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>
+        (TDestination destination) => this is IForcedConversionProvider<TDestination> provider
+        ? provider.GetResult(destination)
+        : new IConversion[0];
 
     internal virtual IEnumerable<IConversion> GetCutEnabledConversion(NumberType destination) { yield break; }
 
@@ -453,6 +310,16 @@ abstract class TypeBase
             NotImplementedMethod();
             return null!;
         }
+    }
+
+    [DisableDump]
+    protected virtual IssueId MissingDeclarationIssueId
+        => IssueId.MissingDeclarationForType;
+
+    internal virtual object GetDataValue(BitsConst data)
+    {
+        NotImplementedMethod(data);
+        return default!;
     }
 
     Issue GetMissingDeclarationIssue(SourcePart position)
@@ -489,9 +356,9 @@ abstract class TypeBase
     }
 
     internal Result GetArgumentResult(Category category)
-        => GetResult(category, () => ArgumentCode, Closures.GetArgument);
+        => GetResult(category, () => Make.ArgumentCode, Closures.GetArgument);
 
-    Result GetPointerArgumentResult(Category category) => Pointer.GetArgumentResult(category);
+    Result GetPointerArgumentResult(Category category) => Make.Pointer.GetArgumentResult(category);
 
     internal Result GetResult(Category category, IContextReference target)
     {
@@ -573,7 +440,7 @@ abstract class TypeBase
         if(IsHollow)
             return GetArgumentResult(category);
 
-        return ForcedPointer
+        return Make.ForcedPointer
             .GetResult
             (
                 category,
@@ -583,7 +450,7 @@ abstract class TypeBase
     }
 
     CodeBase GetLocalReferenceCode()
-        => ArgumentCode
+        => Make.ArgumentCode
             .GetLocalReference(this);
 
     internal Result GetContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
@@ -600,7 +467,7 @@ abstract class TypeBase
 
     internal Result GetGenericDumpPrintResult(Category category)
     {
-        var searchResults = SmartPointer
+        var searchResults = (IsHollow? this : Make.Pointer)
             .GetDeclarations<DumpPrintToken>()
             .SingleOrDefault();
 
@@ -619,7 +486,7 @@ abstract class TypeBase
     internal Result GetConversion(Category category, TypeBase destination) // todo: rename to GetConversionTo
     {
         if(Category.Type.Replenished().Contains(category))
-            return destination.SmartPointer.GetResult(category);
+            return (destination.IsHollow? destination : destination.Make.Pointer).GetResult(category);
 
         var path = ConversionService.FindPath(this, destination);
         return path == null
@@ -646,8 +513,7 @@ abstract class TypeBase
         => this is T? ((IConversion)this).GetResult(Category.Type).Type : this;
 
     internal Result GetResultFromPointer(Category category, TypeBase resultType)
-        => resultType
-            .Pointer
+        => resultType.Make.Pointer
             .GetResult(category, GetObjectResult);
 
     /// <summary>
@@ -657,13 +523,17 @@ abstract class TypeBase
     /// <returns></returns>
     internal IEnumerable<SearchResult> GetDeclarationsForType(Definable? definable)
     {
-        if(definable == null)
-            return FunctionDeclarationsForType;
+        if(definable != null)
+            return definable
+                .MakeGeneric
+                .SelectMany(g => g.GetDeclarations(this))
+                .ToArray();
+        
+        var result = GetFunctionDeclarationForType();
+        if(result == null)
+            return [];
+        return [SearchResult.Create(result, this)];
 
-        return definable
-            .MakeGeneric
-            .SelectMany(g => g.GetDeclarations(this))
-            .ToArray();
     }
 
     /// <summary>
@@ -690,7 +560,7 @@ abstract class TypeBase
         => GetDeclarationsForType(tokenClass).Any();
 
     Result GetAlignedResult
-        (Category category) => Align.GetResult(category, () => ArgumentCode.GetAlign(), Closures.GetArgument);
+        (Category category) => Make.Align.GetResult(category, () => Make.ArgumentCode.GetAlign(), Closures.GetArgument);
 
     IEnumerable<IConversion> GetSymmetricConversionsForCache()
         => RawSymmetricConversions
@@ -721,10 +591,10 @@ abstract class TypeBase
         =>
             IsHollow
                 ? GetResult(category)
-                : Pointer.GetResult(category | Category.Type, ForcedReference).DereferenceResult;
+                : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference).DereferenceResult;
 
     internal Result GetObjectResult(Category category)
-        => IsHollow? GetResult(category) : Pointer.GetResult(category | Category.Type, ForcedReference);
+        => IsHollow? GetResult(category) : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);
 
     internal Result GetResult
     (
@@ -754,15 +624,11 @@ abstract class TypeBase
         return new(category, [..left.Issues, issue]);
     }
 
-    [DisableDump]
-    protected virtual IssueId MissingDeclarationIssueId 
-        => IssueId.MissingDeclarationForType;
-
     Result GetIdentityOperationResult(Category category, TypeBase right, bool isEqual)
     {
-        if(AutomaticDereferenceType == right.AutomaticDereferenceType)
+        if(Make.AutomaticDereferenceType == right.Make.AutomaticDereferenceType)
             return GetIdentityOperationResult(category, isEqual)
-                .ReplaceArguments(c => right.GetConversion(c, AutomaticDereferenceType.Pointer));
+                .ReplaceArguments(c => right.GetConversion(c, Make.AutomaticDereferenceType.Make.Pointer));
 
         return Root.BitType.GetResult
         (
@@ -780,15 +646,15 @@ abstract class TypeBase
             Closures.GetArgument
         );
 
-        var leftResult = GetObjectResult(category | Category.Type).GetConversion(Align);
-        var rightResult = GetObjectResult(category | Category.Type).GetConversion(Align);
+        var leftResult = GetObjectResult(category | Category.Type).GetConversion(Make.Align);
+        var rightResult = GetObjectResult(category | Category.Type).GetConversion(Make.Align);
         return result.ReplaceArguments((leftResult + rightResult)!);
     }
 
-    CodeBase GetIdentityOperationCode(bool isEqual) => Align
-        .GetPair(Align)
-        .ArgumentCode
-        .Concat(new IdentityTestCode(isEqual, Size.Bit, Align.Size));
+    CodeBase GetIdentityOperationCode(bool isEqual) => Make.Align
+        .GetPair(Make.Align)
+        .Make.ArgumentCode
+        .Concat(new IdentityTestCode(isEqual, Size.Bit, Make.Align.Size));
 
     internal Result GetConversionToText()
     {
@@ -809,19 +675,12 @@ abstract class TypeBase
 
     internal Result GetConversionToNumber(int count)
     {
-        var targetType = (Root.BitType*count).Number;
+        var targetType = (Root.BitType * count).Number;
         var result = GetConversion(Category.All, targetType);
         return result;
     }
 
     public static ArrayType operator *(TypeBase target, int count) => target.GetArray(count);
-
-    internal virtual object GetDataValue(BitsConst data)
-    {
-        NotImplementedMethod(data);
-        return default!;
-    }
-
 }
 
 // ReSharper disable CommentTypo

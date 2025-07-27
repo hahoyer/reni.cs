@@ -49,7 +49,7 @@ sealed class CondSyntax : ValueSyntax
 
     Result CondResult(ContextBase context, Category category)
         => context.GetResult(category | Category.Type, Cond)
-            .GetConversion(context.RootContext.BitType.Align)
+            .GetConversion(context.RootContext.BitType.Make.Align)
             .GetLocalBlock(category | Category.Type)
             .GetConversion(context.RootContext.BitType);
 
@@ -110,6 +110,6 @@ sealed class CondSyntax : ValueSyntax
 
         var thenType = Then.GetTypeBase(context);
         var elseType = Else.GetTypeBase(context);
-        return thenType.GetCommonType(elseType).Align;
+        return thenType.GetCommonType(elseType).Make.Align;
     }
 }

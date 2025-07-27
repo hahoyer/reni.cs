@@ -1,5 +1,6 @@
 ﻿using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
+using Reni.Type;
 
 namespace Reni.Code;
 
@@ -130,7 +131,7 @@ sealed class RemoveLocalReferences : Base
                     var cleanup1 = reference
                         .ValueType
                         .GetCleanup(Category.Code | Category.Closures)
-                        .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.GetTopRef, Closures.GetVoid);
+                        .ReplaceAbsolute(reference.ValueType.Make.ForcedPointer, CodeBase.GetTopRef, Closures.GetVoid);
                     cleanup = (cleanup1 + cleanup).AssertNotNull();
                     Dump(nameof(cleanup), cleanup);
                     BreakExecution();

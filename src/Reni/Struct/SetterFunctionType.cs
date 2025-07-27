@@ -14,7 +14,7 @@ sealed class SetterFunction : FunctionInstance
         => FunctionId = FunctionId.Setter(index);
 
     [DisableDump]
-    protected override TypeBase CallType => base.CallType.GetPair(Parent.ValueType.Pointer);
+    protected override TypeBase CallType => base.CallType.GetPair(Parent.ValueType.Make.Pointer);
     [DisableDump]
     protected override Size RelevantValueSize => Root.DefaultRefAlignParam.RefSize;
 }

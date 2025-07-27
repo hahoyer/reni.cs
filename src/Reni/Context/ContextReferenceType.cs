@@ -56,8 +56,7 @@ sealed class ContextReferenceType
 
     Result PointerConversion(Category category)
         => Parent
-            .Type
-            .Pointer
+            .Type.Make.Pointer
             .GetResult
             (
                 category

@@ -150,7 +150,7 @@ sealed class FunctionType : SetterTargetType
             var result = GetResult
             (
                 category,
-                () => GetterClosures.GetCode() + ArgumentsType.ArgumentCode,
+                () => GetterClosures.GetCode() + ArgumentsType.Make.ArgumentCode,
                 () => GetterClosures + Closures.GetArgument()
             );
             result.CompleteCategory.Contains(category).Assert();

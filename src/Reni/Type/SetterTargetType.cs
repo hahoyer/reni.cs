@@ -54,11 +54,7 @@ abstract class SetterTargetType
     [DisableDump]
     internal override bool IsPointerPossible => false;
 
-    [DisableDump]
-    internal override TypeBase TypeForTypeOperator => ValueType.TypeForTypeOperator;
-
-    [DisableDump]
-    internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
+    internal override TypeBase GetTypeForTypeOperator() => ValueType.GetTypeForTypeOperator();
 
     protected override IEnumerable<IConversion> RawSymmetricConversions
     {
@@ -82,7 +78,7 @@ abstract class SetterTargetType
         {
             BreakExecution();
             var sourceResult = right
-                .GetConversion(category | Category.Type, ValueType.ForcedPointer);
+                .GetConversion(category | Category.Type, ValueType.Make.ForcedPointer);
             Dump("sourceResult", sourceResult);
             BreakExecution();
 

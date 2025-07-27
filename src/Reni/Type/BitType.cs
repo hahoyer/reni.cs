@@ -39,7 +39,7 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
     protected override string Dump(bool isRecursion) => GetType().PrettyName();
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Align.ArgumentCode.GetDumpPrintNumber();
+    protected override CodeBase DumpPrintCode => Make.Align.Make.ArgumentCode.GetDumpPrintNumber();
 
     internal NumberType Number(int bitCount) => GetArray(bitCount).Number;
 

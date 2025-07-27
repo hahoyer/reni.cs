@@ -37,11 +37,11 @@ sealed class FieldAccessType : DataSetterTargetType
     protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
     protected override CodeBase GetGetterCode()
-        => ArgumentCode.GetReferenceWithOffset(FieldOffset);
+        => Make.ArgumentCode.GetReferenceWithOffset(FieldOffset);
 
     protected override CodeBase GetSetterCode()
-        => GetPair(ValueType.ForcedPointer)
-            .ArgumentCode
+        => GetPair(ValueType.Make.ForcedPointer)
+            .Make.ArgumentCode
             .GetAssignment(ValueType.Size);
 
     internal override Result DestinationResult(Category category) => base

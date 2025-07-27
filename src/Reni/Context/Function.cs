@@ -36,7 +36,7 @@ sealed class Function : Child, IFunctionContext
         if(ValueType == null)
             throw new ValueCannotBeUsedHereException();
 
-        return (ValueType.IsHollow? ValueType : ValueType.Pointer)
+        return (ValueType.IsHollow? ValueType : ValueType.Make.Pointer)
             .GetContextAccessResult
             (
                 category | Category.Type,

@@ -14,8 +14,8 @@ public sealed class Closure : DependenceProvider
         var types = number.SymmetricFeatureClosure().Types().ToArray();
 
         types.Contains(number).Assert();
-        types.Contains(number.Align).Assert();
-        types.Contains(number.Pointer).Assert();
+        types.Contains(number.Make.Align).Assert();
+        types.Contains(number.Make.Pointer).Assert();
         (types.Length == 3).Assert(() => "\n" + types.Stringify("\n"));
     }
 
@@ -27,8 +27,8 @@ public sealed class Closure : DependenceProvider
 
         var destinations = paths.Select(p => p.Source).ToArray();
 
-        destinations.Contains(source.Pointer).Assert();
-        destinations.Contains(source.Align).Assert();
+        destinations.Contains(source.Make.Pointer).Assert();
+        destinations.Contains(source.Make.Align).Assert();
         destinations.Contains(source).Assert();
         (destinations.Length == 2).Assert();
     }
@@ -41,8 +41,8 @@ public sealed class Closure : DependenceProvider
 
         var destinations = paths.Select(p => p.Source).ToArray();
 
-        destinations.Contains(source.Pointer).Assert();
-        destinations.Contains(source.Align).Assert();
+        destinations.Contains(source.Make.Pointer).Assert();
+        destinations.Contains(source.Make.Align).Assert();
         destinations.Contains(source).Assert();
         (destinations.Length == 2).Assert();
     }
@@ -54,8 +54,8 @@ public sealed class Closure : DependenceProvider
         var paths = Type.ConversionService.ClosureService.GetResult(source);
         var destinations = paths.Select(p => p.Destination).ToArray();
 
-        destinations.Contains(source.Pointer).Assert();
-        destinations.Contains(source.Align).Assert();
+        destinations.Contains(source.Make.Pointer).Assert();
+        destinations.Contains(source.Make.Align).Assert();
         destinations.Contains(source).Assert();
         (destinations.Length == 3).Assert();
     }
@@ -64,15 +64,15 @@ public sealed class Closure : DependenceProvider
     public void OfNumberPointer()
     {
         var number = new Root(null!).BitType.Number(4);
-        var pointer = number.Pointer;
+        var pointer = number.Make.Pointer;
         var paths = pointer.SymmetricPathsClosure().ToArray();
 
         (paths.Select(p => p.Source).Distinct().Single() == pointer).Assert();
 
         var destinations = paths.Select(p => p.Destination).ToArray();
 
-        destinations.Contains(number.Pointer).Assert();
-        destinations.Contains(number.Align).Assert();
+        destinations.Contains(number.Make.Pointer).Assert();
+        destinations.Contains(number.Make.Align).Assert();
         destinations.Contains(number).Assert();
         (destinations.Length == 3).Assert();
     }

@@ -97,7 +97,7 @@ sealed class ArrayType
         }
     }
 
-    TypeBase ElementAccessType => ElementType.TypeForArrayElement;
+    TypeBase ElementAccessType => ElementType.Make.TypeForArrayElement;
 
     [DisableDump]
     TypeBase IndexType => Root.BitType.Number(IndexSize.ToInt());
@@ -110,7 +110,7 @@ sealed class ArrayType
         Count = count;
         OptionsValue = Options.Create(optionsId);
         //(count > 0).Assert();
-        (elementType.CheckedReference == null).Assert();
+        (elementType.Make.CheckedReference == null).Assert();
         //(!elementType.IsHollow).Assert();
         RepeaterAccessTypeCache = new(() => new(this));
         NumberCache = new(() => new(this));
@@ -193,8 +193,7 @@ sealed class ArrayType
     [DisableDump]
     internal override CompoundView FindRecentCompoundView => ElementType.FindRecentCompoundView;
 
-    [DisableDump]
-    internal override IImplementation FunctionDeclarationForPointerType
+    internal override IImplementation GetFunctionDeclarationForPointerType()
         => Feature.Extension.FunctionFeature(ElementAccessResult);
 
     [DisableDump]
@@ -239,7 +238,7 @@ sealed class ArrayType
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => ArgumentCode.GetDumpPrintText(SimpleItemSize);
+    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(SimpleItemSize);
 
     internal override object GetDataValue(BitsConst data)
         => IsTextItem? data.ToString(ElementType.Size) : base.GetDataValue(data);
@@ -260,9 +259,9 @@ sealed class ArrayType
 
     Result ConstructorResult(Category category, IFunction function)
     {
-        var indexType = BitType
+        var indexType = Root.BitType
             .Number(BitsConst.Convert(Count).Size.ToInt())
-            .Align;
+            .Make.Align;
         var constructorResult = function.GetResult(category | Category.Type, indexType);
         var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
@@ -291,7 +290,7 @@ sealed class ArrayType
         string? options
     )
     {
-        var oldElementsResult = Pointer
+        var oldElementsResult = Make.Pointer
             .GetResult(category | Category.Type, objectReference)
             .DereferenceResult;
 
@@ -320,12 +319,11 @@ sealed class ArrayType
     }
 
     Result DumpPrintResult(Category category, int position)
-        => ElementType
-            .SmartPointer
+        => (ElementType.IsHollow? ElementType : ElementType.Make.Pointer)
             .GetGenericDumpPrintResult(category)
             .ReplaceAbsolute
             (
-                ElementType.Pointer.CheckedReference!,
+                ElementType.Make.Pointer.Make.CheckedReference!,
                 c => ReferenceResult(c).AddToReference(() => ElementType.Size * position)
             );
 
@@ -353,7 +351,7 @@ sealed class ArrayType
             return null;
 
         return Feature.Extension.Conversion
-            (category => destination.ConversionResult(category, this), SmartPointer);
+            (category => destination.ConversionResult(category, this), IsHollow? this : Make.Pointer);
     }
 
     IConversion? ForcedConversion(PointerType destination)
@@ -361,7 +359,7 @@ sealed class ArrayType
             ? Feature.Extension.Conversion
             (
                 category => destination.ConversionResult(category, this)
-                , SmartPointer
+                , IsHollow? this : Make.Pointer
             )
             : null;
 

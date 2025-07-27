@@ -30,12 +30,12 @@ sealed class RepeaterAccessType
     protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.Size;
 
     protected override CodeBase GetSetterCode()
-        => GetPair(ValueType.SmartPointer)
-            .ArgumentCode
+        => GetPair(ValueType.IsHollow? ValueType : ValueType.Make.Pointer)
+            .Make.ArgumentCode
             .GetArraySetter(ValueType.Size, IndexType.Size);
 
     protected override CodeBase GetGetterCode()
-        => ArgumentCode.GetArrayGetter(ValueType.Size, IndexType.Size);
+        => Make.ArgumentCode.GetArrayGetter(ValueType.Size, IndexType.Size);
 
     internal Result GetResult(Category category, Result leftResult, TypeBase right)
     {

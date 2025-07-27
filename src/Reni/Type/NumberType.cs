@@ -95,7 +95,7 @@ sealed class NumberType
     {
         yield return
             Feature.Extension.Conversion
-                (category => CutEnabledBitCountConversion(category, destination), EnableCut);
+                (category => CutEnabledBitCountConversion(category, destination), Make.EnableCut);
     }
 
     protected override Result ParentConversionResult(Category category)
@@ -104,7 +104,7 @@ sealed class NumberType
     protected override Size GetSize() => Parent.Size;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Align.ArgumentCode.GetDumpPrintNumber(Align.Size);
+    protected override CodeBase DumpPrintCode => Make.Align.Make.ArgumentCode.GetDumpPrintNumber(Make.Align.Size);
 
     internal override object GetDataValue(BitsConst data) => data.ToInt32();
 
@@ -114,13 +114,11 @@ sealed class NumberType
         .GetResult(Category.All, () => Code.Extension.GetCode(BitsConst.Convert(0)));
 
     Result TextItemResult(Category category) => Parent
-        .TextItem
-        .Pointer
+        .TextItem.Make.Pointer
         .GetResult
         (
             category,
-            Parent
-                .Pointer
+            Parent.Make.Pointer
                 .GetResult(category, GetObjectResult(category | Category.Type)));
 
     Result NegationResult(Category category)
@@ -128,14 +126,14 @@ sealed class NumberType
             .OperationResult(category, MinusOperation, this)
             .ReplaceAbsolute
             (
-                ZeroType.ForcedReference
+                ZeroType.Make.ForcedReference
                 , c => ZeroResult.Value.LocalReferenceResult & c
             )
             .ReplaceArguments(GetObjectResult);
 
     Result EnableCutTokenResult(Category category)
-        => EnableCut
-            .Pointer
+        => Make
+            .EnableCut.Make.Pointer
             .GetResult(category | Category.Type, GetObjectResult(category));
 
     Result OperationResult(Category category, TypeBase right, IOperation operation)
@@ -146,7 +144,7 @@ sealed class NumberType
 
         if(destination != null)
             return OperationResult(category, operation, destination)
-                .ReplaceArguments(c => right.GetConversion(c, destination.Pointer));
+                .ReplaceArguments(c => right.GetConversion(c, destination.Make.Pointer));
 
         NotImplementedMethod(category, right, operation);
         return null!;
@@ -171,18 +169,18 @@ sealed class NumberType
         );
 
         var leftResult = GetObjectResult(category | Category.Type)
-            .GetConversion(Align);
-        var rightResult = right.Pointer.GetArgumentResult(category | Category.Type).GetConversion(right.Align);
+            .GetConversion(Make.Align);
+        var rightResult = right.Make.Pointer.GetArgumentResult(category | Category.Type).GetConversion(right.Make.Align);
         return result.ReplaceArguments((leftResult + rightResult)!);
     }
 
     CodeBase OperationCode(Size resultSize, string token, TypeBase right)
     {
         (!(right is PointerType)).Assert();
-        return Align
-            .GetPair(right.Align)
-            .ArgumentCode
-            .GetNumberOperation(token, resultSize, Align.Size, right.Align.Size);
+        return Make.Align
+            .GetPair(right.Make.Align)
+            .Make.ArgumentCode
+            .GetNumberOperation(token, resultSize, Make.Align.Size, right.Make.Align.Size);
     }
 
     Result FlatConversion(Category category, NumberType source)
@@ -193,7 +191,7 @@ sealed class NumberType
         return GetResult
         (
             category,
-            () => source.ArgumentCode.GetBitCast(Size),
+            () => source.Make.ArgumentCode.GetBitCast(Size),
             Closures.GetArgument
         );
     }
@@ -201,13 +199,13 @@ sealed class NumberType
     Result CutEnabledBitCountConversion(Category category, NumberType destination)
     {
         if(Bits == destination.Bits)
-            return EnableCut.GetMutation(this) & category;
+            return Make.EnableCut.GetMutation(this) & category;
 
         return destination
             .GetResult
             (
                 category,
-                () => EnableCut.ArgumentCode.GetBitCast(destination.Size),
+                () => Make.EnableCut.Make.ArgumentCode.GetBitCast(destination.Size),
                 Closures.GetArgument
             );
     }

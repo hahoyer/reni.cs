@@ -72,6 +72,8 @@ sealed class Pair
         }
     }
 
+    TypeBase[] ToList => GetToList().ToArray();
+
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
@@ -80,15 +82,8 @@ sealed class Pair
     protected override IEnumerable<IGenericProviderForType> GenericList
         => this.GenericListFromType(base.GenericList);
 
-    [DisableDump]
-    internal override TypeBase[] ToList
-    {
-        get
-        {
-            var result = new List<TypeBase>(First.ToList) { Second };
-            return result.ToArray();
-        }
-    }
+    internal override IEnumerable<TypeBase> GetToList() 
+        => First.GetToList().Concat(Second.GetToList());
 
     protected override string GetNodeDump() => "pair." + ObjectId;
 }
