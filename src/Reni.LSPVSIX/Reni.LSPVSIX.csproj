@@ -30,8 +30,9 @@
 
   <ItemGroup>
     <PackageReference Include="MessagePack" Version="3.1.4" />
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility" Version="17.13.2060" />
-    <PackageReference Include="System.Text.Json" Version="10.0.0-preview.5.25277.114" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility" Version="17.14.2088" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.12.87" />
+    <PackageReference Include="System.Text.Json" Version="10.0.0-preview.6.25358.103" />
   </ItemGroup>
 
   <ItemGroup>
