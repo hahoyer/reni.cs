@@ -153,8 +153,7 @@ abstract partial class TypeBase
         }
     }
 
-    [DisableDump]
-    internal virtual TypeBase? Weaken => null;
+    internal virtual TypeBase? UnReferenceStableReference() => null;
 
     internal virtual Issue[] Issues => [];
 
@@ -547,7 +546,7 @@ abstract partial class TypeBase
         =>
             GetIsHollow()
                 ? GetResult(category)
-                : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference).DereferenceResult;
+                : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference).Dereference;
 
     internal Result GetObjectResult(Category category)
         => GetIsHollow()? GetResult(category) : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);

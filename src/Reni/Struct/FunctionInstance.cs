@@ -122,8 +122,8 @@ abstract class FunctionInstance
             BreakExecution();
 
             var adjustedResult = rawResult
-                .AutomaticDereferenceResult
-                .Align;
+                .AutomaticDereference
+                .Aligned;
 
             Dump(nameof(adjustedResult), adjustedResult);
             BreakExecution();
@@ -138,7 +138,7 @@ abstract class FunctionInstance
 
             var result = argReferenceReplaced
                 .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, Closures.GetVoid)
-                .Weaken;
+                .AutomaticDereferenceStableReference;
 
             return ReturnMethodDump(result);
         }

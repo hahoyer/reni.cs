@@ -258,7 +258,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         => HasClosures? Closures.HasArguments : HasCode && Code.HasArguments;
 
     [DisableDump]
-    internal Result Align
+    internal Result Aligned
     {
         get
         {
@@ -288,14 +288,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     public bool HasIssue => IssueData.HasIssue;
 
     [DisableDump]
-    internal Result Weaken
+    internal Result AutomaticDereferenceStableReference
     {
         get
         {
-            var weakType = Type.Weaken;
-            return weakType == null
+            var valueType = Type.UnReferenceStableReference();
+            return valueType == null
                 ? this
-                : (Type.GetMutation(weakType) & CompleteCategory).ReplaceArguments(this);
+                : (Type.GetMutation(valueType) & CompleteCategory).ReplaceArguments(this);
         }
     }
 
@@ -303,7 +303,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     Result Clone => Filter(CompleteCategory);
 
     [DisableDump]
-    internal Result AutomaticDereferenceResult
+    internal Result AutomaticDereference
     {
         get
         {
@@ -314,14 +314,14 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
             var result = this;
             while(!result.HasIssue && result.Type.OverView.IsWeakReference)
-                result = result.DereferenceResult;
+                result = result.Dereference;
             return result;
         }
     }
 
     [DisableDump]
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal Result DereferenceResult
+    internal Result Dereference
         => Type
             .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump())).Make.CheckedReference
             .ExpectNotNull(() => (null, $"Type {Type.OverView.DumpPrintText} is not a reference type."))
@@ -330,13 +330,13 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     [DisableDump]
     [PublicAPI]
-    internal Result UnalignedResult
+    internal Result Unaligned
         => ((AlignType)Type.ExpectNotNull(() => (null, "UnalignedResult requires type category:\n " + Dump())))
             .UnalignedResult(CompleteCategory)
             .ReplaceArguments(this);
 
     [DisableDump]
-    internal Result LocalReferenceResult
+    internal Result AsLocalReference
     {
         get
         {
@@ -367,7 +367,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     [DisableDump]
-    internal Result AutomaticDereferencedAlignedResult
+    internal Result AutomaticDereferencedAligned
     {
         get
         {
@@ -760,7 +760,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     }
 
     internal Result GetLocalBlock(Category category)
-        => AutomaticDereferenceResult.InternalLocalBlock(category);
+        => AutomaticDereference.InternalLocalBlock(category);
 
     Result InternalLocalBlock(Category category)
     {
@@ -792,7 +792,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal TypedData GetTypedData(IExecutionContext context)
     {
         Closures.IsNone.Assert(Dump);
-        var result = Align.GetLocalBlock(CompleteCategory);
+        var result = Aligned.GetLocalBlock(CompleteCategory);
         return new
         (
             result.Type
@@ -809,7 +809,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             .GetConversionToText()
             .ReplaceArguments(this);
 
-        var result = a.Align.GetLocalBlock(CompleteCategory);
+        var result = a.Aligned.GetLocalBlock(CompleteCategory);
 
         return result
             .Code.ExpectNotNull()

@@ -120,7 +120,7 @@ sealed class NumberType
             .ReplaceAbsolute
             (
                 ZeroType.Make.ForcedReference
-                , c => ZeroResult.Value.LocalReferenceResult & c
+                , c => ZeroResult.Value.AsLocalReference & c
             )
             .ReplaceArguments(GetObjectResult);
 

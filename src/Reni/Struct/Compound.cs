@@ -115,7 +115,7 @@ sealed class Compound
                 .ToArray();
 
             var results = rawResults
-                .Select(r => r.Align.GetLocalBlock(category))
+                .Select(r => r.Aligned.GetLocalBlock(category))
                 .ToArray();
             Dump(nameof(results), results);
             BreakExecution();
@@ -207,7 +207,7 @@ sealed class Compound
             var unFunction = rawResult.GetSmartUn<FunctionType>();
             Dump(nameof(unFunction), unFunction);
             BreakExecution();
-            var result = unFunction.AutomaticDereferenceResult;
+            var result = unFunction.AutomaticDereference;
             return ReturnMethodDump(result);
         }
         finally

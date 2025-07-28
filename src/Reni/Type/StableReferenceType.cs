@@ -16,8 +16,7 @@ sealed class StableReferenceType
     protected override IEnumerable<IConversion> GetStripConversions() => base.GetStripConversions()
         .Concat([Feature.Extension.Conversion(ConvertToPointer)]);
 
-    [DisableDump]
-    internal override TypeBase Weaken => Parent;
+    internal override TypeBase UnReferenceStableReference() => Parent;
 
     protected override string TagTitle => "stable";
 

@@ -50,7 +50,7 @@ sealed class TypeType
     protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
     internal override Result GetInstanceResult(Category category, Func<Category, Result> getRightResult)
-        => RawInstanceResult(category | Category.Type, getRightResult).LocalReferenceResult;
+        => RawInstanceResult(category | Category.Type, getRightResult).AsLocalReference;
 
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
@@ -68,7 +68,7 @@ sealed class TypeType
     {
         var typedData = right
             .GetResultForAll(context)
-            .AutomaticDereferenceResult
+            .AutomaticDereference
             .GetValue(context.RootContext.ExecutionContext)
             .ToInt32();
         return Value

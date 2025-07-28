@@ -14,61 +14,37 @@ abstract partial class TypeBase
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly TypeBase Parent = parent;
 
-        [DisableDump]
         internal EnableCut EnableCut => Parent.Cache.EnableCut.Value;
+        internal CodeBase ArgumentCode => Parent.GetArgumentCode();
+        internal TypeBase Pointer => ForcedReference.Type();
+        internal IReference ForcedReference => Parent.Cache.ForcedReference.Value;
+        internal TypeBase SmartPointer => Parent.GetIsHollow()? Parent : Pointer;
+        internal TypeBase FunctionInstance => Parent.Cache.FunctionInstanceType.Value;
+        internal PointerType ForcedPointer => Parent.Cache.Pointer.Value;
+        internal TypeBase TypeForStructureElement => Parent.GetDeAlign(Category.Type).Type;
+        internal TypeBase TypeForArrayElement => Parent.GetDeAlign(Category.Type).Type;
+        internal IReference? CheckedReference => Parent as IReference;
+        internal TypeBase TypeType => Parent.GetTypeType();
+        internal TypeBase TypeForTypeOperator => Parent.GetTypeForTypeOperator();
+        internal IGenericProviderForType[] GenericProvidersForType => Parent.GetGenericProviders().ToArray();
+        internal TypeBase TagTargetType => Parent.GetTagTargetType();
 
-        [DisableDump]
         internal TypeBase Align
         {
             get
             {
                 var alignBits = Root.DefaultRefAlignParam.AlignBits;
-                return Parent.OverView.Size.GetAlign(alignBits) == Parent.OverView.Size? Parent : Parent.Cache.Aligner[alignBits];
+                return Parent.OverView.Size.GetAlign(alignBits) == Parent.OverView.Size
+                    ? Parent
+                    : Parent.Cache.Aligner[alignBits];
             }
         }
 
-        [DisableDump]
-        internal CodeBase ArgumentCode => Parent.GetArgumentCode();
 
-        [DisableDump]
         internal TypeBase AutomaticDereferenceType
             =>
                 Parent.OverView.IsWeakReference
                     ? Parent.Make.CheckedReference!.Converter.ResultType().Make.AutomaticDereferenceType
                     : Parent;
-
-        [DisableDump]
-        internal TypeBase Pointer => ForcedReference.Type();
-
-        [DisableDump]
-        internal IReference ForcedReference => Parent.Cache.ForcedReference.Value;
-
-        [DisableDump]
-        internal TypeBase SmartPointer => Parent.GetIsHollow()? Parent : Pointer;
-
-        [DisableDump]
-        internal TypeBase FunctionInstance => Parent.Cache.FunctionInstanceType.Value;
-
-        [DisableDump]
-        internal PointerType ForcedPointer => Parent.Cache.Pointer.Value;
-        [DisableDump]
-        internal TypeBase TypeForStructureElement => Parent.GetDeAlign(Category.Type).Type;
-
-        [DisableDump]
-        internal TypeBase TypeForArrayElement => Parent.GetDeAlign(Category.Type).Type;
-
-        [DisableDump]
-        internal IReference? CheckedReference => Parent as IReference;
-
-        [DisableDump]
-        internal TypeBase TypeType => Parent.GetTypeType();
-
-        [DisableDump]
-        internal TypeBase TypeForTypeOperator => Parent.GetTypeForTypeOperator();
-
-        internal IGenericProviderForType[] GenericProvidersForType => Parent.GetGenericProviders().ToArray();
-
-        [DisableDump]
-        internal TypeBase TagTargetType => Parent.GetTagTargetType();
     }
 }

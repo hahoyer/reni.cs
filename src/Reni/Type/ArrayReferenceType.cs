@@ -202,14 +202,14 @@ sealed class ArrayReferenceType
 
     Result AccessResult(Category category, TypeBase right)
     {
-        var leftResult = GetObjectResult(category).DereferenceResult;
+        var leftResult = GetObjectResult(category).Dereference;
         return AccessType
             .GetResult(category, leftResult, right);
     }
 
     Result PlusResult(Category category, TypeBase right)
     {
-        var codeAndClosures = AccessResult(category, right).DereferenceResult;
+        var codeAndClosures = AccessResult(category, right).Dereference;
         return GetResult(category, codeAndClosures);
     }
 

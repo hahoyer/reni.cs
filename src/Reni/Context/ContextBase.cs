@@ -236,7 +236,7 @@ abstract class ContextBase
 
     internal Result GetResultAsReference(Category category, ValueSyntax syntax)
         => GetResult(category | Category.Type, syntax)
-            .LocalReferenceResult;
+            .AsLocalReference;
 
     internal Result GetArgReferenceResult(Category category)
         => FindRecentFunctionContextObject
@@ -300,12 +300,12 @@ abstract class ContextBase
 
     public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
     {
-        var target = GetResult(category | Category.Type, argsType).GetSmartUn<PointerType>().Align;
+        var target = GetResult(category | Category.Type, argsType).GetSmartUn<PointerType>().Aligned;
         return target
                 .Type
                 .GetArray(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
                 .GetResult(category | Category.Type, target)
-                .LocalReferenceResult
+                .AsLocalReference
             & category;
     }
 }

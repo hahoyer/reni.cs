@@ -283,7 +283,7 @@ sealed class ArrayType
     {
         var oldElementsResult = Make.Pointer
             .GetResult(category | Category.Type, objectReference)
-            .DereferenceResult;
+            .Dereference;
 
         var isElementArgument = argumentsType.IsConvertible(ElementAccessType);
         var newCount = isElementArgument? 1 : argumentsType.GetArrayLength(ElementAccessType);
@@ -292,7 +292,7 @@ sealed class ArrayType
                 ? argumentsType.GetConversion(category | Category.Type, ElementAccessType)
                 : argumentsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, options));
 
-        var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult;
+        var newElementsResult = newElementsResultRaw.AutomaticDereferencedAligned;
         var result = ElementType
             .GetArray(Count + newCount, options)
             .GetResult(category, (newElementsResult + oldElementsResult)!);
@@ -323,14 +323,14 @@ sealed class ArrayType
 
     Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
     {
-        var target = (left & Category.All).AutomaticDereferencedAlignedResult
+        var target = (left & Category.All).AutomaticDereferencedAligned
             .GetValue(context.RootContext.ExecutionContext);
         //.ToString(ElementType.Size);
         //todo: Error handling:
         var conversionBase = right!.Evaluate(context).ExpectNotNull().ToInt32();
         (conversionBase >= 2).Assert(conversionBase.ToString);
         var result = BitsConst.Convert((string)target, conversionBase);
-        return Root.BitType.GetResult(category, result).Align;
+        return Root.BitType.GetResult(category, result).Aligned;
     }
 
     Result CountResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
