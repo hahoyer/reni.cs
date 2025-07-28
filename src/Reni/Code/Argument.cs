@@ -17,7 +17,7 @@ sealed class Argument : FiberHead
         StopByObjectIds();
     }
 
-    protected override Size GetSize() => Type.Size;
+    protected override Size GetSize() => Type.OverView.Size;
     protected override Closures GetClosures() => Closures.GetArgument();
     protected override TCode? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         where TCode : default

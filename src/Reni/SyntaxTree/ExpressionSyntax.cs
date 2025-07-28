@@ -95,7 +95,7 @@ sealed class ExpressionSyntax : ValueSyntax
 
             var leftType = left.Type;
 
-            if(leftType.HasIssues)
+            if(leftType.OverView.HasIssues)
                 return leftType.Issues.GetResult(category);
 
             var result = leftType

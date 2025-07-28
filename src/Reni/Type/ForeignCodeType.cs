@@ -59,7 +59,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         CodeBase GetCode()
             => ArgsType
                 .Make.ArgumentCode
-                .GetForeignCall(MethodInfo, ResultType.Size);
+                .GetForeignCall(MethodInfo, ResultType.OverView.Size);
 
         TypeBase GetType(ParameterInfo argument)
             => GetRightSideType(argument.ParameterType);
@@ -142,7 +142,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         if(methods.Length == 1)
             return methods[0].GetResult(category, argsType);
 
-        NotImplementedMethod(category, argsType, "m", methods, "argsType", argsType.StripConversionsFromPointer);
+        NotImplementedMethod(category, argsType, "m", methods, "argsType", argsType.Conversion.StripFromPointer);
         return default!;
     }
 
@@ -150,8 +150,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
 
     IMeta? IMetaImplementation.Function => default;
 
-    [DisableDump]
-    internal override bool IsHollow => true;
+    protected override bool GetIsHollow() => true;
 
     internal override IImplementation GetFunctionDeclarationForType() => this;
 

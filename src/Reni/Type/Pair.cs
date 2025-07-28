@@ -50,26 +50,21 @@ sealed class Pair
     [DisableDump]
     internal override Root Root => First.Root;
 
-    [DisableDump]
-    internal override bool IsHollow => First.IsHollow && Second.IsHollow;
+    protected override bool GetIsHollow() => First.OverView.IsHollow && Second.OverView.IsHollow;
 
-    protected override Size GetSize() => First.Size + Second.Size;
+    protected override Size GetSize() => First.OverView.Size + Second.OverView.Size;
 
-    [DisableDump]
-    internal override string DumpPrintText
+    protected override string GetDumpPrintText()
     {
-        get
+        var result = "";
+        var types = ToList;
+        foreach(var t in types)
         {
-            var result = "";
-            var types = ToList;
-            foreach(var t in types)
-            {
-                result += "\n";
-                result += t;
-            }
-
-            return "(" + result.Indent() + "\n)";
+            result += "\n";
+            result += t;
         }
+
+        return "(" + result.Indent() + "\n)";
     }
 
     TypeBase[] ToList => GetToList().ToArray();
@@ -78,9 +73,7 @@ sealed class Pair
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-    [DisableDump]
-    protected override IEnumerable<IGenericProviderForType> GenericList
-        => this.GenericListFromType(base.GenericList);
+    protected override IEnumerable<IGenericProviderForType> GetGenericProviders() => this.GetGenericProviders(base.GetGenericProviders());
 
     internal override IEnumerable<TypeBase> GetToList() 
         => First.GetToList().Concat(Second.GetToList());

@@ -25,8 +25,7 @@ sealed class IssueType : TypeBase, IContextReference
 
     protected override TypeBase GetTypeType() => this;
 
-    [DisableDump]
-    internal override bool IsHollow => true;
+    protected override bool GetIsHollow() => true;
 
     protected override Size GetSize() => Size.Zero;
 

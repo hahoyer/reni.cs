@@ -32,7 +32,7 @@ sealed class NumberType
     NumberType ZeroType => (NumberType)ZeroResult.Value.Type;
 
     [EnableDump]
-    internal int Bits => Size.ToInt();
+    internal int Bits => OverView.Size.ToInt();
 
     static IEnumerable<string> InternalDeclarationOptions
         => new[]
@@ -74,18 +74,11 @@ sealed class NumberType
     [DisableDump]
     internal override Root Root => Parent.Root;
 
-    [DisableDump]
-    internal override bool IsHollow => Parent.IsHollow;
+    protected override bool GetIsHollow() => Parent.OverView.IsHollow;
 
-    [DisableDump]
-    internal override string DumpPrintText => "number(bits:" + Bits + ")";
+    protected override string GetDumpPrintText() => "number(bits:" + Bits + ")";
 
-    [DisableDump]
-    internal override bool IsCuttingPossible => true;
-
-    [DisableDump]
-    protected override IEnumerable<IGenericProviderForType> GenericList
-        => this.GenericListFromType(base.GenericList);
+    protected override IEnumerable<IGenericProviderForType> GetGenericProviders() => this.GetGenericProviders(base.GetGenericProviders());
 
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
@@ -101,10 +94,10 @@ sealed class NumberType
     protected override Result ParentConversionResult(Category category)
         => GetMutation(Parent) & category;
 
-    protected override Size GetSize() => Parent.Size;
+    protected override Size GetSize() => Parent.OverView.Size;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Make.Align.Make.ArgumentCode.GetDumpPrintNumber(Make.Align.Size);
+    protected override CodeBase DumpPrintCode => Make.Align.Make.ArgumentCode.GetDumpPrintNumber(Make.Align.OverView.Size);
 
     internal override object GetDataValue(BitsConst data) => data.ToInt32();
 
@@ -164,7 +157,7 @@ sealed class NumberType
         var result = resultType.GetResult
         (
             category,
-            () => OperationCode(resultType.Size, operationName, right),
+            () => OperationCode(resultType.OverView.Size, operationName, right),
             Closures.GetArgument
         );
 
@@ -180,7 +173,7 @@ sealed class NumberType
         return Make.Align
             .GetPair(right.Make.Align)
             .Make.ArgumentCode
-            .GetNumberOperation(token, resultSize, Make.Align.Size, right.Make.Align.Size);
+            .GetNumberOperation(token, resultSize, Make.Align.OverView.Size, right.Make.Align.OverView.Size);
     }
 
     Result FlatConversion(Category category, NumberType source)
@@ -191,7 +184,7 @@ sealed class NumberType
         return GetResult
         (
             category,
-            () => source.Make.ArgumentCode.GetBitCast(Size),
+            () => source.Make.ArgumentCode.GetBitCast(OverView.Size),
             Closures.GetArgument
         );
     }
@@ -205,7 +198,7 @@ sealed class NumberType
             .GetResult
             (
                 category,
-                () => Make.EnableCut.Make.ArgumentCode.GetBitCast(destination.Size),
+                () => Make.EnableCut.Make.ArgumentCode.GetBitCast(destination.OverView.Size),
                 Closures.GetArgument
             );
     }

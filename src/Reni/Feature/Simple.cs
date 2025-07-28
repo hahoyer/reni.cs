@@ -30,9 +30,9 @@ sealed class Value
     Result IValue.Execute(Category category) => Function(category);
 
     protected override string GetNodeDump()
-        => Source.DumpPrintText
+        => Source.OverView.DumpPrintText
             + "-->"
-            + Function(Category.Type).Type.DumpPrintText
+            + Function(Category.Type).Type.OverView.DumpPrintText
             + " MethodName="
             + Function.Method.Name;
 }

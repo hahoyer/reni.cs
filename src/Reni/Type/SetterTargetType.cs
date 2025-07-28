@@ -48,24 +48,15 @@ abstract class SetterTargetType
 
     internal virtual Result DestinationResult(Category category) => GetArgumentResult(category);
 
-    [DisableDump]
-    internal override bool IsAligningPossible => false;
+    protected override bool GetIsAligningPossible() => false;
 
-    [DisableDump]
-    internal override bool IsPointerPossible => false;
+    protected override bool GetIsPointerPossible() => false;
 
     internal override TypeBase GetTypeForTypeOperator() => ValueType.GetTypeForTypeOperator();
 
-    protected override IEnumerable<IConversion> RawSymmetricConversions
-    {
-        get { yield break; }
-    }
+    protected override IEnumerable<IConversion> GetSymmetricConversions() { yield break; }
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> StripConversions
-    {
-        get { yield return Feature.Extension.Conversion(GetGetterResult); }
-    }
+    protected override IEnumerable<IConversion> GetStripConversions() { yield return Feature.Extension.Conversion(GetGetterResult); }
 
     Result ReassignResult(Category category, TypeBase right)
     {

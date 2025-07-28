@@ -43,10 +43,9 @@ sealed class TypeType
     [DisableDump]
     internal override Root Root => Value.Root;
 
-    [DisableDump]
-    internal override bool IsHollow => true;
+    protected override bool GetIsHollow() => true;
 
-    internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
+    protected override string GetDumpPrintText() => "(" + Value.OverView.DumpPrintText + "()) type";
 
     protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 

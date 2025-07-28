@@ -28,8 +28,7 @@ sealed class FieldAccessType : DataSetterTargetType
     [DisableDump]
     internal override TypeBase ValueType => View.ValueType(Position);
 
-    [DisableDump]
-    internal override bool IsHollow => false;
+    protected override bool GetIsHollow() => false;
 
     protected override string GetNodeDump()
         => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
@@ -42,7 +41,7 @@ sealed class FieldAccessType : DataSetterTargetType
     protected override CodeBase GetSetterCode()
         => GetPair(ValueType.Make.ForcedPointer)
             .Make.ArgumentCode
-            .GetAssignment(ValueType.Size);
+            .GetAssignment(ValueType.OverView.Size);
 
     internal override Result DestinationResult(Category category) => base
         .DestinationResult(category)

@@ -62,7 +62,7 @@ static class ResultExtension
         ValueCache<CodeBase?>? getCode
     )
         => getSize?.Value
-            ?? getType?.Value?.Size
+            ?? getType?.Value?.OverView.Size
             ?? getCode?.Value?.Size
             ?? (getIsHollow?.Value == true? Size.Zero : null);
 
@@ -91,7 +91,7 @@ static class ResultExtension
     ) =>
         getIsHollow?.Value
         ?? getSize?.Value?.IsZero
-        ?? getType?.Value?.IsHollow
+        ?? getType?.Value?.OverView.IsHollow
         ?? getCode?.Value?.IsEmpty;
 
     static Closures? GetClosures

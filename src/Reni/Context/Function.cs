@@ -28,7 +28,7 @@ sealed class Function : Child, IFunctionContext
     TypeBase IFunctionContext.ArgumentsType => ArgumentsType;
 
     Result IFunctionContext.CreateArgumentReferenceResult(Category category) => ArgumentsType
-            .GetContextAccessResult(category | Category.Type, this, () => ArgumentsType.Size * -1)
+            .GetContextAccessResult(category | Category.Type, this, () => ArgumentsType.OverView.Size * -1)
         & category;
 
     Result IFunctionContext.CreateValueReferenceResult(Category category)
@@ -36,12 +36,12 @@ sealed class Function : Child, IFunctionContext
         if(ValueType == null)
             throw new ValueCannotBeUsedHereException();
 
-        return (ValueType.IsHollow? ValueType : ValueType.Make.Pointer)
+        return (ValueType.OverView.IsHollow? ValueType : ValueType.Make.Pointer)
             .GetContextAccessResult
             (
                 category | Category.Type,
                 this,
-                () => (ArgumentsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
+                () => (ArgumentsType.OverView.Size + Root.DefaultRefAlignParam.RefSize) * -1)
             & category;
     }
 

@@ -28,16 +28,13 @@ sealed class ContextReferenceType
     [DisableDump]
     internal override Root Root => Parent.Root;
 
-    [DisableDump]
-    internal override CompoundView FindRecentCompoundView => Parent;
+    internal override CompoundView FindRecentCompoundView() => Parent;
 
-    [DisableDump]
-    internal override bool IsHollow => Parent.IsHollow;
+    protected override bool GetIsHollow() => Parent.IsHollow;
 
-    [DisableDump]
-    internal override bool IsPointerPossible => !IsHollow;
+    protected override bool GetIsPointerPossible() => !GetIsHollow();
 
-    protected override Size GetSize() => IsHollow? Size.Zero : Root.DefaultRefAlignParam.RefSize;
+    protected override Size GetSize() => GetIsHollow()? Size.Zero : Root.DefaultRefAlignParam.RefSize;
 
     [DisableDump]
     protected override CodeBase DumpPrintCode => ContextOperator.TokenId.GetDumpPrintTextCode();
@@ -46,9 +43,8 @@ sealed class ContextReferenceType
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
 
-    protected override IEnumerable<IConversion> StripConversions
-        => base.StripConversions
-            .Concat([Feature.Extension.Conversion(PointerConversion)]);
+    protected override IEnumerable<IConversion> GetStripConversions() => base.GetStripConversions()
+        .Concat([Feature.Extension.Conversion(PointerConversion)]);
 
     new Result GetDumpPrintTokenResult(Category category)
         => Root.VoidType

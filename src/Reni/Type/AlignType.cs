@@ -18,15 +18,13 @@ sealed class AlignType
     {
         AlignBits = alignBits;
         StopByObjectIds(-9);
-        Parent.IsAligningPossible.Assert(Parent.Dump);
+        Parent.OverView.IsAligningPossible.Assert(Parent.Dump);
     }
 
-    [DisableDump]
-    internal override string DumpPrintText
-        => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + AlignBits;
+    protected override string GetDumpPrintText()
+        => "(" + Parent.OverView.DumpPrintText + ")" + AlignToken.TokenId + AlignBits;
 
-    [DisableDump]
-    internal override bool IsHollow => Parent.IsHollow;
+    protected override bool GetIsHollow() => Parent.OverView.IsHollow;
 
     protected override IReference GetForcedReferenceForCache() => Parent.Make.ForcedReference;
 
@@ -38,19 +36,14 @@ sealed class AlignType
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> RawSymmetricConversions
-        =>
-            base.RawSymmetricConversions.Concat
-                ([Feature.Extension.Conversion(UnalignedResult)]);
+    protected override IEnumerable<IConversion> GetSymmetricConversions() => base.GetSymmetricConversions().Concat
+        ([Feature.Extension.Conversion(UnalignedResult)]);
 
-    [DisableDump]
-    internal override bool IsAligningPossible => false;
+    protected override bool GetIsAligningPossible() => false;
 
-    [DisableDump]
-    internal override bool IsPointerPossible => false;
+    protected override bool GetIsPointerPossible() => false;
 
-    protected override Size GetSize() => Parent.Size.GetAlign(AlignBits);
+    protected override Size GetSize() => Parent.OverView.Size.GetAlign(AlignBits);
 
     internal override int? GetSmartArrayLength(TypeBase elementType)
         => Parent.GetSmartArrayLength(elementType);
@@ -66,5 +59,5 @@ sealed class AlignType
         => UnalignedResult(category);
 
     public Result UnalignedResult(Category category)
-        => Parent.GetResult(category, () => Make.ArgumentCode.GetBitCast(Parent.Size));
+        => Parent.GetResult(category, () => Make.ArgumentCode.GetBitCast(Parent.OverView.Size));
 }

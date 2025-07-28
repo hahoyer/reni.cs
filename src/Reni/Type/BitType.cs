@@ -24,11 +24,9 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
         => Feature.Extension.Value(GetDumpPrintTokenResult, this);
 
-    [DisableDump]
-    internal override string DumpPrintText => "bit";
+    protected override string GetDumpPrintText() => "bit";
 
-    [DisableDump]
-    internal override bool IsHollow => false;
+    protected override bool GetIsHollow() => false;
 
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);

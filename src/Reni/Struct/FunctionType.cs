@@ -87,14 +87,11 @@ sealed class FunctionType : SetterTargetType
     [DisableDump]
     internal override TypeBase ValueType => Getter.ReturnType;
 
-    [DisableDump]
-    internal override bool IsHollow => GetterClosures.IsNone && ArgumentsType.IsHollow;
+    protected override bool GetIsHollow() => GetterClosures.IsNone && ArgumentsType.OverView.IsHollow;
 
-    [DisableDump]
-    internal override CompoundView FindRecentCompoundView => CompoundView;
+    internal override CompoundView FindRecentCompoundView() => CompoundView;
 
-    [DisableDump]
-    internal override bool HasQuickSize => false;
+    protected override bool GetHasQuickSize() => false;
 
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
@@ -105,13 +102,14 @@ sealed class FunctionType : SetterTargetType
             ? Getter.Issues
             : Getter.Issues.Concat(Setter.Issues).ToArray();
 
-    internal override string DumpPrintText => $"@({ArgumentsType.DumpPrintText})=>{ValueType.DumpPrintText}";
+    protected override string GetDumpPrintText()
+        => $"@({ArgumentsType.OverView.DumpPrintText})=>{ValueType.OverView.DumpPrintText}";
 
     protected override Result GetSetterResult
         (Category category) => Setter?.GetCallResult(category) ?? Root.VoidType.GetResult(category);
 
     protected override Result GetGetterResult(Category category) => Getter.GetCallResult(category);
-    protected override Size GetSize() => ArgumentsType.Size + GetterClosures.Size;
+    protected override Size GetSize() => ArgumentsType.OverView.Size + GetterClosures.Size;
 
     internal ContextBase CreateSubContext(bool useValue)
         => new Context.Function(CompoundView.Context, ArgumentsType, useValue? ValueType : null);

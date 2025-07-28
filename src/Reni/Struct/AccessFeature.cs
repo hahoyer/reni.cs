@@ -70,6 +70,6 @@ sealed class AccessFeature
 
         var valueType = View.ValueType(Position);
         StopByObjectIds();
-        return ((IEvalImplementation?)valueType.CheckedFeature)?.Function;
+        return ((IEvalImplementation?)valueType.GetCheckedFeature())?.Function;
     }
 }

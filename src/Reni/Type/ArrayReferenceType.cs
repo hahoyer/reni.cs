@@ -87,8 +87,8 @@ sealed class ArrayReferenceType
         OptionsValue = Options.Create(optionsId);
         RepeaterAccessTypeCache = new(() => new(this));
         ValueType = valueType;
-        (!valueType.IsHollow).Assert(valueType.Dump);
-        (valueType.GetTagTargetType() is not PointerType).Assert(valueType.Dump);
+        (!valueType.OverView.IsHollow).Assert(valueType.Dump);
+        (valueType.Make.TagTargetType is not PointerType).Assert(valueType.Dump);
 
         StopByObjectIds(-10);
     }
@@ -100,7 +100,7 @@ sealed class ArrayReferenceType
         => ForcedConversion(destination).NullableToArray();
 
     TypeBase IRepeaterType.ElementType => ValueType;
-    TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
+    TypeBase IRepeaterType.IndexType => Root.BitType.Number(OverView.Size.ToInt());
     Root IRepeaterType.Root => Root;
     bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
 
@@ -121,36 +121,30 @@ sealed class ArrayReferenceType
     [DisableDump]
     internal override Root Root => ValueType.Root;
 
-    internal override string DumpPrintText
-        => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
+    protected override string GetDumpPrintText()
+        => "(" + ValueType.OverView.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
 
-    [DisableDump]
-    internal override bool IsHollow => false;
+    protected override bool GetIsHollow() => false;
 
-    [DisableDump]
-    internal override bool IsAligningPossible => false;
+    protected override bool GetIsAligningPossible() => false;
 
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-    [DisableDump]
-    protected override IEnumerable<IGenericProviderForType> GenericList
-        => this.GenericListFromType(base.GenericList);
+    protected override IEnumerable<IGenericProviderForType> GetGenericProviders() 
+        => this.GetGenericProviders(base.GetGenericProviders());
+
+    //todo: Why textitem-tag is not relevant here? 
+    internal override Size GetTextItemSize() => ValueType.OverView.Size;
 
     [DisableDump]
-    protected override IEnumerable<IConversion> RawSymmetricConversions
-        => base.RawSymmetricConversions;
-
-    internal override Size SimpleItemSize => ValueType.Size;
-
-    [DisableDump]
-    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(SimpleItemSize);
+    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(GetTextItemSize());
 
     protected override string GetNodeDump()
         => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
 
-    protected override Size GetSize() => ValueType.Make.Pointer.Size;
+    protected override Size GetSize() => ValueType.Make.Pointer.OverView.Size;
 
     internal override IImplementation GetFunctionDeclarationForPointerType()
         => Feature.Extension.FunctionFeature(AccessResult);

@@ -34,7 +34,7 @@ sealed class DePointer : FiberItem
 
     internal override CodeBase? TryToCombineBack(LocalReference precedingElement)
     {
-        if(precedingElement.ValueType.Size == DataSize)
+        if(precedingElement.ValueType.OverView.Size == DataSize)
             return precedingElement.ValueCode.GetBitCast(OutputSize);
         return null;
     }

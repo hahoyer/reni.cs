@@ -177,21 +177,16 @@ sealed class ArrayType
             ? Feature.Extension.MetaFeature(ToNumberOfBaseResult)
             : null;
 
-    [DisableDump]
-    internal override bool IsHollow => Count == 0 || ElementType.IsHollow;
+    protected override bool GetIsHollow() => Count == 0 || ElementType.OverView.IsHollow;
 
-    internal override string DumpPrintText
-        => "(" + ElementType.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;
+    protected override string GetDumpPrintText()
+        => "(" + ElementType.OverView.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;
 
-    [DisableDump]
-    internal override Size? SimpleItemSize
-        =>
-            OptionsValue.IsTextItem.Value
-                ? ElementType.SimpleItemSize ?? Size
-                : base.SimpleItemSize;
+    internal override Size GetTextItemSize() => OptionsValue.IsTextItem.Value
+        ? ElementType.GetTextItemSize()
+        : base.GetTextItemSize();
 
-    [DisableDump]
-    internal override CompoundView FindRecentCompoundView => ElementType.FindRecentCompoundView;
+    internal override CompoundView FindRecentCompoundView() => ElementType.FindRecentCompoundView();
 
     internal override IImplementation GetFunctionDeclarationForPointerType()
         => Feature.Extension.FunctionFeature(ElementAccessResult);
@@ -203,7 +198,7 @@ sealed class ArrayType
     internal override int? GetSmartArrayLength(TypeBase elementType)
         => ElementType.IsConvertible(elementType)? Count : base.GetSmartArrayLength(elementType);
 
-    protected override Size GetSize() => ElementType.Size * Count;
+    protected override Size GetSize() => ElementType.OverView.Size * Count;
 
     internal override Result GetCopier(Category category)
         => ElementType.GetArrayCopier(category);
@@ -211,11 +206,7 @@ sealed class ArrayType
     internal override Result GetCleanup(Category category)
         => ElementType.GetArrayCleanup(category);
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> StripConversions
-    {
-        get { yield return Feature.Extension.Conversion(NoTextItemResult); }
-    }
+    protected override IEnumerable<IConversion> GetStripConversions() { yield return Feature.Extension.Conversion(NoTextItemResult); }
 
     internal override Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
@@ -223,7 +214,7 @@ sealed class ArrayType
             return new(Category.None);
 
         if(argumentsType == Root.VoidType)
-            return GetResult(category, () => BitsConst.Convert(0).GetCode(Size));
+            return GetResult(category, () => BitsConst.Convert(0).GetCode(OverView.Size));
 
         if(argumentsType is IFunction function)
             return ConstructorResult(category, function);
@@ -238,16 +229,16 @@ sealed class ArrayType
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(SimpleItemSize);
+    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(GetTextItemSize());
 
     internal override object GetDataValue(BitsConst data)
-        => IsTextItem? data.ToString(ElementType.Size) : base.GetDataValue(data);
+        => IsTextItem? data.ToString(ElementType.OverView.Size) : base.GetDataValue(data);
 
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
 
     Result NoTextItemResult(Category category)
-        => IsHollow
+        => GetIsHollow()
             ? NoTextItem.GetResult(category)
             : GetResultFromPointer(category, NoTextItem);
 
@@ -274,7 +265,7 @@ sealed class ArrayType
     {
         var resultForArg = indexType
             .GetResult
-                (category | Category.Type, () => BitsConst.Convert(i).GetCode(indexType.Size));
+                (category | Category.Type, () => BitsConst.Convert(i).GetCode(indexType.OverView.Size));
         return elementConstructorResult
                 .ReplaceArguments(resultForArg)
                 .GetConversion(ElementAccessType)
@@ -319,12 +310,12 @@ sealed class ArrayType
     }
 
     Result DumpPrintResult(Category category, int position)
-        => (ElementType.IsHollow? ElementType : ElementType.Make.Pointer)
+        => (ElementType.OverView.IsHollow ? ElementType : ElementType.Make.Pointer)
             .GetGenericDumpPrintResult(category)
             .ReplaceAbsolute
             (
                 ElementType.Make.Pointer.Make.CheckedReference!,
-                c => ReferenceResult(c).AddToReference(() => ElementType.Size * position)
+                c => ReferenceResult(c).AddToReference(() => ElementType.OverView.Size * position)
             );
 
     Result ElementAccessResult(Category category, TypeBase right)
@@ -351,7 +342,7 @@ sealed class ArrayType
             return null;
 
         return Feature.Extension.Conversion
-            (category => destination.ConversionResult(category, this), IsHollow? this : Make.Pointer);
+            (category => destination.ConversionResult(category, this), GetIsHollow()? this : Make.Pointer);
     }
 
     IConversion? ForcedConversion(PointerType destination)
@@ -359,7 +350,7 @@ sealed class ArrayType
             ? Feature.Extension.Conversion
             (
                 category => destination.ConversionResult(category, this)
-                , IsHollow? this : Make.Pointer
+                , GetIsHollow()? this : Make.Pointer
             )
             : null;
 

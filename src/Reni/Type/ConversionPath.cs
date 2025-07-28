@@ -79,7 +79,7 @@ sealed class ConversionPath
 
         (Types.Count() == Types.Distinct().Count()).Assert
         (() => "Cyclic conversion:\n"
-            + Types.Select(t => t.DumpPrintText).Stringify("\n")
+            + Types.Select(t => t.OverView.DumpPrintText).Stringify("\n")
             + "\n****\n"
             + Dump()
         );

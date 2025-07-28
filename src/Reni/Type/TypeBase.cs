@@ -30,34 +30,23 @@ abstract partial class TypeBase
 
     [Node]
     [SmartNode]
-    readonly CacheContainer Cache;
+    internal readonly ConversionSetup Conversion;
 
     [Node]
-    internal Size Size => Cache.Size.Value;
+    [SmartNode]
+    internal readonly SetupOverView OverView;
 
-    [DisableDump]
-    internal bool IsWeakReference => Make.CheckedReference != null && Make.CheckedReference.IsWeak;
-
-    [DisableDump]
-    public IEnumerable<IConversion> SymmetricConversions => Cache.SymmetricConversions.Value;
-
-    [DisableDump]
-    internal IEnumerable<IConversion> NextConversionStepOptions
-        => SymmetricClosureConversions.Union(StripConversions);
-
-    [DisableDump]
-    internal IEnumerable<IConversion> SymmetricClosureConversions
-        => new SymmetricClosureService(this).Results;
-
-    internal bool HasIssues => Issues.Any();
-
-    public Size? SmartSize => Cache.Size.IsBusy? null : Size;
+    [Node]
+    [SmartNode]
+    readonly CacheContainer Cache;
 
     protected TypeBase()
         : base(NextObjectId++)
     {
         Cache = new(this);
         Make = new(this);
+        OverView = new(this);
+        Conversion = new(this);
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -90,53 +79,35 @@ abstract partial class TypeBase
     /// <summary>
     ///     Is this a hollow type? With no data?
     /// </summary>
-    [DisableDump]
-    internal virtual bool IsHollow
+    protected virtual bool GetIsHollow()
     {
-        get
-        {
-            NotImplementedMethod();
-            return true;
-        }
+        NotImplementedMethod();
+        return true;
     }
 
 
     internal virtual IEnumerable<TypeBase> GetToList() => [this];
 
 
-    [DisableDump]
-    internal virtual string DumpPrintText => NodeDump;
+    protected virtual string GetDumpPrintText() => NodeDump;
 
-    [DisableDump]
-    internal virtual bool IsCuttingPossible => false;
+    protected virtual bool GetIsAligningPossible() => true;
 
-    [DisableDump]
-    internal virtual bool IsAligningPossible => true;
+    protected virtual bool GetIsPointerPossible() => true;
 
-    [DisableDump]
-    internal virtual bool IsPointerPossible => true;
+    internal virtual Size GetTextItemSize() => OverView.Size;
 
-    [DisableDump]
-    internal virtual Size? SimpleItemSize => null;
-
-    [DisableDump]
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual CompoundView FindRecentCompoundView
+    internal virtual CompoundView FindRecentCompoundView()
     {
-        get
-        {
-            NotImplementedMethod();
-            return null!;
-        }
+        NotImplementedMethod();
+        return null!;
     }
 
-    [DisableDump]
-    internal virtual IImplementation? CheckedFeature => this as IImplementation;
+    internal virtual IImplementation? GetCheckedFeature() => this as IImplementation;
 
-    [DisableDump]
-    internal virtual bool HasQuickSize => true;
+    protected virtual bool GetHasQuickSize() => true;
 
-    internal virtual TypeBase GetTagTargetType() => this;
+    protected virtual TypeBase GetTagTargetType() => this;
 
     internal virtual TypeBase GetTypeForTypeOperator()
         => GetDePointer(Category.Type).Type
@@ -155,36 +126,22 @@ abstract partial class TypeBase
             .OrderBy(item => item)
             .ToArray();
 
-    [DisableDump]
-    protected virtual IEnumerable<IGenericProviderForType> GenericList
-        => this.GenericListFromType();
+    protected virtual IEnumerable<IGenericProviderForType> GetGenericProviders()
+        => Feature.Extension.GetGenericProviders(this);
 
-    [DisableDump]
-    protected virtual IEnumerable<IConversion> RawSymmetricConversions
+    protected virtual IEnumerable<IConversion> GetSymmetricConversions()
     {
-        get
-        {
-            if(IsHollow)
-                yield break;
+        if(GetIsHollow())
+            yield break;
 
-            if(IsAligningPossible && Make.Align.Size != Size)
-                yield return Feature.Extension.Conversion(GetAlignedResult);
-            if(IsPointerPossible)
-                yield return Feature.Extension.Conversion(GetLocalReferenceResult);
-        }
+        if(GetIsAligningPossible() && Make.Align.OverView.Size != OverView.Size)
+            yield return Feature.Extension.Conversion(GetAlignedResult);
+        if(GetIsPointerPossible())
+            yield return Feature.Extension.Conversion(GetLocalReferenceResult);
     }
 
-    [DisableDump]
-    protected virtual IEnumerable<IConversion> StripConversions
-    {
-        get { yield break; }
-    }
-
-    [DisableDump]
-    internal virtual IEnumerable<IConversion> StripConversionsFromPointer
-    {
-        get { yield break; }
-    }
+    protected virtual IEnumerable<IConversion> GetStripConversions() { yield break; }
+    protected virtual IEnumerable<IConversion> GetStripConversionsFromPointer() { yield break; }
 
     [DisableDump]
     internal virtual ContextBase ToContext
@@ -237,13 +194,13 @@ abstract partial class TypeBase
 
     protected virtual IReference GetForcedReferenceForCache()
     {
-        (!IsHollow).Assert();
+        (!GetIsHollow()).Assert();
         return Make.CheckedReference ?? Make.ForcedPointer;
     }
 
     protected virtual PointerType GetPointerForCache()
     {
-        (!IsHollow).Assert();
+        (!GetIsHollow()).Assert();
         return new(this);
     }
 
@@ -331,7 +288,7 @@ abstract partial class TypeBase
     Size GetSizeForCache()
     {
         StopByObjectIds();
-        return IsHollow? Size.Zero : GetSize();
+        return GetIsHollow()? Size.Zero : GetSize();
     }
 
     Result GetVoidCodeAndRefs(Category category)
@@ -362,7 +319,7 @@ abstract partial class TypeBase
 
     internal Result GetResult(Category category, IContextReference target)
     {
-        if(IsHollow)
+        if(GetIsHollow())
             return GetResult(category);
 
         return GetResult
@@ -437,7 +394,7 @@ abstract partial class TypeBase
 
     internal Result GetLocalReferenceResult(Category category)
     {
-        if(IsHollow)
+        if(GetIsHollow())
             return GetArgumentResult(category);
 
         return Make.ForcedPointer
@@ -455,19 +412,19 @@ abstract partial class TypeBase
 
     internal Result GetContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
     {
-        if(IsHollow)
+        if(GetIsHollow())
             return GetResult(category);
 
         return GetResult
         (
             category,
-            () => target.GetCode().GetReferenceWithOffset(getOffset()).GetDePointer(Size)
+            () => target.GetCode().GetReferenceWithOffset(getOffset()).GetDePointer(OverView.Size)
         );
     }
 
     internal Result GetGenericDumpPrintResult(Category category)
     {
-        var searchResults = (IsHollow? this : Make.Pointer)
+        var searchResults = (GetIsHollow()? this : Make.Pointer)
             .GetDeclarations<DumpPrintToken>()
             .SingleOrDefault();
 
@@ -486,7 +443,7 @@ abstract partial class TypeBase
     internal Result GetConversion(Category category, TypeBase destination) // todo: rename to GetConversionTo
     {
         if(Category.Type.Replenished().Contains(category))
-            return (destination.IsHollow? destination : destination.Make.Pointer).GetResult(category);
+            return (destination.GetIsHollow()? destination : destination.Make.Pointer).GetResult(category);
 
         var path = ConversionService.FindPath(this, destination);
         return path == null
@@ -504,7 +461,7 @@ abstract partial class TypeBase
         .GetResult
         (
             category,
-            () => DumpPrintText.GetDumpPrintTextCode(),
+            () => GetDumpPrintText().GetDumpPrintTextCode(),
             Closures.GetVoid
         );
 
@@ -528,12 +485,11 @@ abstract partial class TypeBase
                 .MakeGeneric
                 .SelectMany(g => g.GetDeclarations(this))
                 .ToArray();
-        
+
         var result = GetFunctionDeclarationForType();
         if(result == null)
             return [];
         return [SearchResult.Create(result, this)];
-
     }
 
     /// <summary>
@@ -562,15 +518,15 @@ abstract partial class TypeBase
     Result GetAlignedResult
         (Category category) => Make.Align.GetResult(category, () => Make.ArgumentCode.GetAlign(), Closures.GetArgument);
 
-    IEnumerable<IConversion> GetSymmetricConversionsForCache()
-        => RawSymmetricConversions
+    IConversion[] GetSymmetricConversionsForCache()
+        => GetSymmetricConversions()
             .ToDictionary(x => x.ResultType())
-            .Values;
+            .Values
+            .ToArray();
 
     internal IEnumerable<IConversion> GetForcedConversions(TypeBase destination)
     {
-        var genericProviderForTypes = destination
-            .GenericList
+        var genericProviderForTypes = destination.GetGenericProviders()
             .ToArray();
         var result = genericProviderForTypes
             .SelectMany(g => g.GetForcedConversions(this).ToArray())
@@ -589,12 +545,12 @@ abstract partial class TypeBase
 
     Result GetDereferencesObjectResult(Category category)
         =>
-            IsHollow
+            GetIsHollow()
                 ? GetResult(category)
                 : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference).DereferenceResult;
 
     internal Result GetObjectResult(Category category)
-        => IsHollow? GetResult(category) : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);
+        => GetIsHollow()? GetResult(category) : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);
 
     internal Result GetResult
     (
@@ -654,7 +610,7 @@ abstract partial class TypeBase
     CodeBase GetIdentityOperationCode(bool isEqual) => Make.Align
         .GetPair(Make.Align)
         .Make.ArgumentCode
-        .Concat(new IdentityTestCode(isEqual, Size.Bit, Make.Align.Size));
+        .Concat(new IdentityTestCode(isEqual, Size.Bit, Make.Align.OverView.Size));
 
     internal Result GetConversionToText()
     {

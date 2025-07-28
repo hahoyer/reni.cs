@@ -23,8 +23,9 @@ static class ConversionService
         {
             var startType = startFeature?.Destination ?? Source;
 
-            var newFeatures = startType
-                .NextConversionStepOptions
+            var conversionNextStep = startType
+                .Conversion.NextStep;
+            var newFeatures = conversionNextStep
                 .Where(IsRelevantForConversionPathExtension)
                 .Select(feature => startFeature + feature)
                 .ToArray();
@@ -56,7 +57,7 @@ static class ConversionService
             {
                 var features = NewPathsCache.Value;
                 NewPathsCache.IsValid = false;
-                var newResults = features.SelectMany(ExtendPathByOneConversionAndCollect);
+                var newResults = features.SelectMany(ExtendPathByOneConversionAndCollect).ToArray();
                 results.AddRange(newResults);
             }
 
@@ -164,7 +165,7 @@ static class ConversionService
             (
                 path => new
                 {
-                    source = path.Source.DumpPrintText, destination = path.ResultType().DumpPrintText
+                    source = path.Source.OverView.DumpPrintText, destination = path.ResultType().OverView.DumpPrintText
                 }
             )
             .Stringify("\n")
@@ -240,7 +241,7 @@ static class ConversionService
         {
             types = types.Union(newTypes).ToArray();
             var newElements = newTypes
-                .SelectMany(type => type.SymmetricConversions)
+                .SelectMany(type => type.Conversion.Symmetric)
                 .ToArray();
             foreach(var element in newElements)
                 yield return element;
@@ -256,7 +257,7 @@ static class ConversionService
     internal static IEnumerable<ConversionPath> SymmetricPathsClosure(this TypeBase source)
         =>
             new[] { new ConversionPath(source) }.Concat
-                (source.SymmetricClosureConversions.Select(f => new ConversionPath(f)));
+                (source.Conversion.SymmetricClosure.Select(f => new ConversionPath(f)));
 
     internal static IEnumerable<ConversionPath> SymmetricPathsClosureBackwards
         (this TypeBase destination)

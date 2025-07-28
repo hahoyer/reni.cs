@@ -98,7 +98,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             (value != null).Assert();
 
             Set(Category.Type, value);
-            Size = Type.Size;
+            Size = Type.OverView.Size;
 
             AssertValid();
         }
@@ -204,7 +204,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Size? FindSize
         => HasSize? Size :
             HasCode? Code.Size :
-            HasType? Type.Size : null;
+            HasType? Type.OverView.Size : null;
 
     internal Closures? FindClosures
         => HasClosures? Closures :
@@ -313,7 +313,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             HasType.Expect(() => (null, "Dereference requires type category:\n " + Dump()));
 
             var result = this;
-            while(!result.HasIssue && result.Type.IsWeakReference)
+            while(!result.HasIssue && result.Type.OverView.IsWeakReference)
                 result = result.DereferenceResult;
             return result;
         }
@@ -324,7 +324,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     internal Result DereferenceResult
         => Type
             .ExpectNotNull(() => (null, "Dereference requires type category:\n " + Dump())).Make.CheckedReference
-            .ExpectNotNull(() => (null, $"Type {Type.DumpPrintText} is not a reference type."))
+            .ExpectNotNull(() => (null, $"Type {Type.OverView.DumpPrintText} is not a reference type."))
             .Converter.GetResult(CompleteCategory)
             .ReplaceArguments(this);
 
@@ -344,7 +344,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 return this;
             if(!HasCode && !HasType && !HasSize)
                 return this;
-            if(Type.IsHollow)
+            if(Type.OverView.IsHollow)
                 return this;
             if(Type is IReference)
                 return this;
@@ -479,7 +479,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
         if(SizeRaw == null && TypeRaw != null)
         {
-            var typeSize = Type.SmartSize;
+            var typeSize = Type.OverView.SmartSize;
             if(typeSize != null)
                 Size = typeSize;
         }
@@ -570,18 +570,18 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(HasIsHollow && HasSize)
             (Size.IsZero == IsHollow).Assert
                 (() => "Size and IsHollow differ: " + Dump());
-        if(HasIsHollow && HasType && Type.HasQuickSize)
-            (Type.IsHollow == IsHollow).Assert
+        if(HasIsHollow && HasType && Type.OverView.HasQuickSize)
+            (Type.OverView.IsHollow == IsHollow).Assert
                 (() => "Type and IsHollow differ: " + Dump());
         if(HasIsHollow && HasCode)
             (Code.IsHollow == IsHollow).Assert
                 (() => "Code and IsHollow differ: " + Dump());
-        if(HasSize && HasType && Type.HasQuickSize)
-            (Type.Size == Size).Assert(() => "Type and Size differ: " + Dump());
+        if(HasSize && HasType && Type.OverView.HasQuickSize)
+            (Type.OverView.Size == Size).Assert(() => "Type and Size differ: " + Dump());
         if(HasSize && HasCode)
             (Code.Size == Size).Assert(() => "Code and Size differ: " + Dump());
-        if(HasType && HasCode && Type.HasQuickSize)
-            (Code.Size == Type.Size).Assert(() => "Code and Type differ: " + Dump());
+        if(HasType && HasCode && Type.OverView.HasQuickSize)
+            (Code.Size == Type.OverView.Size).Assert(() => "Code and Type differ: " + Dump());
         if(HasClosures && HasCode)
             Code.Closures.IsEqual(Closures)
                 .Assert(() => "Code and Closures differ: " + Dump());
@@ -914,7 +914,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             this;
 
     internal Result ConvertToConverter(TypeBase source)
-        => source.IsHollow || (!HasClosures && !HasCode)
+        => source.OverView.IsHollow || (!HasClosures && !HasCode)
             ? this
             : ReplaceAbsolute(source.Make.CheckedReference!, source.GetArgumentResult);
 
@@ -952,7 +952,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             destination.GetResult
             (
                 CompleteCategory
-                , HasCode? () => Code.GetInvalidConversion(destination.Size) : null
+                , HasCode? () => Code.GetInvalidConversion(destination.OverView.Size) : null
                 , HasClosures? () => Closures : null
             );
 

@@ -29,13 +29,13 @@ sealed class CompoundType
     ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
     IImplementation? IMultiSymbolProvider<Definable>.GetFeature(Definable tokenClass)
-        => IsHollow? View.Find(tokenClass, true) : null;
+        => GetIsHollow()? View.Find(tokenClass, true) : null;
 
     IImplementation? IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, true);
 
     IImplementation? ISymbolProvider<DumpPrintToken>.Feature
-        => IsHollow? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
+        => GetIsHollow()? Feature.Extension.Value(GetDumpPrintTokenResult) : null;
 
     IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
         => Feature.Extension.Value(GetDumpPrintTokenResult);
@@ -46,45 +46,33 @@ sealed class CompoundType
     [DisableDump]
     internal int Count => View.Compound.Syntax.EndPosition;
 
-    [DisableDump]
-    internal override CompoundView FindRecentCompoundView => View;
+    internal override CompoundView FindRecentCompoundView() => View;
 
-    [DisableDump]
-    internal override bool IsHollow => View.IsHollow;
+    protected override bool GetIsHollow() => View.IsHollow;
 
-    internal override string DumpPrintText
+    protected override string GetDumpPrintText()
     {
-        get
-        {
-            if(IsDumpPrintTextActive)
-                return "?";
-            IsDumpPrintTextActive = true;
-            var result = View.DumpPrintTextOfType;
-            IsDumpPrintTextActive = false;
-            return result;
-        }
+        if(IsDumpPrintTextActive)
+            return "?";
+        IsDumpPrintTextActive = true;
+        var result = View.DumpPrintTextOfType;
+        IsDumpPrintTextActive = false;
+        return result;
     }
 
-    [DisableDump]
-    internal override bool HasQuickSize => false;
+    protected override bool GetHasQuickSize() => false;
 
-    [DisableDump]
-    internal override IEnumerable<IConversion> StripConversionsFromPointer
+    protected override IEnumerable<IConversion> GetStripConversionsFromPointer()
         => View.ConverterFeatures.Union(View.MixinConversions).Union(View.KernelPartConversions);
 
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> StripConversions
+    protected override IEnumerable<IConversion> GetStripConversions()
     {
-        get
-        {
-            if(IsHollow)
-                yield return Feature.Extension.Conversion(VoidConversion);
-
-        }
+        if(GetIsHollow())
+            yield return Feature.Extension.Conversion(VoidConversion);
     }
 
     [DisableDump]

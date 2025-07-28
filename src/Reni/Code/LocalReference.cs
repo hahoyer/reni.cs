@@ -13,7 +13,7 @@ sealed class LocalReference : FiberHead
     {
         ValueType = valueType;
         ValueCode = valueCode;
-        (valueCode.Size == ValueType.Size).Assert();
+        (valueCode.Size == ValueType.OverView.Size).Assert();
         IsUsedOnce = isUsedOnce;
         StopByObjectIds();
     }

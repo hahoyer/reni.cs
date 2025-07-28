@@ -46,7 +46,7 @@ abstract partial class TypeBase
 
         [Node]
         [SmartNode]
-        public readonly ValueCache<IEnumerable<IConversion>> SymmetricConversions;
+        public readonly ValueCache<IConversion[]> SymmetricConversions;
 
         [Node]
         [SmartNode]

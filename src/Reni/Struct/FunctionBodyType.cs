@@ -17,31 +17,31 @@ sealed class FunctionBodyType
         , ISymbolProvider<DumpPrintToken>
         , ITemplateProvider
 {
-    [DisableDump]
     [Node]
-    internal override CompoundView FindRecentCompoundView { get; }
+    internal override CompoundView FindRecentCompoundView() => CompoundView;
 
     [EnableDump]
     [Node]
     internal readonly FunctionSyntax Syntax;
 
     readonly TypeBase TemplateArguments;
+    readonly CompoundView CompoundView;
 
     [DisableDump]
-    internal IEnumerable<FunctionType> Functions => FindRecentCompoundView.Functions(Syntax);
+    internal IEnumerable<FunctionType> Functions => FindRecentCompoundView().Functions(Syntax);
 
     [DisableDump]
     internal TypeBase Template => this.CachedValue(GetTemplate);
 
     public FunctionBodyType(CompoundView compoundView, FunctionSyntax syntax)
     {
-        FindRecentCompoundView = compoundView;
+        CompoundView = compoundView;
         Syntax = syntax;
         TemplateArguments = new TemplateArguments(this);
         StopByObjectIds();
     }
 
-    CompoundView IChild<CompoundView>.Parent => FindRecentCompoundView;
+    CompoundView IChild<CompoundView>.Parent => FindRecentCompoundView();
 
     Result IConversion.Execute(Category category)
     {
@@ -70,10 +70,9 @@ sealed class FunctionBodyType
     }
 
     [DisableDump]
-    internal override Root Root => FindRecentCompoundView.Root;
+    internal override Root Root => FindRecentCompoundView().Root;
 
-    [DisableDump]
-    internal override bool IsHollow => true;
+    protected override bool GetIsHollow() => true;
 
     internal override IImplementation GetFunctionDeclarationForType() => this;
 
@@ -114,7 +113,7 @@ sealed class FunctionBodyType
         => Root.VoidType
             .GetResult(category, () => DumpPrintCode);
 
-    FunctionType Function(TypeBase argsType) => FindRecentCompoundView.Function(Syntax, argsType.AssertNotNull());
+    FunctionType Function(TypeBase argsType) => FindRecentCompoundView().Function(Syntax, argsType.AssertNotNull());
 }
 
 sealed class TemplateArguments : TypeBase

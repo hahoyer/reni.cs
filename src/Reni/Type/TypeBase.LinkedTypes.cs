@@ -23,7 +23,7 @@ abstract partial class TypeBase
             get
             {
                 var alignBits = Root.DefaultRefAlignParam.AlignBits;
-                return Parent.Size.GetAlign(alignBits) == Parent.Size? Parent : Parent.Cache.Aligner[alignBits];
+                return Parent.OverView.Size.GetAlign(alignBits) == Parent.OverView.Size? Parent : Parent.Cache.Aligner[alignBits];
             }
         }
 
@@ -33,7 +33,7 @@ abstract partial class TypeBase
         [DisableDump]
         internal TypeBase AutomaticDereferenceType
             =>
-                Parent.IsWeakReference
+                Parent.OverView.IsWeakReference
                     ? Parent.Make.CheckedReference!.Converter.ResultType().Make.AutomaticDereferenceType
                     : Parent;
 
@@ -44,7 +44,7 @@ abstract partial class TypeBase
         internal IReference ForcedReference => Parent.Cache.ForcedReference.Value;
 
         [DisableDump]
-        internal TypeBase SmartPointer => Parent.IsHollow? Parent : Pointer;
+        internal TypeBase SmartPointer => Parent.GetIsHollow()? Parent : Pointer;
 
         [DisableDump]
         internal TypeBase FunctionInstance => Parent.Cache.FunctionInstanceType.Value;
@@ -66,5 +66,9 @@ abstract partial class TypeBase
         [DisableDump]
         internal TypeBase TypeForTypeOperator => Parent.GetTypeForTypeOperator();
 
+        internal IGenericProviderForType[] GenericProvidersForType => Parent.GetGenericProviders().ToArray();
+
+        [DisableDump]
+        internal TypeBase TagTargetType => Parent.GetTagTargetType();
     }
 }

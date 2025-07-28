@@ -225,7 +225,7 @@ abstract class CodeBase
     internal CodeBase GetDumpPrintNumber(Size leftSize)
         => Concat(new DumpPrintNumberOperation(leftSize, Size - leftSize));
 
-    internal CodeBase GetDumpPrintText(Size? itemSize)
+    internal CodeBase GetDumpPrintText(Size itemSize)
         => Concat(new DumpPrintTextOperation(Size, itemSize.AssertNotNull()));
 
     internal CodeBase GetNumberOperation(string operation, Size size)

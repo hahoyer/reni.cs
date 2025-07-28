@@ -28,8 +28,8 @@ sealed class PointerType
     {
         Order = Closures.NextOrder++;
         ValueType = valueType;
-        (!valueType.IsHollow).Assert(valueType.Dump);
-        valueType.IsPointerPossible.Assert(valueType.Dump);
+        (!valueType.OverView.IsHollow).Assert(valueType.Dump);
+        valueType.OverView.IsPointerPossible.Assert(valueType.Dump);
         StopByObjectIds(-10);
     }
 
@@ -49,32 +49,22 @@ sealed class PointerType
     [DisableDump]
     internal override Root Root => ValueType.Root;
 
-    internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")[Pointer]";
+    protected override string GetDumpPrintText() => "(" + ValueType.OverView.DumpPrintText + ")[Pointer]";
 
-    [DisableDump]
-    internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
+    internal override CompoundView FindRecentCompoundView() => ValueType.FindRecentCompoundView();
 
-    [DisableDump]
-    internal override IImplementation? CheckedFeature => ValueType.CheckedFeature;
+    internal override IImplementation? GetCheckedFeature() => ValueType.GetCheckedFeature();
 
-    [DisableDump]
-    internal override bool IsHollow => false;
+    protected override bool GetIsHollow() => false;
 
-    [DisableDump]
-    internal override bool IsAligningPossible => false;
+    protected override bool GetIsAligningPossible() => false;
 
-    [DisableDump]
-    internal override bool IsPointerPossible => false;
+    protected override bool GetIsPointerPossible() => false;
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> RawSymmetricConversions
-        =>
-            base.RawSymmetricConversions.Concat
-                ([Feature.Extension.Conversion(DereferenceResult)]);
+    protected override IEnumerable<IConversion> GetSymmetricConversions() => base.GetSymmetricConversions().Concat
+        ([Feature.Extension.Conversion(DereferenceResult)]);
 
-    [DisableDump]
-    protected override IEnumerable<IGenericProviderForType> GenericList
-        => this.GenericListFromType(base.GenericList);
+    protected override IEnumerable<IGenericProviderForType> GetGenericProviders() => this.GetGenericProviders(base.GetGenericProviders());
 
     protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 
@@ -98,9 +88,7 @@ sealed class PointerType
             yield return feature;
     }
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> StripConversions
-        => ValueType.StripConversionsFromPointer;
+    protected override IEnumerable<IConversion> GetStripConversions() => ValueType.Conversion.StripFromPointer;
 
     internal override IImplementation? GetFunctionDeclarationForType()
         => ValueType.GetFunctionDeclarationForPointerType() ?? base.GetFunctionDeclarationForType();
@@ -123,7 +111,7 @@ sealed class PointerType
             .GetResult
             (
                 category,
-                () => Make.ArgumentCode.GetDePointer(ValueType.Size),
+                () => Make.ArgumentCode.GetDePointer(ValueType.OverView.Size),
                 Closures.GetArgument
             );
 
@@ -136,7 +124,7 @@ sealed class PointerType
             .GetResult
             (
                 category,
-                () => Make.ArgumentCode.GetDePointer(ValueType.Size).GetAlign(),
+                () => Make.ArgumentCode.GetDePointer(ValueType.OverView.Size).GetAlign(),
                 Closures.GetArgument
             );
 

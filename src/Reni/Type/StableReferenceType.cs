@@ -9,16 +9,12 @@ sealed class StableReferenceType
     internal StableReferenceType(PointerType parent)
         : base(parent) { }
 
-    [DisableDump]
-    internal override bool IsAligningPossible => false;
+    protected override bool GetIsAligningPossible() => false;
 
-    [DisableDump]
-    internal override bool IsPointerPossible => false;
+    protected override bool GetIsPointerPossible() => false;
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> StripConversions
-        => base.StripConversions
-            .Concat([Feature.Extension.Conversion(ConvertToPointer)]);
+    protected override IEnumerable<IConversion> GetStripConversions() => base.GetStripConversions()
+        .Concat([Feature.Extension.Conversion(ConvertToPointer)]);
 
     [DisableDump]
     internal override TypeBase Weaken => Parent;

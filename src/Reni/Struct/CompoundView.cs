@@ -155,7 +155,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         => Compound
             .Syntax
             .EndPosition
-            .Select(position => Compound.AccessType(ViewPosition, position).DumpPrintText)
+            .Select(position => Compound.AccessType(ViewPosition, position).OverView.DumpPrintText)
             .Stringify(", ")
             .Surround("(", ")");
 
@@ -269,7 +269,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal TypeBase AccessType(int position)
     {
         var result = Compound.AccessType(ViewPosition, position);
-        if(result.IsHollow)
+        if(result.OverView.IsHollow)
             return result;
 
         return FieldAccessTypeCache[position];
@@ -307,16 +307,16 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     Result AccessViaObjectPointer(Category category, int position)
     {
         var resultType = AccessType(position);
-        if(resultType.IsHollow)
+        if(resultType.OverView.IsHollow)
             return resultType.GetResult(category);
 
-        return (Type.IsHollow? Type : Type.Make.Pointer).GetMutation(resultType) & category;
+        return (Type.OverView.IsHollow ? Type : Type.Make.Pointer).GetMutation(resultType) & category;
     }
 
     internal Result AccessViaObject(Category category, int position)
     {
         var resultType = AccessType(position);
-        if(resultType.IsHollow)
+        if(resultType.OverView.IsHollow)
             return resultType.GetResult(category);
 
         return resultType.GetResult(category, Type.GetObjectResult);
@@ -325,7 +325,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Result AccessValueViaObject(Category category, int position)
     {
         var resultType = ValueType(position);
-        if(resultType.IsHollow)
+        if(resultType.OverView.IsHollow)
             return resultType.GetResult(category);
 
         return resultType.GetResult
@@ -335,7 +335,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result ReplaceObjectPointerByContext(Result target)
     {
-        var reference = (Type.IsHollow? Type : Type.Make.Pointer).Make.CheckedReference!;
+        var reference = (Type.OverView.IsHollow ? Type : Type.Make.Pointer).Make.CheckedReference!;
         return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
     }
 
@@ -363,7 +363,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(IsHollow)
             return Type.GetResult(category);
 
-        return (Type.IsHollow? Type : Type.Make.Pointer)
+        return (Type.OverView.IsHollow ? Type : Type.Make.Pointer)
             .GetResult
             (
                 category,
@@ -380,7 +380,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         {
             BreakExecution();
             TypeBase tempQualifier = ValueType(position);
-            var accessType = tempQualifier.IsHollow? tempQualifier : tempQualifier.Make.Pointer;
+            var accessType = tempQualifier.OverView.IsHollow ? tempQualifier : tempQualifier.Make.Pointer;
             var genericDumpPrintResult = accessType.GetGenericDumpPrintResult(category);
             Dump("genericDumpPrintResult", genericDumpPrintResult);
             BreakExecution();

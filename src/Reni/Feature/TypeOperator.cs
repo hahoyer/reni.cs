@@ -21,7 +21,7 @@ sealed class TypeOperator : SuffixSyntaxToken
         {
             var leftType = left.GetTypeBase(context);
             leftType.ExpectIsNotNull(() => (left.Anchor.SourcePart, null));
-            if(leftType.HasIssues)
+            if(leftType.OverView.HasIssues)
                 return new(category, leftType.Issues.AssertNotNull());
 
             return leftType.Make.TypeForTypeOperator.Make.TypeType

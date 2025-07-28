@@ -1,6 +1,5 @@
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Struct;
 
 namespace Reni.Type;
 
@@ -13,15 +12,13 @@ abstract class TagChild<TParent> : Child<TParent>
     [DisableDump]
     protected abstract string TagTitle { get; }
 
-    [DisableDump]
-    internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + TagTitle;
+    protected override string GetDumpPrintText() => "(" + Parent.OverView.DumpPrintText + ")" + TagTitle;
 
-    [DisableDump]
-    internal sealed override bool IsHollow => Parent.IsHollow;
+    protected sealed override bool GetIsHollow() => Parent.OverView.IsHollow;
 
-    internal sealed override TypeBase GetTagTargetType() => Parent.GetTagTargetType();
+    protected sealed override TypeBase GetTagTargetType() => Parent.Make.TagTargetType;
 
-    protected sealed override Size GetSize() => Parent.Size;
+    protected sealed override Size GetSize() => Parent.OverView.Size;
     protected override string GetNodeDump() => Parent.NodeDump + "[" + TagTitle + "]";
     internal sealed override Result GetCleanup(Category category) => Parent.GetCleanup(category);
     internal sealed override Result GetCopier(Category category) => Parent.GetCopier(category);
@@ -29,9 +26,8 @@ abstract class TagChild<TParent> : Child<TParent>
     protected override Result ParentConversionResult(Category category)
         => GetMutation(Parent) & category;
 
-    [DisableDump]
-    protected override IEnumerable<IConversion> StripConversions
+    protected override IEnumerable<IConversion> GetStripConversions()
     {
-        get { yield return Feature.Extension.Conversion(ParentConversionResult); }
+        yield return Feature.Extension.Conversion(ParentConversionResult);
     }
 }

@@ -65,7 +65,7 @@ static class Extension
         return result;
     }
 
-    public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
+    public static IEnumerable<IGenericProviderForType> GetGenericProviders<T>
         (this T target, IEnumerable<IGenericProviderForType>? baseList = null)
         where T : TypeBase
         => CreateList(baseList, () => new GenericProviderForType<T>(target));

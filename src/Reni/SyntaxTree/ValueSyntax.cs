@@ -103,7 +103,7 @@ abstract class ValueSyntax : Syntax, IStatementSyntax
             return result.Value;
 
         var type = context.GetTypeIfKnown(this) ?? GetTypeBase(context);
-        return type.GetSmartUn<FunctionType>().IsHollow;
+        return type.GetSmartUn<FunctionType>().OverView.IsHollow;
     }
 
     internal ValueSyntax ReplaceArg(ValueSyntax? syntax)

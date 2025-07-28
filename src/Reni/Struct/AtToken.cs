@@ -20,8 +20,7 @@ sealed class AtToken : InfixPrefixSyntaxToken
         var target = context.GetResultAsReference(category | Category.Type, left);
         return target
             .Type
-            .AssertNotNull()
-            .FindRecentCompoundView
+            .AssertNotNull().FindRecentCompoundView()
             .AccessViaPositionExpression(category, right.GetResultForAll(context))
             .ReplaceArguments(target);
     }

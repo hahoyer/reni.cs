@@ -24,18 +24,17 @@ sealed class RepeaterAccessType
         IndexType = repeaterType.IndexType;
     }
 
-    [DisableDump]
-    internal override bool IsHollow => false;
+    protected override bool GetIsHollow() => false;
 
-    protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.Size;
+    protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.OverView.Size;
 
     protected override CodeBase GetSetterCode()
-        => GetPair(ValueType.IsHollow? ValueType : ValueType.Make.Pointer)
+        => GetPair(ValueType.OverView.IsHollow ? ValueType : ValueType.Make.Pointer)
             .Make.ArgumentCode
-            .GetArraySetter(ValueType.Size, IndexType.Size);
+            .GetArraySetter(ValueType.OverView.Size, IndexType.OverView.Size);
 
     protected override CodeBase GetGetterCode()
-        => Make.ArgumentCode.GetArrayGetter(ValueType.Size, IndexType.Size);
+        => Make.ArgumentCode.GetArrayGetter(ValueType.OverView.Size, IndexType.OverView.Size);
 
     internal Result GetResult(Category category, Result leftResult, TypeBase right)
     {
