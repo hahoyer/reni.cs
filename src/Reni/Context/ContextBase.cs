@@ -46,7 +46,10 @@ abstract class ContextBase
             StopByObjectIds();
         }
 
-        Result ResultCache.IResultProvider.Execute(Category category)
+        Result ResultCache.IResultProvider.Execute(Category category) 
+            => Execute(category);
+
+        Result Execute(Category category)
             => AsReference
                 ? Context.GetResultAsReference(category, Syntax)
                 : Context.GetResultForCache(category, Syntax);
