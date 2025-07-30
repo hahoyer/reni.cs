@@ -32,6 +32,9 @@ sealed class ResultCache : DumpableObject
         Result IResultProvider.Execute(Category category) => ObtainResult(category);
     }
 
+    /// <summary>
+    /// Used for debugging purposes only
+    /// </summary>
     [PublicAPI]
     sealed class CallStack : DumpableObject
     {
@@ -56,6 +59,9 @@ sealed class ResultCache : DumpableObject
         }
     }
 
+    /// <summary>
+    /// Used for debugging purposes only
+    /// </summary>
     [PublicAPI]
     sealed class Call : DumpableObject
     {
@@ -80,6 +86,9 @@ sealed class ResultCache : DumpableObject
         }
     }
 
+    /// <summary>
+    /// Used for debugging purposes only
+    /// </summary>
     [DisableDump]
     static CallStack? Current;
 
@@ -103,6 +112,9 @@ sealed class ResultCache : DumpableObject
 
     bool InGet;
 
+    /// <summary>
+    /// Used for debugging purposes only
+    /// </summary>
     [DisableDump]
     [PublicAPI]
     static Call[] Calls => Current?.ToEnumerable.ToArray() ?? [];
