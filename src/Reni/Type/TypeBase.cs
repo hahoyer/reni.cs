@@ -549,7 +549,9 @@ abstract partial class TypeBase
                 : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference).Dereference;
 
     internal Result GetObjectResult(Category category)
-        => GetIsHollow()? GetResult(category) : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);
+        => GetIsHollow()
+            ? GetResult(category) 
+            : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);
 
     internal Result GetResult
     (

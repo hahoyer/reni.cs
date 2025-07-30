@@ -114,6 +114,7 @@ sealed class ArrayType
         //(!elementType.IsHollow).Assert();
         RepeaterAccessTypeCache = new(() => new(this));
         NumberCache = new(() => new(this));
+        StopByObjectIds();
     }
 
     TypeBase IChild<TypeBase>.Parent => ElementType;
@@ -206,7 +207,10 @@ sealed class ArrayType
     internal override Result GetCleanup(Category category)
         => ElementType.GetArrayCleanup(category);
 
-    protected override IEnumerable<IConversion> GetStripConversions() { yield return Feature.Extension.Conversion(NoTextItemResult); }
+    protected override IEnumerable<IConversion> GetStripConversions()
+    {
+        yield return Feature.Extension.Conversion(NoTextItemResult);
+    }
 
     internal override Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
@@ -311,7 +315,7 @@ sealed class ArrayType
     }
 
     Result DumpPrintResult(Category category, int position)
-        => (ElementType.OverView.IsHollow ? ElementType : ElementType.Make.Pointer)
+        => (ElementType.OverView.IsHollow? ElementType : ElementType.Make.Pointer)
             .GetGenericDumpPrintResult(category)
             .ReplaceAbsolute
             (
