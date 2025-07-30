@@ -95,7 +95,7 @@ abstract partial class TypeBase
 
     protected virtual bool GetIsPointerPossible() => true;
 
-    internal virtual Size GetTextItemSize() => OverView.Size;
+    internal virtual Size? GetTextItemSize() => null;
 
     internal virtual CompoundView FindRecentCompoundView()
     {

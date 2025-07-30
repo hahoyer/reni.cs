@@ -182,8 +182,8 @@ sealed class ArrayType
     protected override string GetDumpPrintText()
         => "(" + ElementType.OverView.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;
 
-    internal override Size GetTextItemSize() => OptionsValue.IsTextItem.Value
-        ? ElementType.GetTextItemSize()
+    internal override Size? GetTextItemSize() => OptionsValue.IsTextItem.Value
+        ? ElementType.GetTextItemSize() ?? OverView.Size
         : base.GetTextItemSize();
 
     internal override CompoundView FindRecentCompoundView() => ElementType.FindRecentCompoundView();
@@ -229,7 +229,8 @@ sealed class ArrayType
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(GetTextItemSize());
+    protected override CodeBase DumpPrintCode
+        => Make.ArgumentCode.GetDumpPrintText(GetTextItemSize() ?? ElementType.OverView.Size);
 
     internal override object GetDataValue(BitsConst data)
         => IsTextItem? data.ToString(ElementType.OverView.Size) : base.GetDataValue(data);
@@ -285,18 +286,18 @@ sealed class ArrayType
             .GetResult(category | Category.Type, objectReference)
             .Dereference;
 
-        var isElementArgument = argumentsType.IsConvertible(ElementAccessType);
-        var newCount = isElementArgument? 1 : argumentsType.GetArrayLength(ElementAccessType);
+        var newCount = argumentsType.GetArrayLength(ElementAccessType);
+        var isElementArgument = newCount == 1 && argumentsType.IsConvertible(ElementAccessType);
         var newElementsResultRaw
             = isElementArgument
                 ? argumentsType.GetConversion(category | Category.Type, ElementAccessType)
                 : argumentsType.GetConversion(category | Category.Type, ElementType.GetArray(newCount, options));
 
         var newElementsResult = newElementsResultRaw.AutomaticDereferencedAligned;
-        var result = ElementType
+
+        return ElementType
             .GetArray(Count + newCount, options)
             .GetResult(category, (newElementsResult + oldElementsResult)!);
-        return result;
     }
 
     Result DumpPrintTokenArrayResult(Category category)
