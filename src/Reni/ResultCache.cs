@@ -144,7 +144,7 @@ sealed class ResultCache : DumpableObject
     [DebuggerHidden]
     [DebuggerNonUserCode]
     [PublicAPI]
-    internal bool? IsHollow => Get(Category.IsHollow).IsHollow;
+    internal bool IsHollow => Get(Category.IsHollow).IsHollow;
 
     [DisableDump]
     [DebuggerHidden]
@@ -232,7 +232,6 @@ sealed class ResultCache : DumpableObject
         {
             var result = Provider.Execute(category);
             result.IsValidOrIssue(category).Assert();
-
             Data.Update(result);
             PendingCategory = PendingCategory.Without(result.CompleteCategory);
         }
