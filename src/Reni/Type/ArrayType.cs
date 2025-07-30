@@ -92,8 +92,8 @@ sealed class ArrayType
     {
         get
         {
-            NotImplementedMethod();
-            return null!;
+            (Count > 0).Assert();
+            return [];
         }
     }
 
