@@ -441,7 +441,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             , getIsHollow, ToString
         );
 
-        Replenish();
+        Replenish(Category.All);
         AssertValid();
         StopByObjectIds();
     }
@@ -470,24 +470,27 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result.Substring(1);
     }
 
-    void Replenish()
+    internal void Replenish(Category category)
     {
         AssertValid();
 
-        if(ClosuresRaw == null && CodeRaw != null)
+        if(category.HasClosures() && ClosuresRaw == null && CodeRaw != null)
             Closures = Code.Closures;
 
-        if(SizeRaw == null && TypeRaw != null)
+        if(category.HasSize() && SizeRaw == null)
         {
-            var typeSize = Type.OverView.SmartSize;
-            if(typeSize != null)
-                Size = typeSize;
+            if(TypeRaw != null)
+            {
+                var typeSize = Type.OverView.SmartSize;
+                if(typeSize != null)
+                    Size = typeSize;
+            }
+
+            if(CodeRaw != null)
+                Size = Code.Size;
         }
 
-        if(SizeRaw == null && CodeRaw != null)
-            Size = Code.Size;
-
-        if(IsHollowRaw == null && SizeRaw != null)
+        if(category.HasIsHollow() && IsHollowRaw == null && SizeRaw != null)
             IsHollow = Size.IsZero;
     }
 

@@ -212,29 +212,7 @@ sealed class ResultCache : DumpableObject
     ///     For instance <see cref="IsHollow" /> may be obvious if size has been obtained already.
     /// </summary>
     /// <param name="category"></param>
-    void SimpleUpdate(Category category)
-    {
-        if(category.HasIsHollow())
-        {
-            var isHollow = Data.FindIsHollow;
-            if(isHollow != null)
-                Data.IsHollow = isHollow.Value;
-        }
-
-        if(category.HasSize())
-        {
-            var size = Data.FindSize;
-            if(size != null)
-                Data.Size = size;
-        }
-
-        if(category.HasClosures())
-        {
-            var closures = Data.FindClosures;
-            if(closures != null)
-                Data.Closures = closures;
-        }
-    }
+    void SimpleUpdate(Category category) => Data.Replenish(category);
 
     /// <summary>
     ///     Update anything that is hasn't been obtained yet.
