@@ -1,3 +1,4 @@
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -95,7 +96,9 @@ sealed class Root
     [DisableDump]
     protected override string LevelFormat => "root context";
 
-    internal override string ContextIdentificationDump => "r";
+    internal override string GetContextIdentificationDump() => "r";
+    
+    internal override string GetPositionInformation(SourcePosition target) => "";
 
     internal TypeBase GetIssueType(Issue[] issues)
         => issues

@@ -1,3 +1,4 @@
+using hw.Scanner;
 using Reni.Feature;
 using Reni.Struct;
 
@@ -14,11 +15,14 @@ abstract class Child : ContextBase
         Parent.AssertIsNotNull();
     }
 
-    [DisableDump]
-    protected abstract string ContextChildIdentificationDump { get; }
+    protected abstract string GetContextIdentificationDumpAsChild();
 
-    [DisableDump]
-    internal override string ContextIdentificationDump => Parent.ContextIdentificationDump + ContextChildIdentificationDump;
+    protected abstract SourcePosition GetMainPosition();
+
+    internal override string GetContextIdentificationDump()
+        => Parent.GetContextIdentificationDump()
+            + Parent.GetPositionInformation(GetMainPosition())
+            + GetContextIdentificationDumpAsChild();
 
     [DisableDump]
     internal override bool IsRecursionMode => Parent.IsRecursionMode;

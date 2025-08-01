@@ -1,3 +1,4 @@
+using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -16,9 +17,6 @@ sealed class CompoundContext
 
     readonly int Order;
 
-    [EnableDump]
-    ValueSyntax[] Syntax => View.Compound.Syntax.PureStatements;
-
     internal CompoundContext(CompoundView view)
         : base(view.Compound.Parent)
     {
@@ -32,9 +30,15 @@ sealed class CompoundContext
     IImplementation? IMultiSymbolProviderForPointer<Definable>.GetFeature(Definable tokenClass)
         => View.Find(tokenClass, false);
 
-    protected override string ContextChildIdentificationDump => GetCompoundIdentificationDump();
+    protected override string GetContextIdentificationDumpAsChild()
+        => View.GetContextDump();
+
+    protected override SourcePosition GetMainPosition() => View.Compound.Syntax.MainAnchor.FullToken.Start;
 
     internal override CompoundView GetRecentCompoundView() => View;
+
+    internal override string GetPositionInformation(SourcePosition target)
+        => View.Compound.Syntax.GetChildPositionDump(target) ?? "";
 
     [DisableDump]
     protected override string LevelFormat => "compount";
@@ -42,5 +46,6 @@ sealed class CompoundContext
     [DisableDump]
     internal override IEnumerable<string> DeclarationOptions => View.DeclarationOptions;
 
-    string GetCompoundIdentificationDump() => View.GetCompoundChildDump();
+    internal string? GetChildPositionDump(Syntax target)
+        => View.Compound.Syntax.GetChildPositionDump(target.MainAnchor.Token.Start);
 }

@@ -88,8 +88,11 @@ abstract partial class TypeBase
 
     internal virtual IEnumerable<TypeBase> GetToList() => [this];
 
+    internal string NameDump => GetNameDump();
+    
+    protected virtual string GetNameDump() => GetNodeDump();
 
-    protected virtual string GetDumpPrintText() => NodeDump;
+    protected virtual string GetDumpPrintText() => GetNodeDump();
 
     protected virtual bool GetIsAligningPossible() => true;
 

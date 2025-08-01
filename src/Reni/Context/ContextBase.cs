@@ -134,7 +134,7 @@ abstract class ContextBase
     [DisableDump]
     protected abstract string LevelFormat { get; }
 
-    internal abstract string ContextIdentificationDump { get; }
+    internal abstract string GetContextIdentificationDump();
 
     [DisableDump]
     internal virtual IEnumerable<string> DeclarationOptions
@@ -177,7 +177,7 @@ abstract class ContextBase
     }
 
     protected override string GetNodeDump()
-        => base.GetNodeDump() + "(" + ContextIdentificationDump + ")";
+        => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
 
     [UsedImplicitly]
@@ -311,6 +311,8 @@ abstract class ContextBase
                 .AsLocalReference
             & category;
     }
+
+    internal abstract string GetPositionInformation(SourcePosition target);
 }
 
 sealed class SmartNodeAttribute : Attribute;

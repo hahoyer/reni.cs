@@ -1,11 +1,15 @@
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
+using Reni.SyntaxTree;
 using Reni.Type;
 
 namespace Reni.Context;
 
 sealed class Function : Child, IFunctionContext
 {
+    readonly SourcePart Token;
+
     [Node]
     internal TypeBase ArgumentsType { get; }
 
@@ -14,9 +18,10 @@ sealed class Function : Child, IFunctionContext
     [Node]
     TypeBase? ValueType { get; }
 
-    internal Function(ContextBase parent, TypeBase argumentsType, TypeBase? valueType = null)
+    internal Function(ContextBase parent, SourcePart token, TypeBase argumentsType, TypeBase? valueType = null)
         : base(parent)
     {
+        Token = token;
         Order = Closures.NextOrder++;
         ArgumentsType = argumentsType;
         ValueType = valueType;
@@ -45,9 +50,12 @@ sealed class Function : Child, IFunctionContext
             & category;
     }
 
-    protected override string ContextChildIdentificationDump => "@(." + ArgumentsType.ObjectId + "i)";
+    protected override string GetContextIdentificationDumpAsChild() => "@(" + ArgumentsType.NameDump + ")";
+    protected override SourcePosition GetMainPosition() => Token.Start;
 
     internal override IFunctionContext GetRecentFunctionContext() => this;
+
+    internal override string GetPositionInformation(SourcePosition target) => "";
 
     [DisableDump]
     protected override string LevelFormat => "function";

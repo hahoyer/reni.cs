@@ -68,6 +68,8 @@ sealed class PointerType
 
     protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 
+    protected override string GetNameDump() => ValueType.NameDump + "[Pointer]";
+
     internal override int? GetSmartArrayLength(TypeBase elementType)
         => ValueType.GetSmartArrayLength(elementType);
 

@@ -43,6 +43,7 @@ sealed class ArrayType
         }
 
         protected override string GetNodeDump() => DumpPrintText;
+        internal string NameDump  => DumpPrintText;
 
         public static Options Create(string optionsId = "") => new(optionsId);
     }
@@ -231,6 +232,10 @@ sealed class ArrayType
 
     protected override string GetNodeDump()
         => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
+
+    protected override string GetNameDump()
+        => ElementType.NameDump + "*" + Count + OptionsValue.NameDump;
+
 
     [DisableDump]
     protected override CodeBase DumpPrintCode

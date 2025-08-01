@@ -112,7 +112,12 @@ sealed class FunctionType : SetterTargetType
     protected override Size GetSize() => ArgumentsType.OverView.Size + GetterClosures.Size;
 
     internal ContextBase CreateSubContext(bool useValue)
-        => new Context.Function(CompoundView.Context, ArgumentsType, useValue? ValueType : null);
+        => new Context.Function
+        (CompoundView.Context
+            , Body.MainAnchor.Token
+            , ArgumentsType
+            , useValue? ValueType : null
+        );
 
     public string DumpFunction()
     {

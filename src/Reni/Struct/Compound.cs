@@ -73,9 +73,7 @@ sealed class Compound
     int IContextReference.Order { get; } = Closures.NextOrder++;
 
     protected override string GetNodeDump()
-        => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
-
-    public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
+        => base.GetNodeDump() + "(" + Syntax.GetCompoundIdentificationDump() + ")";
 
     ResultCache CachedResult(int position)
         => Parent
@@ -286,4 +284,5 @@ sealed class Compound
 
     internal Issue[] GetIssues(int? viewPosition = null)
         => ResultsOfStatements(Category.Type, 0, viewPosition).Issues;
+
 }

@@ -74,7 +74,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     bool IsDumpPrintResultViaObjectActive;
 
-    bool IsEndPosition => ViewPosition == Compound.Syntax.EndPosition;
+    bool IsEndPosition => Compound.Syntax.GetIsEndPosition(ViewPosition);
 
     [DisableDump]
     internal ContextBase Context
@@ -140,13 +140,12 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
                 .ToArray();
             if(kernelPartPositions.Any())
             {
-                var conversion = new Conversion(category => GetPartConverter(category, kernelPartPositions), Type.Make.Pointer);
+                var conversion = new Conversion(category => GetPartConverter(category, kernelPartPositions)
+                    , Type.Make.Pointer);
                 return [conversion];
             }
 
             return [];
-
-
         }
     }
 
@@ -210,7 +209,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     protected override string GetNodeDump()
     {
         var result = base.GetNodeDump();
-        result += $"({Context.ContextIdentificationDump})";
+        result += $"({Context.GetContextIdentificationDump()})";
         if(HasIssues)
             result += $".AllIssues[{Issues.Length}]";
         return result;
@@ -237,28 +236,9 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         return default;
     }
 
-    public string GetCompoundChildDump()
-        => Compound.GetCompoundIdentificationDump() + PositionDump();
+    internal string GetContextDump() => Compound.Syntax.GetPositionDump(ViewPosition);
 
-    string PositionDump()
-    {
-        var names =
-            Compound
-                .Syntax
-                .NameIndex
-                .Where(item => item.Value == ViewPosition)
-                .Select(item => item.Key.Quote())
-                .Stringify("|");
-
-
-        if(names == "")
-            return ViewPosition + (IsEndPosition? "e" : "") + "v";
-
-        return names + "n";
-    }
-
-    public string GetCompoundIdentificationDump()
-        => Context.ContextIdentificationDump;
+    internal string GetCompoundIdentificationDump() => Context.GetContextIdentificationDump();
 
     internal TypeBase FunctionalType(FunctionSyntax syntax) => FunctionBodyTypeCache[syntax];
 
@@ -310,7 +290,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(resultType.OverView.IsHollow)
             return resultType.GetResult(category);
 
-        return (Type.OverView.IsHollow ? Type : Type.Make.Pointer).GetMutation(resultType) & category;
+        return (Type.OverView.IsHollow? Type : Type.Make.Pointer).GetMutation(resultType) & category;
     }
 
     internal Result AccessViaObject(Category category, int position)
@@ -335,7 +315,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
 
     internal Result ReplaceObjectPointerByContext(Result target)
     {
-        var reference = (Type.OverView.IsHollow ? Type : Type.Make.Pointer).Make.CheckedReference!;
+        var reference = (Type.OverView.IsHollow? Type : Type.Make.Pointer).Make.CheckedReference!;
         return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
     }
 
@@ -363,7 +343,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(IsHollow)
             return Type.GetResult(category);
 
-        return (Type.OverView.IsHollow ? Type : Type.Make.Pointer)
+        return (Type.OverView.IsHollow? Type : Type.Make.Pointer)
             .GetResult
             (
                 category,
@@ -379,8 +359,8 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         try
         {
             BreakExecution();
-            TypeBase tempQualifier = ValueType(position);
-            var accessType = tempQualifier.OverView.IsHollow ? tempQualifier : tempQualifier.Make.Pointer;
+            var tempQualifier = ValueType(position);
+            var accessType = tempQualifier.OverView.IsHollow? tempQualifier : tempQualifier.Make.Pointer;
             var genericDumpPrintResult = accessType.GetGenericDumpPrintResult(category);
             Dump("genericDumpPrintResult", genericDumpPrintResult);
             BreakExecution();

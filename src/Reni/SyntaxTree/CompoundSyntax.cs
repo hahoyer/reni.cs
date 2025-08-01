@@ -132,10 +132,35 @@ sealed class CompoundSyntax : ValueSyntax
 
     internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree? listTarget = null) => this;
 
-    public static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
+    int? GetChildIndex(SourcePosition token) 
+        => PureStatements
+            .IndexWhere(value => value.MainAnchor.SourcePart.Contains(token));
+
+    internal string? GetChildPositionDump(SourcePosition token)
+    {
+        var childIndex = GetChildIndex(token);
+        return childIndex == null? null : GetPositionDump(childIndex.Value)+":";
+    }
+
+    internal string GetPositionDump(int viewPosition)
+    {
+        var names =
+            NameIndex
+                .Where(item => item.Value == viewPosition)
+                .Select(item => item.Key.Quote())
+                .Stringify("|");
+
+
+        if(names == "")
+            return "p" + viewPosition + (GetIsEndPosition(viewPosition)? "e" : "");
+
+        return "n" + names;
+    }
+
+    internal static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax? cleanupSection, Anchor anchor)
         => new(statements, cleanupSection, anchor);
 
-    public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
+    internal string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
     internal bool IsMutable(int position) => Statements[position].Declarer!.IsMutableSyntax;
 
@@ -195,6 +220,8 @@ sealed class CompoundSyntax : ValueSyntax
         IsInContainerDump = isInDump;
         return result;
     }
+
+    internal bool GetIsEndPosition(int viewPosition) => viewPosition == EndPosition;
 }
 
 interface IStatementSyntax
