@@ -231,7 +231,7 @@ sealed class ArrayType
     internal override Root Root => ElementType.Root;
 
     protected override string GetNodeDump()
-        => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
+        => ElementType.NameDump + "*" + Count + OptionsValue.NameDump;
 
     protected override string GetNameDump()
         => ElementType.NameDump + "*" + Count + OptionsValue.NameDump;
