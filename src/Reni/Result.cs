@@ -25,14 +25,20 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
     bool IsDirtyValue;
 
-    bool HasSize => SizeRaw != null;
+    [DisableDump]
+    internal bool HasSize => SizeRaw != null;
 
     [DisableDump]
     internal bool HasType => TypeRaw != null;
 
-    bool HasCode => CodeRaw != null;
-    bool HasClosures => ClosuresRaw != null;
-    bool HasIsHollow => IsHollowRaw != null;
+    [DisableDump]
+    internal bool HasCode => CodeRaw != null;
+
+    [DisableDump]
+    internal bool HasClosures => ClosuresRaw != null;
+
+    [DisableDump]
+    internal bool HasIsHollow => IsHollowRaw != null;
 
     [Node]
     [EnableDumpWithExceptionPredicate]
@@ -441,7 +447,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             , getIsHollow, ToString
         );
 
-        Replenish(Category.All);
+        Replenish();
         AssertValid();
         StopByObjectIds();
     }
@@ -470,7 +476,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         return result.Substring(1);
     }
 
-    internal void Replenish(Category category)
+    internal void Replenish(Category category = Category.All)
     {
         AssertValid();
 
