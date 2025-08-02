@@ -308,8 +308,13 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         if(resultType.OverView.IsHollow)
             return resultType.GetResult(category);
 
-        return resultType.GetResult
-            (category, c => Type.GetObjectResult(c).AddToReference(() => FieldOffset(position)));
+        return resultType.GetResult(category, getCodeAndRefs);
+
+        Result getCodeAndRefs(Category c)
+            => Type
+                .GetObjectResult(c)
+                .AddToReference(() => FieldOffset(position))
+                .GetDereferencedAlignedResult(resultType.OverView.Size);
     }
 
 
