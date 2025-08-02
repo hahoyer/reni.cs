@@ -148,8 +148,9 @@ sealed class Root
             if(category.HasCode())
                 result.Code = result.Code + elementResult.Code;
 
-            if(category.HasClosures())
+            if(category.HasClosures() || category.HasCode())
                 result.Closures = result.Closures.Sequence(elementResult.Closures);
+
             result.IsDirty = false;
 
         }
