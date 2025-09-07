@@ -39,7 +39,7 @@
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
-        "electron": "31.3",
+        "electron": "35.7",
         "electron-edge-js": "31.3",
         "vscode-languageclient": "^9.0.1"
     },
