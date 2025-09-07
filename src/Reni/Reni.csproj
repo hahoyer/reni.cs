@@ -10,11 +10,14 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="hw.UnitTest" Version="25.1.1" />
+        <PackageReference Include="hw.UnitTest" Version="25.1.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
         <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.11.0" Version="17.0.32112.339" />
-        <PackageReference Include="System.CodeDom" Version="10.0.0-preview.6.25358.103" />
+        <PackageReference Include="System.CodeDom" Version="10.0.0-preview.7.25380.108" />
     </ItemGroup>
     <ItemGroup>
         <Compile Update="AssemblyInfo.cs">
