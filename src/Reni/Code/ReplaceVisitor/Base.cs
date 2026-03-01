@@ -33,7 +33,7 @@ abstract class Base : Visitor<CodeBase, FiberItem>
 
         return newListCompleted.Length switch
         {
-            0 => CodeBase.Void, 1 => newListCompleted[0], var _ => newListCompleted.GetCode()
+            0 => CodeBase.Void, 1 => newListCompleted[0], var _ => newListCompleted.Code
         };
     }
 

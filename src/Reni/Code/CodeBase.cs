@@ -118,7 +118,7 @@ abstract class CodeBase
         return Concat(new BitCast(size, Size, Size));
     }
 
-    CodeBase GetSequence(params CodeBase[] data) => this.Plus(data).GetCode();
+    CodeBase GetSequence(params CodeBase[] data) => this.Plus(data).Code;
 
     internal CodeBase ReplaceArgument(ResultCache argument)
     {

@@ -34,7 +34,7 @@ sealed class List : FiberHead
         for(; i < Data.Length - 1; i++)
             newData[i] = Data[i];
         newData[i] = Data[i].Concat(subsequentElement);
-        return newData.GetCode();
+        return newData.Code;
     }
 
     [DisableDump]
@@ -67,7 +67,7 @@ sealed class List : FiberHead
         => Data
             .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
 
-    protected override Closures GetClosures() => Data.GetClosures();
+    protected override Closures GetClosures() => Data.Closures;
     internal override void Visit(IVisitor visitor) => visitor.List(Data);
 
     internal static CodeBase Create(params CodeBase?[] data)
