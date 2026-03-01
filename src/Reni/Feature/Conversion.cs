@@ -27,7 +27,4 @@ sealed class Conversion : DumpableObject, IConversion
 
     Result IConversion.Execute(Category category) => Function(category);
     TypeBase IConversion.Source => Source;
-
-    protected override string GetNodeDump()
-        => $"{Source.OverView.DumpPrintText}-->{Destination.OverView.DumpPrintText} MethodName={Function.Method.Name}";
 }
