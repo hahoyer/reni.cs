@@ -65,6 +65,7 @@ interface IConversion
 {
     Result Execute(Category category);
     TypeBase Source { get; }
+    int Weight { get; }
 }
 
 interface IValue

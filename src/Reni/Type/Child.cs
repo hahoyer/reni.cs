@@ -20,6 +20,9 @@ abstract class Child<TParent>
     TParent IChild<TParent>.Parent => Parent;
     Result IConversion.Execute(Category category) => ParentConversionResult(category);
     TypeBase IConversion.Source => this;
+
+    int IConversion.Weight => 1;
+
     IConversion IProxyType.Converter => this;
     protected abstract Result ParentConversionResult(Category category);
 

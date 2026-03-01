@@ -41,6 +41,8 @@ sealed class AccessFeature
 
     TypeBase IConversion.Source => View.Type.Make.Pointer;
 
+    int IConversion.Weight => 1;
+
     IFunction? IEvalImplementation.Function => FunctionFeature.Value;
 
     IValue? IEvalImplementation.Value

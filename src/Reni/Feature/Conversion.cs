@@ -15,6 +15,8 @@ sealed class Conversion : DumpableObject, IConversion
     [EnableDump]
     TypeBase Destination => Function(Category.Type).Type;
 
+    int IConversion.Weight => 1;
+
     internal Conversion(Func<Category, Result> function, TypeBase source)
         : base(NextObjectId++)
     {
