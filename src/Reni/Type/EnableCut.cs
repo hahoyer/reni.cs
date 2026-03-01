@@ -17,4 +17,5 @@ sealed class EnableCut
 
     [DisableDump]
     protected override string TagTitle => "enable_cut";
+
 }
