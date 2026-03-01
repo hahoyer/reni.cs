@@ -4,7 +4,7 @@
         <TargetTypeEx>CSharp.Library</TargetTypeEx>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    <Import Project="sys.targets" />
+    
     <ItemGroup>
         <PackageReference Include="hw.CompilerTools" Version="26.0.1">
           <PrivateAssets>all</PrivateAssets>

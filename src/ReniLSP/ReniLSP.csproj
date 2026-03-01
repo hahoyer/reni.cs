@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetTypeEx>CSharp.Library</TargetTypeEx>
     </PropertyGroup>
-    <Import Project="sys.targets" />
+    
     <ItemGroup>
       <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.9" />
     </ItemGroup>

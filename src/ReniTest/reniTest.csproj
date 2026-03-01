@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
     </PropertyGroup>
-    <Import Project="sys.targets" />
+    
     <ItemGroup>
         <None Update="AssemblyInfo.tt">
             <Generator>TextTemplatingFileGenerator</Generator>

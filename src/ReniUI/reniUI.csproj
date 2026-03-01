@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetTypeEx>CSharp.Library</TargetTypeEx>
   </PropertyGroup>
-    <Import Project="sys.targets" />
+    
     <ItemGroup>
       <Content Include="Generated\**\*.reni">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
