@@ -155,7 +155,7 @@ public sealed class BitsConst : DumpableObject
     {
         if(index < Data.Length)
             return Data[index];
-        if(Data.Length == 0 || Data[Data.Length - 1] < 0x80)
+        if(Data.Length == 0 || Data[^1] < 0x80)
             return 0;
         return 0xff;
     }
@@ -212,7 +212,7 @@ public sealed class BitsConst : DumpableObject
         if(!(Marshal.SizeOf(typeof(long)) * 8 >= size.ToInt()))
             Tracer.AssertionFailed
             (
-                @"sizeof(Int64)*8 >= size.ToInt()",
+                "sizeof(Int64)*8 >= size.ToInt()",
                 () => "right=" + right + ";size=" + size.Dump());
         return Convert(ToInt64() * right.ToInt64()).Resize(size);
     }
@@ -230,7 +230,7 @@ public sealed class BitsConst : DumpableObject
         if(!(Marshal.SizeOf(typeof(long)) * 8 >= size.ToInt()))
             Tracer.AssertionFailed
             (
-                @"sizeof(Int64)*8 >= size.ToInt()",
+                "sizeof(Int64)*8 >= size.ToInt()",
                 () => "right=" + right + ";size=" + size.Dump());
         return Convert(ToInt64() / right.ToInt64()).Resize(size);
     }
@@ -310,7 +310,7 @@ public sealed class BitsConst : DumpableObject
     {
         var sizeInt64 = Marshal.SizeOf(typeof(long));
         if(!(64 >= Size.ToInt()))
-            Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + Size.Dump());
+            Tracer.AssertionFailed("64 >= _size.ToInt()", () => "size=" + Size.Dump());
 
         var x64 = ByteResize(sizeInt64);
         fixed(byte* dataPtr = &x64.Data[0])
@@ -321,7 +321,7 @@ public sealed class BitsConst : DumpableObject
     {
         var sizeInt32 = Marshal.SizeOf(typeof(int));
         if(!(64 >= Size.ToInt()))
-            Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + Size.Dump());
+            Tracer.AssertionFailed("64 >= _size.ToInt()", () => "size=" + Size.Dump());
 
         var x32 = ByteResize(sizeInt32);
         fixed(byte* dataPtr = &x32.Data[0])
