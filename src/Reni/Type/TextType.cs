@@ -1,15 +1,12 @@
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Helper;
 
 namespace Reni.Type;
 
 sealed class TextType : Child<TypeBase>
 {
     public TextType(TypeBase parent)
-        : base(parent)
-    {
-    }
+        : base(parent) { }
 
     protected override Result ParentConversionResult(Category category)
     {
