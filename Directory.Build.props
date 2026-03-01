@@ -12,8 +12,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <ProductDir>$(MSBuildThisFileDirectory)</ProductDir>
         <BinDir>$(ProductDir)bin\</BinDir>
-        <OutputPath>$(ProductDir)out\$(Configuration)\</OutputPath>
-        <IntermediateOutputPath>$(ProductDir)intermediate\$(MSBuildProjectName)\$(Configuration)\</IntermediateOutputPath>
+        <BaseOutputPath>$(ProductDir)out\</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(ProductDir)intermediate\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+        <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -46,7 +48,7 @@
         <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
 
-    
+
     <ItemGroup>
         <Using Include="hw.DebugFormatter" />
         <Using Include="hw.Helper" />
