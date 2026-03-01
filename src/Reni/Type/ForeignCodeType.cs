@@ -67,7 +67,7 @@ sealed class ForeignCodeType : TypeBase, IImplementation, IFunction
         TypeBase GetRightSideType(System.Type target)
         {
             if(target == typeof(string))
-                return (Root.BitType * 8).TextItem.Make.Pointer;
+                return (Root.BitType * 8).TextItem.Make.Pointer.Make.Text;
 
             NotImplementedMethod(target);
             return default!;
