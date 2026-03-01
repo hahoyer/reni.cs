@@ -43,7 +43,7 @@ sealed class Pair
             .Select((element, index) => ConversionService.FindPath(element, destinationList[index]))
             .ToArray();
 
-        NotImplementedMethod(destination);
+        NotImplementedMethod(destination, "results", results);
         return [];
     }
 
