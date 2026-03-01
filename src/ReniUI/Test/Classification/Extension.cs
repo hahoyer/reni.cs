@@ -4,20 +4,23 @@ namespace reniUI.Test.Classification;
 
 static class Extension
 {
-    public static void GetTokenForPosition(this string text, string expected)
+    extension(string text)
     {
-        var compiler = CompilerBrowser.FromText(text);
+        public void GetTokenForPosition(string expected)
+        {
+            var compiler = CompilerBrowser.FromText(text);
 
-        var typeCharacters = new string
-        (
-            text
-                .Length
-                .Select(item => compiler.GetToken(item).TypeCharacter)
-                .ToArray()
-        );
-        (expected == typeCharacters).Assert
-        (() =>
-            "\nXpctd: " + expected + "\nFound: " + typeCharacters + "\nText : " + text
-        );
+            var typeCharacters = new string
+            (
+                text
+                    .Length
+                    .Select(item => compiler.GetToken(item).TypeCharacter)
+                    .ToArray()
+            );
+            (expected == typeCharacters).Assert
+            (() =>
+                "\nXpctd: " + expected + "\nFound: " + typeCharacters + "\nText : " + text
+            );
+        }
     }
 }

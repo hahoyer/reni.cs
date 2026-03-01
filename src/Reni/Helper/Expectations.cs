@@ -20,57 +20,6 @@ static class Expectations
 
     internal static BreakModeType BreakMode;
 
-    [PublicAPI]
-    [DebuggerHidden]
-    [ContractAnnotation("target: null => halt")]
-    public static TResult ExpectNotNull<TResult>
-        (this TResult? target, Func<(SourcePart?, string?)>? getData = null, int stackFrameDepth = 0)
-        where TResult : class
-    {
-        target.ExpectIsNotNull(getData, stackFrameDepth: stackFrameDepth + 1);
-        return target!;
-    }
-
-
-    [PublicAPI]
-    [DebuggerHidden]
-    [ContractAnnotation("b: null => halt")]
-    internal static void ExpectIsNotNull
-        (this object? b, Func<(SourcePart?, string?)>? getData = null, int stackFrameDepth = 0)
-    {
-        if(b != null)
-            return;
-        ExpectationFailed("ExpectIsNotNull", getData, stackFrameDepth + 1);
-    }
-
-    [PublicAPI]
-    [DebuggerHidden]
-    [ContractAnnotation("b: notnull => halt")]
-    internal static void ExpectIsNull(this object? b, Func<(SourcePart?, string?)> getData, int stackFrameDepth = 0)
-    {
-        if(b == null)
-            return;
-        ExpectationFailed($"ExpectIsNull: {b.LogDump()}", getData, stackFrameDepth + 1);
-    }
-
-    [DebuggerHidden]
-    [ContractAnnotation("b: false => halt")]
-    public static void Expect(this bool b, Func<(SourcePart?, string?)>? getData= null, int stackFrameDepth = 0)
-    {
-        if(b)
-            return;
-        ExpectationFailed("ExpectTrue", getData, stackFrameDepth + 1);
-    }
-
-    [PublicAPI]
-    [DebuggerHidden]
-    internal static void Expect<TTargetType>
-        (this object target, Func<(SourcePart?, string?)> getData, int stackFrameDepth = 0)
-    {
-        if(target is TTargetType)
-            return;
-        ExpectationFailed($"Expect is {typeof(TTargetType).PrettyName()}", getData, stackFrameDepth + 1);
-    }
 
     [DebuggerHidden]
     [IsLoggingFunction]
@@ -94,5 +43,64 @@ static class Expectations
 
         var stackFrame = new StackTrace(true).GetFrame(stackFrameDepth + 1);
         throw new ExpectationFailedException(cond, getData?.Invoke());
+    }
+
+    extension<TResult>(TResult? target)
+        where TResult : class
+    {
+        [PublicAPI]
+        [DebuggerHidden]
+        [ContractAnnotation("target: null => halt")]
+        public TResult ExpectNotNull(Func<(SourcePart?, string?)>? getData = null, int stackFrameDepth = 0)
+        {
+            target.ExpectIsNotNull(getData, stackFrameDepth: stackFrameDepth + 1);
+            return target!;
+        }
+    }
+
+    extension(object? b)
+    {
+        [PublicAPI]
+        [DebuggerHidden]
+        [ContractAnnotation("b: null => halt")]
+        internal void ExpectIsNotNull
+            (Func<(SourcePart?, string?)>? getData = null, int stackFrameDepth = 0)
+        {
+            if(b != null)
+                return;
+            ExpectationFailed("ExpectIsNotNull", getData, stackFrameDepth + 1);
+        }
+
+        [PublicAPI]
+        [DebuggerHidden]
+        [ContractAnnotation("b: notnull => halt")]
+        internal void ExpectIsNull(Func<(SourcePart?, string?)> getData, int stackFrameDepth = 0)
+        {
+            if(b == null)
+                return;
+            ExpectationFailed($"ExpectIsNull: {b.LogDump()}", getData, stackFrameDepth + 1);
+        }
+
+        [PublicAPI]
+        [DebuggerHidden]
+        internal void Expect<TTargetType>
+            (Func<(SourcePart?, string?)> getData, int stackFrameDepth = 0)
+        {
+            if(b is TTargetType)
+                return;
+            ExpectationFailed($"Expect is {typeof(TTargetType).PrettyName()}", getData, stackFrameDepth + 1);
+        }
+    }
+
+    extension(bool b)
+    {
+        [DebuggerHidden]
+        [ContractAnnotation("b: false => halt")]
+        public void Expect(Func<(SourcePart?, string?)>? getData= null, int stackFrameDepth = 0)
+        {
+            if(b)
+                return;
+            ExpectationFailed("ExpectTrue", getData, stackFrameDepth + 1);
+        }
     }
 }

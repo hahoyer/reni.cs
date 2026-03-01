@@ -58,18 +58,6 @@ public static class SettingDefinitions
             Description = "If set, line breaks will be used before list token.",
         };
 
-    public static int? ToOptionalInt(this ISettingValue target)
-    {
-        var value = ((SettingValue<string>)target).Value;
-        return value == DisableFeature? default(int?) : int.Parse(value);
-    }
-
-    public static bool? ToOptionalBool(this ISettingValue target)
-    {
-        var value = ((SettingValue<string>)target).Value;
-        return value == DisableFeature? default : bool.Parse(value);
-    }
-
     internal static void Convert
     (
         KeyValuePair<SettingIdentifier, ISettingValue> pair
@@ -98,22 +86,46 @@ public static class SettingDefinitions
         Dumpable.NotImplementedFunction(pair.Key.ToString(), formatOptions);
     }
 
-    static bool Is(this Setting setting, ISettingValue target)
-        => string.Equals(target.SettingIdentifier.ToString(), setting.FullId, StringComparison.OrdinalIgnoreCase);
-
-    static bool TrySetValue(this Setting.String setting, ref int? target, ISettingValue settingValue)
+    extension(ISettingValue target)
     {
-        if(!setting.Is(settingValue))
-            return false;
-        target = settingValue.ToOptionalInt();
-        return true;
+        public int? ToOptionalInt()
+        {
+            var value = ((SettingValue<string>)target).Value;
+            return value == DisableFeature? default(int?) : int.Parse(value);
+        }
+
+        public bool? ToOptionalBool()
+        {
+            var value = ((SettingValue<string>)target).Value;
+            return value == DisableFeature? default : bool.Parse(value);
+        }
     }
 
-    static bool TrySetValue(this Setting.Boolean setting, ref bool target, ISettingValue settingValue)
+    extension(Setting setting)
     {
-        if(!setting.Is(settingValue))
-            return false;
-        target = settingValue.Value<bool>();
-        return true;
+        bool Is(ISettingValue target)
+            => string.Equals(target.SettingIdentifier.ToString(), setting.FullId, StringComparison.OrdinalIgnoreCase);
+    }
+
+    extension(Setting.String setting)
+    {
+        bool TrySetValue(ref int? target, ISettingValue settingValue)
+        {
+            if(!setting.Is(settingValue))
+                return false;
+            target = settingValue.ToOptionalInt();
+            return true;
+        }
+    }
+
+    extension(Setting.Boolean setting)
+    {
+        bool TrySetValue(ref bool target, ISettingValue settingValue)
+        {
+            if(!setting.Is(settingValue))
+                return false;
+            target = settingValue.Value<bool>();
+            return true;
+        }
     }
 }

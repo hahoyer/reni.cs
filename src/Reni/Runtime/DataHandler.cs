@@ -89,81 +89,11 @@ static class DataHandler
 
     public static void Set(byte[] dest, int destStart, params byte[] source) => source.CopyTo(dest, destStart);
 
-    internal static unsafe byte[] Pointer(this byte[] data, int dataStart)
-    {
-        var bytes = RefBytes;
-
-        var result = new byte[bytes];
-        fixed(byte* dataPointer = data)
-        {
-            (sizeof(long) == sizeof(byte*)).Assert(()
-                => $"sizeof(long) = {sizeof(long)}, sizeof(byte*) = {sizeof(byte*)}");
-            var intPointer = (long)(dataPointer + dataStart);
-            var bytePointer = (byte*)&intPointer;
-            for(var i = 0; i < bytes; i++)
-                result[i] = bytePointer[i];
-        }
-
-        return result;
-    }
-
-    public static unsafe byte[] Dereference(this byte[] data, int dataStart, int bytes)
-    {
-        try
-        {
-            (data.Length >= dataStart + RefBytes).Assert();
-            var result = new byte[bytes];
-            fixed(byte* dataPointer = &data[dataStart])
-            {
-                var bytePointer = *(byte**)dataPointer;
-                for(var i = 0; i < bytes; i++)
-                    result[i] = bytePointer[i];
-            }
-
-            return result;
-        }
-        catch(AccessViolationException exception)
-        {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
-    {
-        fixed(byte* dataPointer = &data[dataStart])
-        {
-            var intPointer = (int*)dataPointer;
-            *intPointer += offset;
-        }
-    }
-
-    internal static byte[] Get(this byte[] source, int sourceStart, int bytes)
-    {
-        var result = new byte[bytes];
-        for(var i = 0; i < bytes; i++)
-            result[i] = source[sourceStart + i];
-        return result;
-    }
-
     [UsedImplicitly]
     public static unsafe void BitCast(byte[] data, int dataStart, int bytes, int bits)
     {
         fixed(byte* dataPointer = &data[dataStart])
             BitCast(bytes, dataPointer, bits);
-    }
-
-    internal static void PrintNumber(this byte[] data) => PrintText(new BigInteger(data).ToString());
-
-    internal static void PrintText(this string text) => Data.OutStream?.AddData(text);
-
-    internal static void PrintText(this byte[] text) => new string(text.Select(x => (char)x).ToArray()).PrintText();
-
-    internal static unsafe void AssignFromPointers
-        (this byte[] leftData, byte[] rightData, int bytes)
-    {
-        fixed(byte* leftPointer = leftData)
-        fixed(byte* rightPointer = rightData)
-            MoveBytes(bytes, *(byte**)leftPointer, *(byte**)rightPointer);
     }
 
     internal static bool IsLessEqual(byte[] left, byte[] right) => !IsGreater(left, right);
@@ -229,86 +159,161 @@ static class DataHandler
         return true;
     }
 
-    internal static byte[] Plus(this byte[] left, byte[] right, int bytes)
+    extension(byte[] data)
     {
-        var leftBytes = left.Length;
-        var rightBytes = right.Length;
-        var result = new byte[bytes];
-        var d = 0;
-        var carry = 0;
-
-        for(var i = 0; i < bytes; i++)
+        internal unsafe byte[] Pointer(int dataStart)
         {
-            if(i < leftBytes)
-                carry += (sbyte)left[i] & 0xff;
-            if(i < rightBytes)
+            var bytes = RefBytes;
+
+            var result = new byte[bytes];
+            fixed(byte* dataPointer = data)
             {
-                d = (sbyte)right[i];
-                carry += d & 0xff;
+                (sizeof(long) == sizeof(byte*)).Assert(()
+                    => $"sizeof(long) = {sizeof(long)}, sizeof(byte*) = {sizeof(byte*)}");
+                var intPointer = (long)(dataPointer + dataStart);
+                var bytePointer = (byte*)&intPointer;
+                for(var i = 0; i < bytes; i++)
+                    result[i] = bytePointer[i];
             }
-            else if(d < 0)
-                carry += 0xff;
 
-            result[i] = (byte)(carry & 0xff);
-            carry >>= 8;
+            return result;
         }
 
-        return result;
-    }
-
-    [UsedImplicitly]
-    internal static byte[] PlusSimple(this byte[] left, byte[] right)
-    {
-        (left.Length == right.Length).Assert();
-        var bytes = left.Length;
-        var result = new byte[bytes];
-        var carry = 0;
-        for(var i = 0; i < bytes; i++)
+        public unsafe byte[] Dereference(int dataStart, int bytes)
         {
-            carry += (sbyte)left[i] & 0xff;
-            carry += (sbyte)right[i] & 0xff;
-            result[i] = (byte)(carry & 0xff);
-            carry >>= 8;
+            try
+            {
+                (data.Length >= dataStart + RefBytes).Assert();
+                var result = new byte[bytes];
+                fixed(byte* dataPointer = &data[dataStart])
+                {
+                    var bytePointer = *(byte**)dataPointer;
+                    for(var i = 0; i < bytes; i++)
+                        result[i] = bytePointer[i];
+                }
+
+                return result;
+            }
+            catch(AccessViolationException exception)
+            {
+                throw new RuntimeException(exception);
+            }
         }
 
-        return result;
-    }
-
-    internal static void MinusPrefix(this byte[] data)
-    {
-        var carry = 1;
-        for(var i = 0; i < data.Length; i++)
+        internal unsafe void DoRefPlus(int dataStart, int offset)
         {
-            data[i] = (byte)((sbyte)~(sbyte)data[i] + carry);
-            carry = data[i] == 0? 1 : 0;
+            fixed(byte* dataPointer = &data[dataStart])
+            {
+                var intPointer = (int*)dataPointer;
+                *intPointer += offset;
+            }
         }
-    }
 
-    internal static byte[] Times(this byte[] left, byte[] right, int bytes)
-        => (new BigInteger(left) * new BigInteger(right))
-            .ToByteArray()
-            .ByteAlign(bytes);
-
-    static byte[] ByteAlign(this byte[] data, int bytes)
-    {
-        if(data.Length == bytes)
-            return data;
-        var result = new byte[bytes];
-        var i = 0;
-        for(; i < bytes && i < data.Length; i++)
-            result[i] = data[i];
-        if(i < bytes)
+        internal byte[] Get(int sourceStart, int bytes)
         {
-            var sign = (byte)(data[i - 1] >= 128? 127 : 0);
-            for(; i < bytes; i++)
-                result[i] = sign;
+            var result = new byte[bytes];
+            for(var i = 0; i < bytes; i++)
+                result[i] = data[sourceStart + i];
+            return result;
         }
 
-        return result;
+        internal void PrintNumber() => PrintText(new BigInteger(data).ToString());
+        internal void PrintText() => new string(data.Select(x => (char)x).ToArray()).PrintText();
+
+        internal unsafe void AssignFromPointers
+            (byte[] rightData, int bytes)
+        {
+            fixed(byte* leftPointer = data)
+            fixed(byte* rightPointer = rightData)
+                MoveBytes(bytes, *(byte**)leftPointer, *(byte**)rightPointer);
+        }
+
+        internal byte[] Plus(byte[] right, int bytes)
+        {
+            var leftBytes = data.Length;
+            var rightBytes = right.Length;
+            var result = new byte[bytes];
+            var d = 0;
+            var carry = 0;
+
+            for(var i = 0; i < bytes; i++)
+            {
+                if(i < leftBytes)
+                    carry += (sbyte)data[i] & 0xff;
+                if(i < rightBytes)
+                {
+                    d = (sbyte)right[i];
+                    carry += d & 0xff;
+                }
+                else if(d < 0)
+                    carry += 0xff;
+
+                result[i] = (byte)(carry & 0xff);
+                carry >>= 8;
+            }
+
+            return result;
+        }
+
+        [UsedImplicitly]
+        internal byte[] PlusSimple(byte[] right)
+        {
+            (data.Length == right.Length).Assert();
+            var bytes = data.Length;
+            var result = new byte[bytes];
+            var carry = 0;
+            for(var i = 0; i < bytes; i++)
+            {
+                carry += (sbyte)data[i] & 0xff;
+                carry += (sbyte)right[i] & 0xff;
+                result[i] = (byte)(carry & 0xff);
+                carry >>= 8;
+            }
+
+            return result;
+        }
+
+        internal void MinusPrefix()
+        {
+            var carry = 1;
+            for(var i = 0; i < data.Length; i++)
+            {
+                data[i] = (byte)((sbyte)~(sbyte)data[i] + carry);
+                carry = data[i] == 0? 1 : 0;
+            }
+        }
+
+        internal byte[] Times(byte[] right, int bytes)
+            => (new BigInteger(data) * new BigInteger(right))
+                .ToByteArray()
+                .ByteAlign(bytes);
+
+        byte[] ByteAlign(int bytes)
+        {
+            if(data.Length == bytes)
+                return data;
+            var result = new byte[bytes];
+            var i = 0;
+            for(; i < bytes && i < data.Length; i++)
+                result[i] = data[i];
+            if(i < bytes)
+            {
+                var sign = (byte)(data[i - 1] >= 128? 127 : 0);
+                for(; i < bytes; i++)
+                    result[i] = sign;
+            }
+
+            return result;
+        }
+
+        internal byte[] Times(int right, int bytes)
+            => (new BigInteger(data) * new BigInteger(right))
+                .ToByteArray()
+                .ByteAlign(bytes);
     }
 
-    internal static byte[] Times(this byte[] left, int right, int bytes)
-        => (new BigInteger(left) * new BigInteger(right))
-            .ToByteArray()
-            .ByteAlign(bytes);
+    extension(string text)
+    {
+        internal void PrintText() => Data.OutStream?.AddData(text);
+    }
 }

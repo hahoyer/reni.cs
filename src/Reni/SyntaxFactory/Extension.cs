@@ -19,15 +19,19 @@ static class Extension
             right == null? new SuffixSyntax(left, (ISuffix)tokenClass, token, anchor) :
             new InfixSyntax(left, (IInfix)tokenClass, right, token, anchor);
 
-    internal static IStatementSyntax[] With(this IStatementSyntax[] statements, Anchor? frameItems)
+    static TValue[] T<TValue>(params TValue[] value) => value;
+
+    extension(IStatementSyntax[] statements)
     {
-        if(frameItems == null || !frameItems.Items.Any())
-            return statements;
+        internal IStatementSyntax[] With(Anchor? frameItems)
+        {
+            if(frameItems == null || !frameItems.Items.Any())
+                return statements;
 
-        if(frameItems.Items.Last().SourcePart < statements.First().SourcePart)
-            return T(statements.First().With(frameItems)).Concat(statements.Skip(1)).ToArray();
+            if(frameItems.Items.Last().SourcePart < statements.First().SourcePart)
+                return T(statements.First().With(frameItems)).Concat(statements.Skip(1)).ToArray();
 
-        $@"{nameof(statements)}[{statements.Length}] = 
+            $@"{nameof(statements)}[{statements.Length}] = 
 ------------------
 {statements.Select(statement => statement.SourcePart.GetDumpAroundCurrent(20)).Stringify("\n------------------\n")}
 ------------------
@@ -39,11 +43,10 @@ static class Extension
 ------------------
 
 "
-            .Log();
+                .Log();
 
-        Dumpable.NotImplementedFunction(statements, frameItems);
-        return default!;
+            Dumpable.NotImplementedFunction(statements, frameItems);
+            return default!;
+        }
     }
-
-    static TValue[] T<TValue>(params TValue[] value) => value;
 }

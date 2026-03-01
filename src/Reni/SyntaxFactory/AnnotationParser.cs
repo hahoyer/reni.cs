@@ -11,21 +11,6 @@ sealed class Annotation(BinaryTree? value = null, BinaryTree[]? anchors = null)
 
 static class AnnotationParser
 {
-    internal static(BinaryTree? item, Annotation[] annotations) CheckForAnnotations(this BinaryTree? target)
-    {
-        if(target == null)
-            return (item: null, annotations: []);
-        if(target.TokenClass is not ExclamationBoxToken)
-            return (item: target, annotations: []);
-
-        var (item, leftAnnotations) = target.Left.CheckForAnnotations();
-        var rightAnnotations = ParseAnnotations(target.Right);
-        AddAnchors(rightAnnotations, T(target));
-        var annotations = T(leftAnnotations, rightAnnotations).ConcatMany().ToArray();
-
-        return (item, annotations);
-    }
-
     static Annotation[] ParseAnnotations(BinaryTree? target)
     {
         if(target == null)
@@ -72,4 +57,22 @@ static class AnnotationParser
     }
 
     static TValue[] T<TValue>(params TValue[] value) => value;
+
+    extension(BinaryTree? target)
+    {
+        internal(BinaryTree? item, Annotation[] annotations) CheckForAnnotations()
+        {
+            if(target == null)
+                return (item: null, annotations: []);
+            if(target.TokenClass is not ExclamationBoxToken)
+                return (item: target, annotations: []);
+
+            var (item, leftAnnotations) = target.Left.CheckForAnnotations();
+            var rightAnnotations = ParseAnnotations(target.Right);
+            AddAnchors(rightAnnotations, T(target));
+            var annotations = T(leftAnnotations, rightAnnotations).ConcatMany().ToArray();
+
+            return (item, annotations);
+        }
+    }
 }

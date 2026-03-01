@@ -677,16 +677,19 @@ public class UtilDiff
 
 public static class ArrayExtension
 {
-    public static T[] SliceJS<T>(this T[] array, int startingIndex, int followingIndex)
+    extension<T>(T[] array)
     {
-        if(followingIndex > array.Length)
-            followingIndex = array.Length;
+        public T[] SliceJS(int startingIndex, int followingIndex)
+        {
+            if(followingIndex > array.Length)
+                followingIndex = array.Length;
 
-        var outArray = new T[followingIndex - startingIndex];
+            var outArray = new T[followingIndex - startingIndex];
 
-        for(var i = 0; i < outArray.Length; i++)
-            outArray[i] = array[i + startingIndex];
+            for(var i = 0; i < outArray.Length; i++)
+                outArray[i] = array[i + startingIndex];
 
-        return outArray;
+            return outArray;
+        }
     }
 }
