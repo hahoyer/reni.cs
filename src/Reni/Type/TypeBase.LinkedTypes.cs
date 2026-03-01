@@ -28,6 +28,7 @@ abstract partial class TypeBase
         internal TypeBase TypeForTypeOperator => Parent.GetTypeForTypeOperator();
         internal IGenericProviderForType[] GenericProvidersForType => Parent.GetGenericProviders().ToArray();
         internal TypeBase TagTargetType => Parent.GetTagTargetType();
+        internal TypeBase Text => Parent.Cache.Text.Value;
 
         internal TypeBase Align
         {

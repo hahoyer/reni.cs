@@ -54,13 +54,17 @@ abstract partial class TypeBase
 
         [Node]
         [SmartNode]
-        internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
+        public readonly FunctionCache<SourcePart, Issue> MissingDeclarationIssue;
 
         [Node]
         [SmartNode]
-        public readonly FunctionCache<SourcePart, Issue> MissingDeclarationIssue;
+        public readonly ValueCache<TextType> Text;
 
-        
+        [Node]
+        [SmartNode]
+        internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
+
+
         public CacheContainer(TypeBase parent)
         {
             EnableCut = new(() => new(parent));
@@ -84,6 +88,7 @@ abstract partial class TypeBase
             Size = new(parent.GetSizeForCache);
             SymmetricConversions = new(parent.GetSymmetricConversionsForCache);
             ArrayReferenceCache = new(id => new(parent, id));
+            Text = new(() => new(parent));
             MissingDeclarationIssue = new(parent.GetMissingDeclarationIssueForCache);
         }
     }
