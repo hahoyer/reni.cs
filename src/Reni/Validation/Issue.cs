@@ -31,7 +31,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
             var result = Position.Id == "("
                 ? Position.Start.FilePosition(Tag) + " Functional"
                 : Position.FileErrorPosition(Tag);
-            var additionalInformation = AdditionalInformation.Select(p => " " + p.NodeDump()).Stringify("");
+            var additionalInformation = AdditionalInformation.Select(p => " " + p.GetNodeDump()).Stringify("");
             return result + additionalInformation;
         }
     }
@@ -62,7 +62,7 @@ public sealed class Issue : DumpableObject, IEquatable<Issue>
     }
 
     protected override string GetNodeDump()
-        => base.GetNodeDump() + IssueId.NodeDump().Surround("{", "}");
+        => base.GetNodeDump() + IssueId.GetNodeDump().Surround("{", "}");
 
     public override bool Equals(object? obj)
     {
