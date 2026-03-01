@@ -18,6 +18,8 @@ sealed class Combination : DumpableObject, IConversion, IEquatable<IConversion>
 
     TypeBase IConversion.Source => Left.Source;
 
+    int IConversion.Weight => Left.Weight + Right.Weight;
+
     bool IEquatable<IConversion>.Equals(IConversion? other)
     {
         if(other is not Combination typedOther)
@@ -32,8 +34,8 @@ sealed class Combination : DumpableObject, IConversion, IEquatable<IConversion>
             return right;
         if(right == null)
             return left;
-        (left.ResultType() == right.Source).Assert();
-        if(right.ResultType() == left.Source)
+        (left.ResultType == right.Source).Assert();
+        if(right.ResultType == left.Source)
             return null;
 
         return new Combination(left, right);

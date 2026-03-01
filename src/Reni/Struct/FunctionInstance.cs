@@ -90,11 +90,11 @@ abstract class FunctionInstance
 
     internal Result GetCallResult(Category category)
     {
-        var result = ResultCache & category.FunctionCall();
+        var result = ResultCache & category.FunctionCall;
 
-        if(category.HasClosures())
+        if(category.HasClosures)
             result.Closures = Closures.GetArgument();
-        if(result.HasIssue != true && category.HasCode())
+        if(result.HasIssue != true && category.HasCode)
             result.Code = CallType
                 .Make.ArgumentCode
                 .GetCall(FunctionId, result.Size);
@@ -106,7 +106,7 @@ abstract class FunctionInstance
         if(IsStopByObjectIdActive)
             return null!;
 
-        var trace = FunctionId.Index.In(-1) && category.HasCode();
+        var trace = FunctionId.Index.In(-1) && category.HasCode;
         StartMethodDump(trace, category);
         try
         {
@@ -157,7 +157,7 @@ abstract class FunctionInstance
             .ReplaceAbsolute
             (
                 reference
-                , () => CodeBase.GetFrameRef().GetDePointer(reference.Size())
+                , () => CodeBase.GetFrameRef().GetDePointer(reference.Size)
                 , Closures.GetVoid
             );
     }

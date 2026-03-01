@@ -176,7 +176,7 @@ sealed class CompoundSyntax : ValueSyntax
 
     internal Result GetCleanup(ContextBase context, Category category)
     {
-        if(CleanupSection != null && (category.HasCode() || category.HasClosures()))
+        if(CleanupSection != null && (category.HasCode || category.HasClosures))
             return context
                     .GetResult(category | Category.Type, CleanupSection.Value)
                     .GetConversion(context.RootContext.VoidType)

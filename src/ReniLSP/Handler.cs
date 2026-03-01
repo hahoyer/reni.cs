@@ -44,13 +44,13 @@ sealed class Handler : DumpableObject
     }
 
     public void Tokenize(SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier)
-        => Buffers[identifier.TextDocument.GetKey()].Tokenize(builder);
+        => Buffers[identifier.TextDocument.Key].Tokenize(builder);
 
     public static TextDocumentAttributes GetTextDocumentAttributes(DocumentUri uri) => new(uri, "reni");
 
     public void DidOpen(DidOpenTextDocumentParams request)
     {
-        var fileName = request.TextDocument.GetKey();
+        var fileName = request.TextDocument.Key;
         Buffers[fileName] = new(this)
         {
             FileName = fileName
@@ -60,10 +60,10 @@ sealed class Handler : DumpableObject
     }
 
     public void DidChange(DidChangeTextDocumentParams request)
-        => Buffers[request.TextDocument.GetKey()].ApplyChanges(request.ContentChanges);
+        => Buffers[request.TextDocument.Key].ApplyChanges(request.ContentChanges);
 
     public void DidClose(DidCloseTextDocumentParams request)
-        => Buffers.TryRemove(request.TextDocument.GetKey(), out var _);
+        => Buffers.TryRemove(request.TextDocument.Key, out var _);
 
     public async Task<TextEditContainer> Format(DocumentFormattingParams request)
     {
@@ -72,7 +72,7 @@ sealed class Handler : DumpableObject
             Items = (ConfigurationItem[]) [new() { Section = "reni" }]
         });
         SetFormattingOptions(request.Options);
-        return await Task.FromResult(Buffers[request.TextDocument.GetKey()].Format(FormatOptions));
+        return await Task.FromResult(Buffers[request.TextDocument.Key].Format(FormatOptions));
     }
 
     void SetFormattingOptions(FormattingOptions options)

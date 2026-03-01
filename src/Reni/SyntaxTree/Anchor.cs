@@ -13,7 +13,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
     readonly string? ReasonForEmptiness;
 
     [DisableDump]
-    internal SourcePart[] SourceParts => Items.GetSourceParts();
+    internal SourcePart[] SourceParts => Items.SourceParts;
 
     [DisableDump]
     internal SourcePart SourcePart => SourceParts.Combine()!;
@@ -38,7 +38,7 @@ sealed class Anchor : DumpableObject, ValueCache.IContainer
             .ToArray();
 
         Items.Any().Assert();
-        Items.GetRoot().AssertIsNotNull();
+        Items.Root.AssertIsNotNull();
         Main.AssertIsNotNull();
     }
 

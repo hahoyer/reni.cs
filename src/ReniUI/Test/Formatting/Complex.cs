@@ -195,7 +195,7 @@ llll: bbbbb;
         var compiler = CompilerBrowser.FromText(text);
         var newSource = compiler.Reformat
             (
-                new ReniUI.Formatting.Configuration { MaxLineLength = 10, EmptyLineLimit = 0 }.Create()
+                new ReniUI.Formatting.Configuration { MaxLineLength = 10, EmptyLineLimit = 0 }.Formatter
             )
             .Replace("\r\n", "\n");
 

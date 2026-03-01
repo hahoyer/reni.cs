@@ -28,6 +28,8 @@ abstract class SetterTargetType
 
     TypeBase IConversion.Source => this;
 
+    int IConversion.Weight => 1;
+
     IConversion IProxyType.Converter => this;
     IConversion IReference.Converter => this;
     bool IReference.IsWeak => true;
@@ -63,7 +65,7 @@ abstract class SetterTargetType
         if(category == Category.Type)
             return Root.VoidType.GetResult(category);
 
-        var trace = ObjectId == -97 && category.HasCode();
+        var trace = ObjectId == -97 && category.HasCode;
         StartMethodDump(trace, category, right);
         try
         {

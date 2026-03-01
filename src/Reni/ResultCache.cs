@@ -201,7 +201,7 @@ sealed class ResultCache : DumpableObject
         // Watch out! Data.CompleteCategory may have changed by SimpleUpdate
 
         // Getting type first is required to treat recursivity
-        if(availableCategory.Without(Data.CompleteCategory).HasType())
+        if(availableCategory.Without(Data.CompleteCategory).HasType)
             LinearUpdate(Category.Type);
         LinearUpdate(availableCategory.Without(Data.CompleteCategory));
         RecursiveUpdate(category & PendingCategory);

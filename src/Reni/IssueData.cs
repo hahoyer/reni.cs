@@ -23,11 +23,11 @@ sealed class IssueData : DumpableObject, ValueCache.IContainer
     public Category Category;
     Root Root => this.CachedValue(() => Issues.First().Root);
 
-    public bool? IsHollow => HasIssue && Category.HasIsHollow()? IssueCode.Instance.IsHollow : null;
-    public CodeBase? Code => HasIssue && Category.HasCode()? IssueCode.Instance : null;
-    public Size? Size => HasIssue && Category.HasSize()? IssueCode.Instance.Size : null;
-    public TypeBase? Type => HasIssue && Category.HasType()? Root.GetIssueType(Issues) : null;
-    public Closures? Closure => HasIssue && Category.HasClosures()? IssueCode.Instance.Closures : null;
+    public bool? IsHollow => HasIssue && Category.HasIsHollow? IssueCode.Instance.IsHollow : null;
+    public CodeBase? Code => HasIssue && Category.HasCode? IssueCode.Instance : null;
+    public Size? Size => HasIssue && Category.HasSize? IssueCode.Instance.Size : null;
+    public TypeBase? Type => HasIssue && Category.HasType? Root.GetIssueType(Issues) : null;
+    public Closures? Closure => HasIssue && Category.HasClosures? IssueCode.Instance.Closures : null;
 
     public bool HasIssue => Issues.Any();
 

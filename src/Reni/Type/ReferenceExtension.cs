@@ -6,9 +6,14 @@ namespace Reni.Type;
 
 static class ReferenceExtension
 {
-    internal static TypeBase Type(this IReference target) => (TypeBase)target;
+    extension(IReference target)
+    {
+        internal TypeBase Type => (TypeBase)target;
+    }
 
-    internal static Size Size(this IContextReference target)
-        => (target as TypeBase)?.OverView.Size
+    extension(IContextReference target)
+    {
+        internal Size Size => (target as TypeBase)?.OverView.Size
             ?? Root.DefaultRefAlignParam.RefSize;
+    }
 }

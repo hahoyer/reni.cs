@@ -40,5 +40,5 @@ sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
     internal NumberType Number(int bitCount) => GetArray(bitCount).Number;
 
     internal Result GetResult(Category category, BitsConst bitsConst) => Number(bitsConst.Size.ToInt())
-        .GetResult(category, () => Code.Extension.GetCode(bitsConst));
+        .GetResult(category, ()=>bitsConst.Code);
 }

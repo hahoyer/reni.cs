@@ -81,10 +81,10 @@ sealed class CondSyntax : ValueSyntax
     Result InternalResult(ContextBase context, Category category)
     {
         var commonType = CommonType(context);
-        if(Category.Type.Replenished().Contains(category))
+        if(Category.Type.Replenished.Contains(category))
             return commonType.GetResult(category);
 
-        var branchCategory = category & Category.Code.Replenished();
+        var branchCategory = category & Category.Code.Replenished;
         var condResult = CondResult(context, category);
         var thenResult = ThenResult(context, branchCategory);
         var elseResult = ElseResult(context, branchCategory);

@@ -15,8 +15,8 @@ abstract partial class TypeBase
         readonly TypeBase Parent = parent;
 
         internal EnableCut EnableCut => Parent.Cache.EnableCut.Value;
-        internal CodeBase ArgumentCode => Parent.GetArgumentCode();
-        internal TypeBase Pointer => ForcedReference.Type();
+        internal CodeBase ArgumentCode => Parent.ArgumentCode;
+        internal TypeBase Pointer => ForcedReference.Type;
         internal IReference ForcedReference => Parent.Cache.ForcedReference.Value;
         internal TypeBase SmartPointer => Parent.GetIsHollow()? Parent : Pointer;
         internal TypeBase FunctionInstance => Parent.Cache.FunctionInstanceType.Value;
@@ -44,7 +44,8 @@ abstract partial class TypeBase
         internal TypeBase AutomaticDereferenceType
             =>
                 Parent.OverView.IsWeakReference
-                    ? Parent.Make.CheckedReference!.Converter.ResultType().Make.AutomaticDereferenceType
+                    ? Parent.Make.CheckedReference!.Converter.ResultType.Make.AutomaticDereferenceType
                     : Parent;
+
     }
 }

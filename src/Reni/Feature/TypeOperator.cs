@@ -17,7 +17,7 @@ sealed class TypeOperator : SuffixSyntaxToken
 
     protected override Result GetResult(ContextBase context, Category category, ValueSyntax left)
     {
-        if(category.HasType())
+        if(category.HasType)
         {
             var leftType = left.GetTypeBase(context);
             leftType.ExpectIsNotNull(() => (left.Anchor.SourcePart, null));

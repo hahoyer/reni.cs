@@ -16,7 +16,7 @@ sealed class SymmetricClosureService
         IConversion? INavigator.Combine(IConversion? start, IConversion end)
             => Feature.Combination.CheckedCreate(start, end);
 
-        TypeBase INavigator.End(IConversion feature) => feature.ResultType();
+        TypeBase INavigator.End(IConversion feature) => feature.ResultType;
         TypeBase INavigator.Start(IConversion feature) => feature.Source;
     }
 
@@ -26,7 +26,7 @@ sealed class SymmetricClosureService
             => Feature.Combination.CheckedCreate(end, start);
 
         TypeBase INavigator.End(IConversion feature) => feature.Source;
-        TypeBase INavigator.Start(IConversion feature) => feature.ResultType();
+        TypeBase INavigator.Start(IConversion feature) => feature.ResultType;
     }
 
     static readonly INavigator Forward = new ForwardNavigator();

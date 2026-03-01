@@ -132,11 +132,11 @@ static class ResultExtension
 
         return new()
         {
-            Type = category.HasType()? GetType(isHollow, size, type, code, getObjectDump) : null
-            , Code = category.HasCode()? GetCode(isHollow, size, type, code, getObjectDump) : null
-            , Size = category.HasSize()? GetSize(isHollow, size, type, code, getObjectDump) : null
-            , Closures = category.HasClosures()? GetClosures(isHollow, size, type, code, closures) : null
-            , IsHollow = category.HasIsHollow()? GetIsHollow(isHollow, size, type, code, getObjectDump) : null
+            Type = category.HasType? GetType(isHollow, size, type, code, getObjectDump) : null
+            , Code = category.HasCode? GetCode(isHollow, size, type, code, getObjectDump) : null
+            , Size = category.HasSize? GetSize(isHollow, size, type, code, getObjectDump) : null
+            , Closures = category.HasClosures? GetClosures(isHollow, size, type, code, closures) : null
+            , IsHollow = category.HasIsHollow? GetIsHollow(isHollow, size, type, code, getObjectDump) : null
         };
     }
 }

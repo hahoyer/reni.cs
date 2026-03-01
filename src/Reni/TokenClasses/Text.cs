@@ -1,5 +1,6 @@
 using hw.Scanner;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.DeclarationOptions;
 using Reni.Parser;
@@ -30,7 +31,7 @@ sealed class Text : TerminalSyntaxToken, IIssueTokenClass
             .GetArray(data.Length)
             .TextItem
             .GetResult
-                (category, () => Code.Extension.GetCode(BitsConst.ConvertAsText(data)), Closures.GetVoid);
+                (category, () => BitsConst.ConvertAsText(data).Code, Closures.GetVoid);
     }
 
     protected override TypeBase? TryGetTypeBase(SourcePart token)

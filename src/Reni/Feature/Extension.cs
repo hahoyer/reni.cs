@@ -52,29 +52,6 @@ static class Extension
         (Func<Category, ResultCache, ContextBase, ValueSyntax?, Result> function)
         => MetaFunctionCache[function];
 
-    internal static TypeBase ResultType(this IConversion conversion)
-        => conversion.GetResult(Category.Type).Type;
-
-    internal static Result GetResult(this IConversion conversion, Category category)
-    {
-        var result = conversion.Execute(category);
-        if(!result.HasIssue && category.HasCode() && result.Code.ArgumentType != null)
-            (result.Code.ArgumentType == conversion.Source).Assert
-                (() => result.DebuggerDump());
-
-        return result;
-    }
-
-    public static IEnumerable<IGenericProviderForType> GetGenericProviders<T>
-        (this T target, IEnumerable<IGenericProviderForType>? baseList = null)
-        where T : TypeBase
-        => CreateList(baseList, () => new GenericProviderForType<T>(target));
-
-    public static IEnumerable<IDeclarationProvider> GenericListFromDefinable<T>
-        (this T target, IEnumerable<IDeclarationProvider>? baseList = null)
-        where T : Definable
-        => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
-
     static IEnumerable<TGeneric> CreateList<TGeneric>
         (IEnumerable<TGeneric>? baseList, Func<TGeneric> creator)
     {
@@ -87,93 +64,131 @@ static class Extension
             yield return item;
     }
 
-    internal static Result GetResult
-    (
-        this IEvalImplementation feature,
-        Category category,
-        SourcePart currentTarget,
-        ContextBase context,
-        ValueSyntax? right
-    )
+    extension(IImplementation feature)
     {
-        (feature.Function == null || !feature.Function.IsImplicit || feature.Value == null)
-            .Assert();
+        internal Result GetResult
+        (
+            Category category,
+            ResultCache left,
+            SourcePart token,
+            ContextBase context,
+            ValueSyntax? right
+        )
+        {
+            var metaFeature = ((IMetaImplementation)feature).Function;
+            if(metaFeature != null)
+                return metaFeature.GetResult(category, left, token, context, right);
 
-        var valueCategory = category;
-        if(right != null)
-            valueCategory = category | Category.Type;
-
-        var valueResult = feature.ValueResult(right, valueCategory, context.RootContext);
-
-        if(right == null)
-            return valueResult
-                ?? new(category, IssueId.MissingRightExpression.GetIssue(context.RootContext, currentTarget, context));
-
-        if(valueResult != null)
-            return valueResult
-                .Type
-                .GetResult(category, valueResult, currentTarget, null, context, right);
-
-        //Todo: Provide context information like this to "Expect"
-        if(feature.Function == null)
-            Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
-        (feature.Function != null).Expect();
-
-        var argsResult = context.GetResultAsReferenceCache(right);
-        var argsType = argsResult.Type;
-
-        return feature
-            .Function!
-            .GetResult(category, argsType)
-            .ReplaceArguments(argsResult);
-    }
-
-    static Result? ValueResult
-    (
-        this IEvalImplementation feature,
-        ValueSyntax? right,
-        Category valueCategory,
-        Root root
-    )
-    {
-        if(feature.Function != null && feature.Function.IsImplicit)
             return feature
-                .Function
-                .GetResult(valueCategory, root.VoidType)
-                .ReplaceArguments(root.VoidType.GetResult(Category.All));
-
-        if(right != null && feature.Function != null)
-            return null;
-
-        return feature.Value?.Execute(valueCategory);
+                .GetResult(category, token, context, right)
+                .ReplaceArguments(left);
+        }
     }
 
-    internal static Result GetResult
-    (
-        this IImplementation feature,
-        Category category,
-        ResultCache left,
-        SourcePart token,
-        ContextBase context,
-        ValueSyntax? right
-    )
+    extension(IConversion conversion)
     {
-        var metaFeature = ((IMetaImplementation)feature).Function;
-        if(metaFeature != null)
-            return metaFeature.GetResult(category, left, token, context, right);
+        internal TypeBase ResultType => conversion.GetResult(Category.Type).Type;
 
-        return feature
-            .GetResult(category, token, context, right)
-            .ReplaceArguments(left);
+        internal Result GetResult(Category category)
+        {
+            var result = conversion.Execute(category);
+            if(!result.HasIssue && category.HasCode && result.Code.ArgumentType != null)
+                (result.Code.ArgumentType == conversion.Source).Assert
+                    (result.DebuggerDump);
+
+            return result;
+        }
     }
 
-    internal static T? DistinctNotNull<T>(this IEnumerable<T?> enumerable)
-        where T : class
-        => enumerable
-            .Where(x => x != null)
-            .Distinct()
-            .SingleOrDefault();
+    extension(IEvalImplementation feature)
+    {
+        internal Result GetResult
+        (
+            Category category,
+            SourcePart currentTarget,
+            ContextBase context,
+            ValueSyntax? right
+        )
+        {
+            (feature.Function == null || !feature.Function.IsImplicit || feature.Value == null)
+                .Assert();
 
-    internal static Result GetResult(this Issue[] issues, Category category)
-        => new(category, issues);
+            var valueCategory = category;
+            if(right != null)
+                valueCategory = category | Category.Type;
+
+            var valueResult = feature.ValueResult(right, valueCategory, context.RootContext);
+
+            if(right == null)
+                return valueResult
+                    ?? new(category, IssueId.MissingRightExpression.GetIssue(context.RootContext, currentTarget, context));
+
+            if(valueResult != null)
+                return valueResult
+                    .Type
+                    .GetResult(category, valueResult, currentTarget, null, context, right);
+
+            //Todo: Provide context information like this to "Expect"
+            if(feature.Function == null)
+                Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
+            (feature.Function != null).Expect();
+
+            var argsResult = context.GetResultAsReferenceCache(right);
+            var argsType = argsResult.Type;
+
+            return feature
+                .Function!
+                .GetResult(category, argsType)
+                .ReplaceArguments(argsResult);
+        }
+
+        Result? ValueResult
+        (
+            ValueSyntax? right,
+            Category valueCategory,
+            Root root
+        )
+        {
+            if(feature.Function != null && feature.Function.IsImplicit)
+                return feature
+                    .Function
+                    .GetResult(valueCategory, root.VoidType)
+                    .ReplaceArguments(root.VoidType.GetResult(Category.All));
+
+            if(right != null && feature.Function != null)
+                return null;
+
+            return feature.Value?.Execute(valueCategory);
+        }
+    }
+
+    extension<T>(T target)
+        where T : TypeBase
+    {
+        public IEnumerable<IGenericProviderForType> GetGenericProviders(IEnumerable<IGenericProviderForType>? baseList = null)
+            => CreateList(baseList, () => new GenericProviderForType<T>(target));
+    }
+
+    extension<T>(IEnumerable<T?> enumerable)
+        where T : class
+    {
+        internal T? DistinctNotNull()
+            => enumerable
+                .Where(x => x != null)
+                .Distinct()
+                .SingleOrDefault();
+    }
+
+    extension<T>(T target)
+        where T : Definable
+    {
+        public IEnumerable<IDeclarationProvider> GenericListFromDefinable(IEnumerable<IDeclarationProvider>? baseList = null)
+            => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
+    }
+
+    extension(Issue[] issues)
+    {
+        internal Result GetResult(Category category)
+            => new(category, issues);
+    }
 }

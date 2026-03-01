@@ -80,7 +80,7 @@ sealed class Compound
             .GetCompoundPositionContext(Syntax, position)
             .GetResultCache(Syntax.PureStatements[position]);
 
-    internal Size Size(int? position = null)
+    internal Size GetSize(int? position = null)
     {
         if(IsHollow(position))
             return Basics.Size.Zero;
@@ -96,7 +96,7 @@ sealed class Compound
     {
         if(category == Category.None)
             return new(category);
-        var trace = Syntax.ObjectId.In() && category.HasCode();
+        var trace = Syntax.ObjectId.In() && category.HasCode;
         StartMethodDump(trace, category, fromPosition, fromNotPosition);
         try
         {
@@ -133,7 +133,7 @@ sealed class Compound
 
     internal Result GetResult(Category category)
     {
-        var trace = Syntax.ObjectId.In() && category.HasType();
+        var trace = Syntax.ObjectId.In() && category.HasType;
         StartMethodDump(trace, category);
         try
         {
@@ -163,7 +163,7 @@ sealed class Compound
             if(result.HasIssue)
                 return ReturnMethodDump(result);
 
-            if(category.HasType())
+            if(category.HasType)
                 result.Type = CompoundView.Type;
 
             return ReturnMethodDump(result);

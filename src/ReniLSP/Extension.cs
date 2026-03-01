@@ -9,31 +9,47 @@ namespace ReniLSP;
 
 static class Extension
 {
-    public static string GetKey(this TextDocumentIdentifier target) => target.Uri.GetFileSystemPath();
-
-    public static Range GetRange(this SourcePart token)
+    extension(TextDocumentIdentifier target)
     {
-        var range = token.TextPosition;
-        return new(range.start.LineNumber, range.start.ColumnNumber, range.end.LineNumber
-            , range.end.ColumnNumber);
+        public string Key => target.Uri.GetFileSystemPath();
     }
 
-    public static bool? ToBoolean(this FormattingOptions option, string name)
+    extension(SourcePart token)
     {
-        if(option.ContainsKey(name) && option[name].IsBool)
-            return option[name].Bool;
-        return null;
+        public Range GetRange()
+        {
+            var range = token.TextPosition;
+            return new(range.start.LineNumber, range.start.ColumnNumber, range.end.LineNumber
+                , range.end.ColumnNumber);
+        }
     }
 
-    public static int? ToInteger(this FormattingOptions option, string name)
+    extension(FormattingOptions option)
     {
-        if(option.ContainsKey(name) && option[name].IsInteger)
-            return option[name].Integer;
-        return null;
+        public bool? ToBoolean(string name)
+        {
+            if(option.ContainsKey(name) && option[name].IsBool)
+                return option[name].Bool;
+            return null;
+        }
+
+        public int? ToInteger(string name)
+        {
+            if(option.ContainsKey(name) && option[name].IsInteger)
+                return option[name].Integer;
+            return null;
+        }
     }
 
-    public static string ToString1(this ReadOnlySequence<byte> target) => Encoding.Default.GetString(target);
-    public static string ToString1(this Span<byte> target) => Encoding.Default.GetString(target.ToArray());
+    extension(ReadOnlySequence<byte> target)
+    {
+        public string ToString1() => Encoding.Default.GetString(target);
+    }
+
+    extension(Span<byte> target)
+    {
+        public string ToString1() => Encoding.Default.GetString(target.ToArray());
+    }
 }
 
 public sealed class MyReader(string name, PipeReader target) : PipeReader

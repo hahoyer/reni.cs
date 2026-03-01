@@ -45,6 +45,6 @@ sealed class Call : FiberItem
         if(FunctionId != functionId)
             return this;
         ResultSize.IsZero.Assert();
-        return ArgsAndRefsSize.GetRecursiveCall();
+        return ArgsAndRefsSize.RecursiveCall;
     }
 }

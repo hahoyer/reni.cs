@@ -22,7 +22,7 @@ sealed class ConversionPath
 
     IEnumerable<TypeBase> TypesByDestination
         => new[] { Source }
-            .Concat(Elements.Select(element => element.ResultType()))
+            .Concat(Elements.Select(element => element.ResultType))
             .ToArray();
 
     [UsedImplicitly]
@@ -31,10 +31,12 @@ sealed class ConversionPath
             .Select(element => element.GetResult(Category.Code).Code.DebuggerDump())
             .ToArray();
 
-    internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
+    internal TypeBase Destination => Elements.LastOrDefault()?.ResultType ?? Source;
 
-    internal int Weight => DumpConversions.Stringify("").Length;
+    internal int Weight => Elements.Select(conversion => conversion.Weight).Sum();
 
+    static int GetWeight(IConversion element) => element.GetResult(Category.Code).Code.DebuggerDump().Length;
+    
     internal ConversionPath(TypeBase source)
         : this(source, []) { }
 
@@ -87,8 +89,7 @@ sealed class ConversionPath
         var typesByDestination = TypesByDestination.ToArray();
 
         var merge = Types.Select
-            (
-                (item, index) => new
+            ((item, index) => new
                 {
                     index, type = item, typeDestination = typesByDestination[index]
                 }
@@ -104,10 +105,9 @@ sealed class ConversionPath
             + Tracer.Dump
             (
                 Elements.Select
-                    (
-                        item => new
+                    (item => new
                         {
-                            item.Source, Destination = item.ResultType()
+                            item.Source, Destination = item.ResultType
                         }
                     )
                     .ToArray()

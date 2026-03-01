@@ -135,12 +135,6 @@ sealed class ArrayReferenceType
     protected override IEnumerable<IGenericProviderForType> GetGenericProviders() 
         => this.GetGenericProviders(base.GetGenericProviders());
 
-    //todo: Why textitem-tag is not relevant here? 
-    internal override Size GetTextItemSize() => ValueType.OverView.Size;
-
-    [DisableDump]
-    protected override CodeBase DumpPrintCode => Make.ArgumentCode.GetDumpPrintText(GetTextItemSize());
-
     protected override string GetNodeDump()
         => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
 
@@ -188,7 +182,7 @@ sealed class ArrayReferenceType
 
     internal Result ConversionResult(Category category, ArrayType source)
     {
-        var trace = ObjectId == -1 && category.HasCode();
+        var trace = ObjectId == -1 && category.HasCode;
         StartMethodDump(trace, category, source);
         try
         {

@@ -191,7 +191,7 @@ sealed class DeclarerSyntax : DumpableObject
             .Distinct()
             .ToArray();
 
-        var issueAnchor = issueAnchors.GetSourceParts().Combine();
+        var issueAnchor = issueAnchors.SourceParts.Combine();
         var issueSyntax = issueAnchor == null
             ? null
             : new Syntax.IssueSyntax

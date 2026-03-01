@@ -81,7 +81,7 @@ sealed class SearchResult : DumpableObject, IImplementation
         ValueSyntax? right
     )
     {
-        var trace = ObjectId.In(-1) && category.HasType();
+        var trace = ObjectId.In(-1) && category.HasType;
         StartMethodDump(trace, category, left, currentTarget, context, right);
         try
         {

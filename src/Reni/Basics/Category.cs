@@ -36,39 +36,48 @@ public static class CategoryExtension
         }
     }
 
-    public static bool HasCode(this Category category) => (category & Category.Code) != Category.None;
-    public static bool HasType(this Category category) => (category & Category.Type) != Category.None;
-    public static bool HasClosures(this Category category) => (category & Category.Closures) != Category.None;
-    public static bool HasSize(this Category category) => (category & Category.Size) != Category.None;
-    public static bool HasIsHollow(this Category category) => (category & Category.IsHollow) != Category.None;
-
-    public static string Dump(this Category category) => $"{category}";
-
-    public static Category Replenished(this Category category)
+    extension(Category category)
     {
-        var result = category;
-        if(result.HasCode())
+        public bool HasCode => (category & Category.Code) != Category.None;
+        public bool HasType => (category & Category.Type) != Category.None;
+        public bool HasClosures => (category & Category.Closures) != Category.None;
+        public bool HasSize => (category & Category.Size) != Category.None;
+        public bool HasIsHollow => (category & Category.IsHollow) != Category.None;
+
+        public string Dump() => $"{category}";
+
+        public Category Replenished
         {
-            result |= Category.Size;
-            result |= Category.Closures;
+            get
+            {
+                var result = category;
+                if(result.HasCode)
+                {
+                    result |= Category.Size;
+                    result |= Category.Closures;
+                }
+
+                if(result.HasSize)
+                    result |= Category.IsHollow;
+                return result;
+            }
         }
 
-        if(result.HasSize())
-            result |= Category.IsHollow;
-        return result;
+        internal Category FunctionCall
+        {
+            get
+            {
+                var result = category;
+                if(category.HasCode)
+                    result = result.Without(Category.Code) | Category.Size;
+                return result.Without(Category.Closures);
+            }
+        }
+
+        internal bool Contains(Category content)
+            => (~category & content) == Category.None;
+
+        internal Category Without(Category content)
+            => category & ~content;
     }
-
-    internal static Category FunctionCall(this Category category)
-    {
-        var result = category;
-        if(category.HasCode())
-            result = result.Without(Category.Code) | Category.Size;
-        return result.Without(Category.Closures);
-    }
-
-    internal static bool Contains(this Category container, Category content)
-        => (~container & content) == Category.None;
-
-    internal static Category Without(this Category container, Category content)
-        => container & ~content;
 }

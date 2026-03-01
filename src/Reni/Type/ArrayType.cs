@@ -2,7 +2,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Helper;
 using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -15,7 +14,6 @@ sealed class ArrayType
         , ISymbolProviderForPointer<ConcatArrays>
         , ISymbolProviderForPointer<MutableConcatArrays>
         , ISymbolProviderForPointer<TextItem>
-        , ISymbolProviderForPointer<ToNumberOfBase>
         , ISymbolProviderForPointer<Mutable>
         , ISymbolProviderForPointer<ArrayReference>
         , ISymbolProviderForPointer<Count>
@@ -29,28 +27,26 @@ sealed class ArrayType
         internal static readonly string DefaultOptionsId = Create().Data.Id;
 
         public Flag IsMutable { get; }
-        public Flag IsTextItem { get; }
         Flags Data { get; }
         public string DumpPrintText => Data.DumpPrintText;
+        internal string NameDump => DumpPrintText;
 
         Options(string optionsId)
         {
             Data = new(optionsId);
             IsMutable = Data.Register("mutable");
-            IsTextItem = Data.Register("text_item");
             Data.Align();
             Data.IsValid.Assert();
         }
 
         protected override string GetNodeDump() => DumpPrintText;
-        internal string NameDump  => DumpPrintText;
 
         public static Options Create(string optionsId = "") => new(optionsId);
     }
 
     [DisableDump]
     [UsedImplicitly]
-    internal TypeBase ElementType { get; }
+    internal override TypeBase ElementType { get; }
 
     [UsedImplicitly]
     [DisableDump]
@@ -64,6 +60,10 @@ sealed class ArrayType
     [SmartNode]
     readonly ValueCache<NumberType> NumberCache;
 
+    [Node]
+    [SmartNode]
+    readonly ValueCache<TextItemType> TextItemCache;
+
     Options OptionsValue { get; }
 
     [DisableDump]
@@ -74,16 +74,10 @@ sealed class ArrayType
     internal bool IsMutable => OptionsValue.IsMutable.Value;
 
     [DisableDump]
-    internal bool IsTextItem => OptionsValue.IsTextItem.Value;
-
-    [DisableDump]
     internal NumberType Number => NumberCache.Value;
 
     [DisableDump]
-    ArrayType NoTextItem => ElementType.GetArray(Count, OptionsValue.IsTextItem.SetTo(false));
-
-    [DisableDump]
-    internal ArrayType TextItem => ElementType.GetArray(Count, OptionsValue.IsTextItem.SetTo(true));
+    internal TextItemType TextItem => TextItemCache.Value;
 
     [DisableDump]
     internal ArrayType Mutable => ElementType.GetArray(Count, OptionsValue.IsMutable.SetTo(true));
@@ -115,6 +109,7 @@ sealed class ArrayType
         //(!elementType.IsHollow).Assert();
         RepeaterAccessTypeCache = new(() => new(this));
         NumberCache = new(() => new(this));
+        TextItemCache = new(() => new(this));
         StopByObjectIds();
     }
 
@@ -151,9 +146,8 @@ sealed class ArrayType
     IImplementation ISymbolProviderForPointer<Count>.Feature
         => Feature.Extension.MetaFeature(CountResult);
 
-    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature => OptionsValue.IsTextItem.Value
-        ? Feature.Extension.Value(GetDumpPrintTokenResult)
-        : Feature.Extension.Value(DumpPrintTokenArrayResult);
+    IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        => Feature.Extension.Value(DumpPrintTokenArrayResult);
 
     IImplementation ISymbolProviderForPointer<Mutable>.Feature
         => Feature.Extension.Value(MutableResult);
@@ -174,20 +168,10 @@ sealed class ArrayType
         => Feature.Extension.Value(TextItemResult);
 
 
-    IImplementation? ISymbolProviderForPointer<ToNumberOfBase>.Feature
-        => OptionsValue.IsTextItem.Value
-            ? Feature.Extension.MetaFeature(ToNumberOfBaseResult)
-            : null;
-
     protected override bool GetIsHollow() => Count == 0 || ElementType.OverView.IsHollow;
 
     protected override string GetDumpPrintText()
         => "(" + ElementType.OverView.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;
-
-    internal override Size? GetTextItemSize() => OptionsValue.IsTextItem.Value
-        ? ElementType.GetTextItemSize() ?? OverView.Size
-        : base.GetTextItemSize();
-
     internal override CompoundView FindRecentCompoundView() => ElementType.FindRecentCompoundView();
 
     internal override IImplementation GetFunctionDeclarationForPointerType()
@@ -207,11 +191,6 @@ sealed class ArrayType
 
     internal override Result GetCleanup(Category category)
         => ElementType.GetArrayCleanup(category);
-
-    protected override IEnumerable<IConversion> GetStripConversions()
-    {
-        yield return Feature.Extension.Conversion(NoTextItemResult);
-    }
 
     internal override Result GetConstructorResult(Category category, TypeBase argumentsType)
     {
@@ -239,18 +218,10 @@ sealed class ArrayType
 
     [DisableDump]
     protected override CodeBase DumpPrintCode
-        => Make.ArgumentCode.GetDumpPrintText(GetTextItemSize() ?? ElementType.OverView.Size);
-
-    internal override object GetDataValue(BitsConst data)
-        => IsTextItem? data.ToString(ElementType.OverView.Size) : base.GetDataValue(data);
+        => Make.ArgumentCode.GetDumpPrintText(ElementType.OverView.Size);
 
     internal ArrayReferenceType Reference(bool isForceMutable)
         => ElementType.GetArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
-
-    Result NoTextItemResult(Category category)
-        => GetIsHollow()
-            ? NoTextItem.GetResult(category)
-            : GetResultFromPointer(category, NoTextItem);
 
     Result TextItemResult(Category category) => GetResultFromPointer(category, TextItem);
     Result MutableResult(Category category) => GetResultFromPointer(category, Mutable);
@@ -312,9 +283,9 @@ sealed class ArrayType
     Result DumpPrintTokenArrayResult(Category category)
     {
         var result = Root.ConcatPrintResult(category, Count, DumpPrintResult);
-        if(category.HasCode())
+        if(category.HasCode)
             //todo: replace strings by TokenId
-            result.Code = ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")).GetDumpPrintTextCode()
+            result.Code = ("<<" + (OptionsValue.IsMutable.Value? ":=" : "")).DumpPrintTextCode
                 + result.Code;
         return result;
     }
@@ -330,18 +301,6 @@ sealed class ArrayType
 
     Result ElementAccessResult(Category category, TypeBase right)
         => AccessType.GetResult(category, GetObjectResult(category), right);
-
-    Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
-    {
-        var target = (left & Category.All).AutomaticDereferencedAligned
-            .GetValue(context.RootContext.ExecutionContext);
-        //.ToString(ElementType.Size);
-        //todo: Error handling:
-        var conversionBase = right!.Evaluate(context).ExpectNotNull().ToInt32();
-        (conversionBase >= 2).Assert(conversionBase.ToString);
-        var result = BitsConst.Convert((string)target, conversionBase);
-        return Root.BitType.GetResult(category, result).Aligned;
-    }
 
     Result CountResult(Category category, ResultCache left, ContextBase context, ValueSyntax? right)
         => IndexType.GetResult(category, () => BitsConst.Convert(Count).GetCode(IndexSize));

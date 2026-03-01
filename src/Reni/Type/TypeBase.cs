@@ -40,6 +40,8 @@ abstract partial class TypeBase
     [SmartNode]
     readonly CacheContainer Cache;
 
+    internal string NameDump => GetNameDump();
+
     protected TypeBase()
         : base(NextObjectId++)
     {
@@ -88,8 +90,6 @@ abstract partial class TypeBase
 
     internal virtual IEnumerable<TypeBase> GetToList() => [this];
 
-    internal string NameDump => GetNameDump();
-    
     protected virtual string GetNameDump() => GetNodeDump();
 
     protected virtual string GetDumpPrintText() => GetNodeDump();
@@ -97,8 +97,6 @@ abstract partial class TypeBase
     protected virtual bool GetIsAligningPossible() => true;
 
     protected virtual bool GetIsPointerPossible() => true;
-
-    internal virtual Size? GetTextItemSize() => null;
 
     internal virtual CompoundView FindRecentCompoundView()
     {
@@ -275,6 +273,15 @@ abstract partial class TypeBase
     protected virtual IssueId MissingDeclarationIssueId
         => IssueId.MissingDeclarationForType;
 
+    internal virtual TypeBase ElementType
+    {
+        get
+        {
+            NotImplementedMethod();
+            return default!;
+        }
+    }
+
     internal virtual object GetDataValue(BitsConst data)
     {
         NotImplementedMethod(data);
@@ -327,7 +334,7 @@ abstract partial class TypeBase
         return GetResult
         (
             category,
-            target.GetCode
+            () => target.Code
         );
     }
 
@@ -420,7 +427,7 @@ abstract partial class TypeBase
         return GetResult
         (
             category,
-            () => target.GetCode().GetReferenceWithOffset(getOffset()).GetDePointer(OverView.Size)
+            () => target.Code.GetReferenceWithOffset(getOffset()).GetDePointer(OverView.Size)
         );
     }
 
@@ -444,7 +451,7 @@ abstract partial class TypeBase
 
     internal Result GetConversion(Category category, TypeBase destination) // todo: rename to GetConversionTo
     {
-        if(Category.Type.Replenished().Contains(category))
+        if(Category.Type.Replenished.Contains(category))
             return (destination.GetIsHollow()? destination : destination.Make.Pointer).GetResult(category);
 
         var path = ConversionService.FindPath(this, destination);
@@ -463,7 +470,7 @@ abstract partial class TypeBase
         .GetResult
         (
             category,
-            () => GetDumpPrintText().GetDumpPrintTextCode(),
+            () => GetDumpPrintText().DumpPrintTextCode,
             Closures.GetVoid
         );
 
@@ -522,7 +529,7 @@ abstract partial class TypeBase
 
     IConversion[] GetSymmetricConversionsForCache()
         => GetSymmetricConversions()
-            .ToDictionary(x => x.ResultType())
+            .ToDictionary(x => x.ResultType)
             .Values
             .ToArray();
 
@@ -535,7 +542,7 @@ abstract partial class TypeBase
             .ToArray();
 
         result.All(f => f.Source == this).Assert();
-        result.All(f => f.ResultType() == destination).Assert();
+        result.All(f => f.ResultType == destination).Assert();
         (result.Length <= 1).Assert();
 
         return result;
@@ -553,7 +560,7 @@ abstract partial class TypeBase
 
     internal Result GetObjectResult(Category category)
         => GetIsHollow()
-            ? GetResult(category) 
+            ? GetResult(category)
             : Make.Pointer.GetResult(category | Category.Type, Make.ForcedReference);
 
     internal Result GetResult
@@ -593,7 +600,7 @@ abstract partial class TypeBase
         return Root.BitType.GetResult
         (
             category,
-            () => Code.Extension.GetCode(BitsConst.Convert(isEqual))
+            () => BitsConst.Convert(isEqual).Code
         );
     }
 

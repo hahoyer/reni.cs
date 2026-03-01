@@ -15,7 +15,7 @@ sealed class InstanceToken : InfixSyntaxToken, IPendingProvider
 
     Result IPendingProvider.GetResult(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
     {
-        if(Category.Type.Replenished().Contains(category))
+        if(Category.Type.Replenished.Contains(category))
             return GetResult(context, category, left, right);
 
         NotImplementedMethod(context, category, left, right);

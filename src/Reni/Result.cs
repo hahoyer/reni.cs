@@ -480,10 +480,10 @@ sealed class Result : DumpableObject, IAggregateable<Result>
     {
         AssertValid();
 
-        if(category.HasClosures() && ClosuresRaw == null && CodeRaw != null)
+        if(category.HasClosures && ClosuresRaw == null && CodeRaw != null)
             Closures = Code.Closures;
 
-        if(category.HasSize() && SizeRaw == null)
+        if(category.HasSize && SizeRaw == null)
         {
             if(TypeRaw != null)
             {
@@ -496,7 +496,7 @@ sealed class Result : DumpableObject, IAggregateable<Result>
                 Size = Code.Size;
         }
 
-        if(category.HasIsHollow() && IsHollowRaw == null && SizeRaw != null)
+        if(category.HasIsHollow && IsHollowRaw == null && SizeRaw != null)
             IsHollow = Size.IsZero;
     }
 
@@ -564,15 +564,15 @@ sealed class Result : DumpableObject, IAggregateable<Result>
 
         if(HasIssue)
         {
-            if(!IssueData.Category.HasIsHollow())
+            if(!IssueData.Category.HasIsHollow)
                 Data.IsHollow.AssertIsNull();
-            if(!IssueData.Category.HasSize())
+            if(!IssueData.Category.HasSize)
                 Data.Size.AssertIsNull();
-            if(!IssueData.Category.HasType())
+            if(!IssueData.Category.HasType)
                 Data.Type.AssertIsNull();
-            if(!IssueData.Category.HasCode())
+            if(!IssueData.Category.HasCode)
                 Data.Code.AssertIsNull();
-            if(!IssueData.Category.HasClosures())
+            if(!IssueData.Category.HasClosures)
                 Data.Closures.AssertIsNull();
         }
 
@@ -617,28 +617,28 @@ sealed class Result : DumpableObject, IAggregateable<Result>
             (() => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
             );
 
-            if(category.HasIsHollow())
+            if(category.HasIsHollow)
                 IsHollow = SmartIsHollow && other.SmartIsHollow;
             else if(HasIsHollow && IsHollow)
                 IsHollowRaw = null;
 
-            if(category.HasSize())
+            if(category.HasSize)
                 Size = Size + other.Size;
             else if(HasSize)
                 SizeRaw = null;
 
-            if(category.HasType())
+            if(category.HasType)
                 Type = Type.GetPair(other.Type);
             else if(HasType)
                 TypeRaw = null;
 
-            if(category.HasCode())
+            if(category.HasCode)
                 Code = Code + other.Code;
             else if(HasCode)
                 CodeRaw = null;
         }
 
-        if(category.HasClosures())
+        if(category.HasClosures)
             Closures = Closures.AssertNotNull().Sequence(other.Closures);
         else if(HasClosures)
             ClosuresRaw = null;
@@ -776,15 +776,15 @@ sealed class Result : DumpableObject, IAggregateable<Result>
         if(HasIssue)
             return this;
 
-        if(!category.HasCode() && !category.HasClosures())
+        if(!category.HasCode && !category.HasClosures)
             return this;
 
         category |= Category.Type;
         var result = (this & category).ExpectNotNull();
         var copier = Type.GetCopier(category);
-        if(category.HasCode())
+        if(category.HasCode)
             result.Code = Code.GetLocalBlock(copier.Code);
-        if(category.HasClosures())
+        if(category.HasClosures)
             result.Closures = Closures.Sequence(copier.Closures);
         return result;
     }

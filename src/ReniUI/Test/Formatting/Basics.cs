@@ -62,7 +62,7 @@ b";
         var newSource = compiler.Reformat
             (
                 new ReniUI.Formatting.Configuration
-                    { EmptyLineLimit = 0 }.Create()
+                    { EmptyLineLimit = 0 }.Formatter
             )
             .Replace("\r\n", "\n");
 
@@ -83,7 +83,7 @@ b";
         var newSource = compiler.Reformat
             (
                 new ReniUI.Formatting.Configuration
-                    { EmptyLineLimit = 0 }.Create()
+                    { EmptyLineLimit = 0 }.Formatter
             )
             .Replace("\r\n", "\n");
 

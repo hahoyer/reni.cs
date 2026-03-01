@@ -37,7 +37,7 @@ sealed class ContextReferenceType
     protected override Size GetSize() => GetIsHollow()? Size.Zero : Root.DefaultRefAlignParam.RefSize;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => ContextOperator.TokenId.GetDumpPrintTextCode();
+    protected override CodeBase DumpPrintCode => ContextOperator.TokenId.DumpPrintTextCode;
 
     internal override IEnumerable<string> DeclarationOptions
         => base.DeclarationOptions.Concat(InternalDeclarationOptions);

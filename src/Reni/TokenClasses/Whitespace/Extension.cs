@@ -58,68 +58,79 @@ static class Extension
     static bool CommentTailCondition(WhiteSpaceItem item) => item.Type is IComment;
     static bool LineBreakTailCondition(WhiteSpaceItem item) => item.Type is IVolatileLineBreak;
 
-    internal static(CommentGroup[], LineGroup) CreateCommentGroups
-    (
-        this IEnumerable<WhiteSpaceItem> allItems
-        , SourcePosition anchor
-        , LineGroup.IConfiguration configuration
+    extension(IEnumerable<WhiteSpaceItem> allItems)
+    {
+        internal(CommentGroup[], LineGroup) CreateCommentGroups
+        (
+            SourcePosition anchor
+            , LineGroup.IConfiguration configuration
+        )
+        {
+            IItemType? predecessor = null;
+            var groups = SplitAndTail(allItems);
+
+            var commentGroups
+                = groups
+                    .Comments
+                    .Select(items => items.CreateCommentGroup(configuration, ref predecessor))
+                    .ToArray();
+
+            var linesAndSpaces
+                = groups
+                    .TailLines
+                    .CreateLinesAndSpaces(configuration, anchor, predecessor, true);
+
+            return (commentGroups, linesAndSpaces);
+        }
+    }
+
+    extension(
+        (((WhiteSpaceItem[] Head, WhiteSpaceItem? Main)[] Items, WhiteSpaceItem[] Tail) Lines, WhiteSpaceItem? Main)
+            items
     )
     {
-        IItemType? predecessor = null;
-        var groups = SplitAndTail(allItems);
+        CommentGroup CreateCommentGroup
+        (
+            LineGroup.IConfiguration configuration
+            , ref IItemType? predecessor
+        )
+        {
+            var head
+                = items
+                    .Lines
+                    .CreateLinesAndSpaces(configuration, items.Main!.SourcePart.Start, predecessor, false);
+            var commentGroup = new CommentGroup(head, items.Main);
+            predecessor = commentGroup.Comment.Type;
+            return commentGroup;
+        }
+    }
 
-        var commentGroups
-            = groups
-                .Comments
-                .Select(items => items.CreateCommentGroup(configuration, ref predecessor))
+    extension(((WhiteSpaceItem[] Head, WhiteSpaceItem? Main)[] Items, WhiteSpaceItem[] Tail) groups)
+    {
+        LineGroup CreateLinesAndSpaces
+        (
+            LineGroup.IConfiguration configuration
+            , SourcePosition anchor
+            , IItemType? predecessorCommentType
+            , bool isLast
+        )
+        {
+            var spaces = groups.Tail;
+            spaces.All(space => space.SourcePart.Length == 1).Assert();
+
+            var lineGroups = groups.Items
+                .Select(item => item.Main!.GetLineGroup(item.Head.Length))
                 .ToArray();
 
-        var linesAndSpaces
-            = groups
-                .TailLines
-                .CreateLinesAndSpaces(configuration, anchor, predecessor, true);
-
-        return (commentGroups, linesAndSpaces);
+            var sourcePart = (lineGroups.FirstOrDefault()?.Start ?? anchor - spaces.Length).Span(anchor);
+            return new(sourcePart, predecessorCommentType, lineGroups.Length, isLast, configuration);
+        }
     }
 
-    static CommentGroup CreateCommentGroup
-    (
-        this(((WhiteSpaceItem[] Head, WhiteSpaceItem? Main)[] Items, WhiteSpaceItem[] Tail) Lines, WhiteSpaceItem? Main)
-            items
-        , LineGroup.IConfiguration configuration
-        , ref IItemType? predecessor
-    )
+    extension(WhiteSpaceItem lineBreak)
     {
-        var head
-            = items
-                .Lines
-                .CreateLinesAndSpaces(configuration, items.Main!.SourcePart.Start, predecessor, false);
-        var commentGroup = new CommentGroup(head, items.Main);
-        predecessor = commentGroup.Comment.Type;
-        return commentGroup;
+        SourcePart GetLineGroup(int spaceCount)
+            => (lineBreak.SourcePart.Start - spaceCount)
+                .Span(lineBreak.SourcePart.End);
     }
-
-    static LineGroup CreateLinesAndSpaces
-    (
-        this((WhiteSpaceItem[] Head, WhiteSpaceItem? Main)[] Items, WhiteSpaceItem[] Tail) groups
-        , LineGroup.IConfiguration configuration
-        , SourcePosition anchor
-        , IItemType? predecessorCommentType
-        , bool isLast
-    )
-    {
-        var spaces = groups.Tail;
-        spaces.All(space => space.SourcePart.Length == 1).Assert();
-
-        var lineGroups = groups.Items
-            .Select(item => item.Main!.GetLineGroup(item.Head.Length))
-            .ToArray();
-
-        var sourcePart = (lineGroups.FirstOrDefault()?.Start ?? anchor - spaces.Length).Span(anchor);
-        return new(sourcePart, predecessorCommentType, lineGroups.Length, isLast, configuration);
-    }
-
-    static SourcePart GetLineGroup(this WhiteSpaceItem lineBreak, int spaceCount)
-        => (lineBreak.SourcePart.Start - spaceCount)
-            .Span(lineBreak.SourcePart.End);
 }

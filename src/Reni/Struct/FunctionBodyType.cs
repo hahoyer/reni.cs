@@ -17,9 +17,6 @@ sealed class FunctionBodyType
         , ISymbolProvider<DumpPrintToken>
         , ITemplateProvider
 {
-    [Node]
-    internal override CompoundView FindRecentCompoundView() => CompoundView;
-
     [EnableDump]
     [Node]
     internal readonly FunctionSyntax Syntax;
@@ -50,6 +47,17 @@ sealed class FunctionBodyType
     }
 
     TypeBase IConversion.Source => this;
+
+    int IConversion.Weight
+    {
+        get
+        {
+            NotImplementedMethod();
+            return default;
+        }
+    }
+
+
     IFunction IEvalImplementation.Function => this;
     IValue IEvalImplementation.Value => this;
 
@@ -69,6 +77,9 @@ sealed class FunctionBodyType
         return null!;
     }
 
+    [Node]
+    internal override CompoundView FindRecentCompoundView() => CompoundView;
+
     [DisableDump]
     internal override Root Root => FindRecentCompoundView().Root;
 
@@ -77,7 +88,7 @@ sealed class FunctionBodyType
     internal override IImplementation GetFunctionDeclarationForType() => this;
 
     [DisableDump]
-    protected override CodeBase DumpPrintCode => Syntax.FunctionKindDump.GetDumpPrintTextCode();
+    protected override CodeBase DumpPrintCode => Syntax.FunctionKindDump.DumpPrintTextCode;
 
     TypeBase GetTemplate()
     {
@@ -87,7 +98,7 @@ sealed class FunctionBodyType
 
     Result GetResult(Category category, TypeBase argumentsType)
     {
-        var trace = ObjectId == -49 && category.Replenished().HasClosures();
+        var trace = ObjectId == -49 && category.Replenished.HasClosures;
         StartMethodDump(trace, category, argumentsType);
         try
         {
@@ -99,7 +110,7 @@ sealed class FunctionBodyType
             BreakExecution();
 
             var result = functionType.ApplyResult(category);
-            (result.CompleteCategory .Contains(category)).Assert();
+            result.CompleteCategory.Contains(category).Assert();
 
             return ReturnMethodDump(result);
         }

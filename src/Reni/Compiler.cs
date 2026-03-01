@@ -100,8 +100,7 @@ public sealed class Compiler
             var code = CodeContainer?.Issues.ToArray() ?? [];
             //$"binaryTree: {binaryTree.Length}, syntax: {syntax.Length}, code: {code.Length}".Log(FilePositionTag.Debug);
             return T(binaryTree, syntax, code)
-                .ConcatMany()
-                .GroupIssues();
+                .ConcatMany().GroupIssues;
         }
     }
 
@@ -314,7 +313,7 @@ public sealed class Compiler
             item.Syntax.AssertIsNotNull(() => item.LogDump());
     }
 
-    CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data ?? "");
+    CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data?[0..] ?? "");
 
     static string ModuleNameFromFileName(string fileName)
         => "_" + Path.GetFileName(fileName).Symbolize();

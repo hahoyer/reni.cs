@@ -211,12 +211,12 @@ abstract class ContextBase
     [DebuggerHidden]
     Result GetResultForCache(Category category, ValueSyntax? syntax)
     {
-        var trace = syntax!.ObjectId.In() && ObjectId.In(7) && category.HasType();
+        var trace = syntax!.ObjectId.In() && ObjectId.In(7) && category.HasType;
         StartMethodDump(trace, category, syntax);
         try
         {
             BreakExecution();
-            var result = syntax.GetResultForCache(this, category.Replenished());
+            var result = syntax.GetResultForCache(this, category.Replenished);
             result.IsValidOrIssue(category).Assert();
             return ReturnMethodDump(result);
         }

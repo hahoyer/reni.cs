@@ -5,35 +5,55 @@ namespace Reni.Code;
 
 static class Extension
 {
-    internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) 
-        => x.Aggregate(CodeBase.Void, (code, result) => code + result);
-
-    internal static CodeBase GetCode(this IContextReference reference)
-        => new ReferenceCode(reference);
-
-    internal static CodeBase GetCode(this BitsConst t, Size size) => new BitArray(size, t);
-    internal static CodeBase GetCode(BitsConst t) => GetCode(t, t.Size);
-
-    internal static CodeBase GetDumpPrintTextCode(this string dumpPrintText)
-        => new DumpPrintText(dumpPrintText);
-
-    internal static FiberItem GetRecursiveCall(this Size refsSize)
-        => new RecursiveCallCandidate(refsSize);
-
-    internal static CodeBase GetCode(this IEnumerable<CodeBase> data)
+    extension(IEnumerable<CodeBase> x)
     {
-        var allData = data
-            .SelectMany(item => item.ToList())
-            .ToArray();
-
-        return List.Create(allData);
+        internal CodeBase ToSequence()
+            => x.Aggregate(CodeBase.Void, (code, result) => code + result);
     }
 
-    internal static Closures GetClosures(this CodeBase[] codeBases)
+    extension(IContextReference reference)
     {
-        var closures = codeBases.Select(code => code.Closures).ToArray();
-        return closures.Aggregate(Closures.GetVoid(), (r1, r2) => r1.Sequence(r2));
+        internal CodeBase Code => new ReferenceCode(reference);
     }
 
-    internal static CodeBase GetArgumentCode(this TypeBase type) => new Argument(type);
+    extension(IEnumerable<CodeBase> data)
+    {
+        internal CodeBase Code
+        {
+            get
+            {
+                var allData = data
+                    .SelectMany(item => item.ToList())
+                    .ToArray();
+
+                return List.Create(allData);
+            }
+        }
+
+        internal Closures Closures
+            => data
+                .Select(code => code.Closures)
+                .Aggregate(Closures.GetVoid(), (r1, r2) => r1.Sequence(r2));
+    }
+
+    extension(BitsConst t)
+    {
+        internal CodeBase Code => t.GetCode(t.Size);
+        internal CodeBase GetCode(Size size) => new BitArray(size, t);
+    }
+
+    extension(TypeBase type)
+    {
+        internal CodeBase ArgumentCode => new Argument(type);
+    }
+
+    extension(Size refsSize)
+    {
+        internal FiberItem RecursiveCall => new RecursiveCallCandidate(refsSize);
+    }
+
+    extension(string dumpPrintText)
+    {
+        internal CodeBase DumpPrintTextCode => new DumpPrintText(dumpPrintText);
+    }
 }

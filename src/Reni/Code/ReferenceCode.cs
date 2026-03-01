@@ -22,7 +22,7 @@ sealed class ReferenceCode : FiberHead
 
     protected override Closures GetClosures() => Closures.Create(Target);
 
-    protected override Size GetSize() => Target.Size();
+    protected override Size GetSize() => Target.Size;
 
     protected override TCode? VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
         where TCode : default
@@ -30,5 +30,5 @@ sealed class ReferenceCode : FiberHead
 
     internal override void Visit(IVisitor visitor) => throw new UnexpectedContextReference(Target);
 
-    public override string DumpData() => Target.NodeDump();
+    public override string DumpData() => Target.GetNodeDump();
 }

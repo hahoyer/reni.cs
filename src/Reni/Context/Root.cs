@@ -145,10 +145,10 @@ sealed class Root
 
             result.Type = result.Type.GetPair(elementResult.Type);
             
-            if(category.HasCode())
+            if(category.HasCode)
                 result.Code = result.Code + elementResult.Code;
 
-            if(category.HasClosures() || category.HasCode())
+            if(category.HasClosures || category.HasCode)
                 result.Closures = result.Closures.Sequence(elementResult.Closures);
 
             result.IsDirty = false;
@@ -161,14 +161,14 @@ sealed class Root
     internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
     {
         var result = VoidType.GetResult(category);
-        if(!(category.HasCode() || category.HasClosures()))
+        if(!(category.HasCode || category.HasClosures))
             return result;
 
         StartMethodDump(false, category, count, "elemResults");
         try
         {
-            if(category.HasCode())
-                result.Code = "(".GetDumpPrintTextCode();
+            if(category.HasCode)
+                result.Code = "(".DumpPrintTextCode;
 
             for(var i = 0; i < count; i++)
             {
@@ -180,14 +180,14 @@ sealed class Root
                 BreakExecution();
 
                 result.IsDirty = true;
-                if(category.HasCode())
+                if(category.HasCode)
                 {
                     if(i > 0)
-                        result.Code = result.Code + ", ".GetDumpPrintTextCode();
+                        result.Code = result.Code + ", ".DumpPrintTextCode;
                     result.Code = result.Code + elemResult.Code;
                 }
 
-                if(category.HasClosures())
+                if(category.HasClosures)
                     result.Closures = result.Closures.Sequence(elemResult.Closures);
                 result.IsDirty = false;
 
@@ -195,8 +195,8 @@ sealed class Root
                 BreakExecution();
             }
 
-            if(category.HasCode())
-                result.Code = result.Code + ")".GetDumpPrintTextCode();
+            if(category.HasCode)
+                result.Code = result.Code + ")".DumpPrintTextCode;
             return ReturnMethodDump(result);
         }
         finally

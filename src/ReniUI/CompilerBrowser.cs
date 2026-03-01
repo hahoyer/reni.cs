@@ -139,7 +139,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
 
 
     internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
-        => (formatter ?? new Formatting.Configuration().Create())
+        => (formatter ?? new Formatting.Configuration().Formatter)
             .GetEditPieces(this, targetPart)
             .Combine(Compiler.Source.All);
 
@@ -148,7 +148,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
 
     internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
-        => (formatter ?? new Formatting.Configuration().Create())
+        => (formatter ?? new Formatting.Configuration().Formatter)
             .GetEditPieces(this, sourcePart);
 
 
@@ -242,7 +242,7 @@ public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     }
 
     internal IEnumerable<Edit> GetEditsForFormatting(Formatting.Configuration options)
-        => options.Create()
+        => options.Formatter
             .GetEditPieces(this, Source.All);
 
     public Issue CreateIssue(Exception exception)

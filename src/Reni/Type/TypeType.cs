@@ -54,7 +54,7 @@ sealed class TypeType
 
     Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
     {
-        if(Category.Type.Replenished().Contains(category))
+        if(Category.Type.Replenished.Contains(category))
             return Value.GetResult(category | Category.Type);
         var constructorResult = Value
             .GetConstructorResult(category, getRightResult(Category.Type).Type);

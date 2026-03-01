@@ -104,7 +104,7 @@ sealed class NumberType
     Result GetZeroResult() => Root
         .BitType
         .Number(1)
-        .GetResult(Category.All, () => Code.Extension.GetCode(BitsConst.Convert(0)));
+        .GetResult(Category.All, () => BitsConst.Convert(0).Code);
 
     Result TextItemResult(Category category) => Parent
         .TextItem.Make.Pointer

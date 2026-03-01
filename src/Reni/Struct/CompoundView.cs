@@ -43,6 +43,8 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         }
 
         TypeBase IConversion.Source => Type.Make.Pointer;
+        int IConversion.Weight => 1;
+
     }
 
     static int NextObjectId;
@@ -100,7 +102,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
             try
             {
                 IsObtainCompoundSizeActive = true;
-                var result = Compound.Size(ViewPosition);
+                var result = Compound.GetSize(ViewPosition);
                 IsObtainCompoundSizeActive = false;
                 return result;
             }
@@ -271,7 +273,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     internal Result GetDumpPrintResultViaObject(Category category)
     {
         if(IsDumpPrintResultViaObjectActive)
-            return Root.VoidType.GetResult(category, () => "?".GetDumpPrintTextCode());
+            return Root.VoidType.GetResult(category, () => "?".DumpPrintTextCode);
 
         IsDumpPrintResultViaObjectActive = true;
         var result = Root.ConcatPrintResult
@@ -381,7 +383,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
     }
 
     CodeBase ObjectPointerViaContext()
-        => Compound.GetCode().GetReferenceWithOffset(CompoundViewSize! * -1);
+        => Compound.Code.GetReferenceWithOffset(CompoundViewSize! * -1);
 
     internal TypeBase ValueType(int position)
         => Compound
@@ -405,7 +407,7 @@ sealed class CompoundView : DumpableObject, ValueCache.IContainer
         => IsHollow
             ? CodeBase.Void
             : Type.Make.ForcedReference
-                .GetCode()
+                .Code
                 .GetReferenceWithOffset(CompoundViewSize!);
 
     Result CreateElement(Category category, int index, TypeBase elementType)

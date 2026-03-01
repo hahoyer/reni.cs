@@ -115,7 +115,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
             return;
 
         (index == Data.Count || Data[index.Value].Order > newItem.Order)
-            .Assert(() => $"{Data[index.Value].NodeDump()}=={newItem.NodeDump()}:{Data[index.Value].Order}");
+            .Assert(() => $"{Data[index.Value].GetNodeDump()}=={newItem.GetNodeDump()}:{Data[index.Value].Order}");
         Data.Insert(index.Value, newItem);
     }
 
@@ -131,7 +131,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
     {
         var result = new SizeArray();
         for(var i = 0; i < Count; i++)
-            result.Add(Data[i].Size());
+            result.Add(Data[i].Size);
         return result;
     }
 
@@ -197,7 +197,7 @@ sealed class Closures : DumpableObject, IEquatable<Closures?>
 
     internal CodeBase GetCode()
         => Data
-            .Aggregate(CodeBase.Void, (current, t) => current + t.GetCode());
+            .Aggregate(CodeBase.Void, (current, t) => current + t.Code);
 
     internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase closureBase)
     {
