@@ -3,11 +3,12 @@
         Condition=" $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != '' "
         Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
     <PropertyGroup>
-        <Copyright>Copyright Harald Hoyer © 2024</Copyright>
+        <Copyright>Copyright Harald Hoyer © 2026</Copyright>
         <Authors>Harald Hoyer</Authors>
         <LangVersion>preview</LangVersion>
         <Features>strict</Features>
         <AnalysisMode>None</AnalysisMode>
+        <AnalysisLevel>none</AnalysisLevel>
         <EnableNETAnalyzers>false</EnableNETAnalyzers>
         <ImplicitUsings>enable</ImplicitUsings>
         <ProductDir>$(MSBuildThisFileDirectory)</ProductDir>
@@ -19,11 +20,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Prefer32Bit>false</Prefer32Bit>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <NoWarn>649;660;661;1717</NoWarn>
+        <NoWarn>$(NoWarn);649;660;661;1717;NU5128;CS8620;NU1603</NoWarn>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -36,7 +37,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DebugSymbols>true</DebugSymbols>
+        <DebugSymbols>true</DebugSymbols> 
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -48,6 +49,9 @@
         <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+    </ItemGroup>
 
     <ItemGroup>
         <Using Include="hw.DebugFormatter" />
