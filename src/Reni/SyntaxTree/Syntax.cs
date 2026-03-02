@@ -4,6 +4,7 @@ using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree;
@@ -60,6 +61,9 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 
     public BinaryTree? LeftMostAnchor
     {
+        // It is not recursive. 
+        // Resharper ignores ?.-Operator
+        // ReSharper disable once FunctionRecursiveOnAllPaths
         get
         {
             var main = Anchor.Items.FirstOrDefault();
@@ -74,6 +78,9 @@ abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, II
 
     public BinaryTree? RightMostAnchor
     {
+        // It is not recursive. 
+        // Resharper ignores ?.-Operator
+        // ReSharper disable once FunctionRecursiveOnAllPaths
         get
         {
             var main = Anchor.Items.LastOrDefault();

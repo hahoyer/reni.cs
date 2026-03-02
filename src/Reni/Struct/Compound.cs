@@ -83,7 +83,7 @@ sealed class Compound
     internal Size GetSize(int? position = null)
     {
         if(IsHollow(position))
-            return Basics.Size.Zero;
+            return Size.Zero;
         return ResultsOfStatements(Category.Size, 0, position).Size;
     }
 

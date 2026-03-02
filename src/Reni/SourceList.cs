@@ -38,7 +38,7 @@ sealed class SourceList
         throw new ArgumentOutOfRangeException(nameof(position));
     }
 
-    ITextProvider? ISourceProvider.Data => this;
+    ITextProvider ISourceProvider.Data => this;
     string? ISourceProvider.Identifier => null;
     bool ISourceProvider.IsPersistent => Target.Any(t => t.IsPersistent);
     int ISourceProvider.Length => Target.Sum(t => t.Length);

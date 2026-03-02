@@ -58,7 +58,7 @@ sealed class BiasCache
 
         if(Data.Count > 0)
         {
-            var minDistanceIndex = Data.Select(d => Distance(d, value)).MinIndexList().First();
+            var minDistanceIndex = Data.Select(d => Distance(d, value)).GetMinIndexList().First();
             if(Distance(Data[minDistanceIndex], value) <= MaxDistance)
                 return
                     (minDistanceIndex, value - new BigInteger(Data[minDistanceIndex]));
